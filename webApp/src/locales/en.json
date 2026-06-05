@@ -1,0 +1,25 @@
+{
+  "ribbon": {
+    "tabs": {
+      "file": "File",
+      "home": "Home",
+      "insert": "Insert",
+      "arrange": "Arrange",
+      "view": "View",
+      "help": "Help"
+    }
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "close": "Close",
+    "apply": "Apply",
+    "loading": "Loading"
+  },
+  "locale": {
+    "ja": "日本語",
+    "en": "English"
+  }
+}

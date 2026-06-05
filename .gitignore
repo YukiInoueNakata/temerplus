@@ -1,0 +1,71 @@
+# Excel一時ファイル
+~$*.xlsm
+~$*.xlsx
+*.tmp
+
+# Windows
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# バックアップ
+*.bak
+
+# 旧版フォルダは除外
+旧版/
+
+# 関連ドキュメント（Git管理対象外）
+*.pdf
+*.pptx
+2024TEA学会シンポ/
+
+# Excelファイル本体（VBA_Backupで管理）
+*.xlsm
+最新版/
+TEMerPlus/
+.claude/
+.tmp/
+
+# 旧版プロジェクト資産（Web版開発では参照のみ）
+old_file/**/*.xlsm
+old_file/**/*.pptx
+old_file/**/*.pdf
+old_file/2024TEA学会シンポ/
+
+# 作業用一時ファイル（非公開）
+.playwright-mcp/
+*.docx
+
+# Node / Web開発
+node_modules/
+webApp/node_modules/
+webApp/dist/
+webApp/*.tsbuildinfo
+*.log
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+
+# CSV データ（個人情報を含む可能性）
+中田_2024_TEMシンポ*.csv
+
+# Markdown ドキュメント（非公開: 公開リポジトリには一切含めない）
+*.md
+**/*.md
+# 公開用の最小 README のみ追跡対象に戻す
+!/README.md
+# LICENSE はテキストファイルなので影響なし
+
+# docs/（調査資料・文献PDF・画像・マニュアルすべてローカル保持・非公開）
+docs/*
+
+# Web アプリからの出力ファイル（ルート直下 / webApp 直下）
+/*.png
+/*.svg
+/*.tem
+webApp/*.png
+webApp/*.svg
+webApp/*.tem
+LICENSE

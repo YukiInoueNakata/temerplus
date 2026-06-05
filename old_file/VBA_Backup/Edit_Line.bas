@@ -1,0 +1,379 @@
+Attribute VB_Name = "Edit_Line"
+Option Explicit
+
+Sub オブジェクト選択モード()
+    With Application.CommandBars.FindControl(id:=182)
+        If .State = msoButtonUp Then .Execute
+    End With
+End Sub
+
+
+
+Private Sub test_Make_line_Click()
+    Dim Line_Type As Integer
+    
+    
+    Dim Start_Margin As Integer
+    Dim End_Margin As Integer
+    
+    Dim adj_Item_Height As Integer
+    
+    Dim Add_data  As Boolean
+    
+    Line_Type = 1
+    'Line_Type = 2
+    
+    Start_Margin = 3
+    End_Margin = 3
+    adj_Item_Height = -80
+        
+    Add_data = True
+        
+    Call Arrow_Connect_box(Line_Type, Add_data, Start_Margin, End_Margin, adj_Item_Height)
+        
+
+    
+End Sub
+
+'@description("shp_IDにもとづいて図形の作成")
+Sub Make_Line_by_ID(shp_ID As String)
+   
+    Dim Line_Type As Integer
+    Dim Start_Margin As Integer
+    Dim End_Margin As Integer
+    Dim Adj_Start_Height As Integer
+    Dim Adj_End_Height As Integer
+    
+    Dim From_shp_Name As String
+    Dim To_shp_Name As String
+    
+    Dim From_shp As shape
+    Dim To_shp As shape
+    
+    Dim wsData As Worksheet
+    Set wsData = ThisWorkbook.Sheets("Data")
+    
+    Dim EndX
+    Dim EndY
+    Dim StartX
+    Dim StartY
+    
+    
+    'shp_IDからデータを取得
+    If Datash_GetValueOfSearchValue(shp_ID, "Type") = "実線矢印" Then
+        Line_Type = 1
+    ElseIf Datash_GetValueOfSearchValue(shp_ID, "Type") = "点線矢印" Then
+        Line_Type = 2
+    End If
+    
+    Start_Margin = Datash_GetValueOfSearchValue(shp_ID, "Start_Margin")
+    End_Margin = Datash_GetValueOfSearchValue(shp_ID, "End_Margin")
+    Adj_Start_Height = Datash_GetValueOfSearchValue(shp_ID, "Adj_Start_Height")
+    Adj_End_Height = Datash_GetValueOfSearchValue(shp_ID, "Adj_End_Height")
+    
+    From_shp_Name = Datash_GetValueOfSearchValue(shp_ID, "From_shp_Name")
+    To_shp_Name = Datash_GetValueOfSearchValue(shp_ID, "To_shp_Name")
+    
+    
+    Set From_shp = GetShapeByID(From_shp_Name)
+    Set To_shp = GetShapeByID(To_shp_Name)
+    
+    '矢印の始端位置
+    StartX = CalculateCoordinates("Start", From_shp, Start_Margin, Adj_Start_Height)(0)
+    StartY = CalculateCoordinates("Start", From_shp, Start_Margin, Adj_Start_Height)(1)
+        
+    '矢印の終端位置
+    EndX = CalculateCoordinates("End", To_shp, End_Margin, Adj_End_Height)(0)
+    EndY = CalculateCoordinates("End", To_shp, End_Margin, Adj_End_Height)(1)
+    
+
+    
+    ' 図形の作成
+    Call CreateAndConfigureConnector( _
+         wsData, _
+         StartX, _
+         StartY, _
+         EndX, _
+         EndY, _
+         Line_Type, _
+         From_shp_Name, _
+         To_shp_Name, _
+         False, _
+         Start_Margin, _
+         End_Margin, _
+         Adj_Start_Height, _
+         Adj_End_Height)
+        
+End Sub
+
+'@description("選択した順に矢印を引く関数")
+Sub Arrow_Connect_box( _
+    Line_Type As Integer, _
+    Add_data As Boolean, _
+    Start_Margin As Integer, _
+    End_Margin As Integer, _
+    Adj_Start_Height As Integer, _
+    Adj_End_Height As Integer)
+
+    Dim wsData As Worksheet
+    Set wsData = ThisWorkbook.Sheets("Data")
+    
+    Dim shp As shape
+    
+    'Todo 下記の部分，nameとStarXとかを計算して，次の関数に入れているけど，From_shp as shapeとTo_shape as shapeとしてやれば，もう少し，引数少なくなる
+    
+    Dim Box_num
+    Dim index_num
+    
+    Dim EndX
+    Dim EndY
+    Dim StartX
+    Dim StartY
+    
+    Dim ShpID As String
+    Dim To_shp_Name As String
+    Dim From_shp_Name As String
+    
+    Dim last_Row
+    
+    With ActiveWorkbook.ActiveSheet
+     
+        '        On Error GoTo ERR1
+        '選択されている図形が1以上か確認
+        If get_count_selected_shape() < 2 Then
+            MsgBox "ボックス図形を2つ以上選択してください"
+            Exit Sub
+        End If
+       
+       
+        Box_num = Selection.ShapeRange.count     'まず選択中のシェイプを選択した順に取得（何もしなくても選択順になる）
+        
+        Debug.Print Box_num
+         
+        'コネクタを作っていく開始
+        For index_num = 1 To Box_num             '選択順 = インデックス番号
+            Set shp = Selection.ShapeRange(index_num)
+            Debug.Print shp.Name
+            
+            To_shp_Name = shp.Name
+                        
+            '矢印の終端位置
+            EndX = CalculateCoordinates("End", shp, End_Margin, Adj_End_Height)(0)
+            EndY = CalculateCoordinates("End", shp, End_Margin, Adj_End_Height)(1)
+            
+            
+            If index_num > 1 Then
+       
+                'コネクタを作る
+                Call CreateAndConfigureConnector( _
+                     wsData, _
+                     StartX, _
+                     StartY, _
+                     EndX, _
+                     EndY, _
+                     Line_Type, _
+                     From_shp_Name, _
+                     To_shp_Name, _
+                     Add_data, _
+                     Start_Margin, _
+                     End_Margin, _
+                     Adj_Start_Height, _
+                     Adj_End_Height)
+                              
+            End If
+            
+            '矢印の始端位置
+            StartX = CalculateCoordinates("Start", shp, Start_Margin, Adj_Start_Height)(0)
+            StartY = CalculateCoordinates("Start", shp, Start_Margin, Adj_Start_Height)(1)
+            
+            From_shp_Name = To_shp_Name
+            
+        Next
+        
+
+        ActiveSheet.Range("A1").Select           ' 選択されている図形の選択を解除
+     
+    End With                                     'activeworkbook,activesheet
+     
+    Exit Sub
+     
+    'ERR1:
+    '    MsgBox "２つ以上のオートシェイプを選択してください。"
+
+End Sub
+
+'@description("矢印の作成と必要に応じて，データをデータシートに入力")
+Private Sub CreateAndConfigureConnector( _
+        ByVal ws As Worksheet, _
+        ByVal StartX As Single, _
+        ByVal StartY As Single, _
+        ByVal EndX As Single, _
+        ByVal EndY As Single, _
+        ByVal Line_Type As Integer, _
+        ByVal From_shp_Name As String, _
+        ByVal To_shp_Name As String, _
+        ByVal Add_data As Boolean, _
+        ByVal Start_Margin As Integer, _
+        ByVal End_Margin As Integer, _
+        ByVal Adj_Start_Height As Integer, _
+        ByVal Adj_End_Height As Integer)
+    
+    
+    Dim newConnector As shape
+    Set newConnector = ActiveWorkbook.ActiveSheet.Shapes.AddConnector(msoConnectorStraight, StartX, StartY, EndX, EndY)
+    
+    'コネクタの色や太さを変更
+    With newConnector.Line
+        .EndArrowheadStyle = msoArrowheadOpen
+        .Visible = msoTrue
+        .Weight = 3
+        .ForeColor.RGB = RGB(0, 0, 0)
+        
+        ' LINE_type = 2 は点線
+        If Line_Type = 2 Then
+            .DashStyle = msoLineSysDot
+        End If
+    End With
+    
+    Dim shp_Type As String
+    If Line_Type = 2 Then
+    shp_Type = "XLine"
+    Else
+    shp_Type = "RLine"
+    End If
+    
+   
+    
+    Dim ShpID As String
+    ShpID = shp_Type + "_" + From_shp_Name + "_" + To_shp_Name + "_" + CStr(GetNextAvailableRow(ExtractRowsWithSubstring(shp_Type)))
+    newConnector.Name = ShpID
+    
+    ' 'Add_data = TrueならDataシートに入力
+    If Add_data Then
+        Call AddLineDataToWorksheet(ws, ShpID, Line_Type, From_shp_Name, To_shp_Name, Start_Margin, End_Margin, Adj_Start_Height, Adj_End_Height)
+    End If
+    
+End Sub
+'@description("指定された引数に基づいてStartXとStartYまたはEndXとEndYの座標を計算し、それらを返します。引数としてEndかStartの指示、対象の図形(shp)、マージン(Margin)、高さ(Height)を取ります。coordinates(0)がX軸，coordinates(1)がY軸")
+Function CalculateCoordinates(ByVal position As String, ByVal shp As shape, _
+            ByVal Margin As Double, ByVal adj_Height As Double) As Variant
+    Dim coordinates(1) As Double ' 座標を格納する配列
+    Dim isVertical As Boolean
+    
+    isVertical = is_type_vertical_or_horizontal() = "Vertical" ' 方向の判断
+    
+    Debug.Print shp.Name
+    
+    If position = "End" Then
+        If isVertical Then
+            coordinates(0) = shp.Left + shp.Width / 2 - adj_Height ' EndX
+            coordinates(1) = shp.Top - Margin ' EndY
+        Else
+            coordinates(0) = shp.Left - Margin ' EndX
+            coordinates(1) = shp.Top + shp.Height / 2 - adj_Height ' EndY
+        End If
+    ElseIf position = "Start" Then
+        If isVertical Then
+            coordinates(0) = shp.Left + shp.Width / 2 - adj_Height ' StartX
+            coordinates(1) = shp.Top + shp.Height + Margin ' StartY
+        Else
+            coordinates(0) = shp.Left + shp.Width + Margin ' StartX
+            coordinates(1) = shp.Top + shp.Height / 2 - adj_Height ' StartY
+        End If
+    Else
+        Err.Raise Number:=vbObjectError + 513, Description:="Invalid position argument"
+    End If
+    
+    CalculateCoordinates = coordinates
+End Function
+
+
+
+Private Sub AddLineDataToWorksheet( _
+        wsData As Worksheet, _
+        ShpID As String, _
+        Line_Type As Integer, _
+        From_shp_Name As String, _
+        To_shp_Name As String, _
+        Start_Margin As Integer, _
+        End_Margin As Integer, _
+        Adj_Start_Height As Integer, _
+        Adj_End_Height As Integer)
+    
+    
+    Dim last_Row As Long
+    last_Row = wsData.Cells(wsData.Rows.count, 1).End(xlUp).row
+    wsData.Cells(last_Row + 1, 1).value = ShpID  'この部分はそのままで
+
+    If Line_Type = 2 Then
+        GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "Type", ShpID).value = "点線矢印"
+    Else
+        GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "Type", ShpID).value = "実線矢印"
+    End If
+
+    GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "From_shp_Name", ShpID).value = From_shp_Name
+    GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "To_shp_Name", ShpID).value = To_shp_Name
+    GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "Start_Margin", ShpID).value = Start_Margin
+    GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "End_Margin", ShpID).value = End_Margin
+    GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "Adj_Start_Height", ShpID).value = Adj_Start_Height
+    GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "Adj_End_Height", ShpID).value = Adj_End_Height
+End Sub
+
+
+
+'=============================================================================
+' 最適化版 - clsShapeDataを使用してデータアクセスを削減
+'=============================================================================
+
+'@description("shp_IDについての矢印の作成 - 最適化版")
+Sub Make_Line_by_ID_Optimized(shp_ID As String)
+    Dim shapeData As New clsShapeData
+    Dim Line_Type As Integer
+    Dim From_shp As shape
+    Dim To_shp As shape
+    Dim wsData As Worksheet
+    Dim EndX As Double, EndY As Double
+    Dim StartX As Double, StartY As Double
+    
+    Set wsData = ThisWorkbook.Sheets("Data")
+    
+    ' clsShapeDataで1回のLoadで全プロパティを取得（6回→1回に削減）
+    shapeData.Load shp_ID
+    If Not shapeData.IsLoaded Then Exit Sub
+    
+    ' Line_Typeの判定
+    If shapeData.shapeType = "実線矢印" Then
+        Line_Type = 1
+    ElseIf shapeData.shapeType = "点線矢印" Then
+        Line_Type = 2
+    End If
+    
+    ' キャッシュされたデータを使用
+    Set From_shp = GetShapeByID(shapeData.FromShpName)
+    Set To_shp = GetShapeByID(shapeData.ToShpName)
+    
+    ' 矢印の始点座標
+    StartX = CalculateCoordinates("Start", From_shp, shapeData.StartMargin, shapeData.AdjStartHeight)(0)
+    StartY = CalculateCoordinates("Start", From_shp, shapeData.StartMargin, shapeData.AdjStartHeight)(1)
+    
+    ' 矢印の終点座標
+    EndX = CalculateCoordinates("End", To_shp, shapeData.EndMargin, shapeData.AdjEndHeight)(0)
+    EndY = CalculateCoordinates("End", To_shp, shapeData.EndMargin, shapeData.AdjEndHeight)(1)
+    
+    ' 矢印の作成
+    Call CreateAndConfigureConnector( _
+        wsData, _
+        StartX, _
+        StartY, _
+        EndX, _
+        EndY, _
+        Line_Type, _
+        shapeData.FromShpName, _
+        shapeData.ToShpName, _
+        False, _
+        CInt(shapeData.StartMargin), _
+        CInt(shapeData.EndMargin), _
+        CInt(shapeData.AdjStartHeight), _
+        CInt(shapeData.AdjEndHeight))
+End Sub
+

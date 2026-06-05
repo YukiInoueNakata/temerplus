@@ -1,0 +1,342 @@
+Attribute VB_Name = "Module_Make_Box"
+Option Explicit
+'Make Sheet for plot
+'プロットを行う新しいシートを作成
+Sub Make_Newsheets()
+    Sheets.Add After:=ActiveSheet
+    ActiveWindow.View = xlPageLayoutView
+    Cells.Select
+    Selection.ColumnWidth = 3.88
+    Selection.RowHeight = 28.25
+
+End Sub
+
+'@description("DataシートからTEM図の作成")
+Sub Main_making_TEM_Fig_from_data()
+    Dim wsData As Worksheet
+    Dim wsFig As Worksheet
+    Dim dict As Object
+    Dim shp_ID As String
+    Dim shp_Type As String
+    
+    Dim lastRow As Long
+    Dim cell As Range
+
+    Set wsData = ThisWorkbook.Sheets("Data")
+    Set wsFig = ThisWorkbook.Sheets("MakeFig")
+    
+    
+    Set dict = dic_fig_type("ALL", 3)
+    PrintDictionaryContents dict
+        
+    '入力シートのIDがふられてないものチェック
+    Call ID_Named
+    
+    ' A列で最後の記入されているセルを見つける
+    lastRow = wsData.Cells(wsData.Rows.count, "A").End(xlUp).row
+
+    ' A2セルから最後のセルまで繰り返しでボックス作成
+    For Each cell In wsData.Range("A2:A" & lastRow)
+        shp_ID = cell.value
+        shp_Type = Datash_GetValueOfSearchValue(shp_ID, "Type")
+        'debug.print "shp_ID"; shp_ID; "shp_Type"; shp_Type
+        'debug.print dict(shp_Type)
+        ' ディクショナリの対応する値が "Box" であるか確認
+        If dict.Exists(shp_Type) Then
+            If dict(shp_Type) = "Box" Then
+                Call Make_Box(shp_ID)
+            End If
+        End If
+    Next cell
+    
+    ' A2セルから最後のセルまで繰り返しでLine作成
+    For Each cell In wsData.Range("A2:A" & lastRow)
+        shp_ID = cell.value
+        shp_Type = Datash_GetValueOfSearchValue(shp_ID, "Type")
+        'debug.print "shp_ID"; shp_ID; "shp_Type"; shp_Type
+        'debug.print dict(shp_Type)
+        ' ディクショナリの対応する値が "Box" であるか確認
+        If dict.Exists(shp_Type) Then
+            If dict(shp_Type) = "Line" Then
+                Call Make_Line_by_ID(shp_ID)
+            End If
+        End If
+    Next cell
+    
+    ' A2セルから最後のセルまで繰り返しでSDSG作成
+    For Each cell In wsData.Range("A2:A" & lastRow)
+        shp_ID = cell.value
+        shp_Type = Datash_GetValueOfSearchValue(shp_ID, "Type")
+        'debug.print "shp_ID"; shp_ID; "shp_Type"; shp_Type
+        'debug.print dict(shp_Type)
+        ' ディクショナリの対応する値が "Box" であるか確認
+        If dict.Exists(shp_Type) Then
+            If dict(shp_Type) = "SDSG" Then
+                Call MakeArrowCalloutByID(shp_ID)
+            End If
+        End If
+    Next cell
+    
+End Sub
+
+'@description("shp_IDにもとづいて図形の作成")
+Sub Make_Box(shp_ID As String)
+   
+    Dim shp As shape
+    
+    Dim rectWidth As Double, rectHeight As Double
+    Dim newLeftPos As Double, newTopPos As Double
+    
+    Call CalculateBoxPosition(shp_ID, rectWidth, rectHeight, newLeftPos, newTopPos)
+    
+    
+    ' 図形の作成
+    
+    Set shp = ActiveSheet.Shapes.AddShape(msoShapeRectangle, newLeftPos, newTopPos, rectWidth, rectHeight)
+    
+    ' shpにスタイルを適用
+    ApplyShapeStyle shp, shp_ID
+    
+
+
+End Sub
+
+'@description("Box図形の位置を算出する")
+Sub CalculateBoxPosition(ByVal shp_ID As String, _
+                         ByRef rectWidth, ByRef rectHeight, _
+                         ByRef newLeftPos, ByRef newTopPos)
+    
+    
+    Dim leftPos As Double, topPos As Double
+    
+    '初期位置の算出
+    Call Start_setting(shp_ID, leftPos, topPos, rectWidth, rectHeight)
+    
+    ' 位置の設定値を取得
+    Dim Box_Item_Level As Variant
+    Dim Box_Time_Level As Variant
+    
+    Box_Item_Level = Datash_GetValueOfSearchValue(shp_ID, "Item_Level")
+    Box_Time_Level = Datash_GetValueOfSearchValue(shp_ID, "Time_Level")
+    
+    ' 縦型か横型かに基づいて、新しい位置を計算
+    If is_type_vertical_or_horizontal = "Vertical" Then
+        newLeftPos = leftPos - rectWidth / 2 + Func_vertical_level_size * Box_Item_Level
+'        newTopPos = topPos + (rectHeight + Func_time_level_size) * Box_Time_Level
+       newTopPos = topPos + (Func_time_level_size * Box_Time_Level)
+    ElseIf is_type_vertical_or_horizontal = "Horizontal" Then
+'        newLeftPos = leftPos + (rectWidth + Func_time_level_size) * Box_Time_Level
+        newLeftPos = leftPos + Func_time_level_size * Box_Time_Level
+        newTopPos = topPos - rectHeight / 2 - Func_vertical_level_size * Box_Item_Level
+    End If
+End Sub
+
+Sub Start_setting(ByVal shp_ID, ByRef leftPos, ByRef topPos, ByRef rectWidth, ByRef rectHeight)
+    '縦型(Vertical)か横型(Horizontal)かにもとづいて，開始位置とテキストボックスの縦横サイズの決定
+    
+    leftPos = Cells(GetValueOfSearchValue("drawing_fig_start_standard_row_num", GetDimensionValue), _
+                    GetValueOfSearchValue("drawing_fig_start_standard_col_num", GetDimensionValue)).Left ' 図形の開始位置（左）
+    
+    topPos = Cells(GetValueOfSearchValue("drawing_fig_start_standard_row_num", GetDimensionValue), _
+                   GetValueOfSearchValue("drawing_fig_start_standard_col_num", GetDimensionValue)).Top ' 図形の開始位置（上）
+    
+    If Datash_GetValueOfSearchValue(shp_ID, "Width") = "" Then
+        rectWidth = GetValueOfSearchValue("ItemBox_Width", GetDimensionValue)
+        GetWriteCellFromValue_typeAndshp_IDorItem(ThisWorkbook.Sheets("Data"), "Width", shp_ID).value = rectWidth
+    Else
+        rectWidth = Datash_GetValueOfSearchValue(shp_ID, "Width")
+    End If
+        
+    If Datash_GetValueOfSearchValue(shp_ID, "Height") = "" Then
+        rectHeight = GetValueOfSearchValue("ItemBox_Height", GetDimensionValue)
+        GetWriteCellFromValue_typeAndshp_IDorItem(ThisWorkbook.Sheets("Data"), "Height", shp_ID).value = rectHeight
+    Else
+        rectHeight = Datash_GetValueOfSearchValue(shp_ID, "Height")
+    End If
+    
+End Sub
+
+Public Sub ApplyShapeStyle(ByRef shp As shape, ByVal shp_ID As String)
+    With shp
+        ' shp_ID付与
+        .Name = shp_ID
+    
+        ' 文字書式関係
+        
+        'テキストの文字
+        If Datash_GetValueOfSearchValue(shp_ID, "Text") = "" Then
+            .TextFrame2.TextRange.Text = Datash_GetValueOfSearchValue(shp_ID, "Text")
+            GetWriteCellFromValue_typeAndshp_IDorItem(ThisWorkbook.Sheets("Data"), "Text", shp_ID).value = _
+                                                                                                         Datash_GetValueOfSearchValue(shp_ID, "Text")
+        Else
+            .TextFrame2.TextRange.Text = Datash_GetValueOfSearchValue(shp_ID, "Text")
+        End If
+        
+        ' フォント設定
+        With .TextFrame2.TextRange.Font
+            'フォント
+            If Datash_GetValueOfSearchValue(shp_ID, "Font") = "" Then
+                .NameComplexScript = GetValueOfSearchValue("ItemBox_text_Font", "Value")
+                .NameFarEast = GetValueOfSearchValue("ItemBox_text_Font", "Value")
+                .Name = GetValueOfSearchValue("ItemBox_text_Font", "Value")
+                GetWriteCellFromValue_typeAndshp_IDorItem(ThisWorkbook.Sheets("Data"), "Font", shp_ID).value = _
+                                                                                                             GetValueOfSearchValue("ItemBox_text_Font", "Value")
+            Else
+                .NameComplexScript = Datash_GetValueOfSearchValue(shp_ID, "Font")
+                .NameFarEast = Datash_GetValueOfSearchValue(shp_ID, "Font")
+                .Name = Datash_GetValueOfSearchValue(shp_ID, "Font")
+            End If
+            
+            'フォントサイズ
+            If Datash_GetValueOfSearchValue(shp_ID, "Fontsize") = "" Then
+                .Size = GetValueOfSearchValue("ItemBox_text_Size", "Value")
+                GetWriteCellFromValue_typeAndshp_IDorItem(ThisWorkbook.Sheets("Data"), "Fontsize", shp_ID).value = _
+                                                                                                                 GetValueOfSearchValue("ItemBox_text_Size", "Value")
+            Else
+                .Size = Datash_GetValueOfSearchValue(shp_ID, "Fontsize")
+            End If
+                
+                
+            .BaselineOffset = 0
+            .Spacing = -3
+        End With
+        
+        ' テキストの行間設定
+        With .TextFrame2.TextRange.ParagraphFormat
+            .LineRuleWithin = msoFalse
+            .SpaceWithin = Datash_GetValueOfSearchValue(shp_ID, "Fontsize") ' 行間の値をフォントサイズに設定
+        End With
+        
+        ' 文字色とボックスの色設定
+        .TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(0, 0, 0)
+        .Fill.ForeColor.RGB = RGB(255, 255, 255)
+        .Line.ForeColor.RGB = RGB(0, 0, 0)
+                    
+        ' テキストの配置設定
+        .TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+        
+        'ボックスの線の様式変更
+        Dim BoxType
+        BoxType = Datash_GetValueOfSearchValue(shp_ID, "Type")
+        Call ApplyLineStyles(shp, BoxType)
+        
+        ' シェイプの方向が横型なら縦書きにする
+        If is_type_vertical_or_horizontal = "Horizontal" Then
+            shp.TextFrame.Orientation = msoTextOrientationHorizontalRotatedFarEast '縦書きにする
+            shp.TextFrame.HorizontalOverflow = xlOartHorizontalOverflowOverflow '縦書きでテキストを図形からはみ出して表示
+            shp.TextFrame2.VerticalAnchor = msoAnchorMiddle
+        End If
+    End With
+End Sub
+
+'@description("ボックスの線の様式変更")
+Public Sub ApplyLineStyles(ByRef shp As shape, ByVal BoxType As String)
+    With shp.Line
+        Select Case BoxType
+        Case "分岐点(BFP)", "EFP", "P-EFP", "必須通過点(OPP)"
+            .Weight = 3
+            If BoxType = "必須通過点(OPP)" Then
+                .Style = msoLineThinThin
+            ElseIf BoxType = "P-EFP" Then
+                .DashStyle = msoLineDash
+            End If
+        Case "実際には生じてない事柄"
+            .Weight = 1
+            .DashStyle = msoLineDash
+        Case Else
+            .Weight = 1
+        End Select
+    End With
+End Sub
+
+'@Folder("TEST")
+'@description("Make_Box()のテスト")
+Sub test_Make_Box()
+    shp_ID = "Item1"
+    Call Make_Box(shp_ID)
+
+End Sub
+
+'@description("Datash_GetValueOfSearchValue()のテスト")
+Sub test_Datash_GetValueOfSearchValue()
+    Dim shp_ID As String
+    shp_ID = "Item1"
+    'debug.print Datash_GetValueOfSearchValue(shp_ID, "Text")
+End Sub
+
+'@description("dictionaryの中身を見る")
+Sub PrintDictionaryContents(ByVal dict As Object)
+    Dim key As Variant
+    
+    ' ディクショナリの各キーについてループ
+    For Each key In dict.Keys
+        ' キーとそれに対応する値をデバッグウィンドウに出力
+        'debug.print "Key: " & key & "; Value: " & dict(key)
+    Next key
+End Sub
+
+
+
+'=============================================================================
+' 最適化版: clsFigureFactoryを使用したTEM図生成
+'=============================================================================
+'@description("最適化版: DataシートからTEM図を生成 - 1ループで全図形作成")
+Sub Main_making_TEM_Fig_Optimized()
+    Dim factory As clsFigureFactory
+    
+    ' IDの自動付与
+    Call ID_Named
+    
+    ' Factoryで一括生成（内部でBox→Line→SDSGの順に処理）
+    Set factory = New clsFigureFactory
+    factory.CreateAll
+End Sub
+
+
+'@description("最適化版: clsShapeDataを使用したBox作成")
+Sub Make_Box_Optimized(shp_ID As String)
+    Dim shp As shape
+    Dim data As clsShapeData
+    Dim cfg As clsSettings
+    Dim rectWidth As Double, rectHeight As Double
+    Dim newLeftPos As Double, newTopPos As Double
+    Dim leftPos As Double, topPos As Double
+    
+    ' データを一括読み込み
+    Set data = New clsShapeData
+    data.Load shp_ID
+    If Not data.IsLoaded Then Exit Sub
+    
+    ' 設定を取得
+    Set cfg = New clsSettings
+    cfg.Initialize
+    
+    ' サイズ取得
+    If data.Width = 0 Then
+        rectWidth = cfg.ItemBoxWidth
+    Else
+        rectWidth = data.Width
+    End If
+    If data.Height = 0 Then
+        rectHeight = cfg.ItemBoxHeight
+    Else
+        rectHeight = data.Height
+    End If
+    
+    ' 位置計算
+    Call Start_setting(shp_ID, leftPos, topPos, rectWidth, rectHeight)
+    
+    If cfg.IsVerticalLayout Then
+        newLeftPos = leftPos - rectWidth / 2 + cfg.VerticalLevelSize * data.ItemLevel
+        newTopPos = topPos + cfg.TimeLevelSize * data.TimeLevel
+    Else
+        newLeftPos = leftPos + cfg.TimeLevelSize * data.TimeLevel
+        newTopPos = topPos - rectHeight / 2 - cfg.VerticalLevelSize * data.ItemLevel
+    End If
+    
+    ' 図形作成
+    Set shp = ActiveSheet.Shapes.AddShape(msoShapeRectangle, newLeftPos, newTopPos, rectWidth, rectHeight)
+    
+    ' スタイル適用
+    ApplyShapeStyle shp, shp_ID
+End Sub

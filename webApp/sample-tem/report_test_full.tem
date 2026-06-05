@@ -1,0 +1,529 @@
+{
+  "version": "0.3",
+  "sheets": [
+    {
+      "id": "sheet-report-test-full",
+      "name": "個人A 全要素テスト",
+      "type": "individual",
+      "order": 0,
+      "boxes": [
+        {
+          "id": "B1",
+          "type": "normal",
+          "label": "学部入学",
+          "x": 100,
+          "y": 300,
+          "width": 80,
+          "height": 60,
+          "description": "20XX 年 4 月、X 大学 Y 学部に入学。学業と並行してサークル活動に参加。"
+        },
+        {
+          "id": "N2",
+          "type": "normal",
+          "label": "学会発表",
+          "x": 350,
+          "y": 250,
+          "width": 80,
+          "height": 60,
+          "description": "国内学会で初めて口頭発表を経験した。"
+        },
+        {
+          "id": "N3",
+          "type": "normal",
+          "label": "インターンシップ",
+          "x": 350,
+          "y": 380,
+          "width": 80,
+          "height": 60,
+          "noDescriptionNeeded": true
+        },
+        {
+          "id": "N4",
+          "type": "normal",
+          "label": "結婚",
+          "x": 800,
+          "y": 250,
+          "width": 80,
+          "height": 60
+        },
+        {
+          "id": "O1",
+          "type": "OPP",
+          "label": "卒業研究着手",
+          "x": 220,
+          "y": 300,
+          "width": 80,
+          "height": 60,
+          "description": "全員が通過する必須通過点として、4 年次の卒業研究着手を設定した。"
+        },
+        {
+          "id": "O2",
+          "type": "OPP",
+          "label": "中間発表",
+          "x": 320,
+          "y": 300,
+          "width": 80,
+          "height": 60,
+          "noDescriptionNeeded": true
+        },
+        {
+          "id": "BF1",
+          "type": "BFP",
+          "label": "進路決定の岐路",
+          "x": 470,
+          "y": 300,
+          "width": 90,
+          "height": 70,
+          "description": "大学院進学か就職かを決める分岐点。"
+        },
+        {
+          "id": "BF2",
+          "type": "BFP",
+          "label": "修了後の選択",
+          "x": 680,
+          "y": 230,
+          "width": 90,
+          "height": 70,
+          "description": "修士修了後、アカデミックに残るか民間就職するかの分岐。"
+        },
+        {
+          "id": "E1",
+          "type": "EFP",
+          "label": "大学院進学",
+          "x": 580,
+          "y": 200,
+          "width": 90,
+          "height": 70,
+          "description": "等至点として大学院進学を設定した。"
+        },
+        {
+          "id": "PE1",
+          "type": "P-EFP",
+          "label": "学部卒業後就職",
+          "x": 580,
+          "y": 400,
+          "width": 90,
+          "height": 70,
+          "description": "両極化した等至点として、大学院進学に対し学部卒業後の就職を設定した。"
+        },
+        {
+          "id": "E2",
+          "type": "2nd-EFP",
+          "label": "研究者として独立",
+          "x": 820,
+          "y": 170,
+          "width": 100,
+          "height": 80,
+          "description": "第 2 等至点として、研究者としての独立 (任期なしポスト獲得) を設定した。"
+        },
+        {
+          "id": "PE2",
+          "type": "P-2nd-EFP",
+          "label": "会社員として勤続",
+          "x": 820,
+          "y": 420,
+          "width": 100,
+          "height": 80,
+          "description": "両極化した第 2 等至点として、会社員としての勤続 (10 年以上) を設定した。"
+        },
+        {
+          "id": "A1",
+          "type": "annotation",
+          "label": "潜在的進路: 海外留学",
+          "x": 470,
+          "y": 460,
+          "width": 100,
+          "height": 50,
+          "description": "本人が言及したが実現しなかった潜在的選択肢。"
+        }
+      ],
+      "lines": [
+        {
+          "id": "RL1",
+          "type": "RLine",
+          "from": "B1",
+          "to": "O1",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "description": "学部入学から卒業研究着手までの一般的経路。"
+        },
+        {
+          "id": "RL2",
+          "type": "RLine",
+          "from": "O1",
+          "to": "O2",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "noDescriptionNeeded": true
+        },
+        {
+          "id": "RL3",
+          "type": "RLine",
+          "from": "O2",
+          "to": "BF1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL4",
+          "type": "RLine",
+          "from": "BF1",
+          "to": "E1",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "description": "進学径路。中間発表後の達成感が進学動機となった。"
+        },
+        {
+          "id": "RL5",
+          "type": "RLine",
+          "from": "BF1",
+          "to": "PE1",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "description": "就職径路。家計の事情で学部卒業後の就職を選択。"
+        },
+        {
+          "id": "RL6",
+          "type": "RLine",
+          "from": "E1",
+          "to": "BF2",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "description": "修了に伴う再分岐への遷移。"
+        },
+        {
+          "id": "RL7",
+          "type": "RLine",
+          "from": "BF2",
+          "to": "E2",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "description": "研究者径路。博士課程進学を経て任期なしポストを獲得。"
+        },
+        {
+          "id": "RL8",
+          "type": "RLine",
+          "from": "PE1",
+          "to": "PE2",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "description": "会社員径路。就職先で 10 年以上勤続。"
+        },
+        {
+          "id": "XL1",
+          "type": "XLine",
+          "from": "BF1",
+          "to": "A1",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "description": "未実現の潜在的径路。海外留学は経済的理由で諦めた。"
+        },
+        {
+          "id": "XL2",
+          "type": "XLine",
+          "from": "BF2",
+          "to": "PE2",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "description": "研究者を志向しなかった場合の潜在径路。"
+        }
+      ],
+      "sdsg": [
+        {
+          "id": "SD1",
+          "type": "SD",
+          "label": "親の助言: 早く就職しなさい",
+          "attachedTo": "B1",
+          "attachedType": "box",
+          "anchorMode": "single",
+          "spaceMode": "band-top",
+          "itemOffset": -150,
+          "timeOffset": 0,
+          "width": 140,
+          "height": 50,
+          "description": "学部入学直後から繰り返し親から早期就職を勧められていた。"
+        },
+        {
+          "id": "SD2",
+          "type": "SD",
+          "label": "経済的不安",
+          "attachedTo": "BF1",
+          "attachedType": "box",
+          "attachedTo2": "BF2",
+          "attachedType2": "box",
+          "anchorMode": "between",
+          "betweenMode": "edge-to-edge",
+          "spaceMode": "band-top",
+          "itemOffset": -150,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "description": "進路決定の岐路と修了後の選択の双方で経済的不安が継続的に影響した。"
+        },
+        {
+          "id": "SG1",
+          "type": "SG",
+          "label": "指導教員の支援",
+          "attachedTo": "O1",
+          "attachedType": "box",
+          "anchorMode": "single",
+          "spaceMode": "band-bottom",
+          "itemOffset": 200,
+          "timeOffset": 0,
+          "width": 140,
+          "height": 50,
+          "description": "卒業研究着手以降、指導教員の個別指導が研究志向を後押しした。",
+          "subLabel": "週次ミーティング"
+        },
+        {
+          "id": "SG2",
+          "type": "SG",
+          "label": "研究室の仲間",
+          "attachedTo": "E1",
+          "attachedType": "box",
+          "attachedTo2": "E2",
+          "attachedType2": "box",
+          "anchorMode": "between",
+          "betweenMode": "edge-to-edge",
+          "spaceMode": "band-bottom",
+          "itemOffset": 200,
+          "timeOffset": 0,
+          "width": 140,
+          "height": 50,
+          "noDescriptionNeeded": true
+        }
+      ],
+      "notes": [],
+      "comments": [],
+      "periodLabels": [
+        {
+          "id": "PD1",
+          "position": 2,
+          "label": "第1期 学部時代"
+        },
+        {
+          "id": "PD2",
+          "position": 7,
+          "label": "第2期 大学院初期"
+        },
+        {
+          "id": "PD3",
+          "position": 12,
+          "label": "第3期 修了・進路選択"
+        },
+        {
+          "id": "PD4",
+          "position": 17,
+          "label": "第4期 就職後"
+        }
+      ]
+    }
+  ],
+  "activeSheetId": "sheet-report-test-full",
+  "participants": [
+    {
+      "id": "P_A",
+      "pseudonym": "A"
+    }
+  ],
+  "settings": {
+    "layout": "horizontal",
+    "locale": "ja",
+    "gridSize": 10,
+    "snap": {
+      "alignGuides": true,
+      "distanceSnap": true,
+      "distancePx": 20,
+      "gridSnap": false,
+      "gridPx": 10
+    },
+    "showLegend": true,
+    "legendPosition": "right",
+    "timelineLabel": {
+      "ja": "非可逆的時間",
+      "en": "Irreversible time"
+    },
+    "timelineAutoInsert": true,
+    "defaultFont": "system-ui",
+    "defaultFontSize": 13,
+    "defaultBoxSize": {
+      "width": 80,
+      "height": 60
+    },
+    "defaultAutoFitText": false,
+    "defaultAutoFitBox": false,
+    "defaultAutoFitBoxMode": "width-fixed",
+    "paperGuides": [
+      {
+        "enabled": false,
+        "size": "A4-landscape",
+        "baseSize": "A4",
+        "color": "#000000",
+        "pageCount": 1,
+        "maskOutside": true
+      }
+    ],
+    "uiFontSize": 13,
+    "ribbonFontSize": 12,
+    "levelStep": 0.5,
+    "timeArrow": {
+      "autoInsert": true,
+      "alwaysVisible": true,
+      "timeStartExtension": -0.5,
+      "timeEndExtension": 0.5,
+      "itemReference": "min",
+      "itemOffset": 0,
+      "label": "非可逆的時間",
+      "strokeWidth": 2.5,
+      "fontSize": 14,
+      "labelSideHorizontal": "bottom",
+      "labelSideVertical": "left",
+      "labelBold": false,
+      "labelItalic": false,
+      "labelUnderline": false,
+      "labelOffset": 4,
+      "labelAlignHorizontal": "center",
+      "labelAlignVertical": "center"
+    },
+    "legend": {
+      "autoGenerate": true,
+      "alwaysVisible": true,
+      "includeInExport": true,
+      "position": {
+        "x": 0,
+        "y": 560
+      },
+      "includeBoxes": true,
+      "includeLines": true,
+      "includeSDSG": true,
+      "includeTimeArrow": false,
+      "title": "凡例",
+      "fontSize": 11,
+      "minWidth": 200,
+      "showDescriptions": false,
+      "columns": 1,
+      "columnsHorizontal": 1,
+      "columnsVertical": 1,
+      "showTitle": true,
+      "titleBold": true,
+      "titleItalic": false,
+      "titleUnderline": false,
+      "titleAlign": "left",
+      "titlePosition": "top",
+      "titleWritingMode": "horizontal",
+      "titleVerticalAlign": "top",
+      "backgroundStyle": "white",
+      "borderWidth": 1,
+      "borderColor": "#999",
+      "sampleWidth": 32,
+      "sampleHeight": 18,
+      "titleSeparatorVisible": true,
+      "titleSeparatorColor": "#dddddd",
+      "itemOverrides": {}
+    },
+    "periodLabels": {
+      "alwaysVisible": true,
+      "includeInExport": true,
+      "itemReference": "max",
+      "itemOffset": 0,
+      "fontSize": 13,
+      "showDividers": true,
+      "dividerStrokeWidth": 1,
+      "bandStyle": "band",
+      "labelSideHorizontal": "top",
+      "labelSideVertical": "right"
+    },
+    "typeLabelVisibility": {
+      "BFP": true,
+      "EFP": true,
+      "P-EFP": true,
+      "OPP": true,
+      "2nd-EFP": true,
+      "P-2nd-EFP": true,
+      "SD": true,
+      "SG": true
+    },
+    "sdsgSpace": {
+      "enabled": true,
+      "bands": {
+        "top": {
+          "enabled": true,
+          "heightMode": "auto",
+          "heightLevel": 1.5,
+          "reference": "boxes",
+          "offsetLevel": 0.2,
+          "showBorder": true,
+          "borderColor": "#9b59b6",
+          "fillStyle": "tinted",
+          "labelPosition": "top-left",
+          "shrinkToFitRow": false,
+          "autoExpandHeight": false
+        },
+        "bottom": {
+          "enabled": true,
+          "heightMode": "auto",
+          "heightLevel": 1.5,
+          "reference": "boxes",
+          "offsetLevel": 0.2,
+          "showBorder": true,
+          "borderColor": "#27ae60",
+          "fillStyle": "tinted",
+          "labelPosition": "top-left",
+          "shrinkToFitRow": false,
+          "autoExpandHeight": false
+        }
+      },
+      "autoPlaceSD": "top",
+      "autoPlaceSG": "bottom",
+      "allowMismatchedPlacement": false,
+      "autoArrange": true,
+      "autoFlipDirectionInBand": false
+    }
+  },
+  "metadata": {
+    "title": "TEMer レポート出力テスト (全要素網羅)",
+    "author": "中田友貴 (テスト用)",
+    "createdAt": "2026-05-22T13:00:00.000Z",
+    "modifiedAt": "2026-05-22T13:00:00.000Z",
+    "description": "論文レポート (.docx) 出力の漏れチェック用テストデータ。Box 全 8 種 (normal/OPP/BFP/EFP/P-EFP/2nd-EFP/P-2nd-EFP/annotation)、Line 全 2 種 (RLine/XLine)、SDSG の SD/SG × single/between の 4 通り、時期区分 4 期を含む。description 記入あり / noDescriptionNeeded フラグあり / 説明未記入 のパターンを意図的に混在させている。",
+    "notationSystem": {
+      "base": "custom",
+      "customDescription": "本図は荒川・安田・サトウ (2012) を基盤としつつ、第 2 等至点 (2nd EFP) の描画を併用する独自体系を採用した。"
+    },
+    "participantsInfo": {
+      "count": 4,
+      "description": "20 代後半の大学院修了者および学部卒業就職者 計 4 名 (うち女性 2 名、男性 2 名)。",
+      "hsiDescription": "HSI 水準 2: 進路選択に関わる経験者を文献および紹介を通じて段階的に招請した。",
+      "pseudonyms": ["A", "B", "C", "D"]
+    },
+    "interview": {
+      "method": "半構造化インタビュー (オンライン)",
+      "durationDescription": "1 回あたり約 60〜90 分、各協力者につき計 2 回",
+      "timesCount": 8,
+      "analysisCombination": "TEM + 修正版 grounded theory approach (M-GTA)",
+      "notes": "全 IC 文書化済み、テキスト化は逐語訳。協力者による member check を 1 回実施。"
+    },
+    "visualConventions": {
+      "horizontalLength": {
+        "hasMeaning": true,
+        "description": "時間軸として用い、年月の経過を概ね等間隔で表現する。"
+      },
+      "arrowAngle": {
+        "hasMeaning": false
+      },
+      "verticalPosition": {
+        "hasMeaning": true,
+        "description": "上下方向は職業的アイデンティティの強度を示す (上=研究志向強、下=非研究志向)。"
+      },
+      "colors": {
+        "hasMeaning": false
+      },
+      "lineWeight": {
+        "hasMeaning": true,
+        "description": "実線=実際に経験された径路、点線=実現しなかった潜在的径路。"
+      }
+    },
+    "reportNotes": "本テストデータは TEMer の論文レポート出力機能 (.docx) の検証専用であり、実在の研究結果ではない。Box の説明欄に複数のパターン (記入済 / 説明不要 / 未記入) を意図的に混在させているため、レポート上で『説明: ...』『（説明不要）』『（説明未記入）』が網羅的に出力されることを確認できる。"
+  },
+  "history": []
+}

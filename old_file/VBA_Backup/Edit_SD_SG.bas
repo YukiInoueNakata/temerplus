@@ -1,0 +1,375 @@
+Attribute VB_Name = "Edit_SD_SG"
+Option Explicit
+'@description("ShpIDからSDとSGを作るマクロ")
+'TODO 被りのIDの処理
+Sub MakeArrowCalloutByID(shp_ID As String)
+    
+    Dim shapeType As MsoAutoShapeType
+    
+    Dim arrowDirection As Integer
+    Dim Text As String
+    Dim NewshapeHeight  As Single
+    Dim NewshapeWidth  As Single
+    Dim NewshapeItemMargin  As Integer
+    Dim NewshapeTimeMargin  As Integer
+    
+    Dim selectedShape As shape
+    Dim newShape As shape
+    Dim position As Variant
+        
+    shapeType = msoShapePentagon
+    
+    If Datash_GetValueOfSearchValue(shp_ID, "Type") = "SD" Then
+        arrowDirection = 0
+    ElseIf Datash_GetValueOfSearchValue(shp_ID, "Type") = "SG" Then
+        arrowDirection = 1
+    End If
+    
+
+    
+    Text = Datash_GetValueOfSearchValue(shp_ID, "Text")
+    NewshapeHeight = Datash_GetValueOfSearchValue(shp_ID, "Height")
+    NewshapeWidth = Datash_GetValueOfSearchValue(shp_ID, "Width")
+    NewshapeItemMargin = Datash_GetValueOfSearchValue(shp_ID, "SDSG_Item_Adj")
+    NewshapeTimeMargin = Datash_GetValueOfSearchValue(shp_ID, "SDSG_Time_Adj")
+    
+
+        
+    
+    Set selectedShape = GetShapeByID(Datash_GetValueOfSearchValue(shp_ID, "To_shp_Name"))
+    
+    
+                
+'        If arrowDirection = 0 Then
+'            shp_Type = "SD_" + selectedShape.Name + "_"
+'        ElseIf arrowDirection = 1 Then
+'            shp_Type = "SG_" + selectedShape.Name + "_"
+'        End If
+        
+
+        
+        ' 選択された図形の位置を計算
+        position = CalculateNewShapePosition(selectedShape, NewshapeHeight, NewshapeWidth, NewshapeItemMargin, NewshapeTimeMargin, arrowDirection)
+        
+   
+        ' 新しい図形を作成
+        If Not IsEmpty(position) Then
+
+            
+            ' SDSG図形の作成
+            Set newShape = CreateSDSGShape(shapeType, position, NewshapeWidth, NewshapeHeight, shp_ID)
+                      
+            
+            '図形の書式設定
+            Call ConfigureSDSGShapeProperties(newShape, shp_ID, Text, arrowDirection)
+            
+        Else
+            MsgBox "positionが設定されていません"
+        End If
+
+End Sub
+
+
+
+'@description("選択した図形からSDとSGを作るマクロ")
+'TODO 被りのIDの処理
+Sub CreateArrowCalloutBasedOnSelectedShape(ByVal arrowDirection As Integer, _
+                                           Text As String, _
+                                           NewshapeHeight As Integer, _
+                                           NewshapeWidth As Integer, _
+                                           NewshapeItemMargin As Integer, _
+                                           NewshapeTimeMargin As Integer, _
+                                           Add_data As Boolean)
+                                           
+    Dim selectedShape As shape
+    Dim newShape As shape
+    Dim position As Variant
+    
+    Dim shapeType As MsoAutoShapeType
+    
+    Dim New_shp_ID As String
+    Dim shp_Type As String
+    
+    Dim Input_NewshapeHeight As Integer
+    Dim Input_NewshapeWidth As Integer
+    
+    Dim ID_num
+     
+    shapeType = msoShapePentagon
+    
+    Input_NewshapeHeight = NewshapeHeight
+    Input_NewshapeWidth = NewshapeWidth
+    
+    ' 選択された図形があるかどうかを確認
+    
+    If get_count_selected_shape() = 1 Then
+    ElseIf get_count_selected_shape() = 0 Then
+        MsgBox "図形が選択されていません。"
+        Exit Sub
+    ElseIf get_count_selected_shape() > 1 Then
+        MsgBox "図形が複数選択されています。選択するのは1つだけにしてください"
+        Exit Sub
+    End If
+    
+    
+    
+
+        Set selectedShape = Selection.ShapeRange(1)
+                
+        If arrowDirection = 0 Then
+            shp_Type = "SD_" + selectedShape.Name + "_"
+        ElseIf arrowDirection = 1 Then
+            shp_Type = "SG_" + selectedShape.Name + "_"
+        End If
+        
+        ID_num = GetNextAvailableRow(ExtractRowsWithSubstring(shp_Type))
+
+        New_shp_ID = shp_Type + CStr(ID_num)
+        
+        ' 選択された図形の位置を計算
+        position = CalculateNewShapePosition(selectedShape, NewshapeWidth, NewshapeHeight, NewshapeItemMargin, NewshapeTimeMargin, arrowDirection)
+        
+        ' 新しい図形を作成
+        If Not IsEmpty(position) Then
+            
+            ' SDSG図形の作成
+            Set newShape = CreateSDSGShape(shapeType, position, NewshapeWidth, NewshapeHeight, New_shp_ID)
+            
+            '図形の書式設定
+            Call ConfigureSDSGShapeProperties(newShape, New_shp_ID, Text, arrowDirection)
+            
+            'Add_dataがTRUEなら，dataシートにデータを入力
+            Call AddSDSGDataToWs(Add_data, arrowDirection, New_shp_ID, Text, selectedShape, Input_NewshapeHeight, Input_NewshapeWidth, NewshapeItemMargin, NewshapeTimeMargin)
+
+
+        Else
+            MsgBox "positionが設定されていません"
+        End If
+
+End Sub
+
+'@description("SDSGの図形の作成位置を返す関数")
+Function CalculateNewShapePosition(ByVal selectedShape As shape, _
+                                                        ByVal NewshapeWidth As Single, ByVal NewshapeHeight As Single, _
+                                                        ByVal NewshapeItemMargin As Integer, ByVal NewshapeTimeMargin As Integer, _
+                                                        ByVal arrowDirection As Integer) As Variant
+    Dim shapeLeft As Single
+    Dim shapeTop As Single
+    Dim position(1) As Single                    ' 0: NewshapeLeft, 1: NewshpeTop
+    
+    Select Case selectedShape.AutoShapeType
+        
+    'todo SDSG位置の縦型の場合の位置に対応させる
+    
+    'SDSG位置対象がボックスの場合
+    Case msoShapeRectangle
+        With selectedShape
+            shapeLeft = .Left + .Width / 2 + NewshapeTimeMargin        ' 図形の左端からの距離
+            If arrowDirection = 0 Then
+                shapeTop = .Top - NewshapeItemMargin              ' 上辺の中点から5ポイント上
+            ElseIf arrowDirection = 1 Then
+                shapeTop = .Top + .Height + NewshapeItemMargin    ' 底辺の中点から5ポイント下
+            End If
+        End With
+        
+    'SDSG位置対象が矢印だった場合
+    Case msoShapeMixed
+        With selectedShape
+            shapeLeft = .Left + .Width / 2 + NewshapeTimeMargin      ' 図形の左端からの距離
+            If arrowDirection = 1 Then 'SGの場合
+                shapeTop = .Top + .Height / 2 + NewshapeItemMargin  ' 新しい図形の底辺の中点 + 50
+            ElseIf arrowDirection = 0 Then  'SDの場合
+                shapeTop = .Top + .Height / 2 - NewshapeItemMargin ' 新しい図形の上辺の中点 - 50
+            End If
+        End With
+    End Select
+    
+    position(0) = shapeLeft - (NewshapeWidth / 2) ' 新しい図形の左端
+    
+'    If (selectedShape.AutoShapeType = msoShapeRectangle And arrowDirection = 0) _
+'       Or (selectedShape.AutoShapeType = msoShapeMixed And arrowDirection = 0) Then
+'        position(1) = shapeTop - NewshapeHeight  ' 新しい図形の上端
+     If arrowDirection = 0 Then
+     
+        
+        position(1) = shapeTop - NewshapeHeight  ' 新しい図形の上端
+    
+        Debug.Print "SD"
+        Debug.Print NewshapeHeight
+        Debug.Print position(1)
+    
+    Else
+        position(1) = shapeTop                   ' 新しい図形の位置を直接設定
+        
+        Debug.Print "SG"
+        Debug.Print position(1)
+    End If
+    
+
+    
+    CalculateNewShapePosition = position
+End Function
+
+'@description("SDSG図形の作成")
+Function CreateSDSGShape(ByVal shapeType As MsoAutoShapeType, _
+                         ByVal position As Variant, _
+                         ByVal NewshapeWidth As Integer, _
+                         ByVal NewshapeHeight As Integer, _
+                         ByVal New_shp_ID As String) As shape
+    Dim newShape As shape
+    Set newShape = ActiveSheet.Shapes.AddShape(shapeType, _
+                                               position(0), _
+                                               position(1), _
+                                               NewshapeWidth, _
+                                               NewshapeHeight)
+    newShape.Name = New_shp_ID
+    Set CreateSDSGShape = newShape
+End Function
+
+'@description("SDSG図形の設定を付与する")
+Sub ConfigureSDSGShapeProperties(ByVal newShape As shape, ByVal New_shp_ID As String, ByVal Text As String, ByVal arrowDirection As Integer)
+    With newShape
+        'shp_ID付与
+        .Name = New_shp_ID
+
+        '文字書式関係
+        .TextFrame.Characters.Text = Text
+
+        '方向の決定，文字方向の決定(ボックスとは異なる)
+        Select Case arrowDirection
+        Case 0
+            .IncrementRotation 90
+            .TextFrame2.Orientation = msoTextOrientationUpward
+        Case 1
+            .IncrementRotation 270
+            .TextFrame2.Orientation = msoTextOrientationDownward
+        Case Else
+            MsgBox "不正な引数です。"
+            Exit Sub
+        End Select
+
+        With .TextFrame2.TextRange.Font
+            .NameComplexScript = "BIZ UDPゴシック"
+            .NameFarEast = "BIZ UDPゴシック"
+            .Name = "BIZ UDPゴシック"
+        End With
+
+        .TextFrame.Characters.Font.Size = 14
+
+        '文字の感覚を詰める
+        .TextFrame2.TextRange.Font.BaselineOffset = 0
+        .TextFrame2.TextRange.Font.Spacing = -3
+
+        '行間を固定値にする
+        .TextFrame2.TextRange.ParagraphFormat.LineRuleWithin = False
+        .TextFrame2.TextRange.ParagraphFormat.SpaceWithin = 14
+
+        '文字色，ボックス色関係
+        .TextFrame.Characters.Font.Color = RGB(0, 0, 0)
+        .Fill.ForeColor.RGB = RGB(255, 255, 255)
+        .Line.ForeColor.RGB = RGB(0, 0, 0)
+
+        '文字の寄せ関係
+        .TextFrame.HorizontalAlignment = xlHAlignCenter
+        .TextFrame.VerticalAlignment = xlVAlignCenter
+        .TextFrame.VerticalOverflow = xlOartVerticalOverflowOverflow
+    End With
+End Sub
+
+'@description("")
+Sub AddSDSGDataToWs(ByVal Add_data As Boolean, _
+                    ByVal arrowDirection As Integer, _
+                    ByVal shp_ID As String, _
+                    ByVal Text As String, _
+                    ByVal selectedShape As shape, _
+                    ByVal Input_NewshapeHeight As Integer, _
+                    ByVal Input_NewshapeWidth As Integer, _
+                    ByVal NewshapeItemMargin As Integer, _
+                    ByVal NewshapeTimeMargin As Integer)
+    
+    Dim wsData As Worksheet
+    Set wsData = ThisWorkbook.Sheets("Data")
+    
+    Dim last_Row As Long
+
+    If Add_data Then
+        last_Row = wsData.Cells(wsData.Rows.count, 1).End(xlUp).row
+        wsData.Cells(last_Row + 1, 1).value = shp_ID 'この部分はそのままで
+
+        If arrowDirection = 0 Then
+            GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "Type", shp_ID).value = "SD"
+        Else
+            GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "Type", shp_ID).value = "SG"
+        End If
+                
+        GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "Text", shp_ID).value = Text
+                
+        GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "To_shp_Name", shp_ID).value = selectedShape.Name
+                
+        GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "Height", shp_ID).value = Input_NewshapeHeight
+        GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "Width", shp_ID).value = Input_NewshapeWidth
+        
+        GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "SDSG_Item_Adj", shp_ID).value = NewshapeItemMargin
+        GetWriteCellFromValue_typeAndshp_IDorItem(wsData, "SDSG_Time_Adj", shp_ID).value = NewshapeTimeMargin
+        
+    End If
+
+End Sub
+
+Sub testSD()
+    Dim arrowDirection As Integer
+    arrowDirection = 0
+
+    Call CreateArrowCalloutBasedOnSelectedShape(arrowDirection)
+
+
+End Sub
+
+
+
+'=============================================================================
+' 最適化版 - clsShapeDataを使用してデータアクセスを削減
+'=============================================================================
+
+'@description("ShpIDからSDとSGを作成する - 最適化版")
+Sub MakeArrowCalloutByID_Optimized(shp_ID As String)
+    Dim shapeData As New clsShapeData
+    Dim shapeType As MsoAutoShapeType
+    Dim arrowDirection As Integer
+    Dim selectedShape As shape
+    Dim newShape As shape
+    Dim position As Variant
+    
+    shapeType = msoShapePentagon
+    
+    ' clsShapeDataで1回のLoadで全プロパティを取得（7回→1回に削減）
+    shapeData.Load shp_ID
+    If Not shapeData.IsLoaded Then Exit Sub
+    
+    ' arrowDirectionの判定
+    If shapeData.shapeType = "SD" Then
+        arrowDirection = 0
+    ElseIf shapeData.shapeType = "SG" Then
+        arrowDirection = 1
+    End If
+    
+    ' キャッシュされたデータを使用
+    Set selectedShape = GetShapeByID(shapeData.ToShpName)
+    
+    ' 選択された図形の位置を計算
+    position = CalculateNewShapePosition(selectedShape, _
+        CSng(shapeData.Height), CSng(shapeData.Width), _
+        CInt(shapeData.SDSGItemAdj), CInt(shapeData.SDSGTimeAdj), _
+        arrowDirection)
+    
+    ' 新しい図形を作成
+    If Not IsEmpty(position) Then
+        ' SDSG図形の作成
+        Set newShape = CreateSDSGShape(shapeType, position, _
+            CInt(shapeData.Width), CInt(shapeData.Height), shp_ID)
+
+        
+        ' 図形の見た目設定
+        Call ConfigureSDSGShapeProperties(newShape, shp_ID, shapeData.Text, arrowDirection)
+    End If
+End Sub

@@ -1,0 +1,58 @@
+VERSION 5.00
+Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} UserForm_Box_level_Change 
+   Caption         =   "ボックス位置修正"
+   ClientHeight    =   1785
+   ClientLeft      =   120
+   ClientTop       =   465
+   ClientWidth     =   2115
+   OleObjectBlob   =   "UserForm_Box_level_Change.frx":0000
+   StartUpPosition =   1  'オーナー フォームの中央
+End
+Attribute VB_Name = "UserForm_Box_level_Change"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = False
+Option Explicit
+
+Private Sub TextBox_adj_num_Change()
+
+End Sub
+
+'@description("Closeボタンで閉じる")
+Private Sub Close_Button_Click()
+Unload UserForm_Box_level_Change
+End Sub
+
+
+Private Sub Up_Button_Click()
+    If Not IsNumeric(TextBox_adj_vertical_level.Text) Or Not IsNumeric(TextBox_adj_time_level.Text) Then
+        MsgBox "調整値は数値である必要があります。", vbExclamation, "入力エラー"
+        Exit Sub
+    End If
+    
+    ' 調整値をテキストボックスから取得
+    Dim adjItemLevel As Double
+    Dim adjTimeLevel As Double
+    adjItemLevel = CDbl(TextBox_adj_vertical_level.Text)
+    adjTimeLevel = CDbl(TextBox_adj_time_level.Text)
+    
+    ' Rectangle タイプの図形のみ処理
+    AdjustSelectedRectangles adjItemLevel, adjTimeLevel, True
+End Sub
+
+Private Sub Down_Button_Click()
+    If Not IsNumeric(TextBox_adj_vertical_level.Text) Or Not IsNumeric(TextBox_adj_time_level.Text) Then
+        MsgBox "調整値は数値である必要があります。", vbExclamation, "入力エラー"
+        Exit Sub
+    End If
+    
+    ' 調整値をテキストボックスから取得
+    Dim adjItemLevel As Double
+    Dim adjTimeLevel As Double
+    adjItemLevel = CDbl(TextBox_adj_vertical_level.Text)
+    adjTimeLevel = CDbl(TextBox_adj_time_level.Text)
+    
+    ' Rectangle タイプの図形のみ処理
+    AdjustSelectedRectangles adjItemLevel, adjTimeLevel, False
+End Sub

@@ -1,0 +1,148 @@
+Attribute VB_Name = "Module_MakeFig_sh"
+Option Explicit
+
+'@Description("シート内のオートシェイプで範囲外は削除")
+Sub シート内のオートシェイプで範囲外は削除()
+    Dim cc As shape
+    Dim deleteShape As Boolean
+
+    For Each cc In ActiveSheet.Shapes
+        ' ドロップダウン以外のオブジェクトのみを対象とする
+        If Not cc.Name Like "Drop Down*" Then
+            ' シェイプが指定範囲外にあるか確認
+            If Intersect(cc.TopLeftCell, Range("A1:BP6")) Is Nothing Or _
+               Intersect(cc.BottomRightCell, Range("A1:BP6")) Is Nothing Then
+                ' 範囲外であれば削除
+                cc.Delete
+            End If
+        End If
+    Next cc
+End Sub
+'@description("ユーザーフォーム内の全てのテキストボックスをループし、入力が数値かどうかを検証")
+Public Function ValidateNumericInput(frm As UserForm) As Boolean
+    Dim tb As Control
+    For Each tb In frm.Controls
+        If typeName(tb) = "TextBox" Then ' コントロールがテキストボックスの場合
+            If Not IsNumeric(tb.Text) Then ' 数値でない場合
+                MsgBox "数値を入力してください", vbExclamation, "入力エラー"
+                tb.SetFocus
+                ValidateNumericInput = False
+                Exit Function
+            End If
+        End If
+    Next tb
+    ValidateNumericInput = True
+End Function
+'@description("線を引くボタンでフォームが立ち上がる")
+Sub Make_Line_Buttom()
+    UserForm_Make_Line.Show vbModeless
+    
+End Sub
+'@description("SD/SG追加ボタンでフォームが立ち上がる")
+Sub Make_SD_SG_Buttom()
+    UserForm_Make_SD_SG.Show vbModeless
+    
+End Sub
+'@description("設定ボタンでフォームが立ち上がる")
+Sub SettingButton()
+    UserForm_General_Setting.Show
+End Sub
+
+'@description("ボックス位置調整ボタンでフォームが立ち上がる")
+Sub adj_Box_Level_Button()
+    UserForm_Box_level_Change.Show vbModeless
+End Sub
+
+'@description("設定ボタンでフォームが立ち上がる")
+Sub AddBoxButtom()
+    UserForm_AddBox.Show vbModeless
+End Sub
+
+
+'@description("選択されている図形の削除とデータの削除")
+Sub DeleteSelectedShapesAndMatchingRows()
+    Dim DataWs As Worksheet
+    Set DataWs = ThisWorkbook.Sheets("Data")
+    
+    Dim shp As shape
+    
+    '選択されている図形が1以上か確認
+    If get_count_selected_shape() = 0 Then
+        MsgBox "図形が選択されていません。"
+        Exit Sub
+    End If
+            
+    ' 選択されたすべての図形を処理
+    For Each shp In Selection.ShapeRange
+        'debug.print shp.Name
+        ' 図形が矩形または線であるか確認
+                
+        'debug.print "shp.Type"; shp.Type
+        'debug.print "shp.AutoShapeType"; shp.AutoShapeType
+        If shp.Type = msoAutoShape And (shp.AutoShapeType = msoShapeRectangle Or shp.AutoShapeType = -2 Or shp.AutoShapeType = 51) Then
+            ' 図形の名前に対応する行を検索して削除
+            Dim foundCell As Range
+            Set foundCell = DataWs.Columns(1).Find(shp.Name, LookIn:=xlValues, LookAt:=xlWhole)
+'            'debug.print "foundCell"; foundCell
+            If Not foundCell Is Nothing Then
+                DataWs.Rows(foundCell.row).Delete
+            End If
+            ' 図形を削除
+            shp.Delete
+        End If
+    Next shp
+        
+
+ 
+End Sub
+Sub CheckSelectionType()
+    ' 選択されているオブジェクトの型をデバッグ出力
+    'debug.print "選択されているオブジェクトの型: " & TypeName(Selection)
+    
+    ' 選択されているオブジェクトが図形の場合、さらに詳細を出力
+    If typeName(Selection) = "Shape" Or typeName(Selection) = "ShapeRange" Then
+        Dim shp As shape
+        For Each shp In Selection
+            'debug.print "図形の名前: " & shp.Name
+        Next shp
+    End If
+End Sub
+
+Sub ShowSelectedDrawingObjectsNames()
+    Dim selectedItems As ShapeRange
+    Dim item As shape
+    
+    ' 選択されているオブジェクトがDrawingObjectsである場合
+    If typeName(Selection) = "DrawingObjects" Then
+        Set selectedItems = Selection.ShapeRange
+        For Each item In selectedItems
+            'debug.print item.Name
+        Next item
+    End If
+End Sub
+
+
+'==============================================================================
+' フローティングツールバー関連
+'==============================================================================
+Public Function IsUserFormLoaded(ByVal formName As String) As Boolean
+    Dim frm As Object
+    On Error Resume Next
+    For Each frm In VBA.UserForms
+        If frm.Name = formName Then
+            IsUserFormLoaded = True
+            Exit Function
+        End If
+    Next frm
+    IsUserFormLoaded = False
+End Function
+
+Public Sub ShowToolbar()
+    frmToolbar.Show vbModeless
+End Sub
+
+Public Sub HideToolbar()
+    If IsUserFormLoaded("frmToolbar") Then
+        Unload frmToolbar
+    End If
+End Sub

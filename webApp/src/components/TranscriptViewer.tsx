@@ -924,7 +924,13 @@ function ParagraphRow({
         background: isHit ? '#fff8d6' : isSelected ? '#f0f7ff' : 'transparent',
         border: '1px solid ' + (isSelected ? '#4a90e2' : '#eee'),
         borderRadius: 4,
-      }}
+        // 仮想スクロール代替: 画面外の段落はブラウザがレンダリング/レイアウトを
+        // スキップ（可変高 contenteditable と highlight 描画をそのまま維持できる）。
+        // contain-intrinsic-size: auto で初回描画後の実寸を記憶しスクロール量を安定化。
+        // 未対応ブラウザは通常描画にフォールバック。
+        contentVisibility: 'auto',
+        containIntrinsicSize: 'auto 90px',
+      } as React.CSSProperties}
       onMouseDown={() => onSelect(null)}
       onMouseUp={handleMouseUp}
     >

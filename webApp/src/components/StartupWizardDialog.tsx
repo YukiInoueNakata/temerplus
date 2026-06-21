@@ -16,7 +16,8 @@ import { useState } from 'react';
 export type StartupWizardChoice =
   | { kind: 'open-tem' }                  // 既存 .tem を開く
   | { kind: 'create-empty' }              // 空ファイルから始める (現状の空 doc のまま)
-  | { kind: 'open-demo' }                 // デモ .tem を開く
+  | { kind: 'open-demo' }                 // デモ .tem を開く (神崎・鈴木 2021)
+  | { kind: 'open-transcript-demo' }      // 原文連動デモ .tem を開く (Phase 4)
   | { kind: 'new-from-transcript' }       // 原文 1 ファイルから取り込み
   | { kind: 'new-from-transcripts-bulk' } // 原文を複数ファイル/フォルダから一括取り込み
   | { kind: 'new-from-csv-boxes' };       // 切片CSV/Excel から Box を作成
@@ -86,6 +87,12 @@ export function StartupWizardDialog({
                   title="デモファイルを開く"
                   desc="神崎・鈴木 (2021) Figure 1 を再現した作例 (32 Box / 34 Line / 4 SDSG / 4 期)"
                   onClick={() => choose({ kind: 'open-demo' })}
+                />
+                <Card
+                  emoji="🔗"
+                  title="原文連動デモを開く"
+                  desc="逐語録と TEM 図のリンク機能のデモ。Box の「原文参照」から逐語録へジャンプ (5 Box / 1 逐語録)"
+                  onClick={() => choose({ kind: 'open-transcript-demo' })}
                 />
               </div>
             </>

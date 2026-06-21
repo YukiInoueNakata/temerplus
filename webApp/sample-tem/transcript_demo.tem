@@ -1,0 +1,240 @@
+{
+  "version": "0.4",
+  "sheets": [
+    {
+      "id": "sheet_demo_transcript",
+      "name": "協力者A 転職の径路",
+      "type": "individual",
+      "order": 0,
+      "boxes": [
+        {
+          "id": "B_start",
+          "type": "normal",
+          "label": "現職への違和感",
+          "x": 100,
+          "y": 220,
+          "width": 110,
+          "height": 60,
+          "description": "入社三年目頃から感じ始めた、現職への違和感・成長実感の欠如。",
+          "sourceRefs": [
+            {
+              "id": "ref_1",
+              "transcriptId": "T_A_1",
+              "paragraphId": "para_2",
+              "charStart": 17,
+              "charEnd": 36,
+              "quoteText": "今の仕事に少しずつ違和感を覚えるように",
+              "createdAt": "2026-06-22T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "B_bfp",
+          "type": "BFP",
+          "label": "転職するか迷う",
+          "x": 320,
+          "y": 220,
+          "width": 110,
+          "height": 60,
+          "description": "転職すべきか否かを迷う分岐点。安定 vs 挑戦の葛藤。",
+          "sourceRefs": [
+            {
+              "id": "ref_2",
+              "transcriptId": "T_A_1",
+              "paragraphId": "para_3",
+              "charStart": 13,
+              "charEnd": 33,
+              "quoteText": "本当に転職すべきか、ずっと迷っていました",
+              "createdAt": "2026-06-22T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "B_opp",
+          "type": "OPP",
+          "label": "上司への相談",
+          "x": 540,
+          "y": 220,
+          "width": 110,
+          "height": 60,
+          "description": "決断に至る必須通過点。直属の上司への相談で本音を言語化。",
+          "sourceRefs": [
+            {
+              "id": "ref_3",
+              "transcriptId": "T_A_1",
+              "paragraphId": "para_5",
+              "charStart": 3,
+              "charEnd": 18,
+              "quoteText": "思い切って直属の上司に相談した",
+              "createdAt": "2026-06-22T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "B_efp",
+          "type": "EFP",
+          "label": "転職を決意",
+          "x": 770,
+          "y": 220,
+          "width": 110,
+          "height": 70,
+          "description": "新分野への挑戦を選び、転職を決意した等至点。",
+          "sourceRefs": [
+            {
+              "id": "ref_4",
+              "transcriptId": "T_A_1",
+              "paragraphId": "para_6",
+              "charStart": 28,
+              "charEnd": 37,
+              "quoteText": "転職を決意しました",
+              "createdAt": "2026-06-22T00:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "B_pefp",
+          "type": "P-EFP",
+          "label": "現職にとどまる",
+          "x": 540,
+          "y": 380,
+          "width": 110,
+          "height": 70,
+          "description": "両極化等至点。最後まで検討された「現職にとどまる」選択肢。",
+          "sourceRefs": [
+            {
+              "id": "ref_5",
+              "transcriptId": "T_A_1",
+              "paragraphId": "para_7",
+              "charStart": 5,
+              "charEnd": 30,
+              "quoteText": "現職にとどまるという選択肢も最後まで考えていました",
+              "createdAt": "2026-06-22T00:00:00.000Z"
+            }
+          ]
+        }
+      ],
+      "lines": [
+        {
+          "id": "L1",
+          "type": "RLine",
+          "from": "B_start",
+          "to": "B_bfp",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L2",
+          "type": "RLine",
+          "from": "B_bfp",
+          "to": "B_opp",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L3",
+          "type": "RLine",
+          "from": "B_opp",
+          "to": "B_efp",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L4",
+          "type": "XLine",
+          "from": "B_bfp",
+          "to": "B_pefp",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        }
+      ],
+      "sdsg": [],
+      "notes": [],
+      "comments": [],
+      "periodLabels": []
+    }
+  ],
+  "activeSheetId": "sheet_demo_transcript",
+  "participants": [
+    {
+      "id": "P_A",
+      "pseudonym": "A"
+    }
+  ],
+  "settings": {
+    "layout": "horizontal",
+    "levelStep": 50,
+    "paperSize": "A4-landscape",
+    "ui": {
+      "fontSize": 11
+    },
+    "locale": "ja",
+    "showFrame": false,
+    "showRulers": false
+  },
+  "metadata": {
+    "title": "原文連動デモ（協力者A 転職の径路）",
+    "author": "TEMer サンプル",
+    "createdAt": "2026-06-22T00:00:00.000Z",
+    "modifiedAt": "2026-06-22T00:00:00.000Z",
+    "description": "Phase 4 インタビューデータ連動のデモ。Box をクリックして「原文参照」から逐語録の該当箇所へジャンプできる。"
+  },
+  "history": [],
+  "transcripts": [
+    {
+      "id": "T_A_1",
+      "participantId": "P_A",
+      "sessionNumber": 1,
+      "title": "協力者A 第1回インタビュー",
+      "source": "manual",
+      "importedAt": "2026-06-22T00:00:00.000Z",
+      "paragraphs": [
+        {
+          "id": "para_1",
+          "index": 0,
+          "speaker": "Int",
+          "text": "今日はお時間ありがとうございます。まず、転職を考え始めたきっかけから教えていただけますか。"
+        },
+        {
+          "id": "para_2",
+          "index": 1,
+          "speaker": "A",
+          "text": "そうですね、入社三年目くらいから、今の仕事に少しずつ違和感を覚えるようになって。毎日同じ作業の繰り返しで、自分が成長している実感が持てなかったんです。"
+        },
+        {
+          "id": "para_3",
+          "index": 2,
+          "speaker": "A",
+          "text": "それでも辞めるのは怖くて、本当に転職すべきか、ずっと迷っていました。給料は安定していましたし、同僚にも恵まれていたので。"
+        },
+        {
+          "id": "para_4",
+          "index": 3,
+          "speaker": "Int",
+          "text": "迷っている中で、何か転機はありましたか。"
+        },
+        {
+          "id": "para_5",
+          "index": 4,
+          "speaker": "A",
+          "text": "はい、思い切って直属の上司に相談したんです。そこで初めて自分の本音を言葉にできて、上司も親身に聞いてくれました。あの相談がなければ、今でも決められなかったと思います。"
+        },
+        {
+          "id": "para_6",
+          "index": 5,
+          "speaker": "A",
+          "text": "最終的には、新しい分野に挑戦したいという気持ちが勝って、転職を決意しました。今は本当にやってよかったと感じています。"
+        },
+        {
+          "id": "para_7",
+          "index": 6,
+          "speaker": "A",
+          "text": "もちろん、現職にとどまるという選択肢も最後まで考えていました。安定を捨てる不安は大きかったので。"
+        }
+      ],
+      "metadata": {
+        "speakerOfInterest": "A",
+        "interviewerName": "Int"
+      }
+    }
+  ]
+}

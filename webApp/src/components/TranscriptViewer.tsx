@@ -17,6 +17,12 @@ import { AnonymizeExportDialog } from './AnonymizeExportDialog';
 
 type LinkTarget = { type: 'box' | 'line' | 'sdsg'; id: string };
 
+// 旧 .tem / 作例ファイルは transcripts / participants を持たない場合がある。
+// undefined を返すと `.find` で throw するため、安定参照の空配列でフォールバックする
+// （selector が毎回新しい [] を返すと無限再レンダリングになるので module-level 定数）。
+const EMPTY_TRANSCRIPTS: Transcript[] = [];
+const EMPTY_PARTICIPANTS: Participant[] = [];
+
 // Box type ごとの代表色（ハイライト用、薄い背景）
 const BOX_TYPE_COLOR: Record<BoxType, string> = {
   'normal':     '#9aa0a6',
@@ -48,8 +54,8 @@ export function TranscriptViewer({
   focusBoxId?: string;             // 起動時にフォーカスする Box（PropertyPanel から起動時など）
   autoOpenImport?: boolean;        // 起動時に取り込みダイアログも自動 open (起動ウィザード経由)
 }) {
-  const transcripts = useTEMStore((s) => s.doc.transcripts);
-  const participants = useTEMStore((s) => s.doc.participants);
+  const transcripts = useTEMStore((s) => s.doc.transcripts ?? EMPTY_TRANSCRIPTS);
+  const participants = useTEMStore((s) => s.doc.participants ?? EMPTY_PARTICIPANTS);
   const splitParagraph = useTEMStore((s) => s.splitParagraph);
   const mergeParagraphWithNext = useTEMStore((s) => s.mergeParagraphWithNext);
   const updateParagraphText = useTEMStore((s) => s.updateParagraphText);

@@ -442,12 +442,29 @@ export default function App() {
       <ResizeDialog open={resizeOpen} onClose={() => setResizeOpen(false)} />
       <CSVImportDialog open={csvOpen} onClose={() => setCsvOpen(false)} />
       <ShiftContentDialog open={shiftOpen} onClose={() => setShiftOpen(false)} />
-      <TranscriptViewer
-        open={transcriptOpen}
-        onClose={() => { setTranscriptOpen(false); setTranscriptFocusBoxId(undefined); setTranscriptAutoImport(false); }}
-        focusBoxId={transcriptFocusBoxId}
-        autoOpenImport={transcriptAutoImport}
-      />
+      <ErrorBoundary
+        label="TranscriptViewer"
+        resetKey={transcriptOpen}
+        fallback={(err) => transcriptOpen ? (
+          <div className="modal-backdrop" onClick={() => setTranscriptOpen(false)}>
+            <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 560, padding: 16 }}>
+              <h3 style={{ marginTop: 0, color: '#c00' }}>原文ビューアでエラー</h3>
+              <p style={{ fontSize: 13 }}>原文ビューアの描画中にエラーが発生しました。console にスタックトレースが出ています。</p>
+              <pre style={{ background: '#f8f8f8', padding: 8, fontSize: 12, whiteSpace: 'pre-wrap' }}>
+                {String(err.message)}
+              </pre>
+              <button className="ribbon-btn-small" onClick={() => { setTranscriptOpen(false); setTranscriptFocusBoxId(undefined); setTranscriptAutoImport(false); }}>閉じる</button>
+            </div>
+          </div>
+        ) : null}
+      >
+        <TranscriptViewer
+          open={transcriptOpen}
+          onClose={() => { setTranscriptOpen(false); setTranscriptFocusBoxId(undefined); setTranscriptAutoImport(false); }}
+          focusBoxId={transcriptFocusBoxId}
+          autoOpenImport={transcriptAutoImport}
+        />
+      </ErrorBoundary>
       <StartupWizardDialog
         open={wizardOpen}
         onChoose={handleWizardChoice}

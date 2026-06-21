@@ -38,8 +38,16 @@ export function hydrateSettings(settings: Partial<ProjectSettings>): ProjectSett
 
 /** TEMDocument 全体のバリデーション + 欠損補完 */
 export function hydrateDocument(doc: TEMDocument): TEMDocument {
+  // Phase 4 で追加された top-level 配列 (transcripts / participants) は
+  // 0.3 以前の .tem や作例ファイルには存在しない。undefined のまま読み込むと
+  // TranscriptViewer 等の `transcripts.find(...)` が throw してアプリ全体が
+  // 白画面になるため、ここで必ず空配列を補完する（全ロード経路の choke point）。
+  const raw = doc as Partial<TEMDocument>;
   return {
     ...doc,
+    version: (doc.version as string) === '0.3' ? '0.4' : doc.version,
     settings: hydrateSettings(doc.settings ?? {}),
+    participants: Array.isArray(raw.participants) ? raw.participants : [],
+    transcripts: Array.isArray(raw.transcripts) ? raw.transcripts : [],
   };
 }

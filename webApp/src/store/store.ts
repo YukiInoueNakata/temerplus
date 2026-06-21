@@ -25,7 +25,6 @@ import {
   removeSourceRefsForTranscript,
 } from '../utils/sourceRefTracking';
 import {
-  createSampleDocument,
   createEmptyDocument,
   createEmptySheet,
   DEFAULT_VIEW_STATE,
@@ -342,7 +341,9 @@ export const useTEMStore = create<Store>()(
   temporal(
     (set, get) => ({
       // Initial state
-      doc: createSampleDocument(),
+      // 初回起動・「空ファイルから作成」では作例を描画せずクリーンな空図から始める
+      // （作例は起動ウィザードの「デモファイルを開く」から明示的に開く）。
+      doc: createEmptyDocument(),
       view: DEFAULT_VIEW_STATE,
       selection: { sheetId: '', boxIds: [], lineIds: [], sdsgIds: [], noteIds: [] },
       fileHandle: null,

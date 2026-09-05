@@ -1,9 +1,10 @@
 // クリップボード（コピー / 貼付）の回帰テスト
-// 2026-09-05 の点検で見つかった 4 点をここで守る:
+// 2026-09-05 の点検で見つかった点をここで守る:
 //   1. データシートの位置指定挿入 (pasteFromClipboardAt) が Line / SDSG を落とさない
 //   2. 貼付で採る ID が種別連番（Box=種別 prefix / Line=RL_n・XL_n / SDSG=SD1・SG1）
 //   3. between モード SDSG の attachedTo2 も再マップされる
 //   4. sourceRefs は複製時に ID を振り直す（同一 SourceRef.id の重複を作らない）
+//   5. 貼付後は複製元ではなく貼り付けた要素が選択される（別シートへ貼った場合は触らない）
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useTEMStore } from './store';
 import { createEmptyDocument } from './defaults';
@@ -123,6 +124,52 @@ describe('clipboard: copy / paste', () => {
     // 引用内容そのものは保たれる
     const quotes = s.boxes.flatMap((x) => (x.sourceRefs ?? []).map((r) => r.quoteText));
     expect(quotes).toEqual(['引用', '引用']);
+  });
+
+  it('貼付後は複製元ではなく新しい要素が選択される', () => {
+    const { a, b, l, sd } = setupSheet();
+    useTEMStore.getState().setSelection([a, b], [l], [sd]);
+    useTEMStore.getState().copyToClipboard();
+    useTEMStore.getState().pasteFromClipboard();
+
+    const sel = useTEMStore.getState().selection;
+    expect(sel.boxIds).toHaveLength(2);
+    expect(sel.boxIds).not.toContain(a);
+    expect(sel.boxIds).not.toContain(b);
+    expect(sel.lineIds).not.toContain(l);
+    expect(sel.sdsgIds).not.toContain(sd);
+    // 選択された ID は実在する
+    const s = sheet();
+    sel.boxIds.forEach((id) => expect(s.boxes.some((x) => x.id === id)).toBe(true));
+  });
+
+  it('データシートからの挿入でも挿入した要素が選択される', () => {
+    const { a, b, l, sd } = setupSheet();
+    useTEMStore.getState().setSelection([a, b], [l], [sd]);
+    useTEMStore.getState().copyToClipboard();
+    useTEMStore.getState().pasteFromClipboardAt('box', sheet().boxes.length);
+
+    const sel = useTEMStore.getState().selection;
+    expect(sel.boxIds).toHaveLength(2);
+    expect(sel.boxIds).not.toContain(a);
+    expect(sel.lineIds).toHaveLength(1);
+    expect(sel.lineIds).not.toContain(l);
+  });
+
+  it('別シートへ貼っても現在シートの選択は書き換えない', () => {
+    const { a, b, l, sd } = setupSheet();
+    const sourceSheetId = useTEMStore.getState().doc.activeSheetId;
+    const targetSheetId = useTEMStore.getState().addSheet();   // addSheet は活性シートを移す
+    useTEMStore.getState().setActiveSheet(sourceSheetId);      // 元シートへ戻してから複製する
+    useTEMStore.getState().setSelection([a, b], [l], [sd]);
+    useTEMStore.getState().copyToClipboard();
+
+    useTEMStore.getState().pasteFromClipboard(targetSheetId);
+
+    const sel = useTEMStore.getState().selection;
+    expect(useTEMStore.getState().doc.activeSheetId).toBe(sourceSheetId);
+    expect(sel.boxIds).toEqual([a, b]);      // 貼付先が別シートなら選択は動かない
+    expect(sel.lineIds).toEqual([l]);
   });
 
   it('別シートへの貼付でも Box / Line / SDSG がそろって複製される', () => {

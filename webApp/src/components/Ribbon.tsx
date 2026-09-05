@@ -3,7 +3,7 @@
 // タブ: File / Home / Insert / 表示 / 出力 / Help
 // ============================================================================
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTEMStore } from '../store/store';
 import type { BoxType } from '../types';
@@ -185,6 +185,15 @@ function HomeTab() {
   const removeBoxes = useTEMStore((s) => s.removeBoxes);
   const removeLines = useTEMStore((s) => s.removeLines);
   const removeSDSG = useTEMStore((s) => s.removeSDSG);
+  const getClipboardInfo = useTEMStore((s) => s.getClipboardInfo);
+  // クリップボード実体はストア外のモジュール変数なので、バージョンを購読して再評価する
+  const clipboardVersion = useTEMStore((s) => s.clipboardVersion);
+  const clipboardCount = useMemo(() => {
+    const info = getClipboardInfo();
+    return info.boxCount + info.lineCount + info.sdsgCount;
+  }, [getClipboardInfo, clipboardVersion]);
+  const selectedCount =
+    selection.boxIds.length + selection.lineIds.length + selection.sdsgIds.length;
   const canvasMode = useTEMStore((s) => s.view.canvasMode);
   const setCanvasMode = useTEMStore((s) => s.setCanvasMode);
 
@@ -223,13 +232,37 @@ function HomeTab() {
       <RibbonGroup title="基本操作">
         <RibbonButton label="元に戻す (Ctrl+Z)" icon="↶" onClick={() => useTEMStore.temporal.getState().undo()} />
         <RibbonButton label="進む (Ctrl+Y)" icon="↷" onClick={() => useTEMStore.temporal.getState().redo()} />
-        <RibbonButton label="コピー" icon="📋" onClick={copyToClipboard} />
-        <RibbonButton label="貼付" icon="📥" onClick={() => pasteFromClipboard()} />
-        <RibbonButton label="削除" icon="🗑" onClick={handleDelete} />
+        <RibbonButton
+          label="コピー"
+          icon="📋"
+          onClick={copyToClipboard}
+          disabled={selectedCount === 0}
+          title={selectedCount > 0 ? `選択中の ${selectedCount} 要素をコピー` : '図形を選択してください'}
+        />
+        <RibbonButton
+          label="貼付"
+          icon="📥"
+          onClick={() => pasteFromClipboard()}
+          disabled={clipboardCount === 0}
+          title={clipboardCount > 0 ? `クリップボードの ${clipboardCount} 要素を貼り付け` : 'クリップボードが空です'}
+        />
+        <RibbonButton
+          label="削除"
+          icon="🗑"
+          onClick={handleDelete}
+          disabled={selectedCount === 0}
+          title={selectedCount > 0 ? `選択中の ${selectedCount} 要素を削除` : '図形を選択してください'}
+        />
       </RibbonGroup>
       <RibbonGroup title="編集">
         <RibbonButton label="全選択" icon="☰" onClick={() => useTEMStore.getState().selectAll()} />
-        <RibbonButton label="複製" icon="⎘" onClick={() => { copyToClipboard(); pasteFromClipboard(); }} />
+        <RibbonButton
+          label="複製"
+          icon="⎘"
+          onClick={() => { copyToClipboard(); pasteFromClipboard(); }}
+          disabled={selectedCount === 0}
+          title={selectedCount > 0 ? `選択中の ${selectedCount} 要素を複製` : '図形を選択してください'}
+        />
         <RibbonButton
           label="文字に合わせる"
           icon="↔↕"

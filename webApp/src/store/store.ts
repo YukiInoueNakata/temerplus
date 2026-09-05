@@ -1313,6 +1313,9 @@ export const useTEMStore = create<Store>()(
       },
       pasteFromClipboard: (targetSheetId) => {
         if (!clipboard) return;
+        // 貼り付けた要素を選択状態にするため、新 ID を控える
+        const pastedRef: { sheetId: string; boxIds: string[]; lineIds: string[]; sdsgIds: string[] } =
+          { sheetId: '', boxIds: [], lineIds: [], sdsgIds: [] };
         set((state) => {
           const sid = targetSheetId ?? state.doc.activeSheetId;
           const idMap = new Map<string, string>();
@@ -1324,6 +1327,7 @@ export const useTEMStore = create<Store>()(
                 const newId = genBoxIdByType(b.type, sheet.boxes.map((x) => x.id));
                 idMap.set(b.id, newId);
                 sheet.boxes.push({ ...b, id: newId, x: b.x + 20, y: b.y + 20, ...withNewSourceRefIds(b) });
+                pastedRef.boxIds.push(newId);
               });
               // Line ID も addLine と同じ種別連番（RL_n / XL_n）で採る
               clipboard!.lines.forEach((l) => {
@@ -1332,6 +1336,7 @@ export const useTEMStore = create<Store>()(
                 const newFrom = idMap.get(l.from) ?? l.from;
                 const newTo = idMap.get(l.to) ?? l.to;
                 sheet.lines.push({ ...l, id: newId, from: newFrom, to: newTo, ...withNewSourceRefIds(l) });
+                pastedRef.lineIds.push(newId);
               });
               // SDSG ID も addSDSG と同じ種別連番（SD1 / SG1）で採る。
               // アンカーは attachedTo だけでなく between モードの attachedTo2 も再マップする
@@ -1350,16 +1355,36 @@ export const useTEMStore = create<Store>()(
                   ...(newAttached2 ? { attachedTo2: newAttached2 } : {}),
                   ...withNewSourceRefIds(s),
                 });
+                pastedRef.sdsgIds.push(newId);
               });
+              pastedRef.sheetId = sid;
             }),
             dirty: true,
           };
         });
+        // 貼り付けた要素を選択状態にする（複製元が選択されたままだと
+        // 直後の Delete で元の方が消えるため）。別シートへ貼った場合は触らない
+        const st = get();
+        if (pastedRef.sheetId && pastedRef.sheetId === st.doc.activeSheetId) {
+          set((s2) => ({
+            selection: {
+              ...s2.selection,
+              sheetId: pastedRef.sheetId,
+              boxIds: pastedRef.boxIds,
+              lineIds: pastedRef.lineIds,
+              sdsgIds: pastedRef.sdsgIds,
+              noteIds: [],
+            },
+          }));
+        }
       },
       // 指定位置挿入: index は「N 番目の前に挿入」（length で末尾後）
       pasteFromClipboardAt: (kind, index, options) => {
         if (!clipboard) return;
         const mode = options?.mode ?? 'offset';
+        // 挿入した要素を選択状態にするため、新 ID を控える
+        const pastedRef: { boxIds: string[]; lineIds: string[]; sdsgIds: string[] } =
+          { boxIds: [], lineIds: [], sdsgIds: [] };
         set((state) => ({
           doc: mutateActiveSheet(state.doc, (sheet) => {
             if (kind === 'box') {
@@ -1424,6 +1449,7 @@ export const useTEMStore = create<Store>()(
 
               const safeIndex = Math.max(0, Math.min(index, sheet.boxes.length));
               sheet.boxes.splice(safeIndex, 0, ...newBoxes);
+              pastedRef.boxIds = newBoxes.map((b) => b.id);
 
               // 貼付 Box 群の内部で完結する Line（両端とも貼付対象）も一緒に挿入する。
               // これが無いと、つながった出来事をデータシートから挿入したときに矢印が黙って消える。
@@ -1435,6 +1461,7 @@ export const useTEMStore = create<Store>()(
                 const newId = genLineIdByType(l.type, sheet.lines.map((x) => x.id));
                 lineIdMap.set(l.id, newId);
                 sheet.lines.push({ ...l, id: newId, from: newFrom, to: newTo, ...withNewSourceRefIds(l) });
+                pastedRef.lineIds.push(newId);
               });
 
               // アンカーがすべて貼付対象に含まれる SD/SG も一緒に挿入する
@@ -1456,6 +1483,7 @@ export const useTEMStore = create<Store>()(
                   ...(newAttached2 ? { attachedTo2: newAttached2 } : {}),
                   ...withNewSourceRefIds(sd),
                 });
+                pastedRef.sdsgIds.push(newId);
               });
             } else {
               // SDSG は midpoint に対応しない（座標は attachedTo に追従するため無意味）
@@ -1467,9 +1495,21 @@ export const useTEMStore = create<Store>()(
               });
               const safeIndex = Math.max(0, Math.min(index, sheet.sdsg.length));
               sheet.sdsg.splice(safeIndex, 0, ...newSDSGs);
+              pastedRef.sdsgIds = newSDSGs.map((x) => x.id);
             }
           }),
           dirty: true,
+        }));
+        // 挿入した要素を選択状態にする（insertBoxesBetween と同じ扱い）
+        set((s2) => ({
+          selection: {
+            ...s2.selection,
+            sheetId: s2.doc.activeSheetId,
+            boxIds: pastedRef.boxIds,
+            lineIds: pastedRef.lineIds,
+            sdsgIds: pastedRef.sdsgIds,
+            noteIds: [],
+          },
         }));
       },
       getClipboardInfo: () => ({

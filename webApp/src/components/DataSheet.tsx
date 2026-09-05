@@ -3,7 +3,7 @@
 // 用途: 初期一括作成、複数Boxコピペ追加、ID・ラベル編集、Excel複数行貼付
 // ============================================================================
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, Fragment } from 'react';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import type { BoxType } from '../types';
 import { BOX_TYPE_LABELS, LEVEL_PX } from '../store/defaults';
@@ -147,8 +147,14 @@ function BoxTable() {
   const selectedBoxIds = useTEMStore((s) => s.selection.boxIds);
   const setSelection = useTEMStore((s) => s.setSelection);
   const pasteAtStore = useTEMStore((s) => s.pasteFromClipboardAt);
+  const copyToClipboard = useTEMStore((s) => s.copyToClipboard);
   const getClipboardInfo = useTEMStore((s) => s.getClipboardInfo);
-  const clipboardBoxCount = getClipboardInfo().boxCount;
+  // クリップボード実体はストア外のモジュール変数なので、バージョンを購読して再評価する
+  const clipboardVersion = useTEMStore((s) => s.clipboardVersion);
+  const clipboardBoxCount = useMemo(
+    () => getClipboardInfo().boxCount,
+    [getClipboardInfo, clipboardVersion],
+  );
   const [pasteMode, setPasteMode] = useState<'offset' | 'midpoint'>(
     () => (localStorage.getItem('temer:paste-mode') as 'offset' | 'midpoint') ?? 'offset',
   );
@@ -284,6 +290,20 @@ function BoxTable() {
             選択 {selectedBoxIds.length}個
           </span>
         )}
+        <button
+          className="ribbon-btn-small"
+          onClick={copyToClipboard}
+          disabled={selectedBoxIds.length === 0}
+          title={selectedBoxIds.length > 0
+            ? `選択中の ${selectedBoxIds.length} 行をコピー（下の「挿入」ボタンで貼り付け）`
+            : '行のチェックボックスで出来事を選択してください'}
+          style={{ marginLeft: 6 }}
+        >コピー</button>
+        {clipboardBoxCount > 0 && (
+          <span style={{ fontSize: '0.77em', color: '#888', marginLeft: 4 }}>
+            クリップボード {clipboardBoxCount}行
+          </span>
+        )}
         <label style={{ marginLeft: 'auto', fontSize: '0.78em', color: '#666', display: 'flex', alignItems: 'center', gap: 4 }}>
           貼付モード:
           <select
@@ -331,8 +351,8 @@ function BoxTable() {
               colSpan={7}
             />
             {sortedBoxes.map((b, idx) => (
-              <>
-                <tr key={b.id} className={selectedBoxIds.includes(b.id) ? 'row-selected' : ''}>
+              <Fragment key={b.id}>
+                <tr className={selectedBoxIds.includes(b.id) ? 'row-selected' : ''}>
                   <td style={{ textAlign: 'center' }}>
                     <input
                       type="checkbox"
@@ -415,7 +435,7 @@ function BoxTable() {
                   </td>
                 </tr>
                 {idx < sortedBoxes.length - 1 && (
-                  <tr className="insert-row" key={`insert-${b.id}`}>
+                  <tr className="insert-row">
                     <td colSpan={7}>
                       <button
                         className="insert-between-btn"
@@ -425,7 +445,7 @@ function BoxTable() {
                     </td>
                   </tr>
                 )}
-              </>
+              </Fragment>
             ))}
             {sortedBoxes.length === 0 && (
               <tr><td colSpan={7} style={{ textAlign: 'center', color: '#888', padding: 20 }}>
@@ -549,10 +569,14 @@ function SDSGTable() {
   const updateSDSG = useTEMStore((s) => s.updateSDSG);
   const removeSDSG = useTEMStore((s) => s.removeSDSG);
   const pasteAt = useTEMStore((s) => s.pasteFromClipboardAt);
-  const clipboardInfo = useTEMStore((s) => s.getClipboardInfo?.());
+  const getClipboardInfo = useTEMStore((s) => s.getClipboardInfo);
+  const clipboardVersion = useTEMStore((s) => s.clipboardVersion);
+  const clipboardSDSGCount = useMemo(
+    () => getClipboardInfo().sdsgCount,
+    [getClipboardInfo, clipboardVersion],
+  );
   if (!sheet) return null;
 
-  const clipboardSDSGCount = clipboardInfo?.sdsgCount ?? 0;
   const canPaste = clipboardSDSGCount > 0;
 
   // 追加ボタン: 選択中 Line あれば Line、なければ最後の Box

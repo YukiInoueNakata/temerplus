@@ -333,8 +333,15 @@ export default function App() {
       const store = useTEMStore.getState();
       const temporal = useTEMStore.temporal.getState();
       const target = e.target as HTMLElement;
+      // チェックボックス等の非テキスト input は「編集中」ではない。
+      // （データシートの行選択チェックボックスにフォーカスがある状態で
+      //   Ctrl+C / Ctrl+V / Delete が効かなくなるのを防ぐ）
+      const NON_TEXT_INPUT_TYPES = ['checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'color', 'file', 'image'];
+      const isTextInput =
+        target.tagName === 'INPUT' &&
+        !NON_TEXT_INPUT_TYPES.includes((target as HTMLInputElement).type);
       const isEditing =
-        target.tagName === 'INPUT' ||
+        isTextInput ||
         target.tagName === 'TEXTAREA' ||
         target.isContentEditable;
 

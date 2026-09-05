@@ -57,6 +57,9 @@ interface UIState {
   // Canvas に fit を要求するシグナル（カウンタ更新で購読側が再実行）
   fitCounter: number;
   fitMode: FitMode | null;
+  // クリップボード更新のシグナル（実体はモジュール変数なので、
+  // このカウンタを購読させないと貼付ボタンの活性状態が更新されない）
+  clipboardVersion: number;
 }
 
 export interface PasteAtOptions {
@@ -350,6 +353,7 @@ export const useTEMStore = create<Store>()(
       dirty: false,
       fitCounter: 0,
       fitMode: null,
+      clipboardVersion: 0,
 
       // --- Document-level ---
       loadDocument: (doc) => {
@@ -1295,6 +1299,8 @@ export const useTEMStore = create<Store>()(
           lines: sheet.lines.filter((l) => lineIds.includes(l.id)),
           sdsg: sheet.sdsg.filter((s) => sdsgIds.includes(s.id)),
         };
+        // 購読側（データシートの貼付ボタン等）へ更新を通知する
+        set((st) => ({ clipboardVersion: st.clipboardVersion + 1 }));
       },
       pasteFromClipboard: (targetSheetId) => {
         if (!clipboard) return;

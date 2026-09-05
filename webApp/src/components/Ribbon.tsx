@@ -68,7 +68,7 @@ export function Ribbon({
         ))}
         <div style={{ flex: 1 }} />
         <LayoutToggle />
-        <LocaleToggle />
+        {SHOW_LOCALE_TOGGLE && <LocaleToggle />}
         <SaveButton onSave={onSave} />
       </div>
       <div className="ribbon-body">
@@ -82,6 +82,14 @@ export function Ribbon({
     </div>
   );
 }
+
+// 言語切替ボタンの表示フラグ。
+// 2026-09-05: en の翻訳がリボンタブ名など 15 語だけで、English に切り替えると
+// 大半が日本語のまま残り「壊れて見える」状態になる（2026-09-20 TEA 国際集会の
+// ハンズオンで参加者が触るため）。翻訳を主要 UI（SettingsDialog / PropertyPanel /
+// 各ダイアログ）まで広げたら true に戻す。i18n の基盤（i18next / locales）は
+// そのまま残してある。
+const SHOW_LOCALE_TOGGLE = false;
 
 function LocaleToggle() {
   const locale = useTEMStore((s) => s.doc.settings.locale);

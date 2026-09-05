@@ -236,6 +236,15 @@ export function ExportPreviewDialog({
     });
   }, [xf.paperSize, xf.pageCount, xf.pageOverlapPx, transformed.doc.settings.layout]);
 
+  // layout に応じた用紙サイズ選択肢
+  // 【重要】フックは早期 return より前に置くこと。open が false→true で
+  // フック数が変わると React error #310 (Rendered more hooks than during
+  // the previous render) になる。
+  const paperOptions = useMemo(
+    () => getPaperSizeOptionsForLayout(doc.settings.layout),
+    [doc.settings.layout],
+  );
+
   if (!open) return null;
 
   const update = (patch: Partial<ExportTransform>) => setXf((x) => ({ ...x, ...patch }));
@@ -250,12 +259,6 @@ export function ExportPreviewDialog({
   const modalStyle: React.CSSProperties = pos
     ? { width: 1000, maxWidth: '95vw', position: 'absolute', left: pos.x, top: pos.y, margin: 0 }
     : { width: 1000, maxWidth: '95vw' };
-
-  // layout に応じた用紙サイズ選択肢
-  const paperOptions = useMemo(
-    () => getPaperSizeOptionsForLayout(doc.settings.layout),
-    [doc.settings.layout],
-  );
 
   const runExport = async () => {
     setBusy(true);

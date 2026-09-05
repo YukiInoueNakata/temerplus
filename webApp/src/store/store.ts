@@ -32,8 +32,8 @@ import {
   LEVEL_PX,
   genBoxId,
   genBoxIdByType,
-  genLineId,
-  genSDSGId,
+  genLineIdByType,
+  genSDSGIdByType,
   genCommentId,
   genPeriodId,
   genSheetId,
@@ -328,6 +328,15 @@ const mutateSheet = (doc: TEMDocument, sheetId: string, mutator: (sheet: Sheet) 
     if (sheet) mutator(sheet);
     draft.metadata.modifiedAt = new Date().toISOString();
   });
+
+// 貼付時に sourceRefs（原文リンク）の ID を振り直すためのヘルパー。
+// 同じ SourceRef.id が複数エンティティに存在すると編集追従・論文レポートの
+// 引用が同一 ID で二重に現れるため、複製のたびに新しい ID を採る。
+const withNewSourceRefIds = <T extends { sourceRefs?: SourceRef[] }>(entity: T):
+  { sourceRefs?: SourceRef[] } =>
+  entity.sourceRefs && entity.sourceRefs.length > 0
+    ? { sourceRefs: entity.sourceRefs.map((r) => ({ ...r, id: genSourceRefId() })) }
+    : {};
 
 // In-memory clipboard
 let clipboard: {
@@ -1307,24 +1316,40 @@ export const useTEMStore = create<Store>()(
         set((state) => {
           const sid = targetSheetId ?? state.doc.activeSheetId;
           const idMap = new Map<string, string>();
+          const lineIdMap = new Map<string, string>();
           return {
             doc: mutateSheet(state.doc, sid, (sheet) => {
               // 旧Excelマクロ準拠のID規則で新規ID生成
               clipboard!.boxes.forEach((b) => {
                 const newId = genBoxIdByType(b.type, sheet.boxes.map((x) => x.id));
                 idMap.set(b.id, newId);
-                sheet.boxes.push({ ...b, id: newId, x: b.x + 20, y: b.y + 20 });
+                sheet.boxes.push({ ...b, id: newId, x: b.x + 20, y: b.y + 20, ...withNewSourceRefIds(b) });
               });
+              // Line ID も addLine と同じ種別連番（RL_n / XL_n）で採る
               clipboard!.lines.forEach((l) => {
-                const newId = genLineId();
+                const newId = genLineIdByType(l.type, sheet.lines.map((x) => x.id));
+                lineIdMap.set(l.id, newId);
                 const newFrom = idMap.get(l.from) ?? l.from;
                 const newTo = idMap.get(l.to) ?? l.to;
-                sheet.lines.push({ ...l, id: newId, from: newFrom, to: newTo });
+                sheet.lines.push({ ...l, id: newId, from: newFrom, to: newTo, ...withNewSourceRefIds(l) });
               });
+              // SDSG ID も addSDSG と同じ種別連番（SD1 / SG1）で採る。
+              // アンカーは attachedTo だけでなく between モードの attachedTo2 も再マップする
               clipboard!.sdsg.forEach((s) => {
-                const newId = genSDSGId();
-                const newAttached = idMap.get(s.attachedTo) ?? s.attachedTo;
-                sheet.sdsg.push({ ...s, id: newId, attachedTo: newAttached });
+                const newId = genSDSGIdByType(s.type, sheet.sdsg.map((x) => x.id));
+                const remapAnchor = (id: string, kind: 'box' | 'line' | undefined) =>
+                  (kind === 'line' ? lineIdMap.get(id) : idMap.get(id)) ?? id;
+                const newAttached = remapAnchor(s.attachedTo, s.attachedType);
+                const newAttached2 = s.attachedTo2
+                  ? remapAnchor(s.attachedTo2, s.attachedType2)
+                  : undefined;
+                sheet.sdsg.push({
+                  ...s,
+                  id: newId,
+                  attachedTo: newAttached,
+                  ...(newAttached2 ? { attachedTo2: newAttached2 } : {}),
+                  ...withNewSourceRefIds(s),
+                });
               });
             }),
             dirty: true,
@@ -1343,7 +1368,7 @@ export const useTEMStore = create<Store>()(
               const newBoxes = clipboard!.boxes.map((b) => {
                 const newId = genBoxIdByType(b.type, [...sheet.boxes.map((x) => x.id), ...idMap.values()]);
                 idMap.set(b.id, newId);
-                return { ...b, id: newId };
+                return { ...b, id: newId, ...withNewSourceRefIds(b) };
               });
 
               // midpoint モード: 前後 Box の Time 軸中間に均等配置
@@ -1399,11 +1424,46 @@ export const useTEMStore = create<Store>()(
 
               const safeIndex = Math.max(0, Math.min(index, sheet.boxes.length));
               sheet.boxes.splice(safeIndex, 0, ...newBoxes);
+
+              // 貼付 Box 群の内部で完結する Line（両端とも貼付対象）も一緒に挿入する。
+              // これが無いと、つながった出来事をデータシートから挿入したときに矢印が黙って消える。
+              const lineIdMap = new Map<string, string>();
+              clipboard!.lines.forEach((l) => {
+                const newFrom = idMap.get(l.from);
+                const newTo = idMap.get(l.to);
+                if (!newFrom || !newTo) return;   // 片端が貼付対象外の Line は連れてこない
+                const newId = genLineIdByType(l.type, sheet.lines.map((x) => x.id));
+                lineIdMap.set(l.id, newId);
+                sheet.lines.push({ ...l, id: newId, from: newFrom, to: newTo, ...withNewSourceRefIds(l) });
+              });
+
+              // アンカーがすべて貼付対象に含まれる SD/SG も一緒に挿入する
+              const resolveAnchor = (id: string, kind: 'box' | 'line' | undefined) =>
+                (kind === 'line' ? lineIdMap.get(id) : idMap.get(id));
+              clipboard!.sdsg.forEach((sd) => {
+                const newAttached = resolveAnchor(sd.attachedTo, sd.attachedType);
+                if (!newAttached) return;
+                let newAttached2: string | undefined;
+                if (sd.attachedTo2) {
+                  newAttached2 = resolveAnchor(sd.attachedTo2, sd.attachedType2);
+                  if (!newAttached2) return;      // between の片側が貼付対象外なら連れてこない
+                }
+                const newId = genSDSGIdByType(sd.type, sheet.sdsg.map((x) => x.id));
+                sheet.sdsg.push({
+                  ...sd,
+                  id: newId,
+                  attachedTo: newAttached,
+                  ...(newAttached2 ? { attachedTo2: newAttached2 } : {}),
+                  ...withNewSourceRefIds(sd),
+                });
+              });
             } else {
               // SDSG は midpoint に対応しない（座標は attachedTo に追従するため無意味）
+              const takenIds = sheet.sdsg.map((x) => x.id);
               const newSDSGs = clipboard!.sdsg.map((s) => {
-                const newId = genSDSGId();
-                return { ...s, id: newId };
+                const newId = genSDSGIdByType(s.type, takenIds);
+                takenIds.push(newId);
+                return { ...s, id: newId, ...withNewSourceRefIds(s) };
               });
               const safeIndex = Math.max(0, Math.min(index, sheet.sdsg.length));
               sheet.sdsg.splice(safeIndex, 0, ...newSDSGs);
@@ -1742,7 +1802,7 @@ export const useTEMStore = create<Store>()(
                   : [endId, ...[...newBoxIds].reverse(), startId];
                 for (let i = 0; i < chain.length - 1; i++) {
                   sheet.lines.push({
-                    id: genLineId(),
+                    id: genLineIdByType(type, sheet.lines.map((x) => x.id)),
                     type,
                     from: chain[i],
                     to: chain[i + 1],

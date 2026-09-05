@@ -184,12 +184,15 @@ function HomeTab() {
   const selection = useTEMStore((s) => s.selection);
   const removeBoxes = useTEMStore((s) => s.removeBoxes);
   const removeLines = useTEMStore((s) => s.removeLines);
+  const removeSDSG = useTEMStore((s) => s.removeSDSG);
   const canvasMode = useTEMStore((s) => s.view.canvasMode);
   const setCanvasMode = useTEMStore((s) => s.setCanvasMode);
 
   const handleDelete = () => {
+    // Delete キー（App.tsx）と同じ範囲を消す。SD/SG が消えないと挙動が食い違う
     if (selection.boxIds.length > 0) removeBoxes(selection.boxIds);
     if (selection.lineIds.length > 0) removeLines(selection.lineIds);
+    if (selection.sdsgIds.length > 0) selection.sdsgIds.forEach((id) => removeSDSG(id));
   };
 
   return (

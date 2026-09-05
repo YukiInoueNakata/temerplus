@@ -243,7 +243,33 @@ export function genBoxIdByType(type: string, existingIds: string[]): string {
   return `${prefix}${maxNum + 1}`;
 }
 
+// 種別連番の共通ヘルパー（prefix + 既存 ID の最大値 +1）
+function nextSequentialId(prefix: string, existingIds: string[]): string {
+  const pattern = new RegExp(`^${prefix}(\\d+)$`);
+  let maxNum = 0;
+  for (const id of existingIds) {
+    const m = id.match(pattern);
+    if (m) {
+      const n = parseInt(m[1], 10);
+      if (n > maxNum) maxNum = n;
+    }
+  }
+  return `${prefix}${maxNum + 1}`;
+}
+
+// Line ID: RLine → RL_n / XLine → XL_n（addLine と同一規則。貼付でも使う）
+export function genLineIdByType(lineType: string, existingIds: string[]): string {
+  return nextSequentialId(lineType === 'XLine' ? 'XL_' : 'RL_', existingIds);
+}
+
+// SDSG ID: SD → SD1 / SG → SG1（addSDSG と同一規則。貼付でも使う）
+export function genSDSGIdByType(type: 'SD' | 'SG', existingIds: string[]): string {
+  return nextSequentialId(type, existingIds);
+}
+
 export const genBoxId = () => genId('Box');  // fallback (random) - 使用しない方針
+// 非推奨（種別を見ないランダム ID）。ID 規則を統一するため genLineIdByType /
+// genSDSGIdByType を使う。旧ファイル互換のため export は残す。
 export const genLineId = () => genId('L');
 export const genSDSGId = () => genId('SG');
 export const genAnnotationId = () => genId('Ann');

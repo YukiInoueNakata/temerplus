@@ -39,6 +39,10 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
+      # フック規約違反（早期 return 後のフック = React #310 / #300）を止める
+      - name: Lint (React hooks rules)
+        run: npm run lint
+
       - name: Unit tests
         run: npm test
 

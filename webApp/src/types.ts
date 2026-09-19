@@ -395,8 +395,18 @@ export interface InterviewInfo {
   notes?: string;
 }
 
+// 表記方針で各視覚的要素に持たせた意味の度合い（論文IV章 図8 の 3 択に対応）
+// - 'yes'   : 意味あり
+// - 'loose' : 緩やかに意味あり
+// - 'no'    : 意味なし（見栄えのみ）
+export type VisualConventionMeaning = 'yes' | 'loose' | 'no';
+
 export interface VisualConventionEntry {
-  hasMeaning: boolean;
+  // 後方互換: 旧 .tem は hasMeaning のみを持つ。読取時は meaning を優先し、
+  // meaning が無ければ hasMeaning から導出する（resolveConventionMeaning）。
+  // 書込時は両方を更新するので、旧バージョンで開いても意味が反転しない。
+  hasMeaning?: boolean;
+  meaning?: VisualConventionMeaning;
   description?: string;
 }
 

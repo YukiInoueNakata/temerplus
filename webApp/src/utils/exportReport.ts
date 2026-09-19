@@ -16,6 +16,7 @@ import {
   ImageRun,
 } from 'docx';
 import { toPng } from 'html-to-image';
+import { resolveConventionMeaning } from './visualConventions';
 import type {
   TEMDocument,
   Sheet,
@@ -27,6 +28,7 @@ import type {
   LayoutDirection,
   SourceRef,
   Transcript,
+  VisualConventionEntry,
 } from '../types';
 
 export interface PaperReportOptions {
@@ -461,11 +463,14 @@ export async function exportPaperReport(
   // 4. 表記方針
   const vc = doc.metadata.visualConventions;
   children.push(heading('4. 表記方針', HeadingLevel.HEADING_1));
-  const addConv = (label: string, ent?: { hasMeaning: boolean; description?: string }) => {
+  const addConv = (label: string, ent?: VisualConventionEntry) => {
     if (!ent) return;
-    const txt = ent.hasMeaning
-      ? `${label}: 意味あり。${ent.description ?? ''}`
-      : `${label}: 意味なし（見栄えのみ）`;
+    const meaning = resolveConventionMeaning(ent);
+    const desc = ent.description ?? '';
+    const txt =
+      meaning === 'yes'   ? `${label}: 意味あり。${desc}` :
+      meaning === 'loose' ? `${label}: 緩やかに意味あり。${desc}` :
+                            `${label}: 意味なし（見栄えのみ）`;
     children.push(para(txt));
   };
   if (vc) {

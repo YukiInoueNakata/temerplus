@@ -6,6 +6,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTEMStore } from '../store/store';
+import {
+  CONVENTION_MEANINGS,
+  CONVENTION_MEANING_LABELS,
+  resolveConventionMeaning,
+  setConventionMeaning,
+} from '../utils/visualConventions';
 import { produce } from 'immer';
 import type {
   NotationSystem,
@@ -404,25 +410,34 @@ function VisualSection({ updateMeta }: { updateMeta: UpdateMeta }) {
     keyName: 'horizontalLength' | 'arrowAngle' | 'verticalPosition' | 'colors' | 'lineWeight';
   }) => {
     const cur = vc?.[props.keyName];
+    const meaning = resolveConventionMeaning(cur);
     return (
       <div style={{ border: '1px solid #eee', borderRadius: 4, padding: 8, marginBottom: 8, background: '#fafafa' }}>
         <div className="setting-row">
-          <label>{props.name} に意味がある</label>
-          <input
-            type="checkbox"
-            checked={cur?.hasMeaning ?? false}
-            onChange={(e) => update(props.keyName, {
-              hasMeaning: e.target.checked,
-              description: cur?.description,
-            })}
-          />
+          <label>{props.name}</label>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {CONVENTION_MEANINGS.map((m) => (
+              <label key={m} style={{ display: 'flex', alignItems: 'center', gap: 4, fontWeight: 'normal' }}>
+                <input
+                  type="radio"
+                  name={`vc-${props.keyName}`}
+                  checked={meaning === m}
+                  onChange={() => update(props.keyName, setConventionMeaning(cur, m))}
+                />
+                {CONVENTION_MEANING_LABELS[m]}
+              </label>
+            ))}
+          </div>
         </div>
-        {cur?.hasMeaning && (
+        {meaning !== 'no' && (
           <div className="setting-row" style={{ alignItems: 'flex-start' }}>
             <label>説明</label>
             <textarea
-              value={cur.description ?? ''}
-              onChange={(e) => update(props.keyName, { hasMeaning: true, description: e.target.value })}
+              value={cur?.description ?? ''}
+              onChange={(e) => update(props.keyName, {
+                ...setConventionMeaning(cur, meaning),
+                description: e.target.value,
+              })}
               style={{ width: 300, height: 40, resize: 'vertical' }}
             />
           </div>
@@ -434,7 +449,7 @@ function VisualSection({ updateMeta }: { updateMeta: UpdateMeta }) {
   return (
     <section className="settings-section">
       <h4>表記方針</h4>
-      <p className="hint">図中で意味を持たせた表記について明文化します（学会での透明性向上）。</p>
+      <p className="hint">図中で意味を持たせた表記について明文化します（学会での透明性向上）。各項目は「意味あり / 緩やかに意味あり / 意味なし」から選びます。</p>
       <Entry name="横軸の長さ" keyName="horizontalLength" />
       <Entry name="矢印の角度" keyName="arrowAngle" />
       <Entry name="縦の位置" keyName="verticalPosition" />

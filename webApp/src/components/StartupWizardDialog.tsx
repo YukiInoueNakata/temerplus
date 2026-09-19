@@ -5,7 +5,7 @@
 //   1. ファイルから新規作成 (→ サブメニュー: 原文取り込み / 切片CSV)
 //   2. プロジェクトを開く (.tem)
 //   3. 空ファイルから作成
-//   4. デモファイルを開く
+//   4. デモファイルを開く（日本語 / 英語）
 //
 // 「次回から表示しない」localStorage キーは temer:hide-startup-wizard。
 // popout window では表示しない (App 側で抑止)。
@@ -17,6 +17,7 @@ export type StartupWizardChoice =
   | { kind: 'open-tem' }                  // 既存 .tem を開く
   | { kind: 'create-empty' }              // 空ファイルから始める (現状の空 doc のまま)
   | { kind: 'open-demo' }                 // デモ .tem を開く (神崎・鈴木 2021)
+  | { kind: 'open-demo-en' }              // 英語版デモ .tem を開く (国際集会向け)
   | { kind: 'open-transcript-demo' }      // 原文連動デモ .tem を開く (Phase 4)
   | { kind: 'new-from-transcript' }       // 原文 1 ファイルから取り込み
   | { kind: 'new-from-transcripts-bulk' } // 原文を複数ファイル/フォルダから一括取り込み
@@ -87,6 +88,12 @@ export function StartupWizardDialog({
                   title="デモファイルを開く"
                   desc="神崎・鈴木 (2021) Figure 1 を再現した作例 (32 Box / 34 Line / 4 SDSG / 4 期)"
                   onClick={() => choose({ kind: 'open-demo' })}
+                />
+                <Card
+                  emoji="🌐"
+                  title="Open English demo"
+                  desc="English version of the Kanzaki & Suzuki (2021) Figure 1 sample (32 boxes / 34 lines / 4 SD-SG / 4 periods)"
+                  onClick={() => choose({ kind: 'open-demo-en' })}
                 />
                 <Card
                   emoji="🔗"

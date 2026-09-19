@@ -1,0 +1,1038 @@
+{
+ "version": "0.3",
+ "sheets": [
+  {
+   "id": "Sheet_moioi0bb_zqbww",
+   "name": "Participant A",
+   "type": "individual",
+   "order": 0,
+   "boxes": [
+    {
+     "id": "Item1",
+     "type": "normal",
+     "label": "Starting point",
+     "x": 100,
+     "y": 200,
+     "width": 60,
+     "height": 100,
+     "textOrientation": "vertical"
+    },
+    {
+     "id": "OPP1",
+     "type": "OPP",
+     "label": "Obligatory\nPassage Point",
+     "x": 300,
+     "y": 200,
+     "width": 60,
+     "height": 120,
+     "textOrientation": "vertical"
+    },
+    {
+     "id": "BFP1",
+     "type": "BFP",
+     "label": "Bifurcation\nPoint",
+     "x": 500,
+     "y": 200,
+     "width": 60,
+     "height": 100,
+     "textOrientation": "vertical"
+    },
+    {
+     "id": "EFP1",
+     "type": "EFP",
+     "label": "Equifinality\nPoint",
+     "x": 700,
+     "y": 100,
+     "width": 70,
+     "height": 120,
+     "textOrientation": "vertical"
+    },
+    {
+     "id": "P_EFP1",
+     "type": "P-EFP",
+     "label": "Polarized\nEFP",
+     "x": 700,
+     "y": 300,
+     "width": 70,
+     "height": 120,
+     "textOrientation": "vertical"
+    }
+   ],
+   "lines": [
+    {
+     "id": "RL_1",
+     "type": "RLine",
+     "from": "Item1",
+     "to": "OPP1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "RL_2",
+     "type": "RLine",
+     "from": "OPP1",
+     "to": "BFP1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "RL_3",
+     "type": "RLine",
+     "from": "BFP1",
+     "to": "EFP1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "XL_1",
+     "type": "XLine",
+     "from": "BFP1",
+     "to": "P_EFP1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    }
+   ],
+   "sdsg": [
+    {
+     "id": "SD1",
+     "type": "SD",
+     "label": "SD",
+     "attachedTo": "BFP1",
+     "attachedType": "box",
+     "itemOffset": -120,
+     "timeOffset": 0,
+     "width": 70,
+     "height": 40
+    },
+    {
+     "id": "SG1",
+     "type": "SG",
+     "label": "SG",
+     "attachedTo": "BFP1",
+     "attachedType": "box",
+     "itemOffset": 130,
+     "timeOffset": 0,
+     "width": 70,
+     "height": 40
+    }
+   ],
+   "notes": [],
+   "comments": [],
+   "periodLabels": [
+    {
+     "id": "P_moioi0bb_04hkh",
+     "position": 4,
+     "label": "Period 1"
+    },
+    {
+     "id": "P_moioi0bb_gusya",
+     "position": 7.5,
+     "label": "Period 2"
+    }
+   ]
+  },
+  {
+   "id": "sheet-kanzaki2021-detail",
+   "name": "Kanzaki & Suzuki (2021) Figure 1 (detailed)",
+   "type": "individual",
+   "order": 1,
+   "boxes": [
+    {
+     "id": "A_1_1",
+     "type": "normal",
+     "label": "Suffers harsh\nteasing",
+     "subLabel": "A",
+     "participantId": "p_A",
+     "x": 100,
+     "y": -320,
+     "width": 80,
+     "height": 60,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "A_1_2",
+     "type": "normal",
+     "label": "Relationships break down;\n\"I can't take it anymore\"",
+     "subLabel": "A",
+     "participantId": "p_A",
+     "x": 220,
+     "y": -320,
+     "width": 100,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "A_1_3",
+     "type": "normal",
+     "label": "Attends in a separate\nroom to avoid classmates",
+     "subLabel": "A",
+     "participantId": "p_A",
+     "x": 360,
+     "y": -320,
+     "width": 110,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "B_1_1",
+     "type": "normal",
+     "label": "Has to transfer\nschools",
+     "subLabel": "B",
+     "participantId": "p_B",
+     "x": 220,
+     "y": -200,
+     "width": 90,
+     "height": 60,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "B_1_2",
+     "type": "normal",
+     "label": "Becomes unable\nto attend school",
+     "subLabel": "B",
+     "participantId": "p_B",
+     "x": 360,
+     "y": -200,
+     "width": 90,
+     "height": 60,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "C_1_1",
+     "type": "normal",
+     "label": "Paired with a classmate\nthey had clashed with",
+     "subLabel": "C",
+     "participantId": "p_C",
+     "x": 100,
+     "y": -50,
+     "width": 130,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "C_1_2",
+     "type": "normal",
+     "label": "Reaches the top ranks\nwithin a few months",
+     "subLabel": "C",
+     "participantId": "p_C",
+     "x": 250,
+     "y": -50,
+     "width": 100,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "C_1_3",
+     "type": "normal",
+     "label": "Coach asks them to step\naside for the third-years",
+     "subLabel": "C",
+     "participantId": "p_C",
+     "x": 380,
+     "y": -50,
+     "width": 130,
+     "height": 90,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "C_1_4",
+     "type": "normal",
+     "label": "Partner moves abroad\nfor family reasons",
+     "subLabel": "C",
+     "participantId": "p_C",
+     "x": 530,
+     "y": -50,
+     "width": 130,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "C_1_5",
+     "type": "normal",
+     "label": "Leaves the club",
+     "subLabel": "C",
+     "participantId": "p_C",
+     "x": 680,
+     "y": -50,
+     "width": 80,
+     "height": 60,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "D_1_1",
+     "type": "normal",
+     "label": "Becomes withdrawn\nat school",
+     "subLabel": "D",
+     "participantId": "p_D",
+     "x": 100,
+     "y": 150,
+     "width": 110,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "D_1_2",
+     "type": "normal",
+     "label": "Works hard at assignments,\nclub and presentations",
+     "subLabel": "D",
+     "participantId": "p_D",
+     "x": 230,
+     "y": 150,
+     "width": 130,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "D_1_3",
+     "type": "normal",
+     "label": "Starts staying away\nfrom school in earnest",
+     "subLabel": "D",
+     "participantId": "p_D",
+     "x": 380,
+     "y": 150,
+     "width": 130,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "D_1_4",
+     "type": "normal",
+     "label": "Every task feels a burden;\nbegins hospital visits",
+     "subLabel": "D",
+     "participantId": "p_D",
+     "x": 530,
+     "y": 150,
+     "width": 130,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "D_1_5",
+     "type": "normal",
+     "label": "Is diagnosed with a\ndevelopmental disorder",
+     "subLabel": "D",
+     "participantId": "p_D",
+     "x": 680,
+     "y": 150,
+     "width": 130,
+     "height": 60,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "BFP_A_1",
+     "type": "BFP",
+     "label": "Begins borrowing\nand reading books",
+     "subLabel": "A BFP",
+     "participantId": "p_A",
+     "x": 500,
+     "y": -320,
+     "width": 100,
+     "height": 80,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "BFP_B_1",
+     "type": "BFP",
+     "label": "Comes to respect\nTeacher E",
+     "subLabel": "B BFP",
+     "participantId": "p_B",
+     "x": 500,
+     "y": -200,
+     "width": 100,
+     "height": 90,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "OPP_KOKO",
+     "type": "OPP",
+     "label": "Enrolls in\nHigh School X",
+     "x": 850,
+     "y": -80,
+     "width": 100,
+     "height": 130,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "OPP_HITO",
+     "type": "OPP",
+     "label": "Relates to others\nnaturally",
+     "x": 1000,
+     "y": -80,
+     "width": 130,
+     "height": 80,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "A_2_1",
+     "type": "normal",
+     "label": "Takes a \"mom\" role after\nschool in online games",
+     "subLabel": "A",
+     "participantId": "p_A",
+     "x": 1170,
+     "y": -300,
+     "width": 160,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "C_2_1",
+     "type": "normal",
+     "label": "Becomes able to\ntalk with humor",
+     "subLabel": "C",
+     "participantId": "p_C",
+     "x": 1170,
+     "y": -100,
+     "width": 130,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "B_2_1",
+     "type": "normal",
+     "label": "Is shaped by\nwell-meaning people",
+     "subLabel": "B",
+     "participantId": "p_B",
+     "x": 1170,
+     "y": 80,
+     "width": 120,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "D_2_1",
+     "type": "normal",
+     "label": "Finds classmates who\nshare similar values",
+     "subLabel": "D",
+     "participantId": "p_D",
+     "x": 1170,
+     "y": 220,
+     "width": 140,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "OPP_KADAI",
+     "type": "OPP",
+     "label": "Transforms the self\nthrough school\nassignments",
+     "x": 1400,
+     "y": -80,
+     "width": 130,
+     "height": 130,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "A_3_1",
+     "type": "normal",
+     "label": "Tries many things at\nuniversity to gain\nnew ideas",
+     "subLabel": "A",
+     "participantId": "p_A",
+     "x": 1580,
+     "y": -320,
+     "width": 140,
+     "height": 90,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "C_3_1",
+     "type": "normal",
+     "label": "Wants to create something\namong motivated people",
+     "subLabel": "C",
+     "participantId": "p_C",
+     "x": 1580,
+     "y": -150,
+     "width": 150,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "B_3_1",
+     "type": "normal",
+     "label": "Resolves to work hard\nto surpass Teacher E",
+     "subLabel": "B",
+     "participantId": "p_B",
+     "x": 1580,
+     "y": 30,
+     "width": 140,
+     "height": 70,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "D_3_1",
+     "type": "normal",
+     "label": "Realizes others mean\nno harm, so there is\nno need to guard",
+     "subLabel": "D",
+     "participantId": "p_D",
+     "x": 1580,
+     "y": 200,
+     "width": 140,
+     "height": 90,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "EFP2_A",
+     "type": "2nd-EFP",
+     "label": "Takes on challenges,\ninvolving even those\nwho differ",
+     "subLabel": "A",
+     "participantId": "p_A",
+     "x": 1800,
+     "y": -320,
+     "width": 160,
+     "height": 100,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "EFP2_C",
+     "type": "2nd-EFP",
+     "label": "Wants to grow in a\nmotivated group and\ncreate something",
+     "subLabel": "C",
+     "participantId": "p_C",
+     "x": 1800,
+     "y": -150,
+     "width": 170,
+     "height": 100,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "EFP2_B",
+     "type": "2nd-EFP",
+     "label": "Becomes someone who\njudges right from wrong\nand speaks up",
+     "subLabel": "B",
+     "participantId": "p_B",
+     "x": 1800,
+     "y": 30,
+     "width": 160,
+     "height": 100,
+     "textOrientation": "horizontal"
+    },
+    {
+     "id": "EFP2_D",
+     "type": "2nd-EFP",
+     "label": "Wants to live without\nbecoming rigid",
+     "subLabel": "D",
+     "participantId": "p_D",
+     "x": 1800,
+     "y": 200,
+     "width": 160,
+     "height": 80,
+     "textOrientation": "horizontal"
+    }
+   ],
+   "lines": [
+    {
+     "id": "L_1",
+     "type": "RLine",
+     "from": "A_1_1",
+     "to": "A_1_2",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_2",
+     "type": "RLine",
+     "from": "A_1_2",
+     "to": "A_1_3",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_3",
+     "type": "RLine",
+     "from": "A_1_3",
+     "to": "BFP_A_1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_4",
+     "type": "RLine",
+     "from": "BFP_A_1",
+     "to": "OPP_KOKO",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_5",
+     "type": "RLine",
+     "from": "OPP_KOKO",
+     "to": "OPP_HITO",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_6",
+     "type": "RLine",
+     "from": "OPP_HITO",
+     "to": "A_2_1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_7",
+     "type": "RLine",
+     "from": "A_2_1",
+     "to": "OPP_KADAI",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_8",
+     "type": "RLine",
+     "from": "OPP_KADAI",
+     "to": "A_3_1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_9",
+     "type": "RLine",
+     "from": "A_3_1",
+     "to": "EFP2_A",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_10",
+     "type": "RLine",
+     "from": "B_1_1",
+     "to": "B_1_2",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_11",
+     "type": "RLine",
+     "from": "B_1_2",
+     "to": "BFP_B_1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_12",
+     "type": "RLine",
+     "from": "BFP_B_1",
+     "to": "OPP_KOKO",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_13",
+     "type": "RLine",
+     "from": "OPP_HITO",
+     "to": "B_2_1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_14",
+     "type": "RLine",
+     "from": "B_2_1",
+     "to": "OPP_KADAI",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_15",
+     "type": "RLine",
+     "from": "OPP_KADAI",
+     "to": "B_3_1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_16",
+     "type": "RLine",
+     "from": "B_3_1",
+     "to": "EFP2_B",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_17",
+     "type": "RLine",
+     "from": "C_1_1",
+     "to": "C_1_2",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_18",
+     "type": "RLine",
+     "from": "C_1_2",
+     "to": "C_1_3",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_19",
+     "type": "RLine",
+     "from": "C_1_3",
+     "to": "C_1_4",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_20",
+     "type": "RLine",
+     "from": "C_1_4",
+     "to": "C_1_5",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_21",
+     "type": "RLine",
+     "from": "C_1_5",
+     "to": "OPP_KOKO",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_22",
+     "type": "RLine",
+     "from": "OPP_HITO",
+     "to": "C_2_1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_23",
+     "type": "RLine",
+     "from": "C_2_1",
+     "to": "OPP_KADAI",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_24",
+     "type": "RLine",
+     "from": "OPP_KADAI",
+     "to": "C_3_1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_25",
+     "type": "RLine",
+     "from": "C_3_1",
+     "to": "EFP2_C",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_26",
+     "type": "RLine",
+     "from": "D_1_1",
+     "to": "D_1_2",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_27",
+     "type": "RLine",
+     "from": "D_1_2",
+     "to": "D_1_3",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_28",
+     "type": "RLine",
+     "from": "D_1_3",
+     "to": "D_1_4",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_29",
+     "type": "RLine",
+     "from": "D_1_4",
+     "to": "D_1_5",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_30",
+     "type": "RLine",
+     "from": "D_1_5",
+     "to": "OPP_KOKO",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_31",
+     "type": "RLine",
+     "from": "OPP_HITO",
+     "to": "D_2_1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_32",
+     "type": "RLine",
+     "from": "D_2_1",
+     "to": "OPP_KADAI",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_33",
+     "type": "RLine",
+     "from": "OPP_KADAI",
+     "to": "D_3_1",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    },
+    {
+     "id": "L_34",
+     "type": "RLine",
+     "from": "D_3_1",
+     "to": "EFP2_D",
+     "connectionMode": "center-to-center",
+     "shape": "straight"
+    }
+   ],
+   "sdsg": [
+    {
+     "id": "SD_KOKO",
+     "type": "SD",
+     "label": "SD",
+     "attachedTo": "OPP_KOKO",
+     "attachedType": "box",
+     "itemOffset": -380,
+     "timeOffset": 0,
+     "width": 120,
+     "height": 50,
+     "subLabel": "Maladjustment in\njunior high school"
+    },
+    {
+     "id": "SG_KOKO",
+     "type": "SG",
+     "label": "SG",
+     "attachedTo": "OPP_KOKO",
+     "attachedType": "box",
+     "itemOffset": 320,
+     "timeOffset": 0,
+     "width": 120,
+     "height": 50,
+     "subLabel": "Freedom of High School X\nAccepts non-attending students"
+    },
+    {
+     "id": "SD_KADAI",
+     "type": "SD",
+     "label": "SD",
+     "attachedTo": "OPP_KADAI",
+     "attachedType": "box",
+     "itemOffset": -380,
+     "timeOffset": 0,
+     "width": 120,
+     "height": 50,
+     "subLabel": "Lack of career\ninformation; anxiety"
+    },
+    {
+     "id": "SG_KADAI",
+     "type": "SG",
+     "label": "SG",
+     "attachedTo": "OPP_KADAI",
+     "attachedType": "box",
+     "itemOffset": 320,
+     "timeOffset": 0,
+     "width": 120,
+     "height": 50,
+     "subLabel": "School assignments\nDialogue with volunteers"
+    }
+   ],
+   "notes": [],
+   "comments": [],
+   "periodLabels": [
+    {
+     "id": "PD1",
+     "position": 4,
+     "label": "Period 1: Facing situations beyond control"
+    },
+    {
+     "id": "PD2",
+     "position": 10,
+     "label": "Period 2: Gaining a sense of control"
+    },
+    {
+     "id": "PD3",
+     "position": 15,
+     "label": "Period 3: Self-transformation toward career choice"
+    },
+    {
+     "id": "PD4",
+     "position": 20,
+     "label": "Period 4: 2nd EFP (career choice)"
+    }
+   ]
+  }
+ ],
+ "activeSheetId": "sheet-kanzaki2021-detail",
+ "participants": [
+  {
+   "id": "Part_moioi0bb_irkn3",
+   "pseudonym": "A"
+  }
+ ],
+ "settings": {
+  "layout": "horizontal",
+  "locale": "en",
+  "gridSize": 10,
+  "snap": {
+   "alignGuides": true,
+   "distanceSnap": true,
+   "distancePx": 20,
+   "gridSnap": false,
+   "gridPx": 10
+  },
+  "showLegend": true,
+  "legendPosition": "right",
+  "timelineLabel": {
+   "ja": "非可逆的時間",
+   "en": "Irreversible Time"
+  },
+  "timelineAutoInsert": true,
+  "defaultFont": "system-ui",
+  "defaultFontSize": 13,
+  "defaultBoxSize": {
+   "width": 60,
+   "height": 100
+  },
+  "defaultAutoFitText": false,
+  "defaultAutoFitBox": false,
+  "defaultAutoFitBoxMode": "width-fixed",
+  "paperGuides": [
+   {
+    "enabled": false,
+    "size": "A4-landscape",
+    "baseSize": "A4",
+    "color": "#000000",
+    "pageCount": 2,
+    "maskOutside": true
+   }
+  ],
+  "uiFontSize": 13,
+  "ribbonFontSize": 12,
+  "levelStep": 0.5,
+  "timeArrow": {
+   "autoInsert": true,
+   "alwaysVisible": true,
+   "timeStartExtension": -0.5,
+   "timeEndExtension": 0.5,
+   "itemReference": "min",
+   "itemOffset": 0,
+   "label": "Irreversible Time",
+   "strokeWidth": 2.5,
+   "fontSize": 14,
+   "labelSideHorizontal": "bottom",
+   "labelSideVertical": "left",
+   "labelBold": false,
+   "labelItalic": false,
+   "labelUnderline": false,
+   "labelOffset": 4,
+   "labelAlignHorizontal": "center",
+   "labelAlignVertical": "center"
+  },
+  "legend": {
+   "autoGenerate": true,
+   "alwaysVisible": true,
+   "includeInExport": true,
+   "position": {
+    "x": 0,
+    "y": 500
+   },
+   "includeBoxes": true,
+   "includeLines": true,
+   "includeSDSG": true,
+   "includeTimeArrow": false,
+   "title": "Legend",
+   "fontSize": 11,
+   "minWidth": 200,
+   "showDescriptions": false,
+   "columns": 1,
+   "columnsHorizontal": 1,
+   "columnsVertical": 1,
+   "showTitle": true,
+   "titleBold": true,
+   "titleItalic": false,
+   "titleUnderline": false,
+   "titleAlign": "left",
+   "titlePosition": "top",
+   "titleWritingMode": "horizontal",
+   "titleVerticalAlign": "top",
+   "backgroundStyle": "white",
+   "borderWidth": 1,
+   "borderColor": "#999",
+   "sampleWidth": 32,
+   "sampleHeight": 18,
+   "titleSeparatorVisible": true,
+   "titleSeparatorColor": "#dddddd",
+   "itemOverrides": {}
+  },
+  "periodLabels": {
+   "alwaysVisible": true,
+   "includeInExport": true,
+   "itemReference": "max",
+   "itemOffset": 0,
+   "fontSize": 13,
+   "showDividers": true,
+   "dividerStrokeWidth": 1,
+   "bandStyle": "band",
+   "labelSideHorizontal": "top",
+   "labelSideVertical": "right"
+  },
+  "typeLabelVisibility": {
+   "BFP": true,
+   "EFP": true,
+   "P-EFP": true,
+   "OPP": true,
+   "2nd-EFP": true,
+   "P-2nd-EFP": true,
+   "SD": true,
+   "SG": true
+  },
+  "sdsgSpace": {
+   "enabled": true,
+   "bands": {
+    "top": {
+     "enabled": true,
+     "heightMode": "auto",
+     "heightLevel": 1.5,
+     "reference": "boxes",
+     "offsetLevel": 0.2,
+     "showBorder": true,
+     "borderColor": "#9b59b6",
+     "fillStyle": "tinted",
+     "labelPosition": "top-left",
+     "shrinkToFitRow": false,
+     "autoExpandHeight": false
+    },
+    "bottom": {
+     "enabled": true,
+     "heightMode": "auto",
+     "heightLevel": 1.5,
+     "reference": "boxes",
+     "offsetLevel": 0.2,
+     "showBorder": true,
+     "borderColor": "#27ae60",
+     "fillStyle": "tinted",
+     "labelPosition": "top-left",
+     "shrinkToFitRow": false,
+     "autoExpandHeight": false
+    }
+   },
+   "autoPlaceSD": "top",
+   "autoPlaceSG": "bottom",
+   "allowMismatchedPlacement": false,
+   "autoArrange": true,
+   "autoFlipDirectionInBand": false
+  }
+ },
+ "metadata": {
+  "title": "Kanzaki & Suzuki (2021) Figure 1 (English demo)",
+  "author": "Yuki Inoue Nakata",
+  "createdAt": "2026-04-28T13:45:28.343Z",
+  "modifiedAt": "2026-04-28T13:46:50.343Z",
+  "description": "English demo used at the TEA international meeting hands-on session. It is a working English rendering of the Japanese sample that reproduces Figure 1 of Kanzaki & Suzuki (2021), Japanese Journal of Developmental Psychology 32(3), 113-125. The wording is a translation prepared for this tool and is not the authors' own English text."
+ },
+ "history": []
+}

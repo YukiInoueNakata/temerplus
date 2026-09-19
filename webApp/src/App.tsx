@@ -22,6 +22,7 @@ import { initPopoutSync, getPopoutQueryParam } from './utils/popoutSync';
 // デモファイル (神崎・鈴木 2021 Figure 1 詳細再現) を raw 文字列として import
 // Vite の ?raw クエリでバンドルに埋め込み
 import demoTemRaw from '../sample-tem/kanzaki2021_figure1.tem?raw';
+import demoTemEnRaw from '../sample-tem/kanzaki2021_figure1_en.tem?raw';
 // 原文連動デモ (Phase 4: 逐語録 ↔ Box リンク)
 import transcriptDemoRaw from '../sample-tem/transcript_demo.tem?raw';
 import { useTEMStore } from './store/store';
@@ -82,6 +83,15 @@ export default function App() {
           await clearAutoBackup();
         } catch (e) {
           alert('デモファイルの読み込みに失敗しました: ' + (e instanceof Error ? e.message : String(e)));
+        }
+        break;
+      case 'open-demo-en':
+        try {
+          const doc = JSON.parse(demoTemEnRaw);
+          useTEMStore.getState().loadDocument(doc);
+          await clearAutoBackup();
+        } catch (e) {
+          alert('Failed to load the English demo file: ' + (e instanceof Error ? e.message : String(e)));
         }
         break;
       case 'open-transcript-demo':

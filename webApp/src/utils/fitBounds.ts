@@ -198,7 +198,7 @@ export function computeContentBounds(
 
   // 凡例（近似：位置 + minWidth + 行数による高さ）
   if (settings.legend && settings.legend.alwaysVisible) {
-    const items = computeLegendItems(sheet, settings.legend);
+    const items = computeLegendItems(sheet, settings.legend, settings.locale);
     if (items.length > 0) {
       const lg = settings.legend;
       const cols = computeLegendColumns(lg, layout, items.length);

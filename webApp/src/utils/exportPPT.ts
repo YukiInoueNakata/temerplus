@@ -22,6 +22,7 @@ import type {
   TimeArrowSettings,
   SDSGSpaceSettings,
   TypeLabelVisibilityMap,
+  Locale,
 } from '../types';
 import { computeTimeArrow } from './timeArrow';
 import { computePeriodLabels } from './periodLabels';
@@ -127,7 +128,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<void> {
     drawLines(pres, slide, opts.sheet, layout, t);
     drawSDSGs(pres, slide, opts.sheet, layout, opts.settings, t);
     drawBoxes(pres, slide, opts.sheet, layout, opts.settings, t);
-    drawLegend(pres, slide, opts.sheet, layout, opts.settings.legend, t);
+    drawLegend(pres, slide, opts.sheet, layout, opts.settings.legend, t, opts.settings.locale);
     drawIdBadges(slide, opts.sheet, layout, t, includeIds);
     await pres.writeFile({ fileName: filename });
     return;
@@ -153,7 +154,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<void> {
     drawSDSGs(pres, slide, pageSheet, layout, opts.settings, t);
     drawBoxes(pres, slide, pageSheet, layout, opts.settings, t);
     // 凡例は全スライドに表示（SPEC）
-    drawLegend(pres, slide, pageSheet, layout, opts.settings.legend, t);
+    drawLegend(pres, slide, pageSheet, layout, opts.settings.legend, t, opts.settings.locale);
     drawIdBadges(slide, pageSheet, layout, t, includeIds);
   }
   await pres.writeFile({ fileName: filename });
@@ -1432,9 +1433,10 @@ function drawLegend(
   layout: LayoutDirection,
   lg: LegendSettings,
   t: Transform,
+  locale: Locale = 'ja',
 ) {
   if (!lg || !lg.includeInExport) return;
-  const items = computeLegendItems(sheet, lg);
+  const items = computeLegendItems(sheet, lg, locale);
   if (items.length === 0) return;
 
   const cols = computeLegendColumns(lg, layout, items.length);

@@ -19,6 +19,7 @@ import type {
   TimeArrowSettings,
   SDSGSpaceSettings,
   TypeLabelVisibilityMap,
+  Locale,
 } from '../types';
 import { computeTimeArrow } from './timeArrow';
 import { computePeriodLabels } from './periodLabels';
@@ -159,7 +160,7 @@ function renderPage(
   drawLines(b, lineSourceSheet ?? sheet, settings.layout, t, includeIds.line, pageInnerRect);
   drawSDSGs(b, sheet, settings.layout, settings, t, includeIds.sdsg);
   drawBoxes(b, sheet, settings.layout, settings, t, includeIds.box);
-  drawLegend(b, sheet, settings.layout, settings.legend, t);
+  drawLegend(b, sheet, settings.layout, settings.legend, t, settings.locale);
   return b.build();
 }
 
@@ -1537,9 +1538,10 @@ function placePeriodLabel(
 
 function drawLegend(
   b: SVGBuilder, sheet: Sheet, layout: LayoutDirection, lg: LegendSettings, t: Transform,
+  locale: Locale = 'ja',
 ) {
   if (!lg || !lg.includeInExport) return;
-  const items = computeLegendItems(sheet, lg);
+  const items = computeLegendItems(sheet, lg, locale);
   if (items.length === 0) return;
 
   const cols = computeLegendColumns(lg, layout, items.length);

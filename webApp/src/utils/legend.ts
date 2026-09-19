@@ -2,7 +2,7 @@
 // 凡例自動生成 - シートから使用記号を抽出
 // ============================================================================
 
-import type { Sheet, LegendSettings, BoxType, LayoutDirection } from '../types';
+import type { Sheet, LegendSettings, BoxType, LayoutDirection, Locale } from '../types';
 import { BOX_TYPE_LABELS } from '../store/defaults';
 
 /**
@@ -52,8 +52,44 @@ const BOX_DESCRIPTIONS: Record<BoxType, string> = {
   'P-2nd-EFP':  '両極化第二等至点',
 };
 
-export function computeLegendItems(sheet: Sheet, settings: LegendSettings): LegendItem[] {
+// 英語ロケール時の説明文（ラベル自体は BOX_TYPE_LABELS.en を使う）
+const BOX_DESCRIPTIONS_EN: Record<BoxType, string> = {
+  'normal':     'Experience / event',
+  'BFP':        'Bifurcation Point',
+  'EFP':        'Equifinality Point',
+  'P-EFP':      'Polarized Equifinality Point',
+  'OPP':        'Obligatory Passage Point',
+  'annotation': 'Latent / imagined unrealized experience',
+  '2nd-EFP':    'Second Equifinality Point',
+  'P-2nd-EFP':  'Polarized Second Equifinality Point',
+};
+
+// Box 以外の凡例項目（径路 / SD・SG / 非可逆的時間）のラベルと説明
+const NON_BOX_TEXT = {
+  ja: {
+    RLine:     { label: '実線径路',     description: '実現した径路' },
+    XLine:     { label: '点線径路',     description: '想定された（未実現）径路' },
+    SD:        { label: 'SD',           description: '社会的方向づけ（径路を妨害する力）' },
+    SG:        { label: 'SG',           description: '社会的ガイド（径路を支援する力）' },
+    timeArrow: { label: '非可逆的時間', description: '時間軸の方向' },
+  },
+  en: {
+    RLine:     { label: 'Solid path',        description: 'Realized path' },
+    XLine:     { label: 'Dashed path',       description: 'Imagined (unrealized) path' },
+    SD:        { label: 'SD',                description: 'Social Direction (force obstructing the path)' },
+    SG:        { label: 'SG',                description: 'Social Guidance (force supporting the path)' },
+    timeArrow: { label: 'Irreversible Time', description: 'Direction of the time axis' },
+  },
+} as const;
+
+export function computeLegendItems(
+  sheet: Sheet,
+  settings: LegendSettings,
+  locale: Locale = 'ja',
+): LegendItem[] {
   const items: LegendItem[] = [];
+  const isEn = locale === 'en';
+  const txt = isEn ? NON_BOX_TEXT.en : NON_BOX_TEXT.ja;
 
   if (settings.includeBoxes) {
     const usedTypes = new Set(sheet.boxes.map((b) => b.type));
@@ -61,11 +97,12 @@ export function computeLegendItems(sheet: Sheet, settings: LegendSettings): Lege
     const order: BoxType[] = ['normal', 'BFP', 'EFP', 'P-EFP', 'OPP', 'annotation', '2nd-EFP', 'P-2nd-EFP'];
     order.forEach((type) => {
       if (usedTypes.has(type)) {
+        const labels = BOX_TYPE_LABELS[type];
         items.push({
           category: 'box',
           key: type,
-          label: BOX_TYPE_LABELS[type]?.ja ?? type,
-          description: BOX_DESCRIPTIONS[type] ?? '',
+          label: (isEn ? labels?.en : labels?.ja) ?? type,
+          description: (isEn ? BOX_DESCRIPTIONS_EN[type] : BOX_DESCRIPTIONS[type]) ?? '',
         });
       }
     });
@@ -74,25 +111,25 @@ export function computeLegendItems(sheet: Sheet, settings: LegendSettings): Lege
   if (settings.includeLines) {
     const usedTypes = new Set(sheet.lines.map((l) => l.type));
     if (usedTypes.has('RLine')) {
-      items.push({ category: 'line', key: 'RLine', label: '実線径路', description: '実現した径路' });
+      items.push({ category: 'line', key: 'RLine', ...txt.RLine });
     }
     if (usedTypes.has('XLine')) {
-      items.push({ category: 'line', key: 'XLine', label: '点線径路', description: '想定された（未実現）径路' });
+      items.push({ category: 'line', key: 'XLine', ...txt.XLine });
     }
   }
 
   if (settings.includeSDSG && sheet.sdsg.length > 0) {
     const types = new Set(sheet.sdsg.map((s) => s.type));
     if (types.has('SD')) {
-      items.push({ category: 'sdsg', key: 'SD', label: 'SD', description: '社会的方向づけ（径路を妨害する力）' });
+      items.push({ category: 'sdsg', key: 'SD', ...txt.SD });
     }
     if (types.has('SG')) {
-      items.push({ category: 'sdsg', key: 'SG', label: 'SG', description: '社会的ガイド（径路を支援する力）' });
+      items.push({ category: 'sdsg', key: 'SG', ...txt.SG });
     }
   }
 
   if (settings.includeTimeArrow) {
-    items.push({ category: 'timeArrow', key: 'timeArrow', label: '非可逆的時間', description: '時間軸の方向' });
+    items.push({ category: 'timeArrow', key: 'timeArrow', ...txt.timeArrow });
   }
 
   return items;

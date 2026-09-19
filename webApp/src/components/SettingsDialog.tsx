@@ -1654,7 +1654,7 @@ export function LegendSettingsSection() {
   };
 
   // 現シート上の凡例項目（上書き対象を提示する用）
-  const currentItems = sheet ? computeLegendItems(sheet, lg) : [];
+  const currentItems = sheet ? computeLegendItems(sheet, lg, doc.settings.locale) : [];
 
   return (
     <div>

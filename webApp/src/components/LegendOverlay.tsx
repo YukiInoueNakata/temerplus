@@ -88,7 +88,7 @@ export function LegendOverlay({ onOpenSettings }: { onOpenSettings?: () => void 
   }, [resizing, transform, isPreview]);
 
   if (!sheet || !legend.alwaysVisible) return null;
-  const items = computeLegendItems(sheet, legend);
+  const items = computeLegendItems(sheet, legend, view.settings.locale);
   if (items.length === 0) return null;
 
   const [panX, panY, zoom] = transform;

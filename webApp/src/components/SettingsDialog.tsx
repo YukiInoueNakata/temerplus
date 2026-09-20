@@ -248,7 +248,7 @@ export function SettingsDialog({
             })}
           </nav>
           <div className="settings-content-pane">
-            {tab === 'general' && <GeneralSection />}
+            {tab === 'general' && <GeneralSection onOpenLineTab={() => setTab('linestyle')} />}
             {tab === 'snap' && <SnapSection />}
             {tab === 'typelabel' && <TypeLabelSection />}
             {tab === 'boxstyle' && <BoxStyleSection />}
@@ -268,10 +268,91 @@ export function SettingsDialog({
   );
 }
 
+// ----------------------------------------------------------------------------
+// Line（矢印）の既定スタイル: よく触る項目だけの入力群
+// 「全体」タブと「Line（矢印）」タブの両方から使う（定義を 1 か所に保つ）
+// ----------------------------------------------------------------------------
+function LineDefaultsBasicFields() {
+  const doc = useTEMStore((s) => s.doc);
+  const setLineDefaults = useTEMStore((s) => s.setLineDefaults);
+  const d = resolveLineDefaults(doc.settings);
+
+  const clamp = (v: string, lo: number, hi: number, fallback: number) => {
+    const n = Number(v);
+    return Math.max(lo, Math.min(hi, Number.isFinite(n) ? n : fallback));
+  };
+
+  return (
+    <>
+      <div className="setting-row">
+        <label>線種</label>
+        <select
+          value={d.type}
+          onChange={(e) => setLineDefaults({ type: e.target.value as 'RLine' | 'XLine' })}
+        >
+          <option value="RLine">実線（実現径路）</option>
+          <option value="XLine">点線（未実現径路）</option>
+        </select>
+      </div>
+
+      <div className="setting-row">
+        <label>形状</label>
+        <select
+          value={d.shape}
+          onChange={(e) => setLineDefaults({ shape: e.target.value as 'straight' | 'elbow' | 'curve' })}
+        >
+          <option value="straight">直線</option>
+          <option value="elbow">L字接続</option>
+          <option value="curve">曲線</option>
+        </select>
+      </div>
+      {d.shape === 'elbow' && (
+        <div className="setting-row">
+          <label>L字 中継位置 (0〜1)</label>
+          <input
+            type="number" min={0} max={1} step={0.05}
+            value={d.elbowBendRatio}
+            onChange={(e) => setLineDefaults({ elbowBendRatio: clamp(e.target.value, 0, 1, 0.5) })}
+            title="折れ位置の比率。0 = from 寄り / 0.5 = 中央 / 1 = to 寄り"
+          />
+        </div>
+      )}
+      {d.shape === 'curve' && (
+        <div className="setting-row">
+          <label>曲率 (0〜1)</label>
+          <input
+            type="number" min={0} max={1} step={0.05}
+            value={d.curveIntensity}
+            onChange={(e) => setLineDefaults({ curveIntensity: clamp(e.target.value, 0, 1, 0.5) })}
+            title="0=ほぼ直線、0.5=標準、1=大きく膨らむ"
+          />
+        </div>
+      )}
+
+      <div className="setting-row">
+        <label>線の色</label>
+        <input
+          type="color"
+          value={d.color}
+          onChange={(e) => setLineDefaults({ color: e.target.value })}
+        />
+      </div>
+      <div className="setting-row">
+        <label>線の太さ (px)</label>
+        <input
+          type="number" min={0.5} max={10} step={0.5}
+          value={d.strokeWidth}
+          onChange={(e) => setLineDefaults({ strokeWidth: clamp(e.target.value, 0.5, 10, 1.5) })}
+        />
+      </div>
+    </>
+  );
+}
+
 // ============================================================================
 // General
 // ============================================================================
-function GeneralSection() {
+function GeneralSection({ onOpenLineTab }: { onOpenLineTab?: () => void }) {
   const doc = useTEMStore((s) => s.doc);
   const setLayout = useTEMStore((s) => s.setLayout);
   const setLocale = useTEMStore((s) => s.setLocale);
@@ -404,6 +485,19 @@ function GeneralSection() {
           自動拡張: ラベルが収まらない時、どちら側を増やすか（Box 個別プロパティで上書き可）<br />
           文字サイズ自動調整: Box に収まる最大文字サイズを自動設定（同時有効不可。個別設定優先）
         </p>
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Line（矢印）の既定" sectionKey="settings-general-line-defaults" defaultOpen={true}>
+        <p className="hint">
+          これから引く矢印の初期値です。既存の矢印は変わりません。
+          端点のオフセット・マージン・角度と「全 Line に適用」は「Line（矢印）」タブにあります。
+        </p>
+        <LineDefaultsBasicFields />
+        <div className="setting-row" style={{ justifyContent: 'flex-start' }}>
+          <button className="ribbon-btn-small" onClick={() => onOpenLineTab?.()}>
+            Line（矢印）の詳細設定を開く
+          </button>
+        </div>
       </CollapsibleSection>
 
       <CollapsibleSection title="用紙枠" sectionKey="settings-general-paper-guide" defaultOpen={false}>
@@ -1019,76 +1113,9 @@ function LineStyleSection() {
         <h4>既定スタイル</h4>
         <p className="hint">
           ここで決めた値が、これから引く矢印の初期値になります。既存の矢印は変わりません
-          （下の「全 Line に適用」で反映できます）。
+          （下の「全 Line に適用」で反映できます）。同じ項目は「全体」タブからも変更できます。
         </p>
-
-        <div className="setting-row">
-          <label>線種</label>
-          <select
-            value={d.type}
-            onChange={(e) => setLineDefaults({ type: e.target.value as 'RLine' | 'XLine' })}
-          >
-            <option value="RLine">実線（実現径路）</option>
-            <option value="XLine">点線（未実現径路）</option>
-          </select>
-        </div>
-
-        <div className="setting-row">
-          <label>形状</label>
-          <select
-            value={d.shape}
-            onChange={(e) => setLineDefaults({ shape: e.target.value as 'straight' | 'elbow' | 'curve' })}
-          >
-            <option value="straight">直線</option>
-            <option value="elbow">L字接続</option>
-            <option value="curve">曲線</option>
-          </select>
-        </div>
-        {d.shape === 'elbow' && (
-          <div className="setting-row">
-            <label>L字 中継位置 (0〜1)</label>
-            <input
-              type="number" min={0} max={1} step={0.05}
-              value={d.elbowBendRatio}
-              onChange={(e) => setLineDefaults({
-                elbowBendRatio: Math.max(0, Math.min(1, num(e.target.value, 0.5))),
-              })}
-              title="折れ位置の比率。0 = from 寄り / 0.5 = 中央 / 1 = to 寄り"
-            />
-          </div>
-        )}
-        {d.shape === 'curve' && (
-          <div className="setting-row">
-            <label>曲率 (0〜1)</label>
-            <input
-              type="number" min={0} max={1} step={0.05}
-              value={d.curveIntensity}
-              onChange={(e) => setLineDefaults({
-                curveIntensity: Math.max(0, Math.min(1, num(e.target.value, 0.5))),
-              })}
-              title="0=ほぼ直線、0.5=標準、1=大きく膨らむ"
-            />
-          </div>
-        )}
-
-        <div className="setting-row">
-          <label>線の色</label>
-          <input
-            type="color"
-            value={d.color}
-            onChange={(e) => setLineDefaults({ color: e.target.value })}
-          />
-        </div>
-        <div className="setting-row">
-          <label>線の太さ (px)</label>
-          <input
-            type="number" min={0.5} max={10} step={0.5}
-            value={d.strokeWidth}
-            onChange={(e) => setLineDefaults({
-              strokeWidth: Math.max(0.5, Math.min(10, num(e.target.value, 1.5))),
-            })}
-          />
-        </div>
+        <LineDefaultsBasicFields />
       </section>
 
       <section className="settings-section">

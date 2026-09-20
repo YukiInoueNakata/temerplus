@@ -21,6 +21,31 @@ const ROTATE_CHARS = new Set([
 ]);
 
 /**
+ * 縦書きで「横倒しの字形」になるべき文字の集合。
+ *
+ * DOM 描画では writing-mode: vertical-rl が効くので、長音・波ダッシュ等は
+ * ブラウザが自動で縦向きの字形にしてくれる（ROTATE_CHARS はブラウザが面倒を
+ * 見ない半角ハイフン類だけを補正している）。
+ * 一方 SVG 出力は 1 文字ずつ <text> を置く方式で writing-mode に頼れないため、
+ * 「本来縦向きになる文字」を明示的に 90°回転させる必要がある。
+ * その判定にこの集合を使う（ROTATE_CHARS を含む上位集合）。
+ */
+export const VERTICAL_ROTATE_CHARS = new Set([
+  ...ROTATE_CHARS,
+  '\u30FC',  // ー KATAKANA-HIRAGANA PROLONGED SOUND MARK（長音）
+  '\uFF70',  // ｰ HALFWIDTH KATAKANA-HIRAGANA PROLONGED SOUND MARK
+  '\u301C',  // 〜 WAVE DASH
+  '\uFF5E',  // ～ FULLWIDTH TILDE
+  '\u2015',  // ― HORIZONTAL BAR
+  '\u2500',  // ─ BOX DRAWINGS LIGHT HORIZONTAL
+]);
+
+/** 縦書きで 90°回転させるべき文字か */
+export function needsVerticalRotation(ch: string): boolean {
+  return VERTICAL_ROTATE_CHARS.has(ch);
+}
+
+/**
  * 縦書き時に半角ハイフン等を 90°回転させて描画する。
  * vertical=false の場合はそのまま text を返す。
  */

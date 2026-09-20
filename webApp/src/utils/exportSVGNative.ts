@@ -30,6 +30,7 @@ import {
   computeSDSGBandPosition,
 } from './sdsgSpaceLayout';
 import { computeLegendItems, computeLegendColumns, type LegendItem } from './legend';
+import { needsVerticalRotation } from './verticalText';
 import { computeContentBounds } from './fitBounds';
 import { BOX_RENDER_SPECS } from '../store/defaults';
 import { computeBoxDisplay } from './typeDisplay';
@@ -97,7 +98,8 @@ export async function exportToSVGNative(opts: SVGNativeExportOptions): Promise<v
   downloadBlob(blob, `${baseName}_pages.zip`);
 }
 
-function buildSVGDocuments(opts: SVGNativeExportOptions): string[] {
+/** SVG 文字列の生成本体。ダウンロードを伴わないのでテストからも呼べる。 */
+export function buildSVGDocuments(opts: SVGNativeExportOptions): string[] {
   const scale = opts.scale ?? true;
   const offsetRatio = opts.offset ?? 0.1;
   const layout = opts.settings.layout;
@@ -433,6 +435,18 @@ class SVGBuilder {
           }
           // CJK / その他は 1 セル上のまま配置
           const cy = topY + cellIdx * charAdvance + opts.fontSize * 0.85;
+          // 長音「ー」や波ダッシュ等は、縦書きでは横倒しの字形になる。
+          // DOM 描画では writing-mode がブラウザに任せられるが、ここは 1 文字ずつ
+          // <text> を置く方式なので自前で 90°回す（回転中心は字の見た目の中心）。
+          if (needsVerticalRotation(ch)) {
+            const pivotY = cy - opts.fontSize * 0.3;
+            this.parts.push(
+              `<text x="${fmt(colX)}" y="${fmt(cy)}" fill="${escapeAttr(color)}" font-size="${fmt(opts.fontSize)}" text-anchor="middle" transform="rotate(90 ${fmt(colX)} ${fmt(pivotY)})"${style}>${escapeText(ch)}</text>`,
+            );
+            cellIdx++;
+            i++;
+            continue;
+          }
           this.parts.push(
             `<text x="${fmt(colX)}" y="${fmt(cy)}" fill="${escapeAttr(color)}" font-size="${fmt(opts.fontSize)}" text-anchor="middle"${style}>${escapeText(ch)}</text>`,
           );

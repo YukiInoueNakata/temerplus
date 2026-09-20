@@ -389,6 +389,16 @@ export default function App() {
         return;
       }
       if (ctrl && e.shiftKey && e.key === 'T') { e.preventDefault(); store.addSheet(); return; }
+      // Enter / F2: 選択中の Box / SD・SG が 1 つならラベル編集を開始
+      // （ダブルクリックが効きにくい環境向けのキーボード入口）
+      if ((e.key === 'Enter' || e.key === 'F2') && !isEditing && !ctrl) {
+        const sel = store.selection;
+        const single =
+          sel.boxIds.length + sel.sdsgIds.length === 1 && sel.lineIds.length === 0
+            ? (sel.boxIds[0] ?? sel.sdsgIds[0])
+            : undefined;
+        if (single) { e.preventDefault(); store.requestEditNode(single); return; }
+      }
       if (e.key === 'Escape' && !isEditing) { store.clearSelection(); return; }
     };
 

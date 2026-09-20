@@ -74,6 +74,16 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
   // インライン編集
   // --------------------------------------------------------------------------
   const [editing, setEditing] = useState(false);
+
+  // キーボード（Enter / F2）や React Flow の onNodeDoubleClick からの編集開始を受ける
+  const editingNodeId = useTEMStore((st) => st.editingNodeId);
+  const requestEditNode = useTEMStore((st) => st.requestEditNode);
+  useEffect(() => {
+    if (editingNodeId && editingNodeId === data.id && !editingDisabled) {
+      setEditing(true);
+      requestEditNode(null);
+    }
+  }, [editingNodeId, data.id, editingDisabled, requestEditNode]);
   const [draft, setDraft] = useState(data.label);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 

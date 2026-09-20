@@ -62,6 +62,11 @@ interface UIState {
   /** 指定した世界座標の領域へ画面を寄せる要求（重なりチェックの「ジャンプ」で使う） */
   focusCounter: number;
   focusRect: { x: number; y: number; width: number; height: number } | null;
+  /**
+   * ラベル編集を開始したいノードの ID。キーボード（Enter / F2）や
+   * React Flow の onNodeDoubleClick から立て、ノード側が拾ったら null に戻す。
+   */
+  editingNodeId: string | null;
   // クリップボード更新のシグナル（実体はモジュール変数なので、
   // このカウンタを購読させないと貼付ボタンの活性状態が更新されない）
   clipboardVersion: number;
@@ -249,6 +254,7 @@ interface Actions {
   toggleLegend: () => void;
   requestFit: (mode: FitMode) => void;
   requestFocusRect: (rect: { x: number; y: number; width: number; height: number }) => void;
+  requestEditNode: (id: string | null) => void;
   togglePeriodLabels: () => void;
   setCanvasMode: (mode: 'move' | 'pointer' | 'select') => void;
   setDataSheetWidth: (width: number) => void;
@@ -378,6 +384,7 @@ export const useTEMStore = create<Store>()(
       fitMode: null,
       focusCounter: 0,
       focusRect: null,
+      editingNodeId: null,
       clipboardVersion: 0,
 
       // --- Document-level ---
@@ -2035,6 +2042,7 @@ export const useTEMStore = create<Store>()(
       toggleLeftRuler: () => set((state) => ({ view: { ...state.view, showLeftRuler: !state.view.showLeftRuler } })),
       requestFit: (mode) => set((state) => ({ fitMode: mode, fitCounter: state.fitCounter + 1 })),
       requestFocusRect: (rect) => set((state) => ({ focusRect: rect, focusCounter: state.focusCounter + 1 })),
+      requestEditNode: (id) => set(() => ({ editingNodeId: id })),
       toggleLegend: () => set((state) => ({
         doc: produce(state.doc, (d) => { d.settings.legend.alwaysVisible = !d.settings.legend.alwaysVisible; }),
       })),

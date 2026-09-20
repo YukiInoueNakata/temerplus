@@ -857,6 +857,10 @@ function CanvasInner({
             onConnect={onConnect}
             onSelectionChange={onSelectionChange}
             onNodeClick={onNodeClick}
+            // React Flow がノード単位で検出するダブルクリック。ノード内部の
+            // onDoubleClick は 1 回目のクリックで選択→再描画が起きると 2 回目の
+            // 対象がずれて発火しないため、こちらを主経路にする
+            onNodeDoubleClick={(_e, node) => useTEMStore.getState().requestEditNode(node.id)}
             onEdgeClick={onEdgeClick}
             onPaneClick={onPaneClick}
             multiSelectionKeyCode={null}

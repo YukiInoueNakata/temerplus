@@ -1,0 +1,35 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`computeContentBounds（ゴールデン） > 日本語デモの各シートの bbox が変わらない 1`] = `
+[
+  {
+    "height": 715,
+    "width": 820,
+    "x": 0,
+    "y": 27,
+  },
+  {
+    "height": 1211,
+    "width": 2111,
+    "x": 0,
+    "y": -513,
+  },
+]
+`;
+
+exports[`computeContentBounds（ゴールデン） > 英語デモの各シートの bbox が変わらない 1`] = `
+[
+  {
+    "height": 715,
+    "width": 820,
+    "x": 0,
+    "y": 27,
+  },
+  {
+    "height": 1211,
+    "width": 2193,
+    "x": 0,
+    "y": -513,
+  },
+]
+`;

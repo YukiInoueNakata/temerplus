@@ -244,6 +244,39 @@ function BoxTable() {
     if (newIds.length > 0) setSelection(newIds);
   };
 
+  // OS のクリップボード（Excel でコピーした複数行など）から行を読み、
+  // 1 行 = 1 Box として指定行の後ろへ挿入する。
+  // 「クリップボードをここに挿入」ボタンはアプリ内でコピーした行を貼るためのもので、
+  // Excel からの貼付はラベル欄への貼付でしかできず、ボタンが押せないと誤解されていた
+  // （2026-09-20 報告）。アプリ内クリップボードが空のときはこちらへ切り替える。
+  const insertLinesFromSystemClipboard = async (afterBoxId?: string) => {
+    let text = '';
+    try {
+      text = await navigator.clipboard.readText();
+    } catch {
+      alert('クリップボードを読み取れませんでした。ブラウザの許可を確認するか、ラベル欄に直接貼り付けてください（複数行は自動で分割されます）。');
+      return;
+    }
+    // Excel の複数セルはタブ区切りで来るので、1 行のセルは空白でつなぐ
+    const lines = text
+      .split(/\r?\n/)
+      .map((l) => l.replace(/\t+/g, ' ').trim())
+      .filter((l) => l.length > 0);
+    if (lines.length === 0) {
+      alert('クリップボードにテキストがありません。Excel などで行をコピーしてからお使いください。');
+      return;
+    }
+    const anchor = afterBoxId ? sheet.boxes.find((b) => b.id === afterBoxId) : undefined;
+    let x = anchor?.x ?? 0;
+    const y = anchor?.y ?? 200;
+    const newIds: string[] = [];
+    lines.forEach((label) => {
+      x += LEVEL_PX;
+      newIds.push(addBox({ label, x, y }));
+    });
+    setSelection(newIds);
+  };
+
   // チェックボックスクリック: Ctrl/Cmd で追加選択、Shift で範囲選択、通常で切替
   const handleSelectClick = (idx: number, boxId: string, e: React.MouseEvent) => {
     const currentSet = new Set(selectedBoxIds);
@@ -418,6 +451,10 @@ function BoxTable() {
                       className="row-btn"
                       onClick={() => {
                         if (!sheet) return;
+                        if (clipboardBoxCount === 0) {
+                          void insertLinesFromSystemClipboard(b.id);
+                          return;
+                        }
                         const sheetIdx = sheet.boxes.findIndex((x) => x.id === b.id);
                         if (sheetIdx >= 0) {
                           pasteAtStore('box', sheetIdx + 1, {
@@ -427,9 +464,9 @@ function BoxTable() {
                           });
                         }
                       }}
-                      disabled={clipboardBoxCount === 0}
-                      title={clipboardBoxCount > 0 ? `この下にクリップボードを挿入（${clipboardBoxCount} 行、モード: ${pasteMode === 'midpoint' ? '中間配置' : '+20オフセット'}）` : 'クリップボード空'}
-                      style={{ opacity: clipboardBoxCount > 0 ? 1 : 0.35 }}
+                      title={clipboardBoxCount > 0
+                        ? `この下にコピーした行を挿入（${clipboardBoxCount} 行、モード: ${pasteMode === 'midpoint' ? '中間配置' : '+20オフセット'}）`
+                        : 'この下に Excel / テキストの行を挿入（OS のクリップボードを 1 行 = 1 Box として読み込みます）'}
                     >⬇</button>
                     <button className="row-btn danger" onClick={() => removeBoxes([b.id])} title="削除">×</button>
                   </td>
@@ -455,13 +492,14 @@ function BoxTable() {
             <InsertSlot
               kind="box"
               index={sheet?.boxes.length ?? 0}
-              disabled={clipboardBoxCount === 0}
+              disabled={false}
               pasteCount={clipboardBoxCount}
               onPaste={() => pasteAtStore('box', sheet?.boxes.length ?? 0, {
                 mode: pasteMode,
                 prevBoxId: sortedBoxes[sortedBoxes.length - 1]?.id,
                 nextBoxId: undefined,
               })}
+              onPasteText={() => insertLinesFromSystemClipboard(sortedBoxes[sortedBoxes.length - 1]?.id)}
               colSpan={7}
             />
           </tbody>
@@ -755,22 +793,27 @@ function InsertSlot(props: {
   disabled: boolean;
   pasteCount: number;
   onPaste: () => void;
+  /** アプリ内クリップボードが空のとき、OS のクリップボードのテキストを行として挿入する */
+  onPasteText?: () => void;
   colSpan: number;
 }) {
   void props.kind; void props.index;
+  // アプリ内クリップボードにコピーした行があればそれを、無ければテキスト挿入を使う
+  const textMode = props.pasteCount === 0 && !!props.onPasteText;
+  const disabled = props.disabled || (props.pasteCount === 0 && !props.onPasteText);
   return (
     <tr>
       <td colSpan={props.colSpan} style={{ padding: 0 }}>
         <button
-          onClick={props.onPaste}
-          disabled={props.disabled}
+          onClick={textMode ? props.onPasteText : props.onPaste}
+          disabled={disabled}
           style={{
             width: '100%',
             height: 24,
             border: '1px dashed #b0b8c8',
-            background: props.disabled ? '#f6f6f6' : '#fafcff',
-            opacity: props.disabled ? 0.4 : 1,
-            cursor: props.disabled ? 'not-allowed' : 'pointer',
+            background: disabled ? '#f6f6f6' : '#fafcff',
+            opacity: disabled ? 0.4 : 1,
+            cursor: disabled ? 'not-allowed' : 'pointer',
             fontSize: '0.8em',
             color: '#567',
             display: 'flex',
@@ -779,11 +822,17 @@ function InsertSlot(props: {
             gap: 4,
             transition: 'background-color 0.15s',
           }}
-          onMouseEnter={(e) => { if (!props.disabled) e.currentTarget.style.background = '#e8f0ff'; }}
-          onMouseLeave={(e) => { if (!props.disabled) e.currentTarget.style.background = '#fafcff'; }}
-          title={props.disabled ? 'クリップボードに貼り付け可能な要素がありません' : `ここにクリップボードを挿入（${props.pasteCount} 行）`}
+          onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.background = '#e8f0ff'; }}
+          onMouseLeave={(e) => { if (!disabled) e.currentTarget.style.background = '#fafcff'; }}
+          title={disabled
+            ? 'クリップボードに貼り付け可能な要素がありません'
+            : textMode
+              ? 'OS のクリップボードのテキストを 1 行 = 1 Box として末尾に挿入します（Excel の複数行コピーに対応）'
+              : `ここにコピーした行を挿入（${props.pasteCount} 行）`}
         >
-          ＋ クリップボードをここに挿入 {props.pasteCount > 0 ? `(${props.pasteCount} 行)` : ''}
+          {textMode
+            ? '＋ Excel / テキストの行をここに挿入'
+            : `＋ コピーした行をここに挿入 ${props.pasteCount > 0 ? `(${props.pasteCount} 行)` : ''}`}
         </button>
       </td>
     </tr>

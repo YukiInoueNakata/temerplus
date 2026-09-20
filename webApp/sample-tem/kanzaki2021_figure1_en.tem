@@ -929,7 +929,7 @@
    "labelItalic": false,
    "labelUnderline": false,
    "labelOffset": 4,
-   "labelAlignHorizontal": "center",
+   "labelAlignHorizontal": "end",
    "labelAlignVertical": "center"
   },
   "legend": {

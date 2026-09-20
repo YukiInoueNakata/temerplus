@@ -63,6 +63,12 @@ describe('sample-tem/kanzaki2021_figure1_en.tem', () => {
     expect(en.settings.timeArrow.label).toBe('Irreversible Time');
   });
 
+  // 英文は日本語より横に長く、中央揃えだと SG の説明文と重なる（2026-09-20 実機で確認）。
+  // ラベルを矢印の先端側へ寄せて回避しているので、設定が戻ったら検知する。
+  it('時間軸ラベルは矢印の先端側に寄せてある（SG 説明文との重なり回避）', () => {
+    expect(en.settings.timeArrow.labelAlignHorizontal).toBe('end');
+  });
+
   it('日本語版と同じ構造（シート数・ID 一式・Line の接続）を保つ', () => {
     expect(en.sheets.length).toBe(ja.sheets.length);
     en.sheets.forEach((sheet, i) => {

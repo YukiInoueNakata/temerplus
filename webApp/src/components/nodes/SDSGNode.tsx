@@ -255,7 +255,10 @@ export function SDSGNode({ data, selected, id: nodeId }: NodeProps<SDSGNodeData>
     background: subLabelBg,
     border: subLabelBorder,
     padding: '0 4px',
-    whiteSpace: 'nowrap',
+    // 明示的な改行は改行として描く。自動折返しはしない ('pre')。
+    // SVG/PNG 出力側は以前から改行コードを改行として描いており (exportSVGNative の text)、
+    // canvas だけが nowrap で 1 行に潰していた。画面と出力の不一致を解消する。
+    whiteSpace: 'pre',
   };
   const subLabelStyle: React.CSSProperties = isVerticalLayout
     ? {

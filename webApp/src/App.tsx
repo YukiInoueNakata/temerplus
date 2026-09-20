@@ -398,6 +398,10 @@ export default function App() {
             ? (sel.boxIds[0] ?? sel.sdsgIds[0])
             : undefined;
         if (single) { e.preventDefault(); store.requestEditNode(single); return; }
+        // 凡例を選択中なら凡例設定を開く（ダブルクリックと同じ動作）
+        if (sel.legendSelected && sel.boxIds.length + sel.sdsgIds.length + sel.lineIds.length === 0) {
+          e.preventDefault(); openSettings('legend'); return;
+        }
       }
       if (e.key === 'Escape' && !isEditing) { store.clearSelection(); return; }
     };

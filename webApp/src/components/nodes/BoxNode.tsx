@@ -74,6 +74,14 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
   // インライン編集
   // --------------------------------------------------------------------------
   const [editing, setEditing] = useState(false);
+  // 選択直後はリサイズ枠を出さない（ダブルクリックの 2 回目がリサイズ枠の mount で
+  // ノードから外れてしまうのを防ぐ。SD/SG にはリサイズ枠が無く、この問題も起きない）
+  const [resizerReady, setResizerReady] = useState(false);
+  useEffect(() => {
+    if (!selected) { setResizerReady(false); return; }
+    const t = window.setTimeout(() => setResizerReady(true), 350);
+    return () => window.clearTimeout(t);
+  }, [selected]);
 
   // キーボード（Enter / F2）や React Flow の onNodeDoubleClick からの編集開始を受ける
   const editingNodeId = useTEMStore((st) => st.editingNodeId);
@@ -427,7 +435,7 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
   return (
     <div style={{ position: 'relative' }}>
       <NodeResizer
-        isVisible={!!selected && !editing && !resizeDisabled}
+        isVisible={!!selected && resizerReady && !editing && !resizeDisabled}
         minWidth={30}
         minHeight={20}
         handleStyle={{ width: 8, height: 8, borderRadius: 2, background: '#2684ff', border: '1px solid #fff' }}

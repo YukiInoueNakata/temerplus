@@ -19,6 +19,7 @@ import type {
   Paragraph,
   SourceRef,
   LineDefaults,
+  Note,
 } from '../types';
 import {
   retrackSourceRefsForParagraph,
@@ -105,6 +106,12 @@ interface Actions {
   updateBoxes: (ids: string[], patch: Partial<Box>) => void;
   removeBox: (id: string) => void;
   removeBoxes: (ids: string[]) => void;
+
+  // Note（図上のメモ）operations
+  addNote: (partial?: Partial<Note>) => string;
+  updateNote: (id: string, patch: Partial<Note>) => void;
+  updateNotes: (ids: string[], patch: Partial<Note>) => void;
+  removeNotes: (ids: string[]) => void;
   fitBoxesToLabel: (ids: string[], mode?: 'both' | 'width' | 'height') => void;   // ラベルに合わせて Box サイズを最小 Fit
   fitBoxesTextToBox: (ids: string[]) => void; // Box サイズに合わせて文字サイズを調整（1回適用）
   // 選択 Box のサイズ/文字サイズを統一
@@ -195,7 +202,7 @@ interface Actions {
   // Selection
   selectSingle: (type: 'box' | 'line' | 'sdsg' | 'note', id: string) => void;
   toggleSelect: (type: 'box' | 'line' | 'sdsg' | 'note', id: string) => void;
-  setSelection: (boxIds: string[], lineIds?: string[], sdsgIds?: string[], opts?: { legendSelected?: boolean }) => void;
+  setSelection: (boxIds: string[], lineIds?: string[], sdsgIds?: string[], opts?: { legendSelected?: boolean; noteIds?: string[] }) => void;
   selectLegend: () => void;
   clearSelection: () => void;
   selectAll: () => void;
@@ -954,6 +961,66 @@ export const useTEMStore = create<Store>()(
         }));
       },
 
+      // --- Note operations ---
+      addNote: (partial) => {
+        const state = get();
+        const sheet = state.doc.sheets.find((s) => s.id === state.doc.activeSheetId);
+        // ID は Note1, Note2 … の連番（既存の最大値 + 1）
+        let maxN = 0;
+        (sheet?.notes ?? []).forEach((n) => {
+          const m = n.id.match(/^Note(\d+)$/);
+          if (m) maxN = Math.max(maxN, parseInt(m[1], 10));
+        });
+        const id = partial?.id ?? `Note${maxN + 1}`;
+        // 既定位置: 選択中の Box の右上、無ければ原点付近
+        const selBox = sheet?.boxes.find((b) => state.selection.boxIds.includes(b.id));
+        const defaults: Note = {
+          id,
+          x: selBox ? selBox.x + selBox.width + 24 : 40,
+          y: selBox ? selBox.y - 40 : 40,
+          width: 160,
+          height: 80,
+          text: '',
+          style: 'note',
+        };
+        set((st) => ({
+          doc: mutateActiveSheet(st.doc, (sh) => {
+            if (!Array.isArray(sh.notes)) sh.notes = [];
+            sh.notes.push({ ...defaults, ...partial, id });
+          }),
+          selection: { sheetId: st.doc.activeSheetId, boxIds: [], lineIds: [], sdsgIds: [], noteIds: [id] },
+          dirty: true,
+        }));
+        return id;
+      },
+      updateNote: (id, patch) => {
+        set((state) => ({
+          doc: mutateActiveSheet(state.doc, (sheet) => {
+            const n = sheet.notes.find((x) => x.id === id);
+            if (n) Object.assign(n, patch);
+          }),
+          dirty: true,
+        }));
+      },
+      updateNotes: (ids, patch) => {
+        set((state) => ({
+          doc: mutateActiveSheet(state.doc, (sheet) => {
+            sheet.notes.forEach((n) => { if (ids.includes(n.id)) Object.assign(n, patch); });
+          }),
+          dirty: true,
+        }));
+      },
+      removeNotes: (ids) => {
+        const set_ = new Set(ids);
+        set((state) => ({
+          doc: mutateActiveSheet(state.doc, (sheet) => {
+            sheet.notes = sheet.notes.filter((n) => !set_.has(n.id));
+          }),
+          selection: { ...state.selection, noteIds: state.selection.noteIds.filter((x) => !set_.has(x)) },
+          dirty: true,
+        }));
+      },
+
       // --- Line operations ---
       addLine: (from, to, patch) => {
         const state = get();
@@ -1663,7 +1730,7 @@ export const useTEMStore = create<Store>()(
             boxIds,
             lineIds,
             sdsgIds,
-            noteIds: [],
+            noteIds: opts?.noteIds ?? [],
             legendSelected: opts?.legendSelected ?? false,
           },
         }));

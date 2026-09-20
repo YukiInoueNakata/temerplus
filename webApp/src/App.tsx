@@ -386,6 +386,7 @@ export default function App() {
         if (sel.boxIds.length > 0) store.removeBoxes(sel.boxIds);
         if (sel.lineIds.length > 0) store.removeLines(sel.lineIds);
         if (sel.sdsgIds.length > 0) sel.sdsgIds.forEach((id) => store.removeSDSG(id));
+        if (sel.noteIds.length > 0) store.removeNotes(sel.noteIds);
         return;
       }
       if (ctrl && e.shiftKey && e.key === 'T') { e.preventDefault(); store.addSheet(); return; }
@@ -394,8 +395,8 @@ export default function App() {
       if ((e.key === 'Enter' || e.key === 'F2') && !isEditing && !ctrl) {
         const sel = store.selection;
         const single =
-          sel.boxIds.length + sel.sdsgIds.length === 1 && sel.lineIds.length === 0
-            ? (sel.boxIds[0] ?? sel.sdsgIds[0])
+          sel.boxIds.length + sel.sdsgIds.length + sel.noteIds.length === 1 && sel.lineIds.length === 0
+            ? (sel.boxIds[0] ?? sel.sdsgIds[0] ?? sel.noteIds[0])
             : undefined;
         if (single) { e.preventDefault(); store.requestEditNode(single); return; }
         // 凡例を選択中なら凡例設定を開く（ダブルクリックと同じ動作）

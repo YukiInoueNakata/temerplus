@@ -32,7 +32,8 @@ export type ElementPart =
   | 'sdsg'           // SD/SG の本体矩形
   | 'periodLabel'    // 時期ラベル
   | 'timeArrowLabel' // 非可逆的時間のラベル
-  | 'legend';        // 凡例
+  | 'legend'         // 凡例
+  | 'note';          // 図上のメモ
 
 export interface ElementRect {
   /** 元の要素 ID（Box / SDSG の ID。凡例や時間軸は固定文字列） */
@@ -368,6 +369,11 @@ export function collectElementRects(
       });
     }
   }
+
+  // --- 図上のメモ ---
+  (sheet.notes ?? []).forEach((n) => {
+    out.push({ id: n.id, part: 'note', rect: rectOf(n.x, n.y, n.width, n.height), text: n.text });
+  });
 
   // --- 凡例（fitBounds と同じ近似） ---
   if (settings.legend && settings.legend.alwaysVisible) {

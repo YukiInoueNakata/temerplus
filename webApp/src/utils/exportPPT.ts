@@ -33,6 +33,7 @@ import {
   computeSDSGBandPosition,
 } from './sdsgSpaceLayout';
 import { computeLegendItems, computeLegendColumns, type LegendItem } from './legend';
+import { collectSDSGRects } from './elementRects';
 import { computeContentBounds } from './fitBounds';
 import { BOX_RENDER_SPECS } from '../store/defaults';
 import { computeBoxDisplay } from './typeDisplay';
@@ -128,6 +129,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<void> {
     drawLines(pres, slide, opts.sheet, layout, t);
     drawSDSGs(pres, slide, opts.sheet, layout, opts.settings, t);
     drawBoxes(pres, slide, opts.sheet, layout, opts.settings, t);
+    drawNotes(pres, slide, opts.sheet, opts.settings, t);
     drawLegend(pres, slide, opts.sheet, layout, opts.settings.legend, t, opts.settings.locale);
     drawIdBadges(slide, opts.sheet, layout, t, includeIds);
     await pres.writeFile({ fileName: filename });
@@ -153,6 +155,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<void> {
     drawLines(pres, slide, opts.sheet, layout, t, page, mode, showMarkers);
     drawSDSGs(pres, slide, pageSheet, layout, opts.settings, t);
     drawBoxes(pres, slide, pageSheet, layout, opts.settings, t);
+    drawNotes(pres, slide, pageSheet, opts.settings, t);
     // 凡例は全スライドに表示（SPEC）
     drawLegend(pres, slide, pageSheet, layout, opts.settings.legend, t, opts.settings.locale);
     drawIdBadges(slide, pageSheet, layout, t, includeIds);
@@ -710,6 +713,47 @@ function drawBoxSubLabel(slide: PptxGenJS.Slide, b: Box, layout: LayoutDirection
 // ----------------------------------------------------------------------------
 // Line
 // ----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+// Notes（図上のメモ）
+// ----------------------------------------------------------------------------
+
+function drawNotes(pres: PptxGenJS, slide: PptxGenJS.Slide, sheet: Sheet, settings: ProjectSettings, t: Transform) {
+  const notes = sheet.notes ?? [];
+  if (notes.length === 0) return;
+  const sdsgRects = collectSDSGRects(sheet, settings.layout, settings);
+  notes.forEach((n) => {
+    const isCallout = n.style === 'callout';
+    if (n.showLeader && n.leaderTo) {
+      const box = sheet.boxes.find((bx) => bx.id === n.leaderTo);
+      const sg = sdsgRects.find((r) => r.sdsg.id === n.leaderTo);
+      const target = box
+        ? { cx: box.x + box.width / 2, cy: box.y + box.height / 2 }
+        : sg ? { cx: sg.rect.x + sg.rect.width / 2, cy: sg.rect.y + sg.rect.height / 2 } : undefined;
+      if (target) {
+        const x1 = t.toX(n.x + n.width / 2), y1 = t.toY(n.y + n.height / 2);
+        const x2 = t.toX(target.cx), y2 = t.toY(target.cy);
+        // PptxGenJS の線は左上原点の矩形で向きを flip で表す
+        slide.addShape(pres.ShapeType.line, {
+          x: Math.min(x1, x2), y: Math.min(y1, y2),
+          w: Math.max(0.01, Math.abs(x2 - x1)), h: Math.max(0.01, Math.abs(y2 - y1)),
+          flipH: x2 < x1, flipV: y2 < y1,
+          line: { color: '888888', width: 1, dashType: 'dash' },
+        });
+      }
+    }
+    const fs = n.fontSize ?? Math.min(settings.defaultFontSize ?? 13, 13);
+    slide.addText(n.text || '', {
+      x: t.toX(n.x), y: t.toY(n.y), w: t.toLen(n.width), h: t.toLen(n.height),
+      fontSize: fontSizeScaled(fs, t),
+      fontFace: settings.defaultFont,
+      color: '333333',
+      align: 'left', valign: 'top', margin: 4,
+      fill: { color: isCallout ? 'FFFFFF' : 'FFF8C5' },
+      line: { color: isCallout ? '666666' : 'B8A000', width: 0.75, dashType: isCallout ? 'solid' : 'dash' },
+    });
+  });
+}
 
 function drawLines(
   pres: PptxGenJS,

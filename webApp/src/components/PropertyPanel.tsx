@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTEMStore, useActiveSheet } from '../store/store';
-import type { Box, BoxType, SDSG, Line, AutoFitBoxMode } from '../types';
+import type { Box, BoxType, SDSG, Line, AutoFitBoxMode, Note } from '../types';
 import { BOX_TYPE_LABELS } from '../store/defaults';
 import {
   FontFamilyRow,
@@ -70,7 +70,8 @@ export function PropertyPanel({ onOpenLegendSettings, onOpenTranscriptViewer }: 
   const selectedBoxes = sheet.boxes.filter((b) => selection.boxIds.includes(b.id));
   const selectedLines = sheet.lines.filter((l) => selection.lineIds.includes(l.id));
   const selectedSDSGs = sheet.sdsg.filter((s) => selection.sdsgIds.includes(s.id));
-  const hasSelection = selectedBoxes.length > 0 || selectedLines.length > 0 || selectedSDSGs.length > 0;
+  const selectedNotes = (sheet.notes ?? []).filter((n) => selection.noteIds.includes(n.id));
+  const hasSelection = selectedBoxes.length > 0 || selectedLines.length > 0 || selectedSDSGs.length > 0 || selectedNotes.length > 0;
 
   return (
     <div className="property-panel" style={{ width }}>
@@ -89,6 +90,7 @@ export function PropertyPanel({ onOpenLegendSettings, onOpenTranscriptViewer }: 
         {selectedBoxes.length > 0 && <BoxProperties boxes={selectedBoxes} onOpenTranscriptViewer={onOpenTranscriptViewer} />}
         {selectedLines.length > 0 && <LineProperties lines={selectedLines} onOpenTranscriptViewer={onOpenTranscriptViewer} />}
         {selectedSDSGs.length > 0 && <SDSGProperties sdsgs={selectedSDSGs} onOpenTranscriptViewer={onOpenTranscriptViewer} />}
+        {selectedNotes.length > 0 && <NoteProperties notes={selectedNotes} />}
       </div>
     </div>
   );
@@ -1972,6 +1974,97 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
 
       <div className="prop-row">
         <button className="danger-btn" onClick={() => removeLines(ids)}>削除</button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// Note Properties（図上のメモ）
+// ============================================================================
+function NoteProperties({ notes }: { notes: Note[] }) {
+  const updateNotes = useTEMStore((s) => s.updateNotes);
+  const removeNotes = useTEMStore((s) => s.removeNotes);
+  const sheet = useActiveSheet();
+  const isMulti = notes.length > 1;
+  const first = notes[0];
+  const ids = notes.map((n) => n.id);
+  const targets = [
+    ...(sheet?.boxes ?? []).map((b) => ({ id: b.id, label: `${b.id}  ${(b.label || '').replace(/\s+/g, ' ').slice(0, 18)}` })),
+    ...(sheet?.sdsg ?? []).map((s) => ({ id: s.id, label: `${s.id}  (${s.type})` })),
+  ];
+
+  return (
+    <div className="prop-section">
+      <h4>メモ {isMulti && <span className="badge">{notes.length}個</span>}</h4>
+      <p className="hint" style={{ marginTop: 0 }}>
+        解釈やコメントを書く付箋です。Box と違って径路のレベルに乗らず、採番・凡例には出ません。
+      </p>
+      {!isMulti && (
+        <div className="prop-row">
+          <label>本文</label>
+          <textarea
+            value={first.text}
+            onChange={(e) => updateNotes(ids, { text: e.target.value })}
+            rows={4}
+            style={{ width: '100%', resize: 'vertical', fontFamily: 'inherit' }}
+          />
+        </div>
+      )}
+      <div className="prop-row">
+        <label>見た目</label>
+        <select
+          value={getCommon(notes, 'style') ?? 'note'}
+          onChange={(e) => updateNotes(ids, { style: e.target.value as Note['style'] })}
+        >
+          <option value="note">付箋（黄色・点線枠）</option>
+          <option value="callout">吹き出し（白・実線枠）</option>
+        </select>
+      </div>
+      <div className="prop-row">
+        <label>文字サイズ (px)</label>
+        <input
+          type="number" min={6} max={72} step={1}
+          value={getCommon(notes, 'fontSize') ?? ''}
+          placeholder="既定"
+          onChange={(e) => {
+            const v = Number(e.target.value);
+            updateNotes(ids, { fontSize: e.target.value === '' || !Number.isFinite(v) ? undefined : Math.max(6, Math.min(72, v)) });
+          }}
+        />
+      </div>
+      <div className="prop-row">
+        <label>引き出し線</label>
+        <input
+          type="checkbox"
+          checked={getCommon(notes, 'showLeader') === true}
+          onChange={(e) => updateNotes(ids, { showLeader: e.target.checked || undefined })}
+          title="対象の Box / SD・SG へ点線を引く（既定 OFF）"
+        />
+      </div>
+      {getCommon(notes, 'showLeader') === true && (
+        <div className="prop-row">
+          <label>対象</label>
+          <select
+            value={getCommon(notes, 'leaderTo') ?? ''}
+            onChange={(e) => updateNotes(ids, { leaderTo: e.target.value || undefined })}
+          >
+            <option value="">（選択）</option>
+            {targets.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+          </select>
+        </div>
+      )}
+      <div className="prop-row">
+        <label>レポートに含める</label>
+        <input
+          type="checkbox"
+          checked={getCommon(notes, 'includeInReport') === true}
+          onChange={(e) => updateNotes(ids, { includeInReport: e.target.checked || undefined })}
+          title="論文レポートの「注記」に載せる（既定 OFF）"
+        />
+      </div>
+      <div className="prop-row">
+        <button className="btn-danger" style={{ width: '100%' }} onClick={() => removeNotes(ids)}>削除</button>
       </div>
     </div>
   );

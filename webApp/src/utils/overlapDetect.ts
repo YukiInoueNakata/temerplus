@@ -122,7 +122,7 @@ function shrink(r: Rect, by: number): Rect {
 // ----------------------------------------------------------------------------
 
 /** ラベルとして扱う部位（枠の外に出て他とぶつかり得るもの） */
-const LABEL_PARTS: ElementPart[] = ['typeLabel', 'subLabel', 'periodLabel', 'timeArrowLabel', 'legend'];
+const LABEL_PARTS: ElementPart[] = ['typeLabel', 'subLabel', 'periodLabel', 'timeArrowLabel', 'legend', 'note'];
 /** 本体として扱う部位 */
 const BODY_PARTS: ElementPart[] = ['box', 'sdsg'];
 
@@ -135,6 +135,7 @@ const PART_NAMES: Record<ElementPart | 'line', string> = {
   periodLabel: '時期ラベル',
   timeArrowLabel: '時間軸ラベル',
   legend: '凡例',
+  note: 'メモ',
   line: '矢印',
 };
 

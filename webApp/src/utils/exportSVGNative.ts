@@ -31,6 +31,7 @@ import {
 } from './sdsgSpaceLayout';
 import { computeLegendItems, computeLegendColumns, type LegendItem } from './legend';
 import { needsVerticalRotation } from './verticalText';
+import { collectSDSGRects } from './elementRects';
 import { computeContentBounds } from './fitBounds';
 import { BOX_RENDER_SPECS } from '../store/defaults';
 import { computeBoxDisplay } from './typeDisplay';
@@ -162,6 +163,7 @@ function renderPage(
   drawLines(b, lineSourceSheet ?? sheet, settings.layout, t, includeIds.line, pageInnerRect);
   drawSDSGs(b, sheet, settings.layout, settings, t, includeIds.sdsg);
   drawBoxes(b, sheet, settings.layout, settings, t, includeIds.box);
+  drawNotes(b, sheet, settings, t);
   drawLegend(b, sheet, settings.layout, settings.legend, t, settings.locale);
   return b.build();
 }
@@ -1549,6 +1551,48 @@ function placePeriodLabel(
 // ----------------------------------------------------------------------------
 // Legend
 // ----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+// Notes（図上のメモ）: 付箋風 / 吹き出し風の矩形 + 本文。引き出し線は点線
+// ----------------------------------------------------------------------------
+
+function drawNotes(b: SVGBuilder, sheet: Sheet, settings: ProjectSettings, t: Transform) {
+  const notes = sheet.notes ?? [];
+  if (notes.length === 0) return;
+  const sdsgRects = collectSDSGRects(sheet, settings.layout, settings);
+  notes.forEach((n) => {
+    const isCallout = n.style === 'callout';
+    const x = t.toX(n.x); const y = t.toY(n.y);
+    const w = t.toLen(n.width); const h = t.toLen(n.height);
+    // 引き出し線（矩形より先に描いて、矩形で根元を隠す）
+    if (n.showLeader && n.leaderTo) {
+      const box = sheet.boxes.find((bx) => bx.id === n.leaderTo);
+      const sg = sdsgRects.find((r) => r.sdsg.id === n.leaderTo);
+      const target = box
+        ? { cx: box.x + box.width / 2, cy: box.y + box.height / 2 }
+        : sg ? { cx: sg.rect.x + sg.rect.width / 2, cy: sg.rect.y + sg.rect.height / 2 } : undefined;
+      if (target) {
+        b.line(t.toX(n.x + n.width / 2), t.toY(n.y + n.height / 2), t.toX(target.cx), t.toY(target.cy), {
+          stroke: '#888', strokeWidth: t.toLen(1.2), strokeDasharray: `${t.toLen(5)},${t.toLen(4)}`,
+        });
+      }
+    }
+    b.rect(x, y, w, h, {
+      fill: isCallout ? '#ffffff' : '#fff8c5',
+      stroke: isCallout ? '#666666' : '#b8a000',
+      strokeWidth: t.toLen(1),
+      strokeDasharray: isCallout ? undefined : `${t.toLen(4)},${t.toLen(3)}`,
+    });
+    if (n.text) {
+      const fs = n.fontSize ?? Math.min(settings.defaultFontSize ?? 13, 13);
+      const pad = t.toLen(6);
+      b.text(x + pad, y + pad, Math.max(1, w - pad * 2), Math.max(1, h - pad * 2), n.text, {
+        fontSize: fontSizeScaled(fs, t), color: '#333333', alignH: 'left', alignV: 'top',
+        fontFamily: settings.defaultFont,
+      });
+    }
+  });
+}
 
 function drawLegend(
   b: SVGBuilder, sheet: Sheet, layout: LayoutDirection, lg: LegendSettings, t: Transform,

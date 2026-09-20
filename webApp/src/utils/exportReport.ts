@@ -331,6 +331,17 @@ function buildSheetResults(
   // SD / SG
   out.push(...formatSdsg(sheet.sdsg, sheet.boxes, sheet.lines, transcripts, participantsLookup, includeRefs, style));
 
+  // 図上のメモ（includeInReport のものだけ。既定 OFF）
+  const reportNotes = (sheet.notes ?? []).filter((n) => n.includeInReport && (n.text ?? '').trim());
+  if (reportNotes.length > 0) {
+    out.push(heading('注記（図上のメモ）', HeadingLevel.HEADING_3));
+    reportNotes.forEach((n) => {
+      const target = n.showLeader && n.leaderTo ? `（→ ${n.leaderTo}）` : '';
+      out.push(bullet(`${n.id}${target} ${n.text.trim().replace(/\s*\n\s*/g, ' ')}`));
+    });
+    out.push(para(''));
+  }
+
   return out;
 }
 

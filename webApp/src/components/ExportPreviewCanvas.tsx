@@ -19,6 +19,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { TEMDocument } from '../types';
 import { BoxNode, type BoxNodeData } from './nodes/BoxNode';
 import { SDSGNode, type SDSGNodeData } from './nodes/SDSGNode';
+import { NoteNode, NoteLeaderOverlay, type NoteNodeData } from './nodes/NoteNode';
 import {
   computeSDSGBandLayout,
   sdsgBandKey,
@@ -37,7 +38,7 @@ import { MINOR_TICK_PX } from '../store/defaults';
 import type { PageBounds } from '../utils/pageSplit';
 import { useStore as useReactFlowStore } from 'reactflow';
 
-const nodeTypes = { box: BoxNode, sdsg: SDSGNode };
+const nodeTypes = { box: BoxNode, sdsg: SDSGNode, note: NoteNode };
 const edgeTypes = { line: LineEdge };
 
 export interface ExportPreviewCanvasProps {
@@ -350,7 +351,16 @@ function Inner({
       };
     });
 
-    return { nodes: [...boxNodes, ...sdsgNodes], edges };
+    const noteNodes: Node<NoteNodeData>[] = (sheet.notes ?? []).map((n) => ({
+      id: n.id,
+      type: 'note',
+      position: { x: n.x, y: n.y },
+      draggable: false,
+      selectable: false,
+      data: { id: n.id, text: n.text, width: n.width, height: n.height, style: n.style, fontSize: n.fontSize },
+      style: { width: n.width, height: n.height, zIndex: n.zIndex ?? 5 },
+    }));
+    return { nodes: [...boxNodes, ...sdsgNodes, ...noteNodes], edges };
   }, [sheet, doc.settings]);
 
   // 用紙枠サイズ
@@ -515,6 +525,7 @@ function Inner({
             />
             <TimeArrowOverlay />
             <PeriodLabelsOverlay />
+            <NoteLeaderOverlay />
             <LegendOverlay />
             {/* ページ分割のガイド線（キャプチャから除外するため `page-split-overlay` クラスを付与） */}
             {pageBounds && pageBounds.length > 1 && (

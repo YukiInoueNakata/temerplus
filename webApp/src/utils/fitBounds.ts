@@ -33,6 +33,12 @@ export function computeContentBounds(
     ys.push(rect.y, rect.y + rect.height);
   });
 
+  // 図上のメモ
+  (sheet.notes ?? []).forEach((n) => {
+    xs.push(n.x, n.x + n.width);
+    ys.push(n.y, n.y + n.height);
+  });
+
   // 時間矢印（alwaysVisible 問わず計算可能なら含める）
   if (settings.timeArrow) {
     const arrow = computeTimeArrow(sheet, layout, settings.timeArrow, settings.sdsgSpace, settings.typeLabelVisibility);

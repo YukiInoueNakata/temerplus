@@ -360,8 +360,14 @@ export interface Note {
   width: number;
   height: number;
   text: string;
-  style?: 'callout' | 'note';
+  style?: 'callout' | 'note';      // 既定 'note'（付箋風）
   zIndex?: number;
+  fontSize?: number;               // 未指定なら既定サイズ
+  /** 引き出し線の対象（Box または SD/SG の ID）。showLeader が真のときだけ描く */
+  leaderTo?: string;
+  showLeader?: boolean;            // 既定 false
+  /** 論文レポートの「注記」に載せるか。既定 false */
+  includeInReport?: boolean;
 }
 
 export interface PeriodLabel {

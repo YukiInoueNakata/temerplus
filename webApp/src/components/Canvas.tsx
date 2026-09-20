@@ -22,6 +22,7 @@ import 'reactflow/dist/style.css';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import { BoxNode, type BoxNodeData } from './nodes/BoxNode';
 import { SDSGNode, type SDSGNodeData } from './nodes/SDSGNode';
+import { NoteNode, NoteLeaderOverlay, type NoteNodeData } from './nodes/NoteNode';
 import { LineEdge } from './edges/LineEdge';
 import { LEVEL_PX, MINOR_TICK_PX } from '../store/defaults';
 import { computeTimeArrow } from '../utils/timeArrow';
@@ -40,7 +41,7 @@ import { resolveAttachedAnchor, anchorCenter } from '../utils/sdsgAttach';
 import { resolveBetweenEndpoint } from '../utils/sdsgBetween';
 import { useTEMView } from '../context/TEMViewContext';
 
-const nodeTypes = { box: BoxNode, sdsg: SDSGNode };
+const nodeTypes = { box: BoxNode, sdsg: SDSGNode, note: NoteNode };
 const edgeTypes = { line: LineEdge };
 
 // 短辺×長辺（layout に応じて向きを決める）
@@ -96,6 +97,8 @@ function CanvasInner({
   const storeBoxIds = useTEMStore((s) => s.selection.boxIds);
   const storeLineIds = useTEMStore((s) => s.selection.lineIds);
   const storeSdsgIds = useTEMStore((s) => s.selection.sdsgIds);
+  const storeNoteIds = useTEMStore((s) => s.selection.noteIds);
+  const updateNote = useTEMStore((s) => s.updateNote);
   const updateSDSG = useTEMStore((s) => s.updateSDSG);
   const canvasMode = useTEMStore((s) => s.view.canvasMode);
   const showGrid = useTEMStore((s) => s.view.showGrid);
@@ -465,7 +468,21 @@ function CanvasInner({
     }).filter((n): n is NonNullable<typeof n> => n !== null);
   }, [sheet, storeSdsgIds, sdsgBandComputation]);
 
-  const nodes = useMemo(() => [...boxNodes, ...sdsgNodes], [boxNodes, sdsgNodes]);
+  // Note（図上のメモ）: レベルに乗らない自由配置。ドラッグは onNodesChange で updateNote へ
+  const noteNodes: Node<NoteNodeData>[] = useMemo(() => {
+    if (!sheet) return [];
+    const sel = new Set(storeNoteIds);
+    return (sheet.notes ?? []).map((n) => ({
+      id: n.id,
+      type: 'note',
+      position: { x: n.x, y: n.y },
+      selected: sel.has(n.id),
+      data: { id: n.id, text: n.text, width: n.width, height: n.height, style: n.style, fontSize: n.fontSize },
+      style: { width: n.width, height: n.height, zIndex: n.zIndex ?? 5 },
+    }));
+  }, [sheet, storeNoteIds]);
+
+  const nodes = useMemo(() => [...boxNodes, ...sdsgNodes, ...noteNodes], [boxNodes, sdsgNodes, noteNodes]);
 
   const edges: Edge[] = useMemo(() => {
     if (!sheet) return [];
@@ -531,6 +548,11 @@ function CanvasInner({
       if (!sheet) return;
       const temporal = useTEMStore.temporal.getState();
       for (const ch of changes) {
+        // Note はスナップも帯も無関係。ドロップ時に位置を確定するだけ
+        if (ch.type === 'position' && ch.position && sheet.notes?.some((n) => n.id === ch.id)) {
+          if (ch.dragging === false) updateNote(ch.id, { x: ch.position.x, y: ch.position.y });
+          continue;
+        }
         if (ch.type === 'position' && ch.position) {
           if (ch.dragging === true && !dragging.current) {
             dragging.current = true;
@@ -738,8 +760,18 @@ function CanvasInner({
   // ---- Custom click handlers for Shift+multi-select ----
   const onNodeClick = useCallback(
     (event: React.MouseEvent, node: Node) => {
-      const { boxIds, sdsgIds } = useTEMStore.getState().selection;
+      const { boxIds, sdsgIds, noteIds } = useTEMStore.getState().selection;
       const isSDSG = node.type === 'sdsg';
+      if (node.type === 'note') {
+        if (event.shiftKey) {
+          event.stopPropagation();
+          const already = noteIds.includes(node.id);
+          setSelection(boxIds, [], sdsgIds, { noteIds: already ? noteIds.filter((id) => id !== node.id) : [...noteIds, node.id] });
+        } else {
+          setSelection([], [], [], { noteIds: [node.id] });
+        }
+        return;
+      }
       if (event.shiftKey) {
         event.stopPropagation();
         if (isSDSG) {
@@ -793,8 +825,10 @@ function CanvasInner({
     ({ nodes: selNodes, edges: selEdges }: { nodes: Node[]; edges: Edge[] }) => {
       const boxIds: string[] = [];
       const sdsgIds: string[] = [];
+      const noteIds: string[] = [];
       selNodes.forEach((n) => {
         if (n.type === 'sdsg') sdsgIds.push(n.id);
+        else if (n.type === 'note') noteIds.push(n.id);
         else boxIds.push(n.id);
       });
       const lineIds = selEdges.map((e) => e.id);
@@ -804,11 +838,13 @@ function CanvasInner({
         cur.boxIds.length === boxIds.length &&
         cur.sdsgIds.length === sdsgIds.length &&
         cur.lineIds.length === lineIds.length &&
+        cur.noteIds.length === noteIds.length &&
         boxIds.every((id) => cur.boxIds.includes(id)) &&
         sdsgIds.every((id) => cur.sdsgIds.includes(id)) &&
-        lineIds.every((id) => cur.lineIds.includes(id));
+        lineIds.every((id) => cur.lineIds.includes(id)) &&
+        noteIds.every((id) => cur.noteIds.includes(id));
       if (same) return;
-      setSelection(boxIds, lineIds, sdsgIds);
+      setSelection(boxIds, lineIds, sdsgIds, { noteIds });
     },
     [setSelection],
   );
@@ -884,6 +920,7 @@ function CanvasInner({
             <TimeArrowOverlay onOpenSettings={onOpenTimeArrowSettings} />
             <PeriodLabelsOverlay onOpenSettings={onOpenPeriodSettings} />
             <LegendOverlay onOpenSettings={onOpenLegendSettings} />
+            <NoteLeaderOverlay />
             <SDSGBandOverlay dragInfo={bandDragInfo} bandLayout={sdsgBandComputation?.bandLayout ?? {}} />
             <SmartGuidesOverlay guides={guides} />
             <CustomControls />

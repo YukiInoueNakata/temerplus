@@ -543,6 +543,7 @@ function InsertTab({ onOpenInsertBetween, onOpenPeriodLabels }: { onOpenInsertBe
   const selection = useTEMStore((s) => s.selection);
   const addSequentialLines = useTEMStore((s) => s.addSequentialLines);
   const addSDSG = useTEMStore((s) => s.addSDSG);
+  const addNote = useTEMStore((s) => s.addNote);
   const boxTypes: BoxType[] = ['normal', 'annotation', 'BFP', 'EFP', 'P-EFP', 'OPP', 'other'];
 
   // 選択数で自動分岐:
@@ -610,6 +611,14 @@ function InsertTab({ onOpenInsertBetween, onOpenPeriodLabels }: { onOpenInsertBe
             onClick={() => addBox({ type, label: BOX_TYPE_LABELS[type].ja })}
           />
         ))}
+      </RibbonGroup>
+      <RibbonGroup title="メモ">
+        <RibbonButton
+          label="メモ"
+          icon="✎"
+          title="図上に解釈やコメントを書くメモを置く（採番・凡例には出ない。Box を選択中ならその右上に置く）"
+          onClick={() => addNote()}
+        />
       </RibbonGroup>
       <RibbonGroup title="2選択間に">
         <RibbonButton label="間に挿入..." icon="↔+" onClick={onOpenInsertBetween} />

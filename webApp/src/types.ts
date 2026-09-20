@@ -126,6 +126,30 @@ export interface LineStyle {
   color?: string;
 }
 
+// Line（矢印）の既定スタイル。新規に引いた Line へ適用され、
+// 「全 Line に適用」でシート内の既存 Line へも反映できる。
+// すべて optional で、未定義の項目は FACTORY_LINE_DEFAULTS（工場出荷値）に従う。
+export interface LineDefaults {
+  type?: LineType;                 // 新規 Line の線種（一括適用では既定で変更しない）
+  shape?: LineShape;
+  color?: string;
+  strokeWidth?: number;
+  // 始点・終点の Time / Item 方向オフセット（px）
+  startOffsetTime?: number;
+  startOffsetItem?: number;
+  endOffsetTime?: number;
+  endOffsetItem?: number;
+  // 始点・終点の方向ベクトル沿いマージン（px）
+  startMargin?: number;
+  endMargin?: number;
+  // 角度モード
+  angleMode?: boolean;
+  angleDeg?: number;
+  // 形状ごとの付随パラメータ（shape が該当するときだけ意味を持つ）
+  elbowBendRatio?: number;
+  curveIntensity?: number;
+}
+
 export interface Line {
   id: string;
   type: LineType;
@@ -608,6 +632,9 @@ export interface ProjectSettings {
   typeLabelVisibility: TypeLabelVisibilityMap;
   // SD/SG 配置: 上部・下部帯の設定
   sdsgSpace?: SDSGSpaceSettings;
+  // Line（矢印）の既定スタイル。未定義なら工場出荷値へフォールバックする
+  // （sdsgSpace / boxTypePresets と同じ後方互換の取り方）
+  lineDefaults?: LineDefaults;
   // Box タイプごとの様式プリセット（描画時にBOX_RENDER_SPECS ← preset ← box.style の順で動的マージ）
   boxTypePresets?: Partial<Record<BoxType, BoxTypePreset>>;
 }

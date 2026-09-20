@@ -18,6 +18,7 @@ import type {
   Transcript,
   Paragraph,
   SourceRef,
+  LineDefaults,
 } from '../types';
 import {
   retrackSourceRefsForParagraph,
@@ -41,6 +42,7 @@ import {
   genSourceRefId,
 } from './defaults';
 import { computeFitToLabelSize, computeFitFontSize } from '../utils/boxFit';
+import { resolveLineDefaults, lineDefaultsToPatch } from '../utils/lineDefaults';
 import { hydrateDocument } from '../utils/hydrate';
 
 interface DocumentState {
@@ -136,6 +138,14 @@ interface Actions {
   updateLines: (ids: string[], patch: Partial<Line>) => void;
   removeLine: (id: string) => void;
   removeLines: (ids: string[]) => void;
+  // Line の既定スタイル（settings.lineDefaults）の更新と一括適用
+  setLineDefaults: (patch: Partial<LineDefaults>) => void;
+  /**
+   * 現在のシートの全 Line に既定スタイルを適用する（SD/SG の一括配置と同じ範囲）。
+   * - 線種は既定で据え置き（includeType で明示的に揃えられる）
+   * - 手動で編集した曲線の制御点は既定で温存（resetControlPoints で破棄できる）
+   */
+  applyLineDefaultsToAll: (options?: { includeType?: boolean; resetControlPoints?: boolean }) => void;
 
   // SDSG operations
   addSDSG: (partial: Partial<SDSG> & { type: 'SD' | 'SG'; attachedTo: string }) => string;
@@ -956,6 +966,10 @@ export const useTEMStore = create<Store>()(
           ? 0
           : (duplicateCount % 2 === 1 ? 1 : -1) * 5 * Math.ceil(duplicateCount / 2);
 
+        // settings.lineDefaults（未設定なら工場出荷値）を新規 Line の初期値にする
+        const resolved = resolveLineDefaults(state.doc.settings);
+        const defaultsPatch = lineDefaultsToPatch(resolved);
+
         set((st) => ({
           doc: mutateActiveSheet(st.doc, (sh) => {
             const defaults: Line = {
@@ -966,12 +980,16 @@ export const useTEMStore = create<Store>()(
               connectionMode: 'center-to-center',
               shape: 'straight',
             };
-            // 自動オフセット（autoPatch）→ patch の順で spread するため、
-            // 明示的に startOffsetItem / endOffsetItem を指定した場合はユーザ値が勝つ
+            // 重複 Line の自動オフセットは既定値に「足す」。既定で Item 方向に
+            // ずらしている場合でも、2 本目以降の振り分けが効くようにするため
             const autoPatch: Partial<Line> = autoOffsetItem !== 0
-              ? { startOffsetItem: autoOffsetItem, endOffsetItem: autoOffsetItem }
+              ? {
+                  startOffsetItem: (defaultsPatch.startOffsetItem ?? 0) + autoOffsetItem,
+                  endOffsetItem: (defaultsPatch.endOffsetItem ?? 0) + autoOffsetItem,
+                }
               : {};
-            sh.lines.push({ ...defaults, ...autoPatch, ...patch, id, from, to });
+            // 既定スタイル → 自動オフセット → 呼び出し側 patch の順。ユーザ指定が最優先
+            sh.lines.push({ ...defaults, ...defaultsPatch, ...autoPatch, ...patch, id, from, to });
           }),
           dirty: true,
         }));
@@ -985,6 +1003,31 @@ export const useTEMStore = create<Store>()(
           }),
           dirty: true,
         }));
+      },
+      setLineDefaults: (patch) => {
+        set((state) => ({
+          doc: produce(state.doc, (d) => {
+            d.settings.lineDefaults = { ...(d.settings.lineDefaults ?? {}), ...patch };
+          }),
+          dirty: true,
+        }));
+      },
+      applyLineDefaultsToAll: (options) => {
+        set((state) => {
+          const resolved = resolveLineDefaults(state.doc.settings);
+          const patch = lineDefaultsToPatch(resolved, { includeType: options?.includeType });
+          return {
+            doc: mutateActiveSheet(state.doc, (sheet) => {
+              sheet.lines.forEach((l) => {
+                Object.assign(l, patch);
+                // style は毎回新しいオブジェクトを割り当てる（共有参照を作らない）
+                l.style = { ...patch.style };
+                if (options?.resetControlPoints) delete l.controlPoints;
+              });
+            }),
+            dirty: true,
+          };
+        });
       },
       updateLines: (ids, patch) => {
         set((state) => ({

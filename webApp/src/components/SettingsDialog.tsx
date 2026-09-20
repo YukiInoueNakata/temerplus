@@ -28,6 +28,7 @@ import type {
 import { CollapsibleSection } from './CollapsibleSection';
 import { FontFamilyRow, FontSizeRow, ColorRow } from './DecorationEditor';
 import { computeLegendItems } from '../utils/legend';
+import { resolveLineDefaults } from '../utils/lineDefaults';
 import type { PaperBaseKey } from '../types';
 import {
   BUILTIN_THEMES,
@@ -40,7 +41,7 @@ import {
   type BoxStyleTheme,
 } from '../utils/boxThemes';
 
-type Tab = 'general' | 'snap' | 'typelabel' | 'boxstyle' | 'timearrow' | 'legend' | 'period' | 'sdsgspace' | 'project';
+type Tab = 'general' | 'snap' | 'typelabel' | 'boxstyle' | 'linestyle' | 'timearrow' | 'legend' | 'period' | 'sdsgspace' | 'project';
 
 interface NavLeaf {
   key: Tab;
@@ -63,6 +64,8 @@ const NAV: NavItem[] = [
     children: [
       { key: 'boxstyle', label: 'Box スタイル',
         keywords: 'Box プリセット 様式 normal BFP OPP EFP P-EFP 2nd annotation 枠線 背景色 文字色 borderColor backgroundColor borderWidth' },
+      { key: 'linestyle', label: 'Line（矢印）',
+        keywords: 'Line 矢印 径路 既定 default 線種 RLine XLine 形状 straight elbow curve 直線 L字 曲線 色 太さ strokeWidth オフセット offset マージン margin 角度 angle 一括適用 全Lineに適用' },
       { key: 'typelabel', label: 'タイプラベル',
         keywords: '種別 バッジ type label 連番 numbered 表示切替 visibility' },
       { key: 'timearrow', label: '非可逆的時間',
@@ -249,6 +252,7 @@ export function SettingsDialog({
             {tab === 'snap' && <SnapSection />}
             {tab === 'typelabel' && <TypeLabelSection />}
             {tab === 'boxstyle' && <BoxStyleSection />}
+            {tab === 'linestyle' && <LineStyleSection />}
             {tab === 'timearrow' && <TimeArrowSettingsSection />}
             {tab === 'legend' && <LegendSettingsSection />}
             {tab === 'period' && <PeriodLabelSettingsSection />}
@@ -989,6 +993,237 @@ function BoxStyleSection() {
 // ============================================================================
 // SD/SG 配置（専用スペース／帯）
 // ============================================================================
+function LineStyleSection() {
+  const doc = useTEMStore((s) => s.doc);
+  const setLineDefaults = useTEMStore((s) => s.setLineDefaults);
+  const applyLineDefaultsToAll = useTEMStore((s) => s.applyLineDefaultsToAll);
+  const sheet = useActiveSheet();
+  const [includeType, setIncludeType] = useState(false);
+  const [resetControlPoints, setResetControlPoints] = useState(false);
+
+  // 未設定の項目は工場出荷値で埋めて表示する（旧 .tem を開いても空欄にならない）
+  const d = resolveLineDefaults(doc.settings);
+  const lineCount = sheet?.lines.length ?? 0;
+  const manualCurveCount = sheet?.lines.filter(
+    (l) => l.controlPoints && l.controlPoints.length >= 2,
+  ).length ?? 0;
+
+  const num = (v: string, fallback: number) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+  };
+
+  return (
+    <div>
+      <section className="settings-section">
+        <h4>既定スタイル</h4>
+        <p className="hint">
+          ここで決めた値が、これから引く矢印の初期値になります。既存の矢印は変わりません
+          （下の「全 Line に適用」で反映できます）。
+        </p>
+
+        <div className="setting-row">
+          <label>線種</label>
+          <select
+            value={d.type}
+            onChange={(e) => setLineDefaults({ type: e.target.value as 'RLine' | 'XLine' })}
+          >
+            <option value="RLine">実線（実現径路）</option>
+            <option value="XLine">点線（未実現径路）</option>
+          </select>
+        </div>
+
+        <div className="setting-row">
+          <label>形状</label>
+          <select
+            value={d.shape}
+            onChange={(e) => setLineDefaults({ shape: e.target.value as 'straight' | 'elbow' | 'curve' })}
+          >
+            <option value="straight">直線</option>
+            <option value="elbow">L字接続</option>
+            <option value="curve">曲線</option>
+          </select>
+        </div>
+        {d.shape === 'elbow' && (
+          <div className="setting-row">
+            <label>L字 中継位置 (0〜1)</label>
+            <input
+              type="number" min={0} max={1} step={0.05}
+              value={d.elbowBendRatio}
+              onChange={(e) => setLineDefaults({
+                elbowBendRatio: Math.max(0, Math.min(1, num(e.target.value, 0.5))),
+              })}
+              title="折れ位置の比率。0 = from 寄り / 0.5 = 中央 / 1 = to 寄り"
+            />
+          </div>
+        )}
+        {d.shape === 'curve' && (
+          <div className="setting-row">
+            <label>曲率 (0〜1)</label>
+            <input
+              type="number" min={0} max={1} step={0.05}
+              value={d.curveIntensity}
+              onChange={(e) => setLineDefaults({
+                curveIntensity: Math.max(0, Math.min(1, num(e.target.value, 0.5))),
+              })}
+              title="0=ほぼ直線、0.5=標準、1=大きく膨らむ"
+            />
+          </div>
+        )}
+
+        <div className="setting-row">
+          <label>線の色</label>
+          <input
+            type="color"
+            value={d.color}
+            onChange={(e) => setLineDefaults({ color: e.target.value })}
+          />
+        </div>
+        <div className="setting-row">
+          <label>線の太さ (px)</label>
+          <input
+            type="number" min={0.5} max={10} step={0.5}
+            value={d.strokeWidth}
+            onChange={(e) => setLineDefaults({
+              strokeWidth: Math.max(0.5, Math.min(10, num(e.target.value, 1.5))),
+            })}
+          />
+        </div>
+      </section>
+
+      <section className="settings-section">
+        <h4>端点</h4>
+        <p className="hint">
+          矢印の始点・終点をずらす既定値。角度モードが ON のときオフセットは無効になり、
+          マージンだけが効きます（プロパティパネルの挙動と同じ）。
+        </p>
+        <div className="setting-row">
+          <label>始点オフセット Time / Item (px)</label>
+          <div style={{ display: 'flex', gap: 4 }}>
+            <input
+              type="number" step={1} style={{ width: 80 }}
+              value={d.startOffsetTime}
+              onChange={(e) => setLineDefaults({ startOffsetTime: num(e.target.value, 0) })}
+            />
+            <input
+              type="number" step={1} style={{ width: 80 }}
+              value={d.startOffsetItem}
+              onChange={(e) => setLineDefaults({ startOffsetItem: num(e.target.value, 0) })}
+            />
+          </div>
+        </div>
+        <div className="setting-row">
+          <label>終点オフセット Time / Item (px)</label>
+          <div style={{ display: 'flex', gap: 4 }}>
+            <input
+              type="number" step={1} style={{ width: 80 }}
+              value={d.endOffsetTime}
+              onChange={(e) => setLineDefaults({ endOffsetTime: num(e.target.value, 0) })}
+            />
+            <input
+              type="number" step={1} style={{ width: 80 }}
+              value={d.endOffsetItem}
+              onChange={(e) => setLineDefaults({ endOffsetItem: num(e.target.value, 0) })}
+            />
+          </div>
+        </div>
+        <div className="setting-row">
+          <label>始点マージン (px)</label>
+          <input
+            type="number" step={1}
+            value={d.startMargin}
+            onChange={(e) => setLineDefaults({ startMargin: num(e.target.value, 0) })}
+            title="始点から方向ベクトル沿いに離す距離。重なり回避に使う"
+          />
+        </div>
+        <div className="setting-row">
+          <label>終点マージン (px)</label>
+          <input
+            type="number" step={1}
+            value={d.endMargin}
+            onChange={(e) => setLineDefaults({ endMargin: num(e.target.value, 0) })}
+          />
+        </div>
+
+        <div className="setting-row">
+          <label>角度モード</label>
+          <input
+            type="checkbox"
+            checked={d.angleMode}
+            onChange={(e) => setLineDefaults({ angleMode: e.target.checked })}
+          />
+        </div>
+        {d.angleMode && (
+          <div className="setting-row">
+            <label>角度 (-85〜85 度)</label>
+            <input
+              type="number" min={-85} max={85} step={1}
+              value={d.angleDeg}
+              onChange={(e) => setLineDefaults({
+                angleDeg: Math.max(-85, Math.min(85, num(e.target.value, 0))),
+              })}
+            />
+          </div>
+        )}
+      </section>
+
+      <section className="settings-section">
+        <h4>一括適用</h4>
+        <p className="hint">
+          現在のシート（{sheet?.name ?? '-'}）の Line {lineCount} 本に既定スタイルを適用します。
+          SD/SG の一括配置と同じくシート単位です。
+        </p>
+        <div className="setting-row">
+          <label>線種（実線 / 点線）も揃える</label>
+          <input
+            type="checkbox"
+            checked={includeType}
+            onChange={(e) => setIncludeType(e.target.checked)}
+          />
+        </div>
+        {includeType && (
+          <p className="hint" style={{ color: '#b45309' }}>
+            実現径路（実線）と未実現径路（点線）の区別が失われます。
+          </p>
+        )}
+        <div className="setting-row">
+          <label>曲線の手動制御点もリセット</label>
+          <input
+            type="checkbox"
+            checked={resetControlPoints}
+            onChange={(e) => setResetControlPoints(e.target.checked)}
+          />
+        </div>
+        <p className="hint">
+          OFF のままなら、Canvas で手動調整した制御点は温存されます
+          （現在のシートで手動設定は {manualCurveCount} 本）。
+        </p>
+        <div className="setting-row" style={{ justifyContent: 'flex-start', gap: 6, flexWrap: 'wrap' }}>
+          <button
+            className="ribbon-btn-small"
+            disabled={lineCount === 0}
+            onClick={() => {
+              const warnings = [
+                `現在のシートの全 Line (${lineCount} 本) に既定スタイルを適用します。`,
+                '個別に設定した形状・色・太さ・オフセット・マージン・角度はリセットされます。',
+              ];
+              if (includeType) warnings.push('線種も揃えるため、実線 / 点線の区別が失われます。');
+              if (resetControlPoints && manualCurveCount > 0) {
+                warnings.push(`手動で調整した曲線の制御点 (${manualCurveCount} 本) も破棄されます。`);
+              }
+              warnings.push('よろしいですか?');
+              if (!confirm(warnings.join('\n'))) return;
+              applyLineDefaultsToAll({ includeType, resetControlPoints });
+            }}
+          >
+            既定スタイルを全 Line に適用
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function SDSGSpaceSection() {
   const doc = useTEMStore((s) => s.doc);
   const placeAllSDSGToBands = useTEMStore((s) => s.placeAllSDSGToBands);

@@ -59,6 +59,9 @@ interface UIState {
   // Canvas に fit を要求するシグナル（カウンタ更新で購読側が再実行）
   fitCounter: number;
   fitMode: FitMode | null;
+  /** 指定した世界座標の領域へ画面を寄せる要求（重なりチェックの「ジャンプ」で使う） */
+  focusCounter: number;
+  focusRect: { x: number; y: number; width: number; height: number } | null;
   // クリップボード更新のシグナル（実体はモジュール変数なので、
   // このカウンタを購読させないと貼付ボタンの活性状態が更新されない）
   clipboardVersion: number;
@@ -245,6 +248,7 @@ interface Actions {
   toggleLeftRuler: () => void;
   toggleLegend: () => void;
   requestFit: (mode: FitMode) => void;
+  requestFocusRect: (rect: { x: number; y: number; width: number; height: number }) => void;
   togglePeriodLabels: () => void;
   setCanvasMode: (mode: 'move' | 'pointer' | 'select') => void;
   setDataSheetWidth: (width: number) => void;
@@ -372,6 +376,8 @@ export const useTEMStore = create<Store>()(
       dirty: false,
       fitCounter: 0,
       fitMode: null,
+      focusCounter: 0,
+      focusRect: null,
       clipboardVersion: 0,
 
       // --- Document-level ---
@@ -2028,6 +2034,7 @@ export const useTEMStore = create<Store>()(
       toggleTopRuler: () => set((state) => ({ view: { ...state.view, showTopRuler: !state.view.showTopRuler } })),
       toggleLeftRuler: () => set((state) => ({ view: { ...state.view, showLeftRuler: !state.view.showLeftRuler } })),
       requestFit: (mode) => set((state) => ({ fitMode: mode, fitCounter: state.fitCounter + 1 })),
+      requestFocusRect: (rect) => set((state) => ({ focusRect: rect, focusCounter: state.focusCounter + 1 })),
       toggleLegend: () => set((state) => ({
         doc: produce(state.doc, (d) => { d.settings.legend.alwaysVisible = !d.settings.legend.alwaysVisible; }),
       })),

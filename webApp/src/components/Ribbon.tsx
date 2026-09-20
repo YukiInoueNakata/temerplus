@@ -23,6 +23,7 @@ export function Ribbon({
   onOpenCSVImport,
   onCSVExport,
   onOpenShiftContent,
+  onOpenOverlapCheck,
   onOpenTranscript,
   onOpenTranscriptBulkImport,
   onOpenWizard,
@@ -42,6 +43,7 @@ export function Ribbon({
   onOpenCSVImport: () => void;
   onCSVExport: () => void;
   onOpenShiftContent: () => void;
+  onOpenOverlapCheck: () => void;
   onOpenTranscript: () => void;
   onOpenTranscriptBulkImport: () => void;
   onOpenWizard?: () => void;
@@ -75,7 +77,7 @@ export function Ribbon({
         {activeTab === 'file' && <FileTab onSave={onSave} onSaveAs={onSaveAs} onOpen={onOpen} onOpenAsNewSheets={onOpenAsNewSheets} onNew={onNew} onOpenExport={onOpenExport} onOpenPaperReport={onOpenPaperReport} onOpenCSVImport={onOpenCSVImport} onCSVExport={onCSVExport} onOpenSettings={onOpenSettings} onOpenResize={onOpenResize} onOpenShiftContent={onOpenShiftContent} onOpenTranscript={onOpenTranscript} onOpenTranscriptBulkImport={onOpenTranscriptBulkImport} />}
         {activeTab === 'home' && <HomeTab />}
         {activeTab === 'insert' && <InsertTab onOpenInsertBetween={onOpenInsertBetween} onOpenPeriodLabels={onOpenPeriodLabels} />}
-        {activeTab === 'arrange' && <ArrangeTab />}
+        {activeTab === 'arrange' && <ArrangeTab onOpenOverlapCheck={onOpenOverlapCheck} />}
         {activeTab === 'view' && <ViewTab onOpenPeriodSettings={onOpenPeriodSettings} onOpenPeriodLabels={onOpenPeriodLabels} />}
         {activeTab === 'help' && <HelpTab onOpenWizard={onOpenWizard} />}
       </div>
@@ -321,7 +323,7 @@ function HomeTab() {
 // ============================================================================
 // 整理タブ - 整列・サイズ / 順序
 // ============================================================================
-function ArrangeTab() {
+function ArrangeTab({ onOpenOverlapCheck }: { onOpenOverlapCheck: () => void }) {
   const selection = useTEMStore((s) => s.selection);
   const bringToFront = useTEMStore((s) => s.bringToFront);
   const sendToBack = useTEMStore((s) => s.sendToBack);
@@ -378,6 +380,14 @@ function ArrangeTab() {
             if (ids.length < 2) { alert('2 つ以上の Box を選択してください'); return; }
             useTEMStore.getState().matchBoxesFontSize(ids);
           }}
+        />
+      </RibbonGroup>
+      <RibbonGroup title="点検">
+        <RibbonButton
+          label="重なりチェック"
+          icon="⚠"
+          title="ラベル・Box・矢印がぶつかっている箇所を一覧する"
+          onClick={onOpenOverlapCheck}
         />
       </RibbonGroup>
       <RibbonGroup title="順序">

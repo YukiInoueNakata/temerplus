@@ -107,6 +107,8 @@ function CanvasInner({
   const layout = useTEMStore((s) => s.doc.settings.layout);
   const settings = useTEMStore((s) => s.doc.settings);
   const fitCounter = useTEMStore((s) => s.fitCounter);
+  const focusCounter = useTEMStore((s) => s.focusCounter);
+  const focusRect = useTEMStore((s) => s.focusRect);
   const fitMode = useTEMStore((s) => s.fitMode);
 
   const dragging = useRef(false);
@@ -133,6 +135,24 @@ function CanvasInner({
       });
     }
   }, [layout, rf]);
+
+  // 指定領域へ寄せる要求への反応（重なりチェックからのジャンプ）
+  // 倍率は領域が画面の 1/3 程度に収まる値へ寄せ、極端な拡大・縮小はしない
+  useEffect(() => {
+    if (!focusRect || focusCounter === 0) return;
+    const cx = focusRect.x + focusRect.width / 2;
+    const cy = focusRect.y + focusRect.height / 2;
+    const margin = 3;
+    const zoomX = rfWidth > 0 ? rfWidth / Math.max(1, focusRect.width * margin) : 1;
+    const zoomY = rfHeight > 0 ? rfHeight / Math.max(1, focusRect.height * margin) : 1;
+    const zoom = Math.max(0.4, Math.min(2, Math.min(zoomX, zoomY)));
+    try {
+      rf.setCenter(cx, cy, { zoom, duration: 300 });
+    } catch {
+      // ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusCounter]);
 
   // fit リクエストへの反応
   useEffect(() => {

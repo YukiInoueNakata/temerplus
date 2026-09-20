@@ -5,6 +5,8 @@ import { DataSheet } from './components/DataSheet';
 import { PropertyPanel } from './components/PropertyPanel';
 import { SheetTabs } from './components/SheetTabs';
 import { StatusBar } from './components/StatusBar';
+import { OverlapCheckDialog } from './components/OverlapCheckDialog';
+import { loadOverlapChecks, saveOverlapChecks, loadOverlapStatusBar, saveOverlapStatusBar } from './utils/overlapPrefs';
 import { SettingsDialog } from './components/SettingsDialog';
 import { InsertBetweenDialog } from './components/InsertBetweenDialog';
 import { PeriodLabelsDialog } from './components/PeriodLabelsDialog';
@@ -65,6 +67,10 @@ export default function App() {
   const [transcriptAutoImport, setTranscriptAutoImport] = useState(false);
   const [bulkTranscriptImportOpen, setBulkTranscriptImportOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
+  // 重なりチェック（表示設定は localStorage 保存。ドキュメントには残さない）
+  const [overlapOpen, setOverlapOpen] = useState(false);
+  const [overlapChecks, setOverlapChecks] = useState(loadOverlapChecks);
+  const [overlapInStatusBar, setOverlapInStatusBar] = useState(loadOverlapStatusBar);
 
   // 起動ウィザードからの選択をハンドル
   const handleWizardChoice = async (choice: StartupWizardChoice) => {
@@ -417,6 +423,7 @@ export default function App() {
         onOpenCSVImport={() => setCsvOpen(true)}
         onCSVExport={handleCSVExport}
         onOpenShiftContent={() => setShiftOpen(true)}
+        onOpenOverlapCheck={() => setOverlapOpen(true)}
         onOpenTranscript={() => openTranscriptViewer()}
         onOpenTranscriptBulkImport={() => setBulkTranscriptImportOpen(true)}
         onOpenWizard={() => setWizardOpen(true)}
@@ -441,12 +448,24 @@ export default function App() {
         />
       </div>
       <SheetTabs />
-      <StatusBar />
+      <StatusBar
+        overlapChecks={overlapChecks}
+        showOverlapCount={overlapInStatusBar}
+        onOpenOverlapCheck={() => setOverlapOpen(true)}
+      />
       <SettingsDialog
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
         initialTab={settingsInitialTab}
         tabNonce={settingsTabNonce}
+      />
+      <OverlapCheckDialog
+        open={overlapOpen}
+        onClose={() => setOverlapOpen(false)}
+        checks={overlapChecks}
+        onChangeChecks={(next) => { setOverlapChecks(next); saveOverlapChecks(next); }}
+        showInStatusBar={overlapInStatusBar}
+        onChangeShowInStatusBar={(next) => { setOverlapInStatusBar(next); saveOverlapStatusBar(next); }}
       />
       <InsertBetweenDialog open={insertBetweenOpen} onClose={() => setInsertBetweenOpen(false)} />
       <PeriodLabelsDialog open={periodLabelsOpen} onClose={() => setPeriodLabelsOpen(false)} />

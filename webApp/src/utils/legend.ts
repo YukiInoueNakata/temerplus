@@ -50,6 +50,7 @@ const BOX_DESCRIPTIONS: Record<BoxType, string> = {
   'annotation': '潜在経験 / 想定された未実現経験',
   '2nd-EFP':    '第二等至点',
   'P-2nd-EFP':  '両極化第二等至点',
+  'other':      'その他',
 };
 
 // 英語ロケール時の説明文（ラベル自体は BOX_TYPE_LABELS.en を使う）
@@ -62,6 +63,7 @@ const BOX_DESCRIPTIONS_EN: Record<BoxType, string> = {
   'annotation': 'Latent / imagined unrealized experience',
   '2nd-EFP':    'Second Equifinality Point',
   'P-2nd-EFP':  'Polarized Second Equifinality Point',
+  'other':      'Other',
 };
 
 // Box 以外の凡例項目（径路 / SD・SG / 非可逆的時間）のラベルと説明
@@ -92,7 +94,12 @@ export function computeLegendItems(
   const txt = isEn ? NON_BOX_TEXT.en : NON_BOX_TEXT.ja;
 
   if (settings.includeBoxes) {
-    const usedTypes = new Set(sheet.boxes.map((b) => b.type));
+    // 主種別に加え、併記種別も使用中として数える
+    const usedTypes = new Set<BoxType>();
+    sheet.boxes.forEach((b) => {
+      usedTypes.add(b.type);
+      if (b.secondaryType) usedTypes.add(b.secondaryType);
+    });
     // 標準順序で並べる
     const order: BoxType[] = ['normal', 'BFP', 'EFP', 'P-EFP', 'OPP', 'annotation', '2nd-EFP', 'P-2nd-EFP'];
     order.forEach((type) => {
@@ -105,6 +112,21 @@ export function computeLegendItems(
           description: (isEn ? BOX_DESCRIPTIONS_EN[type] : BOX_DESCRIPTIONS[type]) ?? '',
         });
       }
+    });
+    // 種別「その他」は customTypeLabel ごとに 1 項目（ラベル未入力のものは出さない）
+    const otherLabels = Array.from(new Set(
+      sheet.boxes
+        .filter((b) => b.type === 'other')
+        .map((b) => (b.customTypeLabel ?? '').trim())
+        .filter((l) => l.length > 0),
+    ));
+    otherLabels.forEach((label) => {
+      items.push({
+        category: 'box',
+        key: `other:${label}`,
+        label,
+        description: isEn ? 'Other (user-defined)' : 'その他（利用者定義の種別）',
+      });
     });
   }
 

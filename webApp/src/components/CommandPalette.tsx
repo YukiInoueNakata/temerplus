@@ -272,7 +272,7 @@ function useCommands(callbacks: CommandPaletteCallbacks): Command[] {
         } },
 
       // === Insert ===
-      ...(['normal', 'BFP', 'OPP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'annotation'] as BoxType[]).map((type): Command => ({
+      ...(['normal', 'BFP', 'OPP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'annotation', 'other'] as BoxType[]).map((type): Command => ({
         id: `insert.box.${type}`,
         label: `Box: ${type} を追加`,
         keywords: `insert box add ${type} ${type === 'normal' ? '通常' : ''}`,

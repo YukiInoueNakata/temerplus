@@ -15,7 +15,7 @@ import {
   VerticalAlignRow,
 } from './DecorationEditor';
 import { isSDSGOutOfRange } from '../utils/sdsgSpaceLayout';
-import { SELECTABLE_BOX_TYPES } from '../utils/typeDisplay';
+import { SELECTABLE_BOX_TYPES, SECONDARY_BOX_TYPES } from '../utils/typeDisplay';
 import { xyToTimeLevel, xyToItemLevel, setTimeLevelOnly, setItemLevelOnly } from '../utils/coords';
 import { RichTextToolbar } from './RichTextToolbar';
 import { produce } from 'immer';
@@ -391,6 +391,44 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
             ))}
           </select>
         </div>
+        {/* 併記種別: 主種別に加えてもう 1 つの種別を採番・凡例に出す（例: 分岐点かつ必須通過点） */}
+        {commonType !== undefined && commonType !== 'other' && (
+          <div className="prop-row">
+            <label>併記する種別</label>
+            <select
+              value={getCommon(boxes, 'secondaryType') ?? ''}
+              onChange={(e) => updateBoxes(ids, { secondaryType: (e.target.value || undefined) as BoxType | undefined })}
+              title="主種別が枠線の見た目を決め、併記種別は種別ラベルと凡例に追加されます（例: BFP-2 / OPP-1）"
+            >
+              <option value="">なし</option>
+              {SECONDARY_BOX_TYPES.filter((t) => t !== commonType).map((t) => (
+                <option key={t} value={t}>{BOX_TYPE_LABELS[t].ja}</option>
+              ))}
+            </select>
+          </div>
+        )}
+        {/* 種別「その他」: 種別ラベルを自由記入（新しい概念のため） */}
+        {commonType === 'other' && (
+          <>
+            <div className="prop-row">
+              <label>種別ラベル（自由記入）</label>
+              <input
+                value={getCommon(boxes, 'customTypeLabel') ?? ''}
+                placeholder="例: TLMG、促進的記号…"
+                onChange={(e) => updateBoxes(ids, { customTypeLabel: e.target.value })}
+                title="空欄なら種別ラベルは表示されません。凡例には入力したラベルで出ます"
+              />
+            </div>
+            <div className="prop-row">
+              <label>同名の Box に連番を振る</label>
+              <input
+                type="checkbox"
+                checked={getCommon(boxes, 'customTypeNumbered') === true}
+                onChange={(e) => updateBoxes(ids, { customTypeNumbered: e.target.checked || undefined })}
+              />
+            </div>
+          </>
+        )}
         {!isMulti && (
           <div className="prop-row">
             <label>位置（Time / Item Level）</label>

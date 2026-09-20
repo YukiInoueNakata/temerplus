@@ -5,6 +5,7 @@
 
 export type BoxType =
   | 'normal'
+  | 'other'        // その他: 枠線は通常、種別ラベルは自由記入（新概念用）
   | 'BFP'
   | 'EFP'
   | 'P-EFP'
@@ -56,6 +57,15 @@ export interface BoxStyle {
 export interface Box {
   id: string;
   type: BoxType;
+  /**
+   * 併記する種別（例: 主種別 BFP に OPP を併記 → 種別ラベル "BFP-2 / OPP-1"）。
+   * 枠線の描画は主種別が決め、採番・凡例には両方が出る。
+   */
+  secondaryType?: BoxType;
+  /** type === 'other' のときの種別ラベル（空なら非表示） */
+  customTypeLabel?: string;
+  /** type === 'other' のとき、同じ customTypeLabel の Box に連番を振るか（既定 false） */
+  customTypeNumbered?: boolean;
   label: string;
   x: number;
   y: number;

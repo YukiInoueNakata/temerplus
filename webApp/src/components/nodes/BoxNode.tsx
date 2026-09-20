@@ -314,6 +314,7 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
   const typeVisible = typeLabelVisibility
     ? (typeLabelVisibility as Record<string, boolean | undefined>)[data.type] !== false
     : true;
+  // normal / annotation は種別タグ無し。other は customTypeLabel が空なら computeBoxDisplay が '' を返す
   const shouldShowTypeTag = data.type !== 'normal' && data.type !== 'annotation' && typeVisible;
   const typeTagText = shouldShowTypeTag && sheet
     ? computeBoxDisplay(sheet.boxes, sheet.boxes.find((b) => b.id === data.id) ?? currentBoxForDisplay, layout)

@@ -218,6 +218,7 @@ const genId = (prefix: string): string =>
 // dic_fig_type に対応: Type → Prefix
 export const ID_PREFIXES: Record<string, string> = {
   'normal':      'Item',
+  'other':       'Other',
   'BFP':         'BFP',
   'EFP':         'EFP',
   'P-EFP':       'P_EFP',
@@ -391,6 +392,7 @@ export interface BoxRenderSpec {
 export const BOX_RENDER_SPECS: Record<string, BoxRenderSpec> = {
   // 文献標準準拠（Arakawa 2012、Kawai 2016 など）
   normal:       { borderStyle: 'solid',  borderWidth: 1.5, defaultShape: 'rect' },
+  other:        { borderStyle: 'solid',  borderWidth: 1.5, defaultShape: 'rect' },  // その他: 見た目は通常と同じ
   BFP:          { borderStyle: 'solid',  borderWidth: 2.0, defaultShape: 'rect' },  // 通常より少し太い
   EFP:          { borderStyle: 'double', borderWidth: 3.0, defaultShape: 'rect' },
   // P-EFP: 二重+点線（CSS単体では表現不可なので BoxNode で2重枠を特別描画）
@@ -403,6 +405,7 @@ export const BOX_RENDER_SPECS: Record<string, BoxRenderSpec> = {
 
 export const BOX_TYPE_LABELS: Record<string, { ja: string; en: string; shortJa?: string }> = {
   normal:      { ja: '通常',               en: 'Normal', shortJa: '通常' },
+  other:       { ja: 'その他',             en: 'Other',  shortJa: 'その他' },
   BFP:         { ja: '分岐点',             en: 'BFP',    shortJa: 'BFP' },
   EFP:         { ja: '等至点',             en: 'EFP',    shortJa: 'EFP' },
   'P-EFP':     { ja: '両極化等至点',       en: 'P-EFP',  shortJa: 'P-EFP' },

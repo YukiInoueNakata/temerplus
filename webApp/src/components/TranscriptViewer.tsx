@@ -33,6 +33,7 @@ const BOX_TYPE_COLOR: Record<BoxType, string> = {
   '2nd-EFP':    '#2ecc71',
   'P-2nd-EFP':  '#1abc9c',
   'annotation': '#95a5a6',
+  'other': '#7f8c8d',
 };
 
 function withAlpha(hex: string, alpha: number): string {
@@ -1361,7 +1362,7 @@ function LinkCreationDialog({
               <div className="setting-row">
                 <label>Box 種別</label>
                 <select value={boxType} onChange={(e) => setBoxType(e.target.value as BoxType)}>
-                  {(['normal', 'OPP', 'BFP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'annotation'] as BoxType[]).map((t) => (
+                  {(['normal', 'OPP', 'BFP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'annotation', 'other'] as BoxType[]).map((t) => (
                     <option key={t} value={t}>{BOX_TYPE_LABELS[t]?.ja ?? t}</option>
                   ))}
                 </select>
@@ -1541,7 +1542,7 @@ function BulkLinkDialog({
               <div className="setting-row">
                 <label>Box 種別</label>
                 <select value={boxType} onChange={(e) => setBoxType(e.target.value as BoxType)}>
-                  {(['normal', 'OPP', 'BFP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'annotation'] as BoxType[]).map((t) => (
+                  {(['normal', 'OPP', 'BFP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'annotation', 'other'] as BoxType[]).map((t) => (
                     <option key={t} value={t}>{BOX_TYPE_LABELS[t]?.ja ?? t}</option>
                   ))}
                 </select>

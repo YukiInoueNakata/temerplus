@@ -24,29 +24,33 @@ function toOrdinalEn(n: number): string {
  *
  * 同種別は時間軸順で並べる
  */
-export function computeBoxDisplay(
+/** Box が指定の種別を持つか（主種別または併記種別） */
+export function boxHasType(b: Box, type: BoxType): boolean {
+  return b.type === type || b.secondaryType === type;
+}
+
+/** 併記種別として選べる種別（採番のある種別のみ。normal / annotation / other は不可） */
+export const SECONDARY_BOX_TYPES: BoxType[] = ['BFP', 'EFP', 'P-EFP', 'OPP', '2nd-EFP', 'P-2nd-EFP'];
+
+const timeOf = (b: Box, layout: LayoutDirection) => (layout === 'horizontal' ? b.x : b.y);
+
+/**
+ * 1 つの種別についての表示文字列（採番込み）。
+ * 採番は「その種別を主種別または併記種別として持つ Box」を時間軸順に数える。
+ */
+function displayForType(
   allBoxes: Box[],
   currentBox: Box,
+  type: BoxType,
   layout: LayoutDirection,
 ): string {
-  const type = currentBox.type;
   const shortName = BOX_TYPE_LABELS[type]?.shortJa ?? type;
-
-  // normal は表示なし
   if (type === 'normal') return '';
-
-  // typeLabelNumbered=false の場合は連番を付けず種別名のみ
   if (currentBox.typeLabelNumbered === false) return shortName;
 
-  // 同種別の Box を時間軸順でソート
   const sameType = allBoxes
-    .filter((b) => b.type === type)
-    .sort((a, b) => {
-      const aT = layout === 'horizontal' ? a.x : a.y;
-      const bT = layout === 'horizontal' ? b.x : b.y;
-      return aT - bT;
-    });
-
+    .filter((b) => boxHasType(b, type))
+    .sort((a, b) => timeOf(a, layout) - timeOf(b, layout));
   if (sameType.length <= 1) return shortName;
 
   const index = sameType.findIndex((b) => b.id === currentBox.id) + 1;
@@ -57,9 +61,49 @@ export function computeBoxDisplay(
     if (index === 1) return shortName;
     return `${toOrdinalEn(index)} ${shortName}`;
   }
-
   // その他: ハイフン番号
   return `${shortName}-${index}`;
+}
+
+/** 種別「その他」の表示。customTypeLabel が空なら非表示（''） */
+function displayForOther(allBoxes: Box[], currentBox: Box, layout: LayoutDirection): string {
+  const label = (currentBox.customTypeLabel ?? '').trim();
+  if (!label) return '';
+  if (!currentBox.customTypeNumbered) return label;
+  const same = allBoxes
+    .filter((b) => b.type === 'other' && (b.customTypeLabel ?? '').trim() === label)
+    .sort((a, b) => timeOf(a, layout) - timeOf(b, layout));
+  if (same.length <= 1) return label;
+  const index = same.findIndex((b) => b.id === currentBox.id) + 1;
+  return index > 0 ? `${label}-${index}` : label;
+}
+
+/**
+ * Box の表示用タグ文字列を計算する
+ * - 通常: 種別名（例: EFP, OPP）
+ * - 複数ある場合:
+ *   - EFP, P-EFP: "EFP" (1st), "2nd EFP", "3rd EFP"... (英語オーディナル)
+ *   - OPP, BFP: "OPP-1", "OPP-2"... (ハイフン番号)
+ *   - annotation: "潜在-1", "潜在-2"...
+ *   - normal: 連番なし（ID で識別）
+ *   - other: customTypeLabel（customTypeNumbered なら同名内で "-n"）
+ * - 併記種別があれば " / " でつなぐ（例: "BFP-2 / OPP-1"）
+ *
+ * 採番は主種別・併記種別の両方を数え、同種別は時間軸順で並べる
+ */
+export function computeBoxDisplay(
+  allBoxes: Box[],
+  currentBox: Box,
+  layout: LayoutDirection,
+): string {
+  const primary = currentBox.type === 'other'
+    ? displayForOther(allBoxes, currentBox, layout)
+    : displayForType(allBoxes, currentBox, currentBox.type, layout);
+  const sec = currentBox.secondaryType;
+  const secondary = sec && sec !== currentBox.type && SECONDARY_BOX_TYPES.includes(sec)
+    ? displayForType(allBoxes, currentBox, sec, layout)
+    : '';
+  return [primary, secondary].filter((t) => t).join(' / ');
 }
 
 /**
@@ -130,4 +174,5 @@ export const SELECTABLE_BOX_TYPES: BoxType[] = [
   'P-EFP',
   'OPP',
   'annotation',
+  'other',
 ];

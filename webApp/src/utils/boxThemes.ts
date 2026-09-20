@@ -148,7 +148,7 @@ export function deleteUserTheme(id: string): void {
 
 // sanitize ---------------------------------------------------------------------
 
-const VALID_BOX_TYPES: BoxType[] = ['normal', 'BFP', 'OPP', 'EFP', '2nd-EFP', 'P-EFP', 'P-2nd-EFP', 'annotation'];
+const VALID_BOX_TYPES: BoxType[] = ['normal', 'BFP', 'OPP', 'EFP', '2nd-EFP', 'P-EFP', 'P-2nd-EFP', 'annotation', 'other'];
 const VALID_BORDER_STYLE = new Set(['solid', 'double', 'dashed', 'dotted']);
 const VALID_SHAPE = new Set(['rect', 'ellipse']);
 

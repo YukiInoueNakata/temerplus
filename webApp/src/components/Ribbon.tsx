@@ -543,7 +543,7 @@ function InsertTab({ onOpenInsertBetween, onOpenPeriodLabels }: { onOpenInsertBe
   const selection = useTEMStore((s) => s.selection);
   const addSequentialLines = useTEMStore((s) => s.addSequentialLines);
   const addSDSG = useTEMStore((s) => s.addSDSG);
-  const boxTypes: BoxType[] = ['normal', 'annotation', 'BFP', 'EFP', 'P-EFP', 'OPP'];
+  const boxTypes: BoxType[] = ['normal', 'annotation', 'BFP', 'EFP', 'P-EFP', 'OPP', 'other'];
 
   // 選択数で自動分岐:
   //   Box 0 + Line 0 → エラー
@@ -667,6 +667,7 @@ function getIconForBoxType(type: BoxType): string {
     case 'P-EFP': return '⚃';
     case 'OPP': return '▣';
     case 'annotation': return '◈';
+    case 'other': return '▢';
     default: return '□';
   }
 }

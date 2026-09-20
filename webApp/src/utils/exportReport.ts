@@ -17,6 +17,7 @@ import {
 } from 'docx';
 import { toPng } from 'html-to-image';
 import { resolveConventionMeaning } from './visualConventions';
+import { boxHasType } from './typeDisplay';
 import type {
   TEMDocument,
   Sheet,
@@ -90,6 +91,7 @@ const BOX_TYPE_LABEL_JA: Record<BoxType, string> = {
   '2nd-EFP': '第2等至点 (2nd EFP)',
   'P-2nd-EFP': '両極化した第2等至点 (P-2nd EFP)',
   'annotation': '注釈・潜在経験 (annotation)',
+  'other': 'その他（利用者定義の種別）',
 };
 
 // 列挙順（読み手に望ましい順番: EFP 系を先に、normal/annotation を最後に）
@@ -102,6 +104,7 @@ const BOX_TYPE_ORDER: BoxType[] = [
   'P-2nd-EFP',
   'normal',
   'annotation',
+  'other',
 ];
 
 // ----------------------------------------------------------------------------
@@ -169,7 +172,8 @@ function formatBoxesByType(
   includeRefs: boolean,
   style: 'bracket' | 'apa',
 ): Paragraph[] {
-  const subset = boxes.filter((b) => b.type === type);
+  // 併記種別を持つ Box は両方の見出しに載せる（主種別でない側には併記であることを添える）
+  const subset = boxes.filter((b) => boxHasType(b, type));
   if (subset.length === 0) return [];
   const out: Paragraph[] = [];
   out.push(heading(BOX_TYPE_LABEL_JA[type], HeadingLevel.HEADING_3));
@@ -177,7 +181,13 @@ function formatBoxesByType(
     const lab = (b.label && b.label.trim()) ? b.label.trim() : '（ラベル未設定）';
     const sub = b.subLabel && b.subLabel.trim() ? ` [${b.subLabel.trim()}]` : '';
     const refSfx = includeRefs ? sourceRefSuffix(b.sourceRefs, transcripts, participantsLookup, style) : '';
-    out.push(bullet(`${b.id}${sub} 〈${lab}〉${descSuffix(b.description, b.noDescriptionNeeded)}${refSfx}`));
+    // 種別「その他」は利用者が付けた種別ラベルを添える
+    const custom = type === 'other' && (b.customTypeLabel ?? '').trim()
+      ? `（種別: ${(b.customTypeLabel ?? '').trim()}）` : '';
+    // この見出しが併記種別側なら、主種別を添える
+    const asSecondary = b.type !== type
+      ? `（主種別: ${BOX_TYPE_LABEL_JA[b.type]} との併記）` : '';
+    out.push(bullet(`${b.id}${sub} 〈${lab}〉${custom}${asSecondary}${descSuffix(b.description, b.noDescriptionNeeded)}${refSfx}`));
   });
   out.push(para(''));
   return out;

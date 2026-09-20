@@ -48,6 +48,8 @@ export const TYPE_DICT: Record<string, BoxType> = {
   'p-2nd-efp': 'P-2nd-EFP',
   // 日本語
   '通常': 'normal',
+  'その他': 'other',
+  'other': 'other',
   '経験': 'normal',
   'イベント': 'normal',
   '出来事': 'normal',
@@ -189,6 +191,7 @@ export function buildBoxesFromRows(rows: string[][], opts: ImportOptions): Impor
       : type === 'EFP' ? 'EFP'
       : type === 'P-EFP' ? 'P_EFP'
       : type === 'OPP' ? 'OPP'
+      : type === 'other' ? 'Other'
       : type === 'annotation' ? 'Latent'
       : type === '2nd-EFP' ? 'EFP2'
       : 'P_EFP2';

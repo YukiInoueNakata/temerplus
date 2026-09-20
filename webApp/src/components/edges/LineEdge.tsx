@@ -48,6 +48,10 @@ export interface LineEdgeData {
   idFontSize?: number;
 }
 
+// 制御点の当たり判定の半径（世界座標 px）。見た目の円は r=6 のままで、
+// 掴める範囲だけ広げる。WYSIWYG でのドラッグ調整が難しいという指摘への対応。
+const HIT_R = 16;
+
 export function LineEdge({
   id,
   sourceX,
@@ -249,9 +253,10 @@ export function LineEdge({
               stroke="#2684ff" strokeDasharray="3,3" strokeWidth={1} pointerEvents="none"
             />
             {/* ハンドル */}
+            {/* 当たり判定用の透明な円を下に敷く。見た目は変えずに掴める範囲だけ広げる */}
             <circle
-              cx={path.points[1].x} cy={path.points[1].y} r={6}
-              fill="#2684ff" stroke="#fff" strokeWidth={2}
+              cx={path.points[1].x} cy={path.points[1].y} r={HIT_R}
+              fill="transparent"
               style={{ cursor: 'grab' }}
               onPointerDown={startDrag('cp1')}
               onPointerMove={onDragMove}
@@ -261,8 +266,13 @@ export function LineEdge({
               <title>cp1 をドラッグで移動</title>
             </circle>
             <circle
-              cx={path.points[2].x} cy={path.points[2].y} r={6}
+              cx={path.points[1].x} cy={path.points[1].y} r={6}
               fill="#2684ff" stroke="#fff" strokeWidth={2}
+              pointerEvents="none"
+            />
+            <circle
+              cx={path.points[2].x} cy={path.points[2].y} r={HIT_R}
+              fill="transparent"
               style={{ cursor: 'grab' }}
               onPointerDown={startDrag('cp2')}
               onPointerMove={onDragMove}
@@ -271,6 +281,11 @@ export function LineEdge({
             >
               <title>cp2 をドラッグで移動</title>
             </circle>
+            <circle
+              cx={path.points[2].x} cy={path.points[2].y} r={6}
+              fill="#2684ff" stroke="#fff" strokeWidth={2}
+              pointerEvents="none"
+            />
           </g>
         )}
         {showBendHandle && (
@@ -280,6 +295,13 @@ export function LineEdge({
               cy={(path.points[1].y + path.points[2].y) / 2}
               r={6}
               fill="#f39c12" stroke="#fff" strokeWidth={2}
+              pointerEvents="none"
+            />
+            <circle
+              cx={(path.points[1].x + path.points[2].x) / 2}
+              cy={(path.points[1].y + path.points[2].y) / 2}
+              r={HIT_R}
+              fill="transparent"
               style={{ cursor: isH ? 'ew-resize' : 'ns-resize' }}
               onPointerDown={startBendDrag}
               onPointerMove={onBendDragMove}

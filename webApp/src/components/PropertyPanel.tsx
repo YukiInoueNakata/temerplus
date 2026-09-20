@@ -1181,23 +1181,57 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                     onChange={(e) => updateSDSG(first.id, { itemOffset: Number(e.target.value) })}
                   />
                 </div>
-                <div className="prop-row">
-                  <label>幅 (px)</label>
-                  <input
-                    type="number"
-                    value={first.width ?? 70}
-                    onChange={(e) => updateSDSG(first.id, { width: Number(e.target.value) })}
-                    title={first.anchorMode === 'between' ? '※ between モードでは Time 軸方向は自動計算のためこの値は無視されます' : ''}
-                  />
-                </div>
-                <div className="prop-row">
-                  <label>高さ (px)</label>
-                  <input
-                    type="number"
-                    value={first.height ?? 40}
-                    onChange={(e) => updateSDSG(first.id, { height: Number(e.target.value) })}
-                  />
-                </div>
+                {(() => {
+                  // このセクションは attached モードのときだけ描かれる。
+                  // その中でも between アンカーのときは、時間軸方向のサイズが
+                  // 2 Box 間のスパンから自動計算されるため入力しても効かない。
+                  // （帯に配置中のときは spaceWidth / spaceHeight が使われる。
+                  //   そちらは「帯」セクション側の入力欄が担当する）
+                  const isBetween = first.anchorMode === 'between';
+                  const timeIsWidth = sdsgLayout === 'horizontal';
+                  const widthIgnored = isBetween && timeIsWidth;
+                  const heightIgnored = isBetween && !timeIsWidth;
+                  const reason = 'between モードでは時間軸方向のサイズが 2 Box 間のスパンから自動計算されます';
+                  return (
+                    <>
+                      <div className="prop-row">
+                        <label>幅 (px)</label>
+                        <input
+                          type="number"
+                          min={10}
+                          step={5}
+                          value={first.width ?? 70}
+                          disabled={widthIgnored}
+                          onChange={(e) => {
+                            const v = Number(e.target.value);
+                            if (!Number.isFinite(v) || v <= 0) return;
+                            updateSDSG(first.id, { width: v });
+                          }}
+                          title={widthIgnored ? reason : ''}
+                        />
+                      </div>
+                      <div className="prop-row">
+                        <label>高さ (px)</label>
+                        <input
+                          type="number"
+                          min={10}
+                          step={5}
+                          value={first.height ?? 40}
+                          disabled={heightIgnored}
+                          onChange={(e) => {
+                            const v = Number(e.target.value);
+                            if (!Number.isFinite(v) || v <= 0) return;
+                            updateSDSG(first.id, { height: v });
+                          }}
+                          title={heightIgnored ? reason : ''}
+                        />
+                      </div>
+                      {(widthIgnored || heightIgnored) && (
+                        <p className="hint" style={{ color: '#b45309' }}>{reason}</p>
+                      )}
+                    </>
+                  );
+                })()}
               </CollapsibleSection>
             )}
 
@@ -1261,7 +1295,13 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
         {!isMulti && (
           <div className="prop-row">
             <label>ラベル</label>
-            <input value={first.label} onChange={(e) => updateSDSG(first.id, { label: e.target.value })} />
+            <textarea
+              value={first.label}
+              onChange={(e) => updateSDSG(first.id, { label: e.target.value })}
+              rows={2}
+              style={{ width: '100%', resize: 'vertical', fontFamily: 'inherit' }}
+              title="改行できます（キャンバスのダブルクリック編集と同じ）"
+            />
           </div>
         )}
         <FontFamilyRow

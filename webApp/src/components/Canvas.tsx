@@ -777,10 +777,41 @@ function CanvasInner({
     [setSelection]
   );
 
+  // ダブルクリックでのラベル編集。
+  // ノード側の onDoubleClick は、1 回目のクリックによる選択で再描画が起き、
+  // 2 回目と対象がずれると dblclick が共通祖先（ペイン）へ飛んでしまい発火しない。
+  // そこでキャンバス側でも拾い、座標から対象ノードを判定して編集を要求する。
   const onPaneClick = useCallback(() => {
     setSelection([], []);
     setGuides({ v: [], h: [] });
   }, [setSelection]);
+
+  // 範囲選択（ドラッグの矩形選択）を TEM 側の選択状態へ同期する。
+  // これが無いと React Flow 内部の選択だけが変わり、プロパティパネルやリボンの
+  // 操作対象にならなかった（矩形で囲んでも「何も起きない」ように見える）。
+  const onSelectionChange = useCallback(
+    ({ nodes: selNodes, edges: selEdges }: { nodes: Node[]; edges: Edge[] }) => {
+      const boxIds: string[] = [];
+      const sdsgIds: string[] = [];
+      selNodes.forEach((n) => {
+        if (n.type === 'sdsg') sdsgIds.push(n.id);
+        else boxIds.push(n.id);
+      });
+      const lineIds = selEdges.map((e) => e.id);
+      // 同じ内容なら set しない（再描画のループを避ける）
+      const cur = useTEMStore.getState().selection;
+      const same =
+        cur.boxIds.length === boxIds.length &&
+        cur.sdsgIds.length === sdsgIds.length &&
+        cur.lineIds.length === lineIds.length &&
+        boxIds.every((id) => cur.boxIds.includes(id)) &&
+        sdsgIds.every((id) => cur.sdsgIds.includes(id)) &&
+        lineIds.every((id) => cur.lineIds.includes(id));
+      if (same) return;
+      setSelection(boxIds, lineIds, sdsgIds);
+    },
+    [setSelection],
+  );
 
   // 選択が解除されたらガイドも消す
   useEffect(() => {
@@ -824,6 +855,7 @@ function CanvasInner({
             }}
             onNodeDragStop={() => setBandDragInfo(null)}
             onConnect={onConnect}
+            onSelectionChange={onSelectionChange}
             onNodeClick={onNodeClick}
             onEdgeClick={onEdgeClick}
             onPaneClick={onPaneClick}
@@ -836,6 +868,7 @@ function CanvasInner({
             nodesConnectable={!isMoveMode}
             panOnScroll={false}
             zoomOnScroll={false}
+            zoomOnDoubleClick={false}
             zoomOnPinch={true}
             snapToGrid={false}
             snapGrid={[gridPx, gridPx]}

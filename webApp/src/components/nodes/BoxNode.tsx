@@ -434,7 +434,8 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
           setEditing(true);
         }}
       >
-        <Handle type="target" position={targetPosition} style={{ background: '#555' }} />
+        {/* 当たり判定を広げる: 見た目は 6px 相当のまま、透明な border で掴める範囲を 16px にする */}
+        <Handle type="target" position={targetPosition} style={{ background: '#555', width: 16, height: 16, border: '5px solid transparent', backgroundClip: 'padding-box', borderRadius: '50%' }} />
         {idBadge}
         {typeTagText && (
           <div style={typeTagStyle}>
@@ -482,7 +483,7 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
             {renderRichText(data.label, { vertical: isTextVertical, asciiUpright })}
           </div>
         )}
-        <Handle type="source" position={sourcePosition} style={{ background: '#555' }} />
+        <Handle type="source" position={sourcePosition} style={{ background: '#555', width: 16, height: 16, border: '5px solid transparent', backgroundClip: 'padding-box', borderRadius: '50%' }} />
       </div>
       {subLabelText && (
         <div style={subLabelStyle}>

@@ -20,6 +20,7 @@ import type { TEMDocument } from '../types';
 import { BoxNode, type BoxNodeData } from './nodes/BoxNode';
 import { SDSGNode, type SDSGNodeData } from './nodes/SDSGNode';
 import { NoteNode, NoteLeaderOverlay, type NoteNodeData } from './nodes/NoteNode';
+import { SDSGInfluenceOverlay } from './SDSGInfluenceOverlay';
 import {
   computeSDSGBandLayout,
   sdsgBandKey,
@@ -274,7 +275,7 @@ function Inner({
         draggable: false, selectable: false,
         data: {
           id: sg.id, type: sg.type, label: sg.label,
-          width: w, height: h, style: sg.style, rectRatio: sg.rectRatio,
+          width: w, height: h, style: sg.style, rectRatio: sg.rectRatio, shape: sg.shape,
           labelArea: sg.labelArea, labelOffsetX: sg.labelOffsetX, labelOffsetY: sg.labelOffsetY,
           flipDirection,
           subLabel: sg.subLabel,
@@ -526,6 +527,7 @@ function Inner({
             <TimeArrowOverlay />
             <PeriodLabelsOverlay />
             <NoteLeaderOverlay />
+            <SDSGInfluenceOverlay />
             <LegendOverlay />
             {/* ページ分割のガイド線（キャプチャから除外するため `page-split-overlay` クラスを付与） */}
             {pageBounds && pageBounds.length > 1 && (

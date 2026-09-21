@@ -23,6 +23,7 @@ import { useTEMStore, useActiveSheet } from '../store/store';
 import { BoxNode, type BoxNodeData } from './nodes/BoxNode';
 import { SDSGNode, type SDSGNodeData } from './nodes/SDSGNode';
 import { NoteNode, NoteLeaderOverlay, type NoteNodeData } from './nodes/NoteNode';
+import { SDSGInfluenceOverlay } from './SDSGInfluenceOverlay';
 import { LineEdge } from './edges/LineEdge';
 import { LEVEL_PX, MINOR_TICK_PX } from '../store/defaults';
 import { computeTimeArrow } from '../utils/timeArrow';
@@ -336,7 +337,7 @@ function CanvasInner({
               id: sg.id, type: sg.type, label: sg.label,
               width: pos.width, height: pos.height,
               spaceMode: sg.spaceMode,
-              style: sg.style, rectRatio: sg.rectRatio,
+              style: sg.style, rectRatio: sg.rectRatio, shape: sg.shape,
               labelArea: sg.labelArea, labelOffsetX: sg.labelOffsetX, labelOffsetY: sg.labelOffsetY,
               flipDirection: shouldFlip,
               outOfRange: pos.outOfRange,
@@ -404,7 +405,7 @@ function CanvasInner({
           data: {
             id: sg.id, type: sg.type, label: sg.label, width: w, height: h,
             spaceMode: sg.spaceMode,
-            style: sg.style, rectRatio: sg.rectRatio,
+            style: sg.style, rectRatio: sg.rectRatio, shape: sg.shape,
               labelArea: sg.labelArea, labelOffsetX: sg.labelOffsetX, labelOffsetY: sg.labelOffsetY,
             subLabel: sg.subLabel, subLabelOffsetX: sg.subLabelOffsetX,
             subLabelOffsetY: sg.subLabelOffsetY, subLabelFontSize: sg.subLabelFontSize,
@@ -444,7 +445,7 @@ function CanvasInner({
         data: {
           id: sg.id, type: sg.type, label: sg.label, width: w, height: h,
           spaceMode: sg.spaceMode,
-          style: sg.style, rectRatio: sg.rectRatio,
+          style: sg.style, rectRatio: sg.rectRatio, shape: sg.shape,
               labelArea: sg.labelArea, labelOffsetX: sg.labelOffsetX, labelOffsetY: sg.labelOffsetY,
           subLabel: sg.subLabel, subLabelOffsetX: sg.subLabelOffsetX,
           subLabelOffsetY: sg.subLabelOffsetY, subLabelFontSize: sg.subLabelFontSize,
@@ -921,6 +922,7 @@ function CanvasInner({
             <PeriodLabelsOverlay onOpenSettings={onOpenPeriodSettings} />
             <LegendOverlay onOpenSettings={onOpenLegendSettings} />
             <NoteLeaderOverlay />
+            <SDSGInfluenceOverlay />
             <SDSGBandOverlay dragInfo={bandDragInfo} bandLayout={sdsgBandComputation?.bandLayout ?? {}} />
             <SmartGuidesOverlay guides={guides} />
             <CustomControls />

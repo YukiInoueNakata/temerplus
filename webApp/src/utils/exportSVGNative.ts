@@ -32,6 +32,7 @@ import {
 import { computeLegendItems, computeLegendColumns, type LegendItem } from './legend';
 import { needsVerticalRotation } from './verticalText';
 import { collectSDSGRects } from './elementRects';
+import { collectInfluenceSegments } from './sdsgInfluence';
 import { computeContentBounds } from './fitBounds';
 import { BOX_RENDER_SPECS } from '../store/defaults';
 import { computeBoxDisplay } from './typeDisplay';
@@ -162,6 +163,7 @@ function renderPage(
   drawPeriodLabels(b, sheet, settings.layout, settings.periodLabels, settings.timeArrow, t, settings.sdsgSpace, settings.typeLabelVisibility);
   drawLines(b, lineSourceSheet ?? sheet, settings.layout, t, includeIds.line, pageInnerRect);
   drawSDSGs(b, sheet, settings.layout, settings, t, includeIds.sdsg);
+  drawSDSGInfluence(b, sheet, settings, t);
   drawBoxes(b, sheet, settings.layout, settings, t, includeIds.box);
   drawNotes(b, sheet, settings, t);
   drawLegend(b, sheet, settings.layout, settings.legend, t, settings.locale);
@@ -1150,9 +1152,14 @@ function drawSDSGs(
     // 方向別の polygon を直接生成
     // bbox: (wx, wy, w, h) で、矢印の「方向」は layout × type で決まる
     // H SD: 下向き / H SG: 上向き / V SD: 右向き / V SG: 左向き
-    const points = buildSDSGPolygon(wx, wy, w, h, isH, isSD, rectRatio);
-    const svgPoints = points.map((p) => ({ x: t.toX(p.x), y: t.toY(p.y) }));
-    b.polygon(svgPoints, { fill: bgColor, stroke: borderColor, strokeWidth: 1.5 });
+    if (sg.shape === 'rect') {
+      // 四角形（幅を持つ SD/SG）。方向は影響線で示す
+      b.rect(t.toX(wx), t.toY(wy), t.toLen(w), t.toLen(h), { fill: bgColor, stroke: borderColor, strokeWidth: 1.5 });
+    } else {
+      const points = buildSDSGPolygon(wx, wy, w, h, isH, isSD, rectRatio);
+      const svgPoints = points.map((p) => ({ x: t.toX(p.x), y: t.toY(p.y) }));
+      b.polygon(svgPoints, { fill: bgColor, stroke: borderColor, strokeWidth: 1.5 });
+    }
 
     // ラベル領域: pentagon (五角形全体) / rect (矩形部分のみ)
     const labelArea = sg.labelArea ?? 'pentagon';
@@ -1555,6 +1562,16 @@ function placePeriodLabel(
 // ----------------------------------------------------------------------------
 // Notes（図上のメモ）: 付箋風 / 吹き出し風の矩形 + 本文。引き出し線は点線
 // ----------------------------------------------------------------------------
+
+// 幅を持つ SD/SG → 影響先 Box への太い矢印
+function drawSDSGInfluence(b: SVGBuilder, sheet: Sheet, settings: ProjectSettings, t: Transform) {
+  collectInfluenceSegments(sheet, settings.layout, settings).forEach((s) => {
+    const sw = t.toLen(s.strokeWidth);
+    const x1 = t.toX(s.x1), y1 = t.toY(s.y1), x2 = t.toX(s.x2), y2 = t.toY(s.y2);
+    b.line(x1, y1, x2, y2, { stroke: s.color, strokeWidth: sw });
+    drawArrowHead(b, x2, y2, x1, y1, sw, s.color);
+  });
+}
 
 function drawNotes(b: SVGBuilder, sheet: Sheet, settings: ProjectSettings, t: Transform) {
   const notes = sheet.notes ?? [];

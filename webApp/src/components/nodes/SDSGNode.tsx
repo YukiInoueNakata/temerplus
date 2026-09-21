@@ -15,7 +15,7 @@ import { useTEMStore } from '../../store/store';
 
 export interface SDSGNodeData extends Pick<
   SDSG,
-  'type' | 'label' | 'width' | 'height' | 'style' | 'rectRatio' |
+  'type' | 'label' | 'width' | 'height' | 'style' | 'rectRatio' | 'shape' |
   'labelArea' | 'labelOffsetX' | 'labelOffsetY' |
   'subLabel' | 'subLabelOffsetX' | 'subLabelOffsetY' | 'subLabelFontSize' | 'subLabelAsciiUpright' |
   'subLabelColor' | 'subLabelBackgroundColor' | 'subLabelBorderColor' | 'subLabelBorderWidth' |
@@ -117,7 +117,10 @@ export function SDSGNode({ data, selected, id: nodeId }: NodeProps<SDSGNodeData>
   // 本体ラベル配置領域: 既定は五角形全体、'rect' なら矩形部分のみ
   const labelArea = data.labelArea ?? 'pentagon';
   let textRect = { top: 0, left: 0, width, height };
-  if (isHorizontalLayout) {
+  if (data.shape === 'rect') {
+    // 四角形（幅を持つ SD/SG）。方向は影響線の矢印で示すので三角は付けない
+    points = `0,0 ${width},0 ${width},${height} 0,${height}`;
+  } else if (isHorizontalLayout) {
     // 横型: 矩形上側、三角が上下いずれかに出る
     // SD 下向き: 矩形上 + 三角下、rectRatio = 矩形高さ / 全高
     // SG 上向き: 三角上 + 矩形下

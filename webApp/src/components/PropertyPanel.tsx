@@ -1030,6 +1030,63 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                 </select>
               </div>
             )}
+            {first.anchorMode === 'between' && first.attachedTo2 && (
+              <CollapsibleSection title="幅で示して複数 Box に影響（案 X）" sectionKey="sdsg-influence" compact defaultOpen={true}>
+                <p className="hint" style={{ marginTop: 0 }}>
+                  本体を四角形にし、影響先の各 Box へ太い矢印を 1 本ずつ引きます。矢印は SD/SG の枠から Box の枠まで。
+                </p>
+                <div className="prop-row">
+                  <label>本体の形</label>
+                  <select
+                    value={first.shape ?? 'pentagon'}
+                    onChange={(e) => updateSDSG(first.id, { shape: e.target.value as 'pentagon' | 'rect' })}
+                  >
+                    <option value="pentagon">五角形（ホームベース型）</option>
+                    <option value="rect">四角形（幅で示す）</option>
+                  </select>
+                </div>
+                <div className="prop-row" style={{ alignItems: 'flex-start' }}>
+                  <label>影響先の Box</label>
+                  <div style={{ maxHeight: 140, overflowY: 'auto', border: '1px solid #ddd', borderRadius: 4, padding: 4, width: '100%' }}>
+                    {(sheet?.boxes ?? []).map((b) => {
+                      const cur = first.influenceTargets ?? [];
+                      const on = cur.includes(b.id);
+                      return (
+                        <label key={b.id} style={{ display: 'flex', gap: 6, alignItems: 'center', fontWeight: 'normal', fontSize: '0.85em' }}>
+                          <input
+                            type="checkbox"
+                            checked={on}
+                            onChange={(e) => {
+                              const next = e.target.checked ? [...cur, b.id] : cur.filter((x) => x !== b.id);
+                              updateSDSG(first.id, {
+                                influenceTargets: next.length > 0 ? next : undefined,
+                                // 影響先を初めて付けたときは四角形に切り替える（案 X の既定）
+                                ...(next.length > 0 && !first.shape ? { shape: 'rect' as const } : {}),
+                              });
+                            }}
+                          />
+                          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {b.id}  {(b.label || '').replace(/\s+/g, ' ').slice(0, 20)}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="prop-row">
+                  <label>矢印の太さ (px)</label>
+                  <input
+                    type="number" min={1} max={12} step={0.5}
+                    value={first.influenceStrokeWidth ?? 3}
+                    onChange={(e) => {
+                      const v = Number(e.target.value);
+                      if (!Number.isFinite(v) || v <= 0) return;
+                      updateSDSG(first.id, { influenceStrokeWidth: Math.max(1, Math.min(12, v)) });
+                    }}
+                  />
+                </div>
+              </CollapsibleSection>
+            )}
 
             {/* 配置方式 */}
             <div className="prop-row">

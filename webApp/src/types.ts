@@ -242,6 +242,15 @@ export interface SDSG {
   // 五角形の矩形部分の高さ比率（0-1、既定 0.55）
   // 1 に近いほど矩形部分が大きく、三角の点が浅くなる
   rectRatio?: number;
+  /**
+   * 本体の形。'pentagon'（既定・ホームベース型）/ 'rect'（四角形）。
+   * 幅を持たせて複数 Box へ影響を示すときは 'rect' + influenceTargets を使う（案 X）
+   */
+  shape?: 'pentagon' | 'rect';
+  /** 影響線を引く Box の ID（複数）。空なら影響線なし */
+  influenceTargets?: string[];
+  /** 影響線の太さ（px）。既定 3 */
+  influenceStrokeWidth?: number;
   // 本体ラベルの配置領域: 'pentagon' = 五角形全体（既定）/ 'rect' = 矩形部分のみ
   labelArea?: 'pentagon' | 'rect';
   // 本体ラベルの位置調整 (px)。textRect 中の grid alignment に対する追加オフセット

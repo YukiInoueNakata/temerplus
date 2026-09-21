@@ -34,6 +34,7 @@ import {
 } from './sdsgSpaceLayout';
 import { computeLegendItems, computeLegendColumns, type LegendItem } from './legend';
 import { collectSDSGRects } from './elementRects';
+import { collectInfluenceSegments } from './sdsgInfluence';
 import { computeContentBounds } from './fitBounds';
 import { BOX_RENDER_SPECS } from '../store/defaults';
 import { computeBoxDisplay } from './typeDisplay';
@@ -128,6 +129,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<void> {
     drawPeriodLabels(pres, slide, opts.sheet, layout, opts.settings.periodLabels, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility);
     drawLines(pres, slide, opts.sheet, layout, t);
     drawSDSGs(pres, slide, opts.sheet, layout, opts.settings, t);
+    drawSDSGInfluence(pres, slide, opts.sheet, opts.settings, t);
     drawBoxes(pres, slide, opts.sheet, layout, opts.settings, t);
     drawNotes(pres, slide, opts.sheet, opts.settings, t);
     drawLegend(pres, slide, opts.sheet, layout, opts.settings.legend, t, opts.settings.locale);
@@ -154,6 +156,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<void> {
     // Line の端点解決と精密クリップのため、常に原シートの全 Box を持つ opts.sheet を渡す
     drawLines(pres, slide, opts.sheet, layout, t, page, mode, showMarkers);
     drawSDSGs(pres, slide, pageSheet, layout, opts.settings, t);
+    drawSDSGInfluence(pres, slide, pageSheet, opts.settings, t);
     drawBoxes(pres, slide, pageSheet, layout, opts.settings, t);
     drawNotes(pres, slide, pageSheet, opts.settings, t);
     // 凡例は全スライドに表示（SPEC）
@@ -718,6 +721,19 @@ function drawBoxSubLabel(slide: PptxGenJS.Slide, b: Box, layout: LayoutDirection
 // Notes（図上のメモ）
 // ----------------------------------------------------------------------------
 
+// 幅を持つ SD/SG → 影響先 Box への太い矢印
+function drawSDSGInfluence(pres: PptxGenJS, slide: PptxGenJS.Slide, sheet: Sheet, settings: ProjectSettings, t: Transform) {
+  collectInfluenceSegments(sheet, settings.layout, settings).forEach((s) => {
+    const x1 = t.toX(s.x1), y1 = t.toY(s.y1), x2 = t.toX(s.x2), y2 = t.toY(s.y2);
+    slide.addShape(pres.ShapeType.line, {
+      x: Math.min(x1, x2), y: Math.min(y1, y2),
+      w: Math.max(0.01, Math.abs(x2 - x1)), h: Math.max(0.01, Math.abs(y2 - y1)),
+      flipH: x2 < x1, flipV: y2 < y1,
+      line: { color: rgbToHex(s.color), width: Math.max(0.75, s.strokeWidth * 0.75), endArrowType: 'triangle' },
+    });
+  });
+}
+
 function drawNotes(pres: PptxGenJS, slide: PptxGenJS.Slide, sheet: Sheet, settings: ProjectSettings, t: Transform) {
   const notes = sheet.notes ?? [];
   if (notes.length === 0) return;
@@ -1018,14 +1034,15 @@ function drawSDSGs(
     const rectX = wx + w / 2 - rectW / 2;
     const rectY = wy + h / 2 - rectH / 2;
 
-    slide.addShape(pres.ShapeType.rightArrow, {
+    const useRect = sg.shape === 'rect';
+    slide.addShape(useRect ? pres.ShapeType.rect : pres.ShapeType.rightArrow, {
       x: t.toX(rectX),
       y: t.toY(rectY),
       w: t.toLen(rectW),
       h: t.toLen(rectH),
       fill: { color: bgColor },
       line: { color: borderColor, width: 1.5 },
-      rotate,
+      rotate: useRect ? 0 : rotate,
     });
     // ラベル領域: pentagon (五角形全体・既定) / rect (矩形部分のみ)
     const sgRectRatio = Math.max(0.05, Math.min(0.95, sg.rectRatio ?? 0.55));

@@ -240,8 +240,6 @@ export function collectElementRects(
 
   // --- Box 本体 / 本文 / 種別バッジ / サブラベル ---
   sheet.boxes.forEach((b) => {
-    out.push({ id: b.id, part: 'box', rect: rectOf(b.x, b.y, b.width, b.height), text: b.label });
-
     // 本文（枠内。padding 4px を引いた内側に収まるべき）
     // 描画は white-space: pre-wrap なので幅で自動折返しされる。折返しを考慮せずに
     // 測ると、日本語のように文字単位で折り返せるテキストを全部「はみ出し」と
@@ -263,6 +261,12 @@ export function collectElementRects(
     const fitMode = autoFitText ? 'none' : (b.autoFitBoxMode ?? settings.defaultAutoFitBoxMode ?? 'none');
     const ignoreX = autoFitText || fitMode === 'height-fixed';
     const ignoreY = autoFitText || fitMode === 'width-fixed';
+
+    // 自動拡張が効く方向は、描画側が本文に合わせて枠を広げる（BoxNode の autoFitBoxMode）。
+    // 画面と同じ判定になるよう、枠の矩形はその「広がった後」の大きさで扱う
+    const effW = fitMode === 'height-fixed' ? Math.max(b.width, wrapped.width + 8) : b.width;
+    const effH = fitMode === 'width-fixed' ? Math.max(b.height, wrapped.height + 8) : b.height;
+    out.push({ id: b.id, part: 'box', rect: rectOf(b.x, b.y, effW, effH), text: b.label });
 
     out.push({
       id: b.id,
@@ -288,7 +292,7 @@ export function collectElementRects(
           part: 'typeLabel',
           // padding: 2px 4px
           rect: attachedLabelRect(
-            rectOf(b.x, b.y, b.width, b.height),
+            rectOf(b.x, b.y, effW, effH),
             { width: m.width + 8, height: m.height + 4 },
             'type', layout, { alongTime: 0, alongItem: 0 },
           ),
@@ -308,7 +312,7 @@ export function collectElementRects(
         id: b.id,
         part: 'subLabel',
         rect: attachedLabelRect(
-          rectOf(b.x, b.y, b.width, b.height),
+          rectOf(b.x, b.y, effW, effH),
           { width: m.width + 8, height: m.height },
           'sub', layout,
           { alongTime: isH ? offTime : offItem, alongItem: isH ? offItem : offTime },

@@ -336,7 +336,7 @@
      "subLabel": "B 分岐点",
      "participantId": "p_B",
      "x": 500,
-     "y": -190,
+     "y": -180,
      "width": 100,
      "height": 90,
      "textOrientation": "horizontal"

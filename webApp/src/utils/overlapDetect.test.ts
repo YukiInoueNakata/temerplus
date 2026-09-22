@@ -193,21 +193,22 @@ describe('detectOverlaps: 矢印とラベルの衝突', () => {
 describe('同梱デモでの検出', () => {
   const load = (raw: string) => hydrateDocument(JSON.parse(raw) as TEMDocument);
 
-  it('日本語デモで BFP のサブラベル × 種別ラベルを拾う', () => {
+  // 2026-09-22: 検出した被り（BFP_A_1 のサブラベル × BFP_B_1 の種別ラベル、英語デモの
+  // 単語あふれ）をデータ側で直したので、以後は「同梱デモは重なりゼロ」を回帰として守る。
+  it('日本語デモは全シートで重なりゼロ', () => {
     const doc = load(kanzakiRaw);
-    const sheet = doc.sheets[1];
-    const issues = detectOverlaps(sheet, doc.settings.layout, doc.settings, opts);
-    const labelHits = issues.filter((i) => i.kind === 'labelLabel');
-    const bfp = labelHits.find((i) => i.targets.some((t) => t.id.startsWith('BFP_')));
-    expect(bfp, `検出された labelLabel: ${JSON.stringify(labelHits.map((i) => i.message))}`).toBeTruthy();
+    doc.sheets.forEach((sheet) => {
+      const issues = detectOverlaps(sheet, doc.settings.layout, doc.settings, opts);
+      expect(issues.map((i) => i.message), sheet.name).toEqual([]);
+    });
   });
 
-  it('英語デモでも同じ箇所を拾う', () => {
+  it('英語デモは全シートで重なりゼロ', () => {
     const doc = load(kanzakiEnRaw);
-    const sheet = doc.sheets[1];
-    const issues = detectOverlaps(sheet, doc.settings.layout, doc.settings, opts);
-    expect(issues.filter((i) => i.kind === 'labelLabel')
-      .some((i) => i.targets.some((t) => t.id.startsWith('BFP_')))).toBe(true);
+    doc.sheets.forEach((sheet) => {
+      const issues = detectOverlaps(sheet, doc.settings.layout, doc.settings, opts);
+      expect(issues.map((i) => i.message), sheet.name).toEqual([]);
+    });
   });
 
   it('countByKind が種別ごとに数える', () => {

@@ -5,7 +5,7 @@
 // - 逐語録（段落 + tags）と Box / SD / 時期ラベル、原文参照の組み立て
 import { describe, it, expect } from 'vitest';
 import {
-  guessMaxqdaRole, dedupeSegments, summarizeCodes, splitCodePath, buildFromSegments,
+  guessMaxqdaRole, dedupeSegments, summarizeCodes, splitCodePath, buildFromSegments, parseOtherCodesCell,
   type MaxqdaRole,
 } from './maxqdaImport';
 
@@ -150,5 +150,118 @@ describe('buildFromSegments', () => {
       existingBoxIds: new Set(['BFP1', 'BFP2']), existingSdsgIds: new Set(),
     });
     expect(res.boxes.map((b) => b.id)).toEqual(['BFP3', 'BFP4']);
+  });
+});
+
+// ----------------------------------------------------------------------------
+// MAXQDA 24 の実際の書き出し形（2026-09 に届いた実ファイルと同じ列構成・合成データ）
+// - 列: 文書グループ / 文書名 / コード / 開始 / 終了 / セグメント / メモ / セグメントに割り当てられた他のコード
+// - 「コード」列には絞り込んだコードだけが入り、SD / SG のコードは「他のコード」列にしか現れない
+// - 「他のコード」は "親 > 子 (ウェイト: 0)" を改行で並べる
+// ----------------------------------------------------------------------------
+const REAL_HEADER = ['文書グループ', '文書名', 'コード', '開始', '終了', 'セグメント', 'メモ', 'セグメントに割り当てられた他のコード'];
+const REAL_ROWS: string[][] = [
+  REAL_HEADER,
+  ['G', 'P1', '二次コード候補 > 違和感', '2', '2', '最初は戸惑った', ' ', ''],
+  ['G', 'P1', '二次コード候補 > 試行錯誤', '4', '4', 'やり方を変えてみた', ' ', '二次コード候補 > 再意味づけ (ウェイト: 0)'],
+  ['G', 'P1', '二次コード候補 > 再意味づけ', '4', '4', 'やり方を変えてみた', ' ', '二次コード候補 > 試行錯誤 (ウェイト: 0)'],
+  ['G', 'P1', '二次コード候補 > 有標経験', '5', '5', '限界を感じた', ' ', 'TEM_SD > 知識の限界 (ウェイト: 0)'],
+  ['G', 'P1', '二次コード候補 > 再意味づけ', '10', '10', '同僚に支えられた', ' ', 'TEM_SG > 関係性 (ウェイト: 0)\r\nTEM_SG > 慣れ (ウェイト: 0)'],
+];
+
+describe('MAXQDA 24 の実書き出し形（他のコード列）', () => {
+  it('メモ → コメント、他のコード列 → otherCodes と推測する', () => {
+    expect(REAL_HEADER.map(guessMaxqdaRole))
+      .toEqual(['docGroup', 'docName', 'code', 'start', 'end', 'segment', 'comment', 'otherCodes']);
+  });
+
+  it('"親 > 子 (ウェイト: N)" の改行区切りを分解する', () => {
+    expect(parseOtherCodesCell('TEM_SG > 関係性 (ウェイト: 0)\r\nTEM_SG > 慣れ (ウェイト: 2)'))
+      .toEqual([{ code: 'TEM_SG > 関係性', weight: '0' }, { code: 'TEM_SG > 慣れ', weight: '2' }]);
+    expect(parseOtherCodesCell('')).toEqual([]);
+    expect(parseOtherCodesCell('重みなし')).toEqual([{ code: '重みなし' }]);
+  });
+
+  it('他のコード列のコードもセグメントに載り、" > " 区切りの階層を分解する', () => {
+    const mapping = REAL_HEADER.map(guessMaxqdaRole);
+    const r = dedupeSegments(REAL_ROWS, { mapping, hasHeader: true });
+    expect(r.segments).toHaveLength(4);
+    expect(r.segments[1].codes).toEqual(['二次コード候補 > 試行錯誤', '二次コード候補 > 再意味づけ']);
+    expect(r.segments[2].codes).toEqual(['二次コード候補 > 有標経験', 'TEM_SD > 知識の限界']);
+    expect(r.segments[3].codes).toEqual(['二次コード候補 > 再意味づけ', 'TEM_SG > 関係性', 'TEM_SG > 慣れ']);
+    expect(r.segments[3].codeMeta['TEM_SG > 関係性']).toEqual({ weight: '0' });
+    expect(splitCodePath('TEM_SD > 知識の限界')).toEqual({ parents: ['TEM_SD'], leaf: '知識の限界' });
+  });
+
+  it('親コードから扱いを推測する: 二次コード候補 → Box、TEM_SD → SD、TEM_SG → SG', () => {
+    const mapping = REAL_HEADER.map(guessMaxqdaRole);
+    const codes = summarizeCodes(dedupeSegments(REAL_ROWS, { mapping, hasHeader: true }).segments);
+    const action = (c: string) => codes.find((x) => x.code === c)!.suggestedAction;
+    expect(action('二次コード候補 > 違和感')).toBe('box');
+    expect(action('二次コード候補 > 再意味づけ')).toBe('box');
+    expect(action('TEM_SD > 知識の限界')).toBe('sd');
+    expect(action('TEM_SG > 関係性')).toBe('sg');
+  });
+
+  const buildReal = (multiBoxMode: 'stack' | 'merge' | 'sequence') => {
+    const mapping = REAL_HEADER.map(guessMaxqdaRole);
+    const d = dedupeSegments(REAL_ROWS, { mapping, hasHeader: true });
+    const codes = summarizeCodes(d.segments);
+    return buildFromSegments(d, {
+      plans: codes.map((c) => ({ code: c.code, action: c.suggestedAction, boxType: 'normal' })),
+      levelPx: 100, defaultWidth: 100, defaultHeight: 60, multiBoxMode,
+      existingBoxIds: new Set(), existingSdsgIds: new Set(),
+    });
+  };
+
+  it('SD / SG は同じセグメントの Box に紐付く（列順に依存しない）', () => {
+    const res = buildReal('stack');
+    const sd = res.sdsg.find((g) => g.label === '知識の限界')!;
+    const boxOfSd = res.boxes.find((b) => b.id === sd.attachedTo)!;
+    expect(boxOfSd.label).toBe('有標経験');
+    const sgs = res.sdsg.filter((g) => g.type === 'SG');
+    expect(sgs.map((g) => g.label)).toEqual(['関係性', '慣れ']);
+    expect(sgs.every((g) => res.boxes.find((b) => b.id === g.attachedTo)!.label === '再意味づけ')).toBe(true);
+    // 同じ Box に付く 2 つの SG は重ならない
+    expect(sgs[0].itemOffset).not.toBe(sgs[1].itemOffset);
+    expect(res.warnings).toEqual([]);
+  });
+
+  it('同じセグメントの複数 Box: stack は同じ時期に縦に並ぶ', () => {
+    const res = buildReal('stack');
+    const a = res.boxes.find((b) => b.label === '試行錯誤')!;
+    const b = res.boxes.find((b) => b.label === '再意味づけ')!;   // 最初の「再意味づけ」= 段落 4
+    expect(a.x).toBe(b.x);
+    expect(a.y).not.toBe(b.y);
+    expect(res.boxes).toHaveLength(5);
+    expect(res.sourceRefs.filter((r) => r.target.type === 'box')).toHaveLength(5);
+  });
+
+  it('同じセグメントの複数 Box: merge は 1 つの Box にラベルを連ねる', () => {
+    const res = buildReal('merge');
+    expect(res.boxes).toHaveLength(4);
+    expect(res.boxes[1].label).toBe('試行錯誤\n再意味づけ');
+    expect(res.sourceRefs.filter((r) => r.target.type === 'box')).toHaveLength(4);
+  });
+
+  it('同じセグメントの複数 Box: sequence は時期をずらして順に並ぶ', () => {
+    const res = buildReal('sequence');
+    expect(res.boxes.map((b) => b.x)).toEqual([0, 100, 200, 300, 400]);
+    expect(new Set(res.boxes.map((b) => b.y)).size).toBe(1);
+  });
+
+  it('stack で文書を分けるとき、積んだ段数ぶん次の文書の行が下がる', () => {
+    const rows = [
+      REAL_HEADER,
+      ['G', 'P1', 'X > a', '1', '1', 'あ', '', 'X > b (ウェイト: 0)'],
+      ['G', 'P2', 'X > a', '1', '1', 'い', '', ''],
+    ];
+    const mapping = REAL_HEADER.map(guessMaxqdaRole);
+    const res = buildFromSegments(dedupeSegments(rows, { mapping, hasHeader: true }), {
+      plans: [{ code: 'X > a', action: 'box' }, { code: 'X > b', action: 'box' }],
+      levelPx: 100, defaultWidth: 100, defaultHeight: 60, multiBoxMode: 'stack',
+      existingBoxIds: new Set(), existingSdsgIds: new Set(),
+    });
+    expect(res.boxes.map((b) => [b.x, b.y])).toEqual([[0, 0], [0, 100], [0, 250]]);
   });
 });

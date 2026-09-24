@@ -25,7 +25,8 @@ import { buildParagraphsFromRows } from '../utils/transcriptImport/csv';
 import { genTranscriptId } from '../store/defaults';
 import {
   MAXQDA_ROLE_LABELS, guessMaxqdaRole, dedupeSegments, summarizeCodes, buildFromSegments,
-  CODE_ACTION_LABELS, type MaxqdaRole, type CodeAction, type CodePlan, type DedupeKeyMode,
+  CODE_ACTION_LABELS, MULTI_BOX_MODE_LABELS,
+  type MaxqdaRole, type CodeAction, type CodePlan, type DedupeKeyMode, type MultiBoxMode,
 } from '../utils/maxqdaImport';
 import { SELECTABLE_BOX_TYPES } from '../utils/typeDisplay';
 import type { BoxType, Transcript } from '../types';
@@ -114,6 +115,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
   const [keyMode, setKeyMode] = useState<DedupeKeyMode>('range');
   const [plans, setPlans] = useState<Record<string, CodePlan>>({});
   const [stackDocs, setStackDocs] = useState(true);
+  const [multiBoxMode, setMultiBoxMode] = useState<MultiBoxMode>('stack');
 
   const rows = file?.sheets[sheetIdx]?.rows ?? [];
   const header = useMemo(() => (hasHeader && rows.length > 0 ? rows[0] : rows[0]?.map((_, i) => `列${i + 1}`) ?? []), [rows, hasHeader]);
@@ -261,6 +263,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           levelPx: LEVEL_PX,
           defaultWidth: doc.settings.defaultBoxSize.width, defaultHeight: doc.settings.defaultBoxSize.height,
           stackDocuments: stackDocs,
+          multiBoxMode,
           existingBoxIds: toNewSheet ? new Set() : existingBoxIds,
           existingSdsgIds: toNewSheet ? new Set() : existingSdsgIds,
         });
@@ -288,7 +291,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
   const roleLabels = labelsFor(mode);
   const requiredHint: Record<Mode, string> = {
     box: '必須: ラベル', line: '必須: from / to', sdsg: '必須: 紐付け先', period: '必須: 位置・ラベル',
-    transcript: '必須: 本文', maxqda: '必須: 文書名・コード・セグメント本文（開始・終了があると集約が正確）',
+    transcript: '必須: 本文', maxqda: '必須: 文書名・コード・セグメント本文（開始・終了があると集約が正確。「他のコード」列があれば SD/SG のコードもそこから拾う）',
   };
   const canNext2 = file !== null;
   const canRun = mode === 'maxqda' ? !!maxqda && maxqda.dedupe.segments.length > 0 : mapping.some((m) => m !== 'ignore');
@@ -427,6 +430,12 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
                 <p className="hint" style={{ color: '#b45309' }}>{maxqda.dedupe.warnings.join(' / ')}</p>
               )}
               <div className="setting-row"><label>文書ごとに Item 軸を分ける</label><input type="checkbox" checked={stackDocs} onChange={(e) => setStackDocs(e.target.checked)} /></div>
+              <div className="setting-row">
+                <label title="1 つのセグメントに Box になるコードが 2 つ以上付いているときの置き方">同じセグメントに Box が複数</label>
+                <select value={multiBoxMode} onChange={(e) => setMultiBoxMode(e.target.value as MultiBoxMode)}>
+                  {(Object.keys(MULTI_BOX_MODE_LABELS) as MultiBoxMode[]).map((m) => <option key={m} value={m}>{MULTI_BOX_MODE_LABELS[m]}</option>)}
+                </select>
+              </div>
               <div className="setting-row"><label>新しいシートに取り込む</label><input type="checkbox" checked={toNewSheet} onChange={(e) => setToNewSheet(e.target.checked)} /></div>
               <table className="data-table" style={{ fontSize: '0.88em', marginTop: 8 }}>
                 <thead><tr><th>コード</th><th style={{ width: 60 }}>件数</th><th style={{ width: 60 }}>文書</th><th style={{ width: 160 }}>扱い</th><th style={{ width: 150 }}>Box の種別</th></tr></thead>

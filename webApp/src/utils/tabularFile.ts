@@ -37,8 +37,10 @@ export function parseCsvToSheet(text: string, name = 'CSV'): TabularSheet {
   return { name, rows: normalizeRows(parsed.data as unknown[][]) };
 }
 
-export function parseXlsxToSheets(buffer: ArrayBuffer): TabularSheet[] {
-  const wb = XLSX.read(buffer, { type: 'array', cellDates: true });
+export function parseXlsxToSheets(buffer: ArrayBuffer | Uint8Array): TabularSheet[] {
+  // Node（テスト）では ArrayBuffer を渡すと文字列扱いされることがあるので Uint8Array に揃える
+  const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+  const wb = XLSX.read(bytes, { type: 'array', cellDates: true });
   return wb.SheetNames.map((name) => {
     const ws = wb.Sheets[name];
     const aoa = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, blankrows: false, defval: '' });

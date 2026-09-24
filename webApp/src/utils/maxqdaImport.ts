@@ -33,7 +33,8 @@ export type MaxqdaRole =
   | 'coverage'   // 範囲（%）
   | 'codedBy'    // コード付けした人
   | 'created'    // 作成日
-  | 'color';     // 色
+  | 'color'      // 色
+  | 'otherCodes'; // セグメントに割り当てられた他のコード（改行区切り、"(ウェイト: N)" 付き）
 
 export const MAXQDA_ROLE_LABELS: Record<MaxqdaRole, string> = {
   ignore: '（無視）',
@@ -50,6 +51,7 @@ export const MAXQDA_ROLE_LABELS: Record<MaxqdaRole, string> = {
   codedBy: 'コード付けした人',
   created: '作成日',
   color: '色',
+  otherCodes: '他のコード（同じセグメントの）',
 };
 
 /** MAXQDA の日英の標準列名からの推測 */
@@ -63,7 +65,8 @@ export function guessMaxqdaRole(header: string): MaxqdaRole {
   if (/^(終了|end|ende)$/.test(h)) return 'end';
   if (/^(セグメント|segment|text|本文|preview|プレビュー)$/.test(h)) return 'segment';
   if (/^(重み|weight|weight score|gewicht)$/.test(h)) return 'weight';
-  if (/^(コメント|comment|kommentar)$/.test(h)) return 'comment';
+  if (/^(コメント|comment|kommentar|メモ|memo)$/.test(h)) return 'comment';
+  if (/他のコード|other codes|all codes|weitere codes/.test(h)) return 'otherCodes';
   if (/^(領域|area|fläche)$/.test(h)) return 'area';
   if (/^(範囲|範囲 ?\(%\)|coverage|coverage ?%|abdeckungsgrad)$/.test(h)) return 'coverage';
   if (/^(コード付けした人|created by|coded by|erstellt von|作成者)$/.test(h)) return 'codedBy';
@@ -108,6 +111,22 @@ export interface DedupeResult {
   warnings: string[];
 }
 
+/**
+ * 「セグメントに割り当てられた他のコード」列の 1 セルを分解する。
+ * MAXQDA は "親 > 子 (ウェイト: 0)" を改行で並べる。重みは付随情報として返す
+ */
+export function parseOtherCodesCell(cellText: string): Array<{ code: string; weight?: string }> {
+  return cellText
+    .split(/\r?\n|;/)
+    .map((t) => t.trim())
+    .filter((t) => t.length > 0)
+    .map((t) => {
+      const m = t.match(/^(.*?)\s*[（(]\s*(?:ウェイト|weight|gewicht)\s*[:：]\s*(-?\d+(?:\.\d+)?)\s*[)）]\s*$/i);
+      return m ? { code: m[1].trim(), weight: m[2] } : { code: t };
+    })
+    .filter((e) => e.code.length > 0);
+}
+
 function indexOfRole(mapping: MaxqdaRole[], role: MaxqdaRole): number {
   return mapping.indexOf(role);
 }
@@ -125,6 +144,7 @@ export function dedupeSegments(rows: string[][], opts: DedupeOptions): DedupeRes
   const iWeight = indexOfRole(m, 'weight');
   const iComment = indexOfRole(m, 'comment');
   const iColor = indexOfRole(m, 'color');
+  const iOther = indexOfRole(m, 'otherCodes');
   const keyMode: DedupeKeyMode = opts.keyMode ?? 'range';
   const warnings: string[] = [];
 
@@ -174,6 +194,15 @@ export function dedupeSegments(rows: string[][], opts: DedupeOptions): DedupeRes
       if (c) meta.comment = c;
       if (col) meta.color = col;
       seg.codeMeta[code] = meta;
+    }
+    // 「他のコード」列: 同じセグメントに付いている残りのコード（SD/SG 側のコードはここにしか出ないことが多い）
+    if (iOther >= 0) {
+      parseOtherCodesCell(cell(row, iOther)).forEach(({ code: oc, weight }) => {
+        if (!seg!.codes.includes(oc)) seg!.codes.push(oc);
+        if (weight !== undefined && !seg!.codeMeta[oc]?.weight) {
+          seg!.codeMeta[oc] = { ...(seg!.codeMeta[oc] ?? {}), weight };
+        }
+      });
     }
     seg.rowIndexes.push(i + (opts.hasHeader ? 2 : 1));  // 1 始まりの元の行番号
   });
@@ -237,11 +266,27 @@ function guessTypeFromWords(words: string[]): BoxType | undefined {
   return undefined;
 }
 
-function guessActionFromWords(words: string[]): CodeAction | undefined {
-  const joined = words.join(' ').toLowerCase();
-  if (/(^|[^a-z])sd([^a-z]|$)|社会的方向づけ|社会的方向付け/.test(joined)) return 'sd';
-  if (/(^|[^a-z])sg([^a-z]|$)|社会的ガイド|社会的助勢/.test(joined)) return 'sg';
-  if (/時期|期間|period|phase|フェーズ|第[0-9一二三四五六七八九十]+期/.test(joined)) return 'period';
+/**
+ * 語から扱いを推測する。親コード（最上位）を優先し、次に葉を見る。
+ * - "TEM_SD"/"SD"/"社会的方向づけ" → SD、"TEM_SG"/"SG"/"社会的ガイド" → SG
+ * - "時期"/"period"/"第1期" → 時期ラベル
+ * - "二次コード候補"/"TEM_Box"/"Box"/"経験"/"出来事"/"event" などを親に持つ → Box（通常）
+ */
+function guessActionFromWords(parents: string[], leaf: string): CodeAction | undefined {
+  const test = (w: string): CodeAction | undefined => {
+    const t = w.trim().toLowerCase();
+    if (/(^|[^a-z])sd([^a-z]|$)|社会的方向づけ|社会的方向付け/.test(t)) return 'sd';
+    if (/(^|[^a-z])sg([^a-z]|$)|社会的ガイド|社会的助勢/.test(t)) return 'sg';
+    if (/時期|期間|period|phase|フェーズ|第[0-9一二三四五六七八九十]+期/.test(t)) return 'period';
+    return undefined;
+  };
+  for (const w of [...parents, leaf]) {
+    const a = test(w);
+    if (a) return a;
+  }
+  // 親コードの名前が「TEM 図の要素になる候補」を指していれば Box
+  const top = (parents[0] ?? '').trim().toLowerCase();
+  if (top && /候補|二次コード|tem[_\s-]?(box|item|経験|出来事)|(^|[^a-z])box([^a-z]|$)|経験|出来事|イベント|event|episode/.test(top)) return 'box';
   return undefined;
 }
 
@@ -257,9 +302,8 @@ export function summarizeCodes(segments: MaxqdaSegment[]): CodeSummary[] {
   });
   return Array.from(map.entries()).map(([code, e]) => {
     const { parents, leaf } = splitCodePath(code);
-    const words = [...parents, leaf];
     const suggestedType = guessTypeFromWords(parents.length > 0 ? parents : [leaf]) ?? guessTypeFromWords([leaf]);
-    const action = guessActionFromWords(words);
+    const action = guessActionFromWords(parents, leaf);
     return {
       code, leaf, parents,
       count: e.count, docCount: e.docs.size,
@@ -288,9 +332,29 @@ export interface BuildOptions {
   defaultHeight: number;
   /** 文書ごとに Item 軸を 1 段ずつ変える（既定 true） */
   stackDocuments?: boolean;
+  /**
+   * 1 つのセグメントに Box になるコードが複数付いているときの扱い（既定 'stack'）
+   * - 'stack'    : 同じ時期に縦（Item 軸）に並べる。1 コード = 1 Box、原文参照はそれぞれに付く
+   * - 'merge'    : 1 つの Box にまとめ、ラベルはコード名を改行で連ねる
+   * - 'sequence' : 時期をずらして順に並べる（コードの出現順）
+   */
+  multiBoxMode?: MultiBoxMode;
   /** 既存 ID と衝突しないように */
   existingBoxIds: Set<string>;
   existingSdsgIds: Set<string>;
+}
+
+export type MultiBoxMode = 'stack' | 'merge' | 'sequence';
+
+export const MULTI_BOX_MODE_LABELS: Record<MultiBoxMode, string> = {
+  stack: '同じ時期に縦に並べる（1 コード = 1 Box）',
+  merge: '1 つの Box にまとめる（ラベルを連ねる）',
+  sequence: '時期をずらして順に並べる',
+};
+
+/** 段落番号や時刻の並びで、セグメントに Box になるコードが何個付いているか */
+function boxPlansOf(seg: MaxqdaSegment, planByCode: Map<string, CodePlan>): CodePlan[] {
+  return seg.codes.map((c) => planByCode.get(c)).filter((p): p is CodePlan => !!p && p.action === 'box');
 }
 
 export interface BuildResult {
@@ -355,12 +419,30 @@ export function buildFromSegments(dedupe: DedupeResult, opts: BuildOptions): Bui
   const usedBox = new Set(opts.existingBoxIds);
   const usedSdsg = new Set(opts.existingSdsgIds);
   const periodSeen = new Set<string>();
+  // 同じ Box に付く SD / SG の数（2 つ目以降は外側へずらして重ねない）
+  const attachedCount = new Map<string, number>();
+
+  const multiBox: MultiBoxMode = opts.multiBoxMode ?? 'stack';
+  const boxGapY = opts.defaultHeight + 40;  // 縦に積むときの Box 間隔（Box の高さ + 余白。既定サイズが大きくても触れない）
+
+  // 文書ごとの行の高さ: 縦に積む最大段数ぶん確保して、次の文書と重ならないようにする
+  const rowTop: number[] = [];
+  let cursorY = 0;
+  dedupe.docNames.forEach((docName, docIdx) => {
+    rowTop[docIdx] = stack ? cursorY : 0;
+    const segs = dedupe.segments.filter((s) => s.docName === docName);
+    const maxStack = multiBox === 'stack'
+      ? Math.max(1, ...segs.map((s) => boxPlansOf(s, planByCode).length))
+      : 1;
+    cursorY += maxStack * boxGapY + opts.levelPx * 0.5;
+  });
 
   dedupe.docNames.forEach((docName, docIdx) => {
     const segs = dedupe.segments.filter((s) => s.docName === docName);
-    const itemLevelY = stack ? docIdx * opts.levelPx * 1.5 : 0;
+    const itemLevelY = rowTop[docIdx];
     let timeIdx = 0;
-    let lastBoxIdInDoc: string | undefined;
+    let lastBoxIdInDoc: string | undefined;   // SD の紐付け先（直近の Box。積んだときは一番上）
+    let lastBottomBoxInDoc: string | undefined; // SG の紐付け先（積んだときは一番下）
     segs.forEach((s) => {
       // 本文の無いセグメントは段落を持たない → 原文参照は付けられない（時期ラベルだけは作れる）
       const para = paragraphByKey.get(s.key);
@@ -372,7 +454,33 @@ export function buildFromSegments(dedupe: DedupeResult, opts: BuildOptions): Bui
         quoteText: s.text,
       } : null);
       let placedBoxHere = false;
-      s.codes.forEach((code) => {
+      let stackIdx = 0;       // このセグメントで縦に積んだ数
+      let mergedBoxId: string | undefined;  // 'merge' でまとめた Box
+
+      const placeBox = (type: BoxType, label: string, description: string | undefined, x: number, y: number): string => {
+        const prefix = type === 'normal' ? 'Item' : type === 'other' ? 'Other' : type.replace(/-/g, '_');
+        const id = nextId(prefix, usedBox);
+        const box: Box = {
+          id, type, label,
+          x, y,
+          width: opts.defaultWidth, height: opts.defaultHeight,
+          participantId: opts.participantIdFor?.(docName) ?? docName,
+          description,
+        } as Box;
+        boxes.push(box);
+        sourceRefs.push({ target: { type: 'box', id }, ref: refFor()! });
+        return id;
+      };
+
+      // 同じセグメント内では Box → SD/SG → 時期 の順に処理する
+      //（SD/SG が「同じセグメントの Box」に紐付くように。書き出しの列順には依存しない）
+      const ORDER: Record<CodeAction, number> = { box: 0, sd: 1, sg: 1, period: 2, tag: 3 };
+      const codesOrdered = [...s.codes].sort((a, b) => {
+        const pa = planByCode.get(a)?.action ?? 'tag';
+        const pb = planByCode.get(b)?.action ?? 'tag';
+        return ORDER[pa] - ORDER[pb];
+      });
+      codesOrdered.forEach((code) => {
         const plan = planByCode.get(code);
         if (!plan || plan.action === 'tag') return;
         const { leaf } = splitCodePath(code);
@@ -382,33 +490,40 @@ export function buildFromSegments(dedupe: DedupeResult, opts: BuildOptions): Bui
         }
         if (plan.action === 'box') {
           const type = plan.boxType ?? 'normal';
-          const prefix = type === 'normal' ? 'Item' : type === 'other' ? 'Other' : type.replace(/-/g, '_');
-          const id = nextId(prefix, usedBox);
+          const comment = s.codeMeta[code]?.comment || undefined;
+          if (multiBox === 'merge' && mergedBoxId) {
+            // 既にこのセグメントの Box がある → ラベルを連ね、種別は「通常でない方」を優先
+            const b = boxes.find((bx) => bx.id === mergedBoxId)!;
+            b.label = `${b.label}\n${leaf}`;
+            if (b.type === 'normal' && type !== 'normal') b.type = type;
+            if (comment) b.description = b.description ? `${b.description}\n${comment}` : comment;
+            return;
+          }
+          if (multiBox === 'sequence' && placedBoxHere) timeIdx += 1;
           const x = timeIdx * opts.levelPx;
-          const box: Box = {
-            id, type, label: leaf,
-            x, y: itemLevelY,
-            width: opts.defaultWidth, height: opts.defaultHeight,
-            participantId: opts.participantIdFor?.(docName) ?? docName,
-            description: s.codeMeta[code]?.comment || undefined,
-          } as Box;
-          boxes.push(box);
-          sourceRefs.push({ target: { type: 'box', id }, ref: refFor()! });
-          lastBoxIdInDoc = id;
+          const y = itemLevelY + (multiBox === 'stack' ? stackIdx * boxGapY : 0);
+          const id = placeBox(type, leaf, comment, x, y);
+          if (multiBox === 'merge') mergedBoxId = id;
+          if (!placedBoxHere) lastBoxIdInDoc = id;   // 一番上（最初）の Box
+          lastBottomBoxInDoc = id;                    // 一番下（最後）の Box
+          if (multiBox === 'stack') stackIdx += 1;
           placedBoxHere = true;
         } else if (plan.action === 'sd' || plan.action === 'sg') {
           const type = plan.action === 'sd' ? 'SD' : 'SG';
           const id = nextId(type, usedSdsg);
-          // 直前の Box（無ければこのセグメントの Box）に紐付ける
-          const attachedTo = lastBoxIdInDoc;
+          // 直前の Box（このセグメントに Box があればそれ）に紐付ける。SD は上の Box、SG は下の Box
+          const attachedTo = type === 'SD' ? lastBoxIdInDoc : (lastBottomBoxInDoc ?? lastBoxIdInDoc);
           if (!attachedTo) {
             warnings.push(`「${code}」（${docName}）: 紐付ける Box がまだ無いため SD/SG を作れませんでした。先に Box になるコードを選んでください`);
             return;
           }
+          const nth = attachedCount.get(`${attachedTo}:${type}`) ?? 0;
+          attachedCount.set(`${attachedTo}:${type}`, nth + 1);
+          const base = opts.defaultHeight + 60 + nth * 70;
           const sg: SDSG = {
             id, type, label: leaf,
             attachedTo, attachedType: 'box',
-            itemOffset: type === 'SD' ? -(opts.defaultHeight + 60) : opts.defaultHeight + 60,
+            itemOffset: type === 'SD' ? -base : base,
             timeOffset: 0,
           } as SDSG;
           sdsg.push(sg);

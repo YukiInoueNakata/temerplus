@@ -69,3 +69,6 @@ webApp/*.png
 webApp/*.svg
 webApp/*.tem
 LICENSE
+
+# 研究データ等の非公開サンプル（git 管理外・OneDrive のみ）
+test-assets/private/

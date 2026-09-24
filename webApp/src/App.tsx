@@ -15,7 +15,7 @@ import { CommandPalette } from './components/CommandPalette';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { PaperReportDialog } from './components/PaperReportDialog';
 import { ResizeDialog } from './components/ResizeDialog';
-import { CSVImportDialog } from './components/CSVImportDialog';
+import { ImportWizardDialog } from './components/ImportWizardDialog';
 import { ShiftContentDialog } from './components/ShiftContentDialog';
 import { TranscriptViewer } from './components/TranscriptViewer';
 import { TranscriptBulkImportDialog } from './components/TranscriptBulkImportDialog';
@@ -504,7 +504,7 @@ export default function App() {
       </ErrorBoundary>
       <PaperReportDialog open={reportOpen} onClose={() => setReportOpen(false)} />
       <ResizeDialog open={resizeOpen} onClose={() => setResizeOpen(false)} />
-      <CSVImportDialog open={csvOpen} onClose={() => setCsvOpen(false)} />
+      <ImportWizardDialog open={csvOpen} onClose={() => setCsvOpen(false)} />
       <ShiftContentDialog open={shiftOpen} onClose={() => setShiftOpen(false)} />
       <ErrorBoundary
         label="TranscriptViewer"

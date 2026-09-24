@@ -172,7 +172,7 @@ function FileTab({ onSave, onSaveAs, onOpen, onOpenAsNewSheets, onNew, onOpenExp
         <RibbonButton label="移動..." icon="✥" onClick={onOpenShiftContent} title="選択中の Box または全体を Time/Item 方向に移動" />
       </RibbonGroup>
       <RibbonGroup title="インポート">
-        <RibbonButton label="CSV インポート..." icon="📥" onClick={onOpenCSVImport} title="CSV から Box / Line / SDSG / 時期ラベルを一括追加" />
+        <RibbonButton label="表から取り込み..." icon="📥" onClick={onOpenCSVImport} title="CSV / Excel から Box・Line・SD/SG・時期ラベル・逐語録・MAXQDA コード付きセグメントを取り込む（列の役割を指定できる）" />
         <RibbonButton label="原文" icon="📖" onClick={onOpenTranscript} title="インタビュー原文ビューア（取り込み / 編集 / Box とのリンク）" />
         <RibbonButton label="原文一括" icon="📦" onClick={onOpenTranscriptBulkImport} title="複数ファイル/フォルダから原文を一括取り込み（ファイル名から協力者・回数を自動推測）" />
       </RibbonGroup>

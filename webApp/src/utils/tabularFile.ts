@@ -56,13 +56,26 @@ export function looksLikeHeader(rows: string[][]): boolean {
   return nonNumeric >= Math.ceil(first.length / 2);
 }
 
+/**
+ * CSV のバイト列を文字列にする。UTF-8（BOM 付き含む）として厳密に読めなければ Shift_JIS とみなす。
+ * 日本語版 Excel の「CSV（コンマ区切り）」保存は Shift_JIS で、UTF-8 決め打ちだと黙って文字化けする
+ */
+export function decodeCsvBytes(bytes: Uint8Array): { text: string; encoding: 'utf-8' | 'shift_jis' } {
+  try {
+    const text = new TextDecoder('utf-8', { fatal: true, ignoreBOM: false }).decode(bytes);
+    return { text, encoding: 'utf-8' };
+  } catch {
+    return { text: new TextDecoder('shift_jis').decode(bytes), encoding: 'shift_jis' };
+  }
+}
+
 export async function parseTabularFile(file: File): Promise<TabularFile> {
   const format = detectTabularFormat(file.name);
   if (!format) {
     throw new Error(`対応していない形式です: ${file.name}（対応: .csv / .tsv / .xlsx / .xls）`);
   }
   if (format === 'csv') {
-    const text = await file.text();
+    const { text } = decodeCsvBytes(new Uint8Array(await file.arrayBuffer()));
     return { filename: file.name, format, sheets: [parseCsvToSheet(text, file.name)] };
   }
   const buffer = await file.arrayBuffer();

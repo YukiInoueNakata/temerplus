@@ -172,7 +172,7 @@ function FileTab({ onSave, onSaveAs, onOpen, onOpenAsNewSheets, onNew, onOpenExp
         <RibbonButton label="移動..." icon="✥" onClick={onOpenShiftContent} title="選択中の Box または全体を Time/Item 方向に移動" />
       </RibbonGroup>
       <RibbonGroup title="インポート">
-        <RibbonButton label="表から取り込み..." icon="📥" onClick={onOpenCSVImport} title="CSV / Excel から Box・Line・SD/SG・時期ラベル・逐語録・MAXQDA コード付きセグメントを取り込む（列の役割を指定できる）" />
+        <RibbonButton label="表から取り込み..." icon="📥" onClick={onOpenCSVImport} title="CSV / Excel から Box・Line・SD/SG・時期ラベル・逐語録・MAXQDA コード付きセグメントを取り込む（列の役割を指定できる）。PowerPoint（.pptx）で描いた TEM 図も取り込める" />
         <RibbonButton label="原文" icon="📖" onClick={onOpenTranscript} title="インタビュー原文ビューア（取り込み / 編集 / Box とのリンク）" />
         <RibbonButton label="原文一括" icon="📦" onClick={onOpenTranscriptBulkImport} title="複数ファイル/フォルダから原文を一括取り込み（ファイル名から協力者・回数を自動推測）" />
       </RibbonGroup>
@@ -618,6 +618,20 @@ function InsertTab({ onOpenInsertBetween, onOpenPeriodLabels }: { onOpenInsertBe
           icon="✎"
           title="図上に解釈やコメントを書くメモを置く（採番・凡例には出ない。Box を選択中ならその右上に置く）"
           onClick={() => addNote()}
+        />
+        <RibbonButton
+          label="記号"
+          icon="★"
+          title="★・〇 などの強調の記号を置く（枠・背景なしの文字だけのメモ。Box を選択中ならその右上の角に重ねる。記号と色はプロパティで変えられる）"
+          onClick={() => {
+            const st = useTEMStore.getState();
+            const sh = st.doc.sheets.find((s) => s.id === st.doc.activeSheetId);
+            const box = sh?.boxes.find((b) => st.selection.boxIds.includes(b.id));
+            addNote({
+              style: 'text', text: '★', fontSize: 24, width: 36, height: 36,
+              ...(box ? { x: box.x + box.width - 18, y: box.y - 18 } : {}),
+            });
+          }}
         />
       </RibbonGroup>
       <RibbonGroup title="2選択間に">

@@ -478,7 +478,7 @@ function CanvasInner({
       type: 'note',
       position: { x: n.x, y: n.y },
       selected: sel.has(n.id),
-      data: { id: n.id, text: n.text, width: n.width, height: n.height, style: n.style, fontSize: n.fontSize },
+      data: { id: n.id, text: n.text, width: n.width, height: n.height, style: n.style, fontSize: n.fontSize, color: n.color },
       style: { width: n.width, height: n.height, zIndex: n.zIndex ?? 5 },
     }));
   }, [sheet, storeNoteIds]);

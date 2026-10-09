@@ -15,6 +15,7 @@ import { computeLegendItems, computeLegendColumns } from './legend';
 import { computeBoxDisplay } from './typeDisplay';
 import { computeLinePath, sampleCurveToSegments, type Pt } from './linePath';
 import { canvasMeasurer, measureWrapped, type TextMeasurer } from './textMeasure';
+import { sdsgSubLabelShift, SDSG_TYPE_TAG_LINE_HEIGHT, SDSG_LABEL_GAP } from './sdsgShape';
 
 export interface Rect {
   x: number;
@@ -325,18 +326,43 @@ export function collectElementRects(
   // --- SD/SG 本体とサブラベル ---
   collectSDSGRects(sheet, layout, settings).forEach(({ sdsg, rect }) => {
     out.push({ id: sdsg.id, part: 'sdsg', rect, text: sdsg.label });
+    // 描画上の向き（帯モードの自動反転を反映）。種別ラベルは図形の外側:
+    // 横型 SD=上 / SG=下、縦型 SD=右 / SG=左（SDSGNode・utils/sdsgShape と同じ）
+    const bk = sdsg.spaceMode === 'band-top' ? 'top' : sdsg.spaceMode === 'band-bottom' ? 'bottom' : null;
+    const flip = !!settings.sdsgSpace?.enabled && (settings.sdsgSpace?.autoFlipDirectionInBand ?? false)
+      && ((bk === 'top' && sdsg.type === 'SG') || (bk === 'bottom' && sdsg.type === 'SD'));
+    const isSD = flip ? sdsg.type === 'SG' : sdsg.type === 'SD';
+    const typeShown = typeVisibility ? typeVisibility[sdsg.type] !== false : true;
+    const typeFs = sdsg.typeLabelFontSize ?? 11;
+    const typeBorder = sdsg.typeLabelBorderColor ? (sdsg.typeLabelBorderWidth ?? 0) : 0;
+    if (typeShown) {
+      const typeText: string = sdsg.type;
+      const m = measure(typeText, { fontSize: typeFs, bold: sdsg.typeLabelBold !== false });
+      // 寸法は画面の typeTag（line-height 固定・padding 2px 4px）に合わせる
+      const thick = typeFs * SDSG_TYPE_TAG_LINE_HEIGHT + (isH ? 4 : 8) + typeBorder * 2;
+      const len = m.width + (isH ? 8 : 4) + typeBorder * 2;
+      const tw = isH ? len : thick;
+      const th = isH ? thick : len;
+      const tx = isH ? rect.x + rect.width / 2 - tw / 2
+        : (isSD ? rect.x + rect.width + SDSG_LABEL_GAP : rect.x - SDSG_LABEL_GAP - tw);
+      const ty = isH ? (isSD ? rect.y - SDSG_LABEL_GAP - th : rect.y + rect.height + SDSG_LABEL_GAP)
+        : rect.y + rect.height / 2 - th / 2;
+      out.push({ id: sdsg.id, part: 'typeLabel', rect: rectOf(tx, ty, tw, th), text: typeText });
+    }
     const subText = sdsg.subLabel ?? '';
     if (!subText) return;
     const fs = sdsg.subLabelFontSize ?? 10;
     const m = measure(subText, { fontSize: fs });
     const offTime = sdsg.subLabelOffsetX ?? 0;
     const offItem = sdsg.subLabelOffsetY ?? 0;
+    // 種別ラベルと同じ側に来る向き（横型 SG・縦型 SD）は、その外側へずらして描かれる
+    const shift = sdsgSubLabelShift({ isH, isSD, typeTagVisible: typeShown, typeFontSize: typeFs, typeBorderWidth: typeBorder });
     out.push({
       id: sdsg.id,
       part: 'subLabel',
       rect: attachedLabelRect(
         rect, { width: m.width + 8, height: m.height }, 'sub', layout,
-        { alongTime: isH ? offTime : offItem, alongItem: isH ? offItem : offTime },
+        { alongTime: isH ? offTime : offItem, alongItem: (isH ? offItem : offTime) + shift },
       ),
       text: subText,
     });

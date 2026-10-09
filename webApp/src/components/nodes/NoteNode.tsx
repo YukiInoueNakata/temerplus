@@ -12,6 +12,7 @@ import { useTEMStore } from '../../store/store';
 import { useTEMView } from '../../context/TEMViewContext';
 import type { Note } from '../../types';
 import { collectSDSGRects } from '../../utils/elementRects';
+import { NOTE_PADDING_PX, NOTE_TEXT_PADDING_PX, NOTE_LINE_HEIGHT } from '../../utils/noteStyle';
 
 export interface NoteNodeData {
   id: string;
@@ -20,14 +21,19 @@ export interface NoteNodeData {
   height: number;
   style?: Note['style'];
   fontSize?: number;
+  color?: string;
 }
 
 export const NOTE_DEFAULT_WIDTH = 160;
 export const NOTE_DEFAULT_HEIGHT = 80;
 export const NOTE_DEFAULT_FONT_SIZE = 12;
 
-/** メモの見た目。'note' = 付箋風、'callout' = 白地の吹き出し風 */
+
+/** メモの見た目。'note' = 付箋風、'callout' = 白地の吹き出し風、'text' = 枠も背景も無い文字だけ */
 export function noteVisualStyle(style: Note['style'] | undefined): React.CSSProperties {
+  if (style === 'text') {
+    return { background: 'transparent', border: 'none' };
+  }
   if (style === 'callout') {
     return { background: '#ffffff', border: '1px solid #666', borderRadius: 6 };
   }
@@ -69,6 +75,8 @@ export function NoteNode({ data, selected }: NodeProps<NoteNodeData>) {
   const cancel = () => { setEditing(false); setDraft(data.text); };
 
   const visual = noteVisualStyle(data.style);
+  const isText = data.style === 'text';
+  const textColor = data.color ?? '#333';
   // 選択直後はリサイズ枠を出さない（BoxNode と同じ理由: ダブルクリックの 2 回目を邪魔しない）
   const [resizerReady, setResizerReady] = useState(false);
   useEffect(() => {
@@ -97,13 +105,15 @@ export function NoteNode({ data, selected }: NodeProps<NoteNodeData>) {
           width: data.width,
           height: data.height,
           boxSizing: 'border-box',
-          padding: 6,
+          padding: isText ? NOTE_TEXT_PADDING_PX : NOTE_PADDING_PX,
           fontSize,
-          lineHeight: 1.4,
-          color: '#333',
+          lineHeight: NOTE_LINE_HEIGHT,
+          color: textColor,
           whiteSpace: 'pre-wrap',
-          overflow: 'hidden',
-          boxShadow: selected ? '0 0 0 2px #2684ff' : '1px 1px 3px rgba(0,0,0,0.15)',
+          // 文字だけのメモは記号を枠の中央に置き、大きめの記号が枠で切れないようにする
+          overflow: isText ? 'visible' : 'hidden',
+          ...(isText ? { display: 'grid', placeItems: 'center', textAlign: 'center' as const } : {}),
+          boxShadow: selected ? '0 0 0 2px #2684ff' : isText ? 'none' : '1px 1px 3px rgba(0,0,0,0.15)',
           position: 'relative',
         }}
         onDoubleClick={(e) => {
@@ -127,11 +137,12 @@ export function NoteNode({ data, selected }: NodeProps<NoteNodeData>) {
             onClick={(e) => e.stopPropagation()}
             style={{
               width: '100%', height: '100%', border: 'none', outline: 'none', resize: 'none',
-              background: 'transparent', fontSize, lineHeight: 1.4, fontFamily: 'inherit', color: '#333',
+              background: 'transparent', fontSize, lineHeight: NOTE_LINE_HEIGHT, fontFamily: 'inherit', color: textColor,
+              textAlign: isText ? 'center' : undefined,
             }}
           />
         ) : (
-          data.text || <span style={{ color: '#999' }}>（メモ）</span>
+          data.text || <span style={{ color: '#999' }}>{isText ? '（記号）' : '（メモ）'}</span>
         )}
       </div>
     </>

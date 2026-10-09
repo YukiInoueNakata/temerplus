@@ -7,7 +7,7 @@
 import { jsPDF } from 'jspdf';
 import { toPng } from 'html-to-image';
 import { getPaperInch, type PaperSizeKey } from './paperSizes';
-import type { ExportOptions } from './exportImage';
+import { buildFilter, type ExportOptions } from './exportImage';
 import type { PageBounds } from './pageSplit';
 import { checkAborted, type ProgressCallback } from './exportProgress';
 
@@ -22,34 +22,6 @@ export interface PDFExportOptions extends ExportOptions {
   stripBounds?: { x: number; y: number; width: number; height: number };
   onProgress?: ProgressCallback;
   signal?: AbortSignal;
-}
-
-function buildFilter(opts: ExportOptions) {
-  return (el: HTMLElement) => {
-    if (!(el instanceof HTMLElement)) return true;
-    if (!opts.includeControls) {
-      if (el.classList?.contains('react-flow__controls')) return false;
-      if (el.classList?.contains('react-flow__minimap')) return false;
-      if (el.classList?.contains('react-flow__attribution')) return false;
-    }
-    if (el.classList?.contains('scrollbar-h')) return false;
-    if (el.classList?.contains('scrollbar-v')) return false;
-    if (!opts.includeRulers) {
-      if (el.classList?.contains('canvas-rulers')) return false;
-      if (el.classList?.contains('ruler-vertical')) return false;
-      if (el.classList?.contains('ruler-horizontal')) return false;
-      if (el.classList?.contains('ruler-corner')) return false;
-    }
-    if (!opts.includeGrid) {
-      if (el.classList?.contains('react-flow__background')) return false;
-    }
-    if (!opts.includePaperGuides) {
-      if (el.classList?.contains('paper-guide-overlay')) return false;
-    }
-    // ページ分割のガイド線は常に出力から除外（プレビュー専用）
-    if (el.classList?.contains('page-split-overlay')) return false;
-    return true;
-  };
 }
 
 export async function exportToPDF(

@@ -5,6 +5,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import type { Box, BoxType, SDSG, Line, AutoFitBoxMode, Note } from '../types';
+import { NOTE_SYMBOLS } from '../utils/noteStyle';
 import { BOX_TYPE_LABELS } from '../store/defaults';
 import {
   FontFamilyRow,
@@ -2056,6 +2057,7 @@ function NoteProperties({ notes }: { notes: Note[] }) {
       <h4>メモ {isMulti && <span className="badge">{notes.length}個</span>}</h4>
       <p className="hint" style={{ marginTop: 0 }}>
         解釈やコメントを書く付箋です。Box と違って径路のレベルに乗らず、採番・凡例には出ません。
+        見た目を「文字だけ」にすると、★・〇 などの強調の記号を図の好きな位置に置けます。
       </p>
       {!isMulti && (
         <div className="prop-row">
@@ -2076,8 +2078,31 @@ function NoteProperties({ notes }: { notes: Note[] }) {
         >
           <option value="note">付箋（黄色・点線枠）</option>
           <option value="callout">吹き出し（白・実線枠）</option>
+          <option value="text">文字だけ（枠・背景なし。★・〇 などの記号用）</option>
         </select>
       </div>
+      <div className="prop-row" style={{ flexWrap: 'wrap', gap: 4 }}>
+        <label>記号</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+          {NOTE_SYMBOLS.map((sym) => (
+            <button
+              key={sym}
+              className="row-btn"
+              style={{ minWidth: 26, fontSize: '1.05em' }}
+              title={'「文字だけ」のメモは記号を置き換え、ほかのメモは本文の末尾に足す'}
+              onClick={() => notes.forEach((n) => updateNotes([n.id], {
+                text: n.style === 'text' ? sym : `${n.text}${sym}`,
+              }))}
+            >{sym}</button>
+          ))}
+        </div>
+      </div>
+      <ColorRow
+        label="文字色"
+        value={getCommon(notes, 'color')}
+        onChange={(c) => updateNotes(ids, { color: c })}
+        defaultLabel="既定 (#333)"
+      />
       <div className="prop-row">
         <label>文字サイズ (px)</label>
         <input

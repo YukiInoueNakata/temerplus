@@ -369,9 +369,14 @@ export interface Note {
   width: number;
   height: number;
   text: string;
-  style?: 'callout' | 'note';      // 既定 'note'（付箋風）
+  /**
+   * 既定 'note'（付箋風）。'callout' = 白地の吹き出し風。
+   * 'text' = 枠も背景も無い文字だけ（★・〇 など強調の記号を置く用。中央揃え）
+   */
+  style?: 'callout' | 'note' | 'text';
   zIndex?: number;
   fontSize?: number;               // 未指定なら既定サイズ
+  color?: string;                  // 文字色。未指定なら #333
   /** 引き出し線の対象（Box または SD/SG の ID）。showLeader が真のときだけ描く */
   leaderTo?: string;
   showLeader?: boolean;            // 既定 false

@@ -139,33 +139,26 @@ export interface WrappedMetrics {
 }
 
 /**
- * 最大幅で折り返したときの描画サイズを返す。
- * maxWidth が 0 以下なら折返しなしとして扱う。
+ * 最大幅で折り返した行の配列を返す（画面の white-space: pre-wrap に合わせる）。
+ * 重なり検出（measureWrapped）と SVG 出力の折り返しで共用する。
+ * maxWidth が 0 以下なら折返しなし（明示的な改行だけで分ける）。
  */
-export function measureWrapped(
+export function wrapLines(
   text: string,
   maxWidth: number,
   options: MeasureOptions,
   measure: TextMeasurer,
-): WrappedMetrics {
-  const { fontSize, lineHeight = 1.4 } = options;
+): { lines: string[]; widths: number[]; overflowX: number } {
   const widthOf = (t: string) => measure(t, { ...options, lineHeight: 1 }).width;
-
-  if (maxWidth <= 0) {
-    const m = measure(text, options);
-    return { width: m.width, height: m.height, lines: splitLines(text).length, overflowX: 0 };
-  }
-
-  let totalLines = 0;
-  let widest = 0;
+  const lines: string[] = [];
+  const widths: number[] = [];
   let overflowX = 0;
-
   splitLines(text).forEach((line) => {
+    if (maxWidth <= 0) { lines.push(line); widths.push(widthOf(line)); return; }
     const chunks = splitChunks(line);
-    if (chunks.length === 0) { totalLines += 1; return; }
+    if (chunks.length === 0) { lines.push(''); widths.push(0); return; }
     let current = '';
     let currentWidth = 0;
-    let lineCount = 1;
     chunks.forEach((chunk) => {
       const chunkWidth = widthOf(chunk);
       // 単独で幅を超える塊は、それ自体がはみ出しになる
@@ -180,20 +173,38 @@ export function measureWrapped(
         currentWidth += chunkWidth;
         return;
       }
-      widest = Math.max(widest, currentWidth);
-      lineCount += 1;
+      lines.push(current);
+      widths.push(currentWidth);
       // 行頭に来た空白は描画上無視される
       current = chunk.replace(/^\s+/, '');
       currentWidth = widthOf(current);
     });
-    widest = Math.max(widest, currentWidth);
-    totalLines += lineCount;
+    lines.push(current);
+    widths.push(currentWidth);
   });
+  return { lines, widths, overflowX };
+}
 
+/**
+ * 最大幅で折り返したときの描画サイズを返す。
+ * maxWidth が 0 以下なら折返しなしとして扱う。
+ */
+export function measureWrapped(
+  text: string,
+  maxWidth: number,
+  options: MeasureOptions,
+  measure: TextMeasurer,
+): WrappedMetrics {
+  const { fontSize, lineHeight = 1.4 } = options;
+  if (maxWidth <= 0) {
+    const m = measure(text, options);
+    return { width: m.width, height: m.height, lines: splitLines(text).length, overflowX: 0 };
+  }
+  const w = wrapLines(text, maxWidth, options, measure);
   return {
-    width: Math.min(widest, maxWidth),
-    height: totalLines * fontSize * lineHeight,
-    lines: totalLines,
-    overflowX,
+    width: Math.min(Math.max(0, ...w.widths), maxWidth),
+    height: w.lines.length * fontSize * lineHeight,
+    lines: w.lines.length,
+    overflowX: w.overflowX,
   };
 }

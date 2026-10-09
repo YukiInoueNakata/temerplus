@@ -63,3 +63,19 @@ describe('measureWrapped', () => {
     expect(three.height).toBeCloseTo(one.height * 3, 5);
   });
 });
+
+describe('wrapLines', () => {
+  const opts = { fontSize: 10 };
+  it('折り返した行の配列を返し、measureWrapped の行数と一致する', async () => {
+    const { wrapLines, measureWrapped, approximateMeasurer } = await import('./textMeasure');
+    const w = wrapLines('あいうえおかきくけこ', 30, opts, approximateMeasurer);
+    expect(w.lines.join('')).toBe('あいうえおかきくけこ');
+    expect(w.lines.length).toBe(measureWrapped('あいうえおかきくけこ', 30, opts, approximateMeasurer).lines);
+  });
+  it('明示的な改行は保ち、行頭の空白は落とす', async () => {
+    const { wrapLines, approximateMeasurer } = await import('./textMeasure');
+    expect(wrapLines('a\nb', 1000, opts, approximateMeasurer).lines).toEqual(['a', 'b']);
+    const w = wrapLines('hello world', 30, opts, approximateMeasurer);
+    expect(w.lines.every((l) => !l.startsWith(' '))).toBe(true);
+  });
+});

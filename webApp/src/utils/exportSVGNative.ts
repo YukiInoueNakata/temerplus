@@ -22,7 +22,7 @@ import type {
   Locale,
 } from '../types';
 import { computeTimeArrow } from './timeArrow';
-import { computePeriodLabels } from './periodLabels';
+import { computePeriodLabels, computePeriodBandBounds } from './periodLabels';
 import {
   computeSDSGBandLayout,
   sdsgBandKey,
@@ -56,6 +56,10 @@ import { checkAborted, type ProgressCallback } from './exportProgress';
 import { resolveAttachedAnchor, anchorCenter } from './sdsgAttach';
 import { resolveBetweenEndpoint } from './sdsgBetween';
 import { clipPolylineToRect } from './lineClip';
+import { sdsgPentagonPoints, sdsgSubLabelShift, SDSG_LABEL_GAP } from './sdsgShape';
+import { APP_FONT_STACK, resolvePptFontFace, measureNormalLineRatio } from './pptText';
+import { wrapLines, canvasMeasurer } from './textMeasure';
+import { NOTE_LINE_HEIGHT, NOTE_PADDING_PX, NOTE_TEXT_PADDING_PX } from './noteStyle';
 
 // ----------------------------------------------------------------------------
 // Public API
@@ -235,7 +239,8 @@ function buildTransform(
 }
 
 function fontSizeScaled(base: number, t: Transform): number {
-  return Math.max(6, base * Math.max(0.4, t.scale));
+  // 枠と同じ倍率で縮める。以前は縮小率 0.4・6px の下限があり、大きな図で文字だけ縮まず枠からあふれた
+  return Math.max(1, base * t.scale);
 }
 
 // ----------------------------------------------------------------------------
@@ -344,6 +349,13 @@ class SVGBuilder {
       // 余白
       paddingX?: number;
       paddingY?: number;
+      /**
+       * true なら枠（余白の内側）に合わせて折り返す。横書きは幅、縦書きは高さに収まる文字数で分ける。
+       * 画面の Box 本文（white-space: pre-wrap）と同じ見た目にするため。既定 false（明示的な改行だけ）
+       */
+      wrap?: boolean;
+      /** 行の高さ（font-size に対する比）。未指定なら画面と同じ line-height: normal の実測値 */
+      lineHeightRatio?: number;
     },
   ): void {
     const padX = opts.paddingX ?? 2;
@@ -360,13 +372,29 @@ class SVGBuilder {
 
     if (!text) return;
 
-    const lines = String(text).split(/\r?\n/);
     const alignH = opts.alignH ?? 'center';
     const alignV = opts.alignV ?? 'middle';
     const isVert = opts.writingMode === 'vertical';
+    // フォント未指定なら画面と同じスタックを書く（閲覧側の既定フォントに任せない）
+    const fontFamily = opts.fontFamily ?? APP_FONT_STACK;
+    // 行送りは画面と同じ line-height: normal の比率（ブラウザで実測。以前は 1.25 固定）
+    const lineHeight = opts.fontSize * (opts.lineHeightRatio ?? measureNormalLineRatio(resolvePptFontFace(fontFamily)));
 
-    // 行高（経験的）
-    const lineHeight = opts.fontSize * 1.25;
+    let lines = String(text).split(/\r?\n/);
+    if (opts.wrap && !isVert) {
+      const avail = w - padX * 2;
+      lines = wrapLines(String(text), avail, { fontSize: opts.fontSize, bold: opts.bold, fontFamily }, canvasMeasurer).lines;
+    } else if (opts.wrap && isVert) {
+      // 縦書きは 1 文字 = 1em で積むので、高さに収まる文字数ごとに列を分ける
+      const perCol = Math.max(1, Math.floor((h - padY * 2) / opts.fontSize + 1e-6));
+      lines = lines.flatMap((ln) => {
+        const chars = Array.from(ln);
+        if (chars.length <= perCol) return [ln];
+        const out: string[] = [];
+        for (let i = 0; i < chars.length; i += perCol) out.push(chars.slice(i, i + perCol).join(''));
+        return out;
+      });
+    }
     const blockLen = lineHeight * lines.length;
 
     // テキストアンカー
@@ -376,7 +404,7 @@ class SVGBuilder {
     if (opts.bold) styleParts.push('font-weight:bold');
     if (opts.italic) styleParts.push('font-style:italic');
     if (opts.underline) styleParts.push('text-decoration:underline');
-    if (opts.fontFamily) styleParts.push(`font-family:${escapeAttr(opts.fontFamily)}`);
+    styleParts.push(`font-family:${escapeAttr(fontFamily)}`);
     const style = styleParts.length > 0 ? ` style="${styleParts.join(';')}"` : '';
 
     const color = opts.fill ?? opts.color ?? '#222';
@@ -387,12 +415,13 @@ class SVGBuilder {
       // 既定は全文字 upright（縦積み）。asciiUpright=false の場合は ASCII 連続を
       // 90°回転 <text transform=rotate> として書き出し、右に倒して読む形にする。
       // 各行 (元テキストの \n 区切り) = 1 列。
-      const charAdvance = opts.fontSize * 1.05;
+      // 画面の vertical-rl と同じく 1 文字 = 1em、列の間隔 = 行送り（line-height: normal）
+      const charAdvance = opts.fontSize;
       // 各行 (=列) の文字数最大値（縦の長さ推定に使用）
       const maxChars = Math.max(1, ...lines.map((l) => Array.from(l).length));
       const colBlockLen = charAdvance * maxChars;
-      const colGap = opts.fontSize * 0.25;
-      const totalColsW = lines.length * (opts.fontSize + colGap);
+      const colPitch = lineHeight;
+      const totalColsW = lines.length * colPitch;
 
       // 列の x 軸開始（右から左へ）
       let rightColX: number;
@@ -411,7 +440,7 @@ class SVGBuilder {
       const asciiMixed = opts.asciiUpright === false;
 
       lines.forEach((ln, li) => {
-        const colX = rightColX - li * (opts.fontSize + colGap);
+        const colX = rightColX - li * colPitch;
         const chars = Array.from(ln);
         // asciiMixed: 連続 ASCII を 1 グループにし、rotate 変換で横倒し
         //   各グループは占有セル数 = ceil(ASCII 長 / 2) 程度で短縮表示（粗い近似: 1 セル/char）
@@ -732,6 +761,10 @@ function renderBox(
     alignV: (bx.style?.verticalAlign ?? 'middle') as 'top' | 'middle' | 'bottom',
     writingMode: isTextVertical ? 'vertical' : 'horizontal',
     asciiUpright: bx.asciiUpright,
+    // 画面の Box 本文と同じく padding 4px の内側で折り返す（以前は改行文字でしか行を分けず、枠からはみ出した）
+    wrap: true,
+    paddingX: t.toLen(4),
+    paddingY: t.toLen(4),
   });
 
   drawBoxTypeLabel(b, bx, layout, settings, sheet, t);
@@ -1040,7 +1073,7 @@ function computeLineSegment(
 }
 
 // ----------------------------------------------------------------------------
-// SDSG: 右向き矢印 polygon を回転で配置
+// SDSG: 画面と同じ五角形（utils/sdsgShape）を向きごとに直接生成
 // ----------------------------------------------------------------------------
 
 function drawSDSGs(
@@ -1072,7 +1105,8 @@ function drawSDSGs(
       const attached = boxById.get(sg.attachedTo);
       if (!attached) return;
       const centerT = isH ? attached.x + attached.width / 2 : attached.y + attached.height / 2;
-      const w0 = sg.spaceWidth ?? sg.width ?? 70;
+      // 時間軸方向のサイズ: 横型は幅、縦型は高さ（画面 Canvas・重なり検出と同じ。以前は常に幅で、縦型でずれた）
+      const w0 = isH ? (sg.spaceWidth ?? sg.width ?? 70) : (sg.spaceHeight ?? sg.height ?? 40);
       tS = centerT - w0 / 2; tE = centerT + w0 / 2;
     }
     bandEntries[bk].push({ id: sg.id, timeStart: tS, timeEnd: tE, rowOverride: sg.spaceRowOverride });
@@ -1156,7 +1190,7 @@ function drawSDSGs(
       // 四角形（幅を持つ SD/SG）。方向は影響線で示す
       b.rect(t.toX(wx), t.toY(wy), t.toLen(w), t.toLen(h), { fill: bgColor, stroke: borderColor, strokeWidth: 1.5 });
     } else {
-      const points = buildSDSGPolygon(wx, wy, w, h, isH, isSD, rectRatio);
+      const points = sdsgPentagonPoints(wx, wy, w, h, isH, isSD, rectRatio);
       const svgPoints = points.map((p) => ({ x: t.toX(p.x), y: t.toY(p.y) }));
       b.polygon(svgPoints, { fill: bgColor, stroke: borderColor, strokeWidth: 1.5 });
     }
@@ -1192,11 +1226,17 @@ function drawSDSGs(
         alignH: (sg.style?.textAlign ?? 'center') as 'left' | 'center' | 'right',
         alignV: (sg.style?.verticalAlign ?? 'middle') as 'top' | 'middle' | 'bottom',
         asciiUpright: sg.asciiUpright,
+        // 画面の SDSGNode と同じく、縦型レイアウトでは本文も縦書き
+        writingMode: isH ? 'horizontal' : 'vertical',
+        // 画面の SDSGNode の本文は padding 2px の内側で折り返す
+        wrap: true,
+        paddingX: t.toLen(2),
+        paddingY: t.toLen(2),
       },
     );
 
-    drawSDSGTypeLabel(b, sg, wx, wy, w, h, isH, settings, t);
-    drawSDSGSubLabel(b, sg, wx, wy, w, h, isH, t);
+    drawSDSGTypeLabel(b, sg, wx, wy, w, h, isH, isSD, settings, t);
+    drawSDSGSubLabel(b, sg, wx, wy, w, h, isH, isSD, settings, t);
     if (includeIds) drawSDSGIdBadge(b, sg, wx, wy, h, isH, isSD, t);
   }
 }
@@ -1218,76 +1258,10 @@ function drawSDSGIdBadge(b: SVGBuilder, sg: SDSG, wx: number, wy: number, sgH: n
   );
 }
 
-/**
- * SDSG 矢印 polygon を方向別に生成。
- * bbox: (x, y, w, h)。rectRatio = 矩形部分の占める比率。
- * H SD: 下向き / H SG: 上向き / V SD: 右向き / V SG: 左向き
- */
-function buildSDSGPolygon(x: number, y: number, w: number, h: number, isH: boolean, isSD: boolean, rectRatio: number): Pt[] {
-  const neckRatio = 0.6; // 首の幅を bbox の 60% に
-  if (isH) {
-    if (isSD) {
-      // 下向き: 矩形上側 rectRatio*h、下側が三角（頂点下）
-      const neckW = w * neckRatio;
-      const neckCx = x + w / 2;
-      const rectBottom = y + h * rectRatio;
-      return [
-        { x: x + (w - neckW) / 2, y: y },                      // top-left neck
-        { x: x + (w + neckW) / 2, y: y },                      // top-right neck
-        { x: x + (w + neckW) / 2, y: rectBottom },             // neck-head junction R
-        { x: x + w,              y: rectBottom },              // head right shoulder
-        { x: neckCx,             y: y + h },                   // tip (bottom)
-        { x: x,                  y: rectBottom },              // head left shoulder
-        { x: x + (w - neckW) / 2, y: rectBottom },             // neck-head junction L
-      ];
-    }
-    // 上向き (SG): 矩形下側 rectRatio*h、上側が三角
-    const neckW = w * neckRatio;
-    const neckCx = x + w / 2;
-    const rectTop = y + h * (1 - rectRatio);
-    return [
-      { x: x + (w - neckW) / 2, y: y + h },
-      { x: x + (w + neckW) / 2, y: y + h },
-      { x: x + (w + neckW) / 2, y: rectTop },
-      { x: x + w,              y: rectTop },
-      { x: neckCx,             y: y },
-      { x: x,                  y: rectTop },
-      { x: x + (w - neckW) / 2, y: rectTop },
-    ];
-  }
-  // vertical layout
-  if (isSD) {
-    // 右向き: 矩形左 rectRatio*w、右側が三角
-    const neckH = h * neckRatio;
-    const neckCy = y + h / 2;
-    const rectRight = x + w * rectRatio;
-    return [
-      { x: x, y: y + (h - neckH) / 2 },
-      { x: x, y: y + (h + neckH) / 2 },
-      { x: rectRight, y: y + (h + neckH) / 2 },
-      { x: rectRight, y: y + h },
-      { x: x + w, y: neckCy },
-      { x: rectRight, y: y },
-      { x: rectRight, y: y + (h - neckH) / 2 },
-    ];
-  }
-  // 左向き (V SG): 矩形右 rectRatio*w、左側が三角
-  const neckH = h * neckRatio;
-  const neckCy = y + h / 2;
-  const rectLeft = x + w * (1 - rectRatio);
-  return [
-    { x: x + w, y: y + (h - neckH) / 2 },
-    { x: x + w, y: y + (h + neckH) / 2 },
-    { x: rectLeft, y: y + (h + neckH) / 2 },
-    { x: rectLeft, y: y + h },
-    { x: x,        y: neckCy },
-    { x: rectLeft, y: y },
-    { x: rectLeft, y: y + (h - neckH) / 2 },
-  ];
-}
-
+// 種別ラベルは画面（SDSGNode）と同じく図形の外側: 横型 SD=上 / SG=下、縦型 SD=右 / SG=左。
+// isSD は描画上の向き（flipDirection 反映後）
 function drawSDSGTypeLabel(
-  b: SVGBuilder, sg: SDSG, wx: number, wy: number, w: number, h: number, isH: boolean,
+  b: SVGBuilder, sg: SDSG, wx: number, wy: number, w: number, h: number, isH: boolean, isSD: boolean,
   settings: ProjectSettings, t: Transform,
 ) {
   const vis = settings.typeLabelVisibility;
@@ -1306,12 +1280,12 @@ function drawSDSGTypeLabel(
     const wpx = Math.max(60, w);
     const hpx = Math.max(14, baseFS * 1.8);
     b.text(
-      t.toX(wx + w / 2 - wpx / 2), t.toY(wy - hpx - 4),
+      t.toX(wx + w / 2 - wpx / 2), t.toY(isSD ? wy - hpx - SDSG_LABEL_GAP : wy + h + SDSG_LABEL_GAP),
       t.toLen(wpx), t.toLen(hpx),
       sg.type,
       {
         fontSize: fs, bold, italic, fontFamily: fontFace, color: textColor,
-        alignH: 'center', alignV: 'bottom',
+        alignH: 'center', alignV: isSD ? 'bottom' : 'top',
         bgFill, bgStroke: borderColor, bgStrokeWidth: borderW,
       },
     );
@@ -1319,7 +1293,7 @@ function drawSDSGTypeLabel(
     const wpx = Math.max(14, baseFS * 1.8);
     const hpx = Math.max(60, h);
     b.text(
-      t.toX(wx - wpx - 4), t.toY(wy + h / 2 - hpx / 2),
+      t.toX(isSD ? wx + w + SDSG_LABEL_GAP : wx - wpx - SDSG_LABEL_GAP), t.toY(wy + h / 2 - hpx / 2),
       t.toLen(wpx), t.toLen(hpx),
       sg.type,
       {
@@ -1333,9 +1307,17 @@ function drawSDSGTypeLabel(
 }
 
 function drawSDSGSubLabel(
-  b: SVGBuilder, sg: SDSG, wx: number, wy: number, w: number, h: number, isH: boolean, t: Transform,
+  b: SVGBuilder, sg: SDSG, wx: number, wy: number, w: number, h: number, isH: boolean, isSD: boolean,
+  settings: ProjectSettings, t: Transform,
 ) {
   if (!sg.subLabel) return;
+  // 種別ラベルと同じ側に来るとき（横型 SG・縦型 SD）は、その外側へずらす（utils/sdsgShape）
+  const vis = settings.typeLabelVisibility as Record<string, boolean | undefined> | undefined;
+  const shift = sdsgSubLabelShift({
+    isH, isSD, typeTagVisible: vis?.[sg.type] !== false,
+    typeFontSize: sg.typeLabelFontSize ?? 11,
+    typeBorderWidth: sg.typeLabelBorderColor ? (sg.typeLabelBorderWidth ?? 0) : 0,
+  });
   const baseFS = sg.subLabelFontSize ?? 10;
   const fs = fontSizeScaled(baseFS, t);
   const offX = sg.subLabelOffsetX ?? 0;
@@ -1349,7 +1331,7 @@ function drawSDSGSubLabel(
     const wpx = Math.max(80, w);
     const hpx = Math.max(14, baseFS * 1.6);
     b.text(
-      t.toX(wx + w / 2 - wpx / 2 + offX), t.toY(wy + h + 6 + offY),
+      t.toX(wx + w / 2 - wpx / 2 + offX), t.toY(wy + h + SDSG_LABEL_GAP + shift + offY),
       t.toLen(wpx), t.toLen(hpx),
       sg.subLabel,
       {
@@ -1362,7 +1344,7 @@ function drawSDSGSubLabel(
     const wpx = Math.max(14, baseFS * 1.6);
     const hpx = Math.max(80, h);
     b.text(
-      t.toX(wx + w + 6 + offX), t.toY(wy + h / 2 - hpx / 2 + offY),
+      t.toX(wx + w + SDSG_LABEL_GAP + shift + offX), t.toY(wy + h / 2 - hpx / 2 + offY),
       t.toLen(wpx), t.toLen(hpx),
       sg.subLabel,
       {
@@ -1471,16 +1453,7 @@ function drawPeriodLabels(
   }
 
   if (settings.bandStyle === 'band') {
-    const sorted = [...geom.items].sort((a, bb) => (isH ? a.x - bb.x : a.y - bb.y));
-    const bounds: number[] = [];
-    bounds.push(isH ? geom.startX : geom.startY);
-    sorted.forEach((it, i) => {
-      if (i === 0) return;
-      const prev = sorted[i - 1];
-      const mid = isH ? (prev.x + it.x) / 2 : (prev.y + it.y) / 2;
-      bounds.push(mid);
-    });
-    bounds.push(isH ? geom.endX : geom.endY);
+    const { sorted, bounds } = computePeriodBandBounds(geom);
 
     if (settings.showDividers) {
       const tickLen = 10;
@@ -1594,18 +1567,25 @@ function drawNotes(b: SVGBuilder, sheet: Sheet, settings: ProjectSettings, t: Tr
         });
       }
     }
-    b.rect(x, y, w, h, {
-      fill: isCallout ? '#ffffff' : '#fff8c5',
-      stroke: isCallout ? '#666666' : '#b8a000',
-      strokeWidth: t.toLen(1),
-      strokeDasharray: isCallout ? undefined : `${t.toLen(4)},${t.toLen(3)}`,
-    });
+    const isText = n.style === 'text';
+    // 'text' は枠・背景なし（★・〇 などの記号用）
+    if (!isText) {
+      b.rect(x, y, w, h, {
+        fill: isCallout ? '#ffffff' : '#fff8c5',
+        stroke: isCallout ? '#666666' : '#b8a000',
+        strokeWidth: t.toLen(1),
+        strokeDasharray: isCallout ? undefined : `${t.toLen(4)},${t.toLen(3)}`,
+      });
+    }
     if (n.text) {
       const fs = n.fontSize ?? Math.min(settings.defaultFontSize ?? 13, 13);
-      const pad = t.toLen(6);
-      b.text(x + pad, y + pad, Math.max(1, w - pad * 2), Math.max(1, h - pad * 2), n.text, {
-        fontSize: fontSizeScaled(fs, t), color: '#333333', alignH: 'left', alignV: 'top',
-        fontFamily: settings.defaultFont,
+      // 画面の NoteNode と同じ余白・行の高さ（1.4 固定）で折り返す
+      const pad = t.toLen(isText ? NOTE_TEXT_PADDING_PX : NOTE_PADDING_PX);
+      b.text(x, y, w, h, n.text, {
+        fontSize: fontSizeScaled(fs, t), color: normalizeColor(n.color, '#333333'),
+        alignH: isText ? 'center' : 'left', alignV: isText ? 'middle' : 'top',
+        fontFamily: settings.defaultFont === 'system-ui' ? undefined : settings.defaultFont,
+        wrap: true, paddingX: pad, paddingY: pad, lineHeightRatio: NOTE_LINE_HEIGHT,
       });
     }
   });
@@ -1784,12 +1764,9 @@ function drawLegendIcon(
     b.line(X, Y + H / 2, X + W, Y + H / 2, { stroke: '#222', strokeWidth: 1.5, strokeDasharray: dashArr });
     drawArrowHead(b, X + W, Y + H / 2, X, Y + H / 2, 1.5, '#222');
   } else if (item.category === 'sdsg') {
-    // 凡例内は横向き矢印として描画
+    // 画面の凡例（LegendOverlay）と同じ: SD=下向き / SG=上向きの五角形（矩形部分 55%）
     const isSD = item.key === 'SD';
-    // SD: 右向き, SG: 左向き として凡例表示
-    const points = isSD
-      ? buildSDSGPolygon(x, y, w, h, false, true, 0.55)
-      : buildSDSGPolygon(x, y, w, h, false, false, 0.55);
+    const points = sdsgPentagonPoints(x, y, w, h, true, isSD, 0.55);
     const pts = points.map((p) => ({ x: t.toX(p.x), y: t.toY(p.y) }));
     b.polygon(pts, { fill: '#ffffff', stroke: '#333', strokeWidth: 1 });
   } else if (item.category === 'timeArrow') {

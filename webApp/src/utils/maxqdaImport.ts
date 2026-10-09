@@ -12,7 +12,7 @@
 // ============================================================================
 
 import type { Box, BoxType, Paragraph, SDSG, SourceRef, Transcript, PeriodLabel } from '../types';
-import { genParagraphId, genTranscriptId } from '../store/defaults';
+import { genParagraphId, genPeriodId, genTranscriptId } from '../store/defaults';
 import { mapBoxType, TYPE_DICT } from './csvImport';
 
 // ----------------------------------------------------------------------------
@@ -418,7 +418,10 @@ export function buildFromSegments(dedupe: DedupeResult, opts: BuildOptions): Bui
   const sourceRefs: BuildResult['sourceRefs'] = [];
   const usedBox = new Set(opts.existingBoxIds);
   const usedSdsg = new Set(opts.existingSdsgIds);
-  const periodSeen = new Set<string>();
+  // 時期ラベル: 出現ごとの範囲を集め、最後にその範囲の Box の中心の中点へ置く
+  const periodOccurrences = new Map<string, Array<{ docName: string; start: number; end: number; fallback: number }>>();
+  // セグメント key → そこに置いた Box の時間位置（Level、Box の左端）
+  const boxTimesBySeg = new Map<string, number[]>();
   // 同じ Box に付く SD / SG の数（2 つ目以降は外側へずらして重ねない）
   const attachedCount = new Map<string, number>();
 
@@ -504,6 +507,7 @@ export function buildFromSegments(dedupe: DedupeResult, opts: BuildOptions): Bui
           const y = itemLevelY + (multiBox === 'stack' ? stackIdx * boxGapY : 0);
           const id = placeBox(type, leaf, comment, x, y);
           if (multiBox === 'merge') mergedBoxId = id;
+          boxTimesBySeg.set(s.key, [...(boxTimesBySeg.get(s.key) ?? []), x / opts.levelPx]);
           if (!placedBoxHere) lastBoxIdInDoc = id;   // 一番上（最初）の Box
           lastBottomBoxInDoc = id;                    // 一番下（最後）の Box
           if (multiBox === 'stack') stackIdx += 1;
@@ -529,14 +533,36 @@ export function buildFromSegments(dedupe: DedupeResult, opts: BuildOptions): Bui
           sdsg.push(sg);
           sourceRefs.push({ target: { type: 'sdsg', id }, ref: refFor()! });
         } else if (plan.action === 'period') {
-          if (!periodSeen.has(leaf)) {
-            periodSeen.add(leaf);
-            periodLabels.push({ id: `P_${periodLabels.length + 1}`, position: timeIdx, label: leaf });
-          }
+          const list = periodOccurrences.get(leaf) ?? [];
+          // 空欄は Number('') = 0 になるので NaN として扱う（範囲なし）
+          const toNum = (v: string) => (v.trim() === '' ? NaN : Number(v));
+          list.push({ docName, start: toNum(s.start), end: toNum(s.end), fallback: timeIdx });
+          periodOccurrences.set(leaf, list);
         }
       });
       if (placedBoxHere) timeIdx += 1;
     });
+  });
+
+  // 時期ラベルの位置: その時期のコードが覆う範囲（開始〜終了）に入るセグメントの Box の、
+  // 最初と最後の中心の中点（PeriodLabel.position はラベル中心の Time Level）。範囲が数値で取れない・
+  // 範囲内に Box が無いときは、コードが現れた時点の位置（従来どおり）
+  const halfBox = opts.defaultWidth / opts.levelPx / 2;
+  periodOccurrences.forEach((occs, leaf) => {
+    const times: number[] = [];
+    occs.forEach((o) => {
+      if (!Number.isFinite(o.start) || !Number.isFinite(o.end)) return;
+      dedupe.segments.forEach((seg) => {
+        const st = Number(seg.start);
+        if (seg.docName !== o.docName || !Number.isFinite(st) || seg.start === '' || st < o.start || st > o.end) return;
+        times.push(...(boxTimesBySeg.get(seg.key) ?? []));
+      });
+    });
+    const position = times.length > 0
+      ? (Math.min(...times) + Math.max(...times)) / 2 + halfBox
+      : occs[0].fallback;
+    // ID は既存の時期ラベルと衝突しないよう、手で追加するときと同じ生成器を使う
+    periodLabels.push({ id: genPeriodId(), position: Math.round(position * 100) / 100, label: leaf });
   });
 
   return { transcripts, boxes, sdsg, periodLabels, sourceRefs, warnings };

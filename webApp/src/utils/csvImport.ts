@@ -6,6 +6,7 @@
 
 import Papa from 'papaparse';
 import type { Box, BoxType, Line, LineType, LineShape, SDSG, SDSGType, PeriodLabel, TextOrientation } from '../types';
+import { decodeCsvBytes } from './tabularFile';
 
 export type CsvFieldKind =
   | 'ignore'
@@ -102,7 +103,8 @@ export function parseCsvText(text: string): ParsedCsv {
 }
 
 export async function parseCsvFile(file: File): Promise<ParsedCsv> {
-  const text = await file.text();
+  // Shift_JIS の CSV（日本語版 Excel の保存）も読む
+  const { text } = decodeCsvBytes(new Uint8Array(await file.arrayBuffer()));
   // BOM 除去
   const clean = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
   return parseCsvText(clean);

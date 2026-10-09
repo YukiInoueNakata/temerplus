@@ -13,6 +13,7 @@ import { parseXlsx, detectHeader } from './xlsx';
 import { parseDocx } from './docx';
 import { genTranscriptId } from '../../store/defaults';
 import type { Paragraph, Transcript } from '../../types';
+import { decodeCsvBytes } from '../tabularFile';
 
 export type TranscriptSourceFormat = 'txt' | 'csv' | 'xlsx' | 'docx';
 
@@ -53,6 +54,12 @@ export function detectFormatFromFilename(filename: string): TranscriptSourceForm
 // メイン: ファイルから初回パース結果を返す
 // ----------------------------------------------------------------------------
 
+/** UTF-8（BOM 付き含む）として厳密に読めなければ Shift_JIS として読む（tabularFile.decodeCsvBytes と同じ判定） */
+async function readTextFileAutoEncoding(file: File): Promise<string> {
+  const { text } = decodeCsvBytes(new Uint8Array(await file.arrayBuffer()));
+  return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+}
+
 export async function importTranscriptFile(file: File): Promise<ImportInitialResult> {
   const format = detectFormatFromFilename(file.name);
   if (!format) {
@@ -63,7 +70,8 @@ export async function importTranscriptFile(file: File): Promise<ImportInitialRes
 
   switch (format) {
     case 'txt': {
-      const text = await file.text();
+      // Shift_JIS（古いメモ帳・Excel の保存）も読む。UTF-8 決め打ちだと黙って文字化けしていた
+      const text = await readTextFileAutoEncoding(file);
       return { format, filename: file.name, paragraphs: parseTxt(text) };
     }
     case 'docx': {
@@ -71,7 +79,8 @@ export async function importTranscriptFile(file: File): Promise<ImportInitialRes
       return { format, filename: file.name, paragraphs: await parseDocx(buf) };
     }
     case 'csv': {
-      const text = await file.text();
+      // 日本語版 Excel の「CSV（コンマ区切り）」保存は Shift_JIS
+      const text = await readTextFileAutoEncoding(file);
       const { rows, header, suggestedMapping } = parseCsvRaw(text);
       const allRows = header ? [header, ...rows] : rows;
       return {

@@ -16,6 +16,7 @@ export interface PeriodLabelGeometry {
   itemPx: number;          // 時期ラベル帯の item 方向位置
   layout: LayoutDirection;
   items: Array<{
+    id: string;
     x: number;             // ラベル中心 x
     y: number;             // ラベル中心 y
     label: string;
@@ -123,9 +124,9 @@ export function computePeriodLabels(
   const items = sheet.periodLabels.map((pl) => {
     const timePos = pl.position * LEVEL_PX;
     if (layout === 'horizontal') {
-      return { x: timePos, y: itemPx, label: pl.label };
+      return { id: pl.id, x: timePos, y: itemPx, label: pl.label };
     } else {
-      return { x: itemPx, y: timePos, label: pl.label };
+      return { id: pl.id, x: itemPx, y: timePos, label: pl.label };
     }
   });
 
@@ -150,4 +151,24 @@ export function computePeriodLabels(
       items,
     };
   }
+}
+
+/**
+ * 帯スタイル（|---時期1---|---時期2---|）の区切り。画面・PPTX・SVG・設定画面で共用する。
+ * - 時期ラベルを Time_Level の順に並べ、区切りは「隣り合う 2 つの Time_Level の中点」、
+ *   両端は時間矢印の端。ラベルは区切りと区切りの真ん中に置く
+ * - そのため 1 つの Time_Level を動かすと両側の区切りが動き、隣を越えると順番が入れ替わる
+ * 戻り値の bounds は sorted.length + 1 個（時間軸方向の座標）
+ */
+export function computePeriodBandBounds(geom: PeriodLabelGeometry): {
+  sorted: PeriodLabelGeometry['items'];
+  bounds: number[];
+} {
+  const isH = geom.layout === 'horizontal';
+  const tOf = (it: { x: number; y: number }) => (isH ? it.x : it.y);
+  const sorted = [...geom.items].sort((a, b) => tOf(a) - tOf(b));
+  const bounds: number[] = [isH ? geom.startX : geom.startY];
+  for (let i = 1; i < sorted.length; i++) bounds.push((tOf(sorted[i - 1]) + tOf(sorted[i])) / 2);
+  bounds.push(isH ? geom.endX : geom.endY);
+  return { sorted, bounds };
 }

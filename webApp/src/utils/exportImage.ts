@@ -16,9 +16,16 @@ export interface ExportOptions {
   background?: 'white' | 'transparent'; // 既定 'white'
 }
 
-function buildFilter(opts: ExportOptions) {
+/**
+ * html-to-image に渡す「出力に含める要素」の判定。PNG・画像方式の SVG・PDF で共用する。
+ */
+export function buildFilter(opts: ExportOptions) {
   return (el: HTMLElement) => {
     if (!(el instanceof HTMLElement)) return true;
+    // 編集用の部品は常に除く: 矢印をつなぐ接続ハンドル（Box の左右の灰色の丸）と、選択時のリサイズ枠。
+    // 以前は除いておらず、出力した画像に丸が写り込んでいた（2026-10-05 利用者の PNG で確認）
+    if (el.classList?.contains('react-flow__handle')) return false;
+    if (el.classList?.contains('react-flow__resize-control')) return false;
     if (!opts.includeControls) {
       if (el.classList?.contains('react-flow__controls')) return false;
       if (el.classList?.contains('react-flow__minimap')) return false;

@@ -25,7 +25,7 @@ import type {
   Locale,
 } from '../types';
 import { computeTimeArrow } from './timeArrow';
-import { computePeriodLabels } from './periodLabels';
+import { computePeriodLabels, computePeriodBandBounds } from './periodLabels';
 import {
   computeSDSGBandLayout,
   sdsgBandKey,
@@ -58,6 +58,9 @@ import { checkAborted, type ProgressCallback } from './exportProgress';
 import { resolveAttachedAnchor, anchorCenter } from './sdsgAttach';
 import { resolveBetweenEndpoint } from './sdsgBetween';
 import { clipPolylineToRect, type Pt as ClipPt } from './lineClip';
+import { applyPptTextDefaults, pxToPt } from './pptText';
+import { NOTE_LINE_HEIGHT, NOTE_PADDING_PX, NOTE_TEXT_PADDING_PX } from './noteStyle';
+import { sdsgPptRotation, sdsgSubLabelShift, SDSG_LABEL_GAP, PPTX_SDSG_NAME_PREFIX } from './sdsgShape';
 
 // ----------------------------------------------------------------------------
 // Public API
@@ -80,9 +83,13 @@ export interface PPTXExportOptions {
   includeIds?: { box: boolean; sdsg: boolean; line: boolean };
   onProgress?: ProgressCallback;
   signal?: AbortSignal;
+  /** true ならファイルに保存せず、pptx のバイト列を返す（取り込みの往復テスト用） */
+  returnBytes?: boolean;
 }
 
 const PX_PER_INCH = 96;
+/** BoxNode の本文の padding（px）。PPTX の本文の余白をこれに合わせる */
+const BOX_TEXT_PADDING_PX = 4;
 
 interface Transform {
   toX: (worldX: number) => number;  // world px → slide inch
@@ -91,7 +98,7 @@ interface Transform {
   scale: number;
 }
 
-export async function exportToPPTX(opts: PPTXExportOptions): Promise<void> {
+export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array | void> {
   if (!opts || !opts.sheet || !opts.settings) {
     throw new Error('exportToPPTX: options.sheet と options.settings が必須です');
   }
@@ -124,7 +131,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<void> {
   if (!pages) {
     // 単一スライド（従来動作）
     const t = buildTransform(bbox, slideWpx, slideHpx, scale, offsetRatio);
-    const slide = pres.addSlide();
+    const slide = applyPptTextDefaults(pres.addSlide());
     drawTimeArrow(pres, slide, opts.sheet, layout, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility);
     drawPeriodLabels(pres, slide, opts.sheet, layout, opts.settings.periodLabels, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility);
     drawLines(pres, slide, opts.sheet, layout, t);
@@ -134,8 +141,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<void> {
     drawNotes(pres, slide, opts.sheet, opts.settings, t);
     drawLegend(pres, slide, opts.sheet, layout, opts.settings.legend, t, opts.settings.locale);
     drawIdBadges(slide, opts.sheet, layout, t, includeIds);
-    await pres.writeFile({ fileName: filename });
-    return;
+    return finishPresentation(pres, filename, opts.returnBytes);
   }
 
   // N スライド分割出力
@@ -144,7 +150,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<void> {
     checkAborted(opts.signal);
     opts.onProgress?.({ current: i + 1, total, label: `スライド ${i + 1} / ${total} を生成中` });
     const page = pages[i];
-    const slide = pres.addSlide();
+    const slide = applyPptTextDefaults(pres.addSlide());
     const pageBbox = {
       x: page.innerX, y: page.innerY,
       width: page.innerWidth, height: page.innerHeight,
@@ -162,6 +168,14 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<void> {
     // 凡例は全スライドに表示（SPEC）
     drawLegend(pres, slide, pageSheet, layout, opts.settings.legend, t, opts.settings.locale);
     drawIdBadges(slide, pageSheet, layout, t, includeIds);
+  }
+  return finishPresentation(pres, filename, opts.returnBytes);
+}
+
+async function finishPresentation(pres: PptxGenJS, filename: string, returnBytes?: boolean): Promise<Uint8Array | void> {
+  if (returnBytes) {
+    const out = await pres.write({ outputType: 'uint8array' });
+    return out instanceof Uint8Array ? out : new Uint8Array(out as ArrayBuffer);
   }
   await pres.writeFile({ fileName: filename });
 }
@@ -184,7 +198,7 @@ function drawIdBadges(
     slide.addText(text, {
       x: t.toX(wx), y: t.toY(wy),
       w: t.toLen(w), h: t.toLen(h),
-      fontSize: Math.max(6, fs * Math.max(0.4, t.scale)),
+      fontSize: fontSizeScaled(fs, t),
       color: '666666',
       fontFace: 'Consolas',
       fill: { color: 'FFFFFF' },
@@ -317,7 +331,7 @@ function drawContinuationMarker(
     h: t.toLen(hpx),
     align: 'center',
     valign: 'middle',
-    fontSize: Math.max(6, fsBase * Math.max(0.4, t.scale)),
+    fontSize: fontSizeScaled(fsBase, t),
     color: '555555',
     margin: 1,
   });
@@ -435,7 +449,14 @@ function buildTransform(
 function rgbToHex(color: string): string {
   if (!color) return '222222';
   const c = color.trim();
-  if (c.startsWith('#')) return c.slice(1).toUpperCase();
+  if (c.startsWith('#')) {
+    const h = c.slice(1);
+    // PowerPoint は 6 桁しか受け付けない。3 桁（#d33）は 6 桁に広げる（以前はそのまま渡して黒になっていた）、
+    // 8 桁（#rrggbbaa）は透明度を落とす
+    if (/^[0-9a-f]{3}$/i.test(h)) return h.split('').map((ch) => ch + ch).join('').toUpperCase();
+    if (/^[0-9a-f]{8}$/i.test(h)) return h.slice(0, 6).toUpperCase();
+    return h.toUpperCase();
+  }
   // rgb(r,g,b)
   const m = c.match(/rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
   if (m) {
@@ -455,8 +476,11 @@ function toPptVAlign(a: 'top' | 'middle' | 'bottom'): 'top' | 'middle' | 'bottom
 }
 
 function fontSizeScaled(base: number, t: Transform): number {
-  // 文字が小さくなりすぎない下限を設ける
-  return Math.max(6, base * Math.max(0.4, t.scale));
+  // base は画面の px。枠と同じ倍率で縮め、pt に換算する。
+  // 以前は px をそのまま pt として渡し（文字が 4/3 倍）、さらに縮小率 0.4・6pt の下限で
+  // 文字だけが縮まなかったため、大きな図ほど文字が枠からあふれていた
+  // 丸めは pptxgenjs が sz（1/100 pt）を書くときに行う
+  return Math.max(1, pxToPt(base, t.scale));
 }
 
 // ----------------------------------------------------------------------------
@@ -575,7 +599,8 @@ function renderBox(
     color: rgbToHex(visuals.color ?? '#222'),
     fontFace: visuals.fontFamily,
     vert: isTextVertical ? 'eaVert' : undefined,
-    margin: 2,
+    // 画面の Box は padding 4px（BoxNode の baseStyle）。margin の単位は pt
+    margin: pxToPt(BOX_TEXT_PADDING_PX, t.scale),
   });
 
   // タイプラベル
@@ -759,14 +784,21 @@ function drawNotes(pres: PptxGenJS, slide: PptxGenJS.Slide, sheet: Sheet, settin
       }
     }
     const fs = n.fontSize ?? Math.min(settings.defaultFontSize ?? 13, 13);
+    const isText = n.style === 'text';
+    const fsPt = fontSizeScaled(fs, t);
+    // 画面の NoteNode と同じ余白・行の高さ（1.4 固定）。'text' は枠・背景なしで中央に置く
     slide.addText(n.text || '', {
       x: t.toX(n.x), y: t.toY(n.y), w: t.toLen(n.width), h: t.toLen(n.height),
-      fontSize: fontSizeScaled(fs, t),
+      fontSize: fsPt,
       fontFace: settings.defaultFont,
-      color: '333333',
-      align: 'left', valign: 'top', margin: 4,
-      fill: { color: isCallout ? 'FFFFFF' : 'FFF8C5' },
-      line: { color: isCallout ? '666666' : 'B8A000', width: 0.75, dashType: isCallout ? 'solid' : 'dash' },
+      color: rgbToHex(n.color ?? '#333333'),
+      lineSpacing: fsPt * NOTE_LINE_HEIGHT,
+      align: isText ? 'center' : 'left', valign: isText ? 'middle' : 'top',
+      margin: pxToPt(isText ? NOTE_TEXT_PADDING_PX : NOTE_PADDING_PX, t.scale),
+      ...(isText ? {} : {
+        fill: { color: isCallout ? 'FFFFFF' : 'FFF8C5' },
+        line: { color: isCallout ? '666666' : 'B8A000', width: 0.75, dashType: isCallout ? 'solid' as const : 'dash' as const },
+      }),
     });
   });
 }
@@ -922,7 +954,8 @@ function drawSDSGs(
       const attached = boxById.get(sg.attachedTo);
       if (!attached) return;
       const centerT = isH ? attached.x + attached.width / 2 : attached.y + attached.height / 2;
-      const w0 = sg.spaceWidth ?? sg.width ?? 70;
+      // 時間軸方向のサイズ: 横型は幅、縦型は高さ（画面 Canvas・重なり検出と同じ。以前は常に幅で、縦型でずれた）
+      const w0 = isH ? (sg.spaceWidth ?? sg.width ?? 70) : (sg.spaceHeight ?? sg.height ?? 40);
       tS = centerT - w0 / 2; tE = centerT + w0 / 2;
     }
     bandEntries[bk].push({ id: sg.id, timeStart: tS, timeEnd: tE, rowOverride: sg.spaceRowOverride });
@@ -1005,13 +1038,13 @@ function drawSDSGs(
     const itemOff = 0;
     void timeOff; void itemOff; void anchorX; void anchorY;
 
-    // ブロック矢印（rightArrow）は既定で右向き
-    // 横型: SD=下向き(90°), SG=上向き(270°)
-    // 縦型: SD=右向き(0°), SG=左向き(180°)
+    // ホームベース（homePlate）は既定で右向き。向きは画面（SDSGNode）と同じ:
+    // 横型: SD=下向き(90°), SG=上向き(270°)／縦型: SD=左向き(180°), SG=右向き(0°)
+    // （以前は縦型が SD=右・SG=左で画面と逆だった）
     // flipDirection=true の場合は種別と逆の向き
     const effectiveType = flipDirection ? (sg.type === 'SD' ? 'SG' : 'SD') : sg.type;
     const isSD = effectiveType === 'SD';
-    const rotate = isH ? (isSD ? 90 : 270) : (isSD ? 0 : 180);
+    const rotate = sdsgPptRotation(isH, isSD);
 
     const bgColor = rgbToHex(sg.style?.backgroundColor ?? '#ffffff');
     const borderColor = rgbToHex(sg.style?.borderColor ?? '#333');
@@ -1035,7 +1068,14 @@ function drawSDSGs(
     const rectY = wy + h / 2 - rectH / 2;
 
     const useRect = sg.shape === 'rect';
-    slide.addShape(useRect ? pres.ShapeType.rect : pres.ShapeType.rightArrow, {
+    const sgRectRatio = Math.max(0.05, Math.min(0.95, sg.rectRatio ?? 0.55));
+    const sgTriRatio = 1 - sgRectRatio;
+    // 画面（SDSGNode）と同じ五角形にするため、既成図形のホームベース（右向き五角形）を回して使う。
+    // 以前は右向きブロック矢印（軸が細い）で、文字が輪郭にかぶっていた。
+    // 三角部分の長さ = 矢印方向の長さ × (1 - rectRatio)。pptxgenjs は rectRadius を
+    // prstGeom の adj（= 長さ ÷ min(w, h) × 100000）として書くので、それで渡す
+    const arrowLen = isH ? h : w;
+    slide.addShape(useRect ? pres.ShapeType.rect : pres.ShapeType.homePlate, {
       x: t.toX(rectX),
       y: t.toY(rectY),
       w: t.toLen(rectW),
@@ -1043,10 +1083,12 @@ function drawSDSGs(
       fill: { color: bgColor },
       line: { color: borderColor, width: 1.5 },
       rotate: useRect ? 0 : rotate,
+      ...(useRect ? {} : { rectRadius: t.toLen(arrowLen * sgTriRatio) }),
+      // 取り込み（pptxImport）で TEMer 自身の出力の SD/SG を確実に見分けるための図形名。
+      // 種別は向きの反転（帯モード）前の本来のもの。四角形の SD/SG は形からは Box と区別できない
+      objectName: `${PPTX_SDSG_NAME_PREFIX}${sg.type}`,
     });
     // ラベル領域: pentagon (五角形全体・既定) / rect (矩形部分のみ)
-    const sgRectRatio = Math.max(0.05, Math.min(0.95, sg.rectRatio ?? 0.55));
-    const sgTriRatio = 1 - sgRectRatio;
     const labelArea = sg.labelArea ?? 'pentagon';
     let tx2 = wx, ty2 = wy, tw2 = w, th2 = h;
     if (labelArea === 'rect') {
@@ -1073,12 +1115,17 @@ function drawSDSGs(
       fontSize: fontSizeScaled(sg.style?.fontSize ?? 11, t),
       bold: sg.style?.bold ?? true,
       color: rgbToHex(sg.style?.color ?? '#222'),
+      fontFace: sg.style?.fontFamily,
+      // 画面の SDSGNode の本文は padding 2px
+      margin: pxToPt(2, t.scale),
+      // 画面と同じく、縦型レイアウトでは本文も縦書き
+      vert: isH ? undefined : 'eaVert',
     });
 
     // タイプラベル (SD/SG) - Box と同形式
-    drawSDSGTypeLabel(slide, sg, wx, wy, w, h, isH, settings, t);
+    drawSDSGTypeLabel(slide, sg, wx, wy, w, h, isH, isSD, settings, t);
     // サブラベル
-    drawSDSGSubLabel(slide, sg, wx, wy, w, h, isH, t);
+    drawSDSGSubLabel(slide, sg, wx, wy, w, h, isH, isSD, settings, t);
   }
 }
 
@@ -1090,11 +1137,15 @@ function drawSDSGTypeLabel(
   w: number,
   h: number,
   isH: boolean,
+  /** 描画上の向き（flipDirection 反映後）。SDSGNode と同じく、ラベルは Box と反対側の外側に置く */
+  isSD: boolean,
   settings: ProjectSettings,
   t: Transform,
 ) {
   const vis = settings.typeLabelVisibility;
   if (vis && (vis as Record<string, boolean | undefined>)[sg.type] === false) return;
+  // SDSGNode の typeTagStyle: 図形から SDSG_LABEL_GAP 離す。横型 SD=上 / SG=下、縦型 SD=右 / SG=左
+  const GAP = SDSG_LABEL_GAP;
   const baseFS = sg.typeLabelFontSize ?? 11;
   const fs = fontSizeScaled(baseFS, t);
   const bold = sg.typeLabelBold !== false;
@@ -1113,11 +1164,11 @@ function drawSDSGTypeLabel(
     const hpx = Math.max(14, baseFS * 1.8);
     slide.addText(sg.type, {
       x: t.toX(wx + w / 2 - wpx / 2),
-      y: t.toY(wy - hpx - 4),
+      y: t.toY(isSD ? wy - hpx - GAP : wy + h + GAP),
       w: t.toLen(wpx),
       h: t.toLen(hpx),
       align: 'center',
-      valign: 'bottom',
+      valign: isSD ? 'bottom' : 'top',
       fontSize: fs,
       bold,
       italic,
@@ -1131,7 +1182,7 @@ function drawSDSGTypeLabel(
     const wpx = Math.max(14, baseFS * 1.8);
     const hpx = Math.max(60, h);
     slide.addText(sg.type, {
-      x: t.toX(wx - wpx - 4),
+      x: t.toX(isSD ? wx + w + GAP : wx - wpx - GAP),
       y: t.toY(wy + h / 2 - hpx / 2),
       w: t.toLen(wpx),
       h: t.toLen(hpx),
@@ -1158,9 +1209,18 @@ function drawSDSGSubLabel(
   w: number,
   h: number,
   isH: boolean,
+  isSD: boolean,
+  settings: ProjectSettings,
   t: Transform,
 ) {
   if (!sg.subLabel) return;
+  // 種別ラベルと同じ側に来るとき（横型 SG・縦型 SD）は、その外側へずらす（utils/sdsgShape）
+  const vis = settings.typeLabelVisibility as Record<string, boolean | undefined> | undefined;
+  const shift = sdsgSubLabelShift({
+    isH, isSD, typeTagVisible: vis?.[sg.type] !== false,
+    typeFontSize: sg.typeLabelFontSize ?? 11,
+    typeBorderWidth: sg.typeLabelBorderColor ? (sg.typeLabelBorderWidth ?? 0) : 0,
+  });
   const baseFS = sg.subLabelFontSize ?? 10;
   const fs = fontSizeScaled(baseFS, t);
   const offX = sg.subLabelOffsetX ?? 0;
@@ -1178,7 +1238,7 @@ function drawSDSGSubLabel(
     const hpx = Math.max(14, baseFS * 1.6);
     slide.addText(sg.subLabel, {
       x: t.toX(wx + w / 2 - wpx / 2 + offX),
-      y: t.toY(wy + h + 6 + offY),
+      y: t.toY(wy + h + SDSG_LABEL_GAP + shift + offY),
       w: t.toLen(wpx),
       h: t.toLen(hpx),
       align: 'center',
@@ -1193,7 +1253,7 @@ function drawSDSGSubLabel(
     const wpx = Math.max(14, baseFS * 1.6);
     const hpx = Math.max(80, h);
     slide.addText(sg.subLabel, {
-      x: t.toX(wx + w + 6 + offX),
+      x: t.toX(wx + w + SDSG_LABEL_GAP + shift + offX),
       y: t.toY(wy + h / 2 - hpx / 2 + offY),
       w: t.toLen(wpx),
       h: t.toLen(hpx),
@@ -1357,16 +1417,7 @@ function drawPeriodLabels(
 
   // band スタイル: 境界位置を計算
   if (settings.bandStyle === 'band') {
-    const sorted = [...geom.items].sort((a, b) => (isH ? a.x - b.x : a.y - b.y));
-    const bounds: number[] = [];
-    bounds.push(isH ? geom.startX : geom.startY);
-    sorted.forEach((it, i) => {
-      if (i === 0) return;
-      const prev = sorted[i - 1];
-      const mid = isH ? (prev.x + it.x) / 2 : (prev.y + it.y) / 2;
-      bounds.push(mid);
-    });
-    bounds.push(isH ? geom.endX : geom.endY);
+    const { sorted, bounds } = computePeriodBandBounds(geom);
 
     // 境界の短い縦（or 横）線
     if (settings.showDividers) {
@@ -1447,9 +1498,15 @@ function placePeriodLabel(
   baseFS: number,
   t: Transform,
 ) {
+  // 画面の時期ラベルは折り返さない。以前は 8 文字分の固定幅で、長いラベルが PPTX だけ 2 行に折れていた
+  const lines = label.split('\n');
+  const longest = Math.max(...lines.map((l) => l.length), 1);
+  const lineCount = lines.length;
+  const lenPx = Math.max(80, longest * baseFS * 1.1 + 8);
+  const thickPx = Math.max(18, baseFS * 1.8 * lineCount);
   if (isH) {
-    const wpx = Math.max(80, baseFS * 8);
-    const hpx = Math.max(18, baseFS * 1.8);
+    const wpx = lenPx;
+    const hpx = thickPx;
     const cx = centerWorld - wpx / 2;
     const cy = sideH === 'top' ? geom.startY - hpx - 2 : geom.startY + 2;
     slide.addText(label, {
@@ -1462,10 +1519,11 @@ function placePeriodLabel(
       fontSize: fs,
       color: '222222',
       margin: 1,
+      wrap: false,
     });
   } else {
-    const wpx = Math.max(18, baseFS * 1.8);
-    const hpx = Math.max(80, baseFS * 8);
+    const wpx = thickPx;
+    const hpx = lenPx;
     const cx = sideV === 'right' ? geom.startX + 2 : geom.startX - wpx - 2;
     const cy = centerWorld - hpx / 2;
     slide.addText(label, {
@@ -1479,6 +1537,7 @@ function placePeriodLabel(
       color: '222222',
       vert: 'eaVert',
       margin: 1,
+      wrap: false,
     });
   }
 }
@@ -1745,15 +1804,17 @@ function drawLegendIcon(
     });
   } else if (item.category === 'sdsg') {
     const rotate = item.key === 'SD' ? 90 : 270;
-    // 凡例アイコンは横長表示用に rightArrow を適切サイズで。回転で縦長扱い
-    slide.addShape(pres.ShapeType.rightArrow, {
-      x: t.toX(x),
-      y: t.toY(y),
-      w: t.toLen(w),
-      h: t.toLen(h),
+    // 画面の凡例（LegendOverlay）と同じ五角形: w×h の枠に、三角部分は高さの 45%。
+    // 右向きのホームベースを 90 / 270 度回すので、回す前の枠は縦横を入れ替えて中心を合わせる
+    slide.addShape(pres.ShapeType.homePlate, {
+      x: t.toX(x + w / 2 - h / 2),
+      y: t.toY(y + h / 2 - w / 2),
+      w: t.toLen(h),
+      h: t.toLen(w),
       fill: { color: 'FFFFFF' },
       line: { color: '333333', width: 1 },
       rotate,
+      rectRadius: t.toLen(h * 0.45),
     });
   } else if (item.category === 'timeArrow') {
     slide.addShape(pres.ShapeType.line, {

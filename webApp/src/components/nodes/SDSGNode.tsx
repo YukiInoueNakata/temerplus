@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Handle, NodeResizer, Position, type NodeProps } from 'reactflow';
 import type { SDSG } from '../../types';
 import { renderVerticalAwareText } from '../../utils/verticalText';
+import { sdsgPentagonPoints, sdsgSubLabelShift, SDSG_TYPE_TAG_LINE_HEIGHT } from '../../utils/sdsgShape';
 import { useTEMView } from '../../context/TEMViewContext';
 import { useTEMStore } from '../../store/store';
 
@@ -113,7 +114,9 @@ export function SDSGNode({ data, selected, id: nodeId }: NodeProps<SDSGNodeData>
   // triRatio = 1 - rectRatio だが、点の位置計算で直接使う値
   const triRatio = 1 - rectRatio;
 
-  let points: string;
+  // 五角形の頂点は SVG 出力と共通（utils/sdsgShape）。四角形のときだけここで上書きする
+  let points = sdsgPentagonPoints(0, 0, width, height, isHorizontalLayout, isSD, rectRatio)
+    .map((p) => `${p.x},${p.y}`).join(' ');
   // 本体ラベル配置領域: 既定は五角形全体、'rect' なら矩形部分のみ
   const labelArea = data.labelArea ?? 'pentagon';
   let textRect = { top: 0, left: 0, width, height };
@@ -126,11 +129,9 @@ export function SDSGNode({ data, selected, id: nodeId }: NodeProps<SDSGNodeData>
     // SG 上向き: 三角上 + 矩形下
     if (isSD) {
       const rectBottom = height * rectRatio;
-      points = `0,0 ${width},0 ${width},${rectBottom} ${width / 2},${height} 0,${rectBottom}`;
       if (labelArea === 'rect') textRect = { top: 0, left: 0, width, height: rectBottom };
     } else {
       const rectTop = height * triRatio;
-      points = `${width / 2},0 ${width},${rectTop} ${width},${height} 0,${height} 0,${rectTop}`;
       if (labelArea === 'rect') textRect = { top: rectTop, left: 0, width, height: height - rectTop };
     }
   } else {
@@ -139,11 +140,9 @@ export function SDSGNode({ data, selected, id: nodeId }: NodeProps<SDSGNodeData>
     // SG: 右向き（矩形左 + 三角右）→ SG は Box の左側にあり、Box を指す（右）
     if (isSD) {
       const rectLeft = width * triRatio;
-      points = `${rectLeft},0 ${width},0 ${width},${height} ${rectLeft},${height} 0,${height / 2}`;
       if (labelArea === 'rect') textRect = { top: 0, left: rectLeft, width: width - rectLeft, height };
     } else {
       const rectRight = width * rectRatio;
-      points = `0,0 ${rectRight},0 ${width},${height / 2} ${rectRight},${height} 0,${height}`;
       if (labelArea === 'rect') textRect = { top: 0, left: 0, width: rectRight, height };
     }
   }
@@ -195,6 +194,8 @@ export function SDSGNode({ data, selected, id: nodeId }: NodeProps<SDSGNodeData>
 
   const typeTagCommon: React.CSSProperties = {
     fontSize: typeFontSize,
+    // 寸法を出力側（SVG / PPTX）と同じ計算で決めるため行の高さを明示（utils/sdsgShape）
+    lineHeight: SDSG_TYPE_TAG_LINE_HEIGHT,
     padding: '2px 4px',
     color: typeLabelColor,
     background: typeLabelBg,
@@ -273,12 +274,17 @@ export function SDSGNode({ data, selected, id: nodeId }: NodeProps<SDSGNodeData>
     // canvas だけが nowrap で 1 行に潰していた。画面と出力の不一致を解消する。
     whiteSpace: 'pre',
   };
+  // 横型 SG・縦型 SD は種別ラベルと同じ側に来るので、種別ラベルの外側へずらす
+  const subShift = sdsgSubLabelShift({
+    isH: isHorizontalLayout, isSD, typeTagVisible: showTypeTag,
+    typeFontSize, typeBorderWidth: typeLabelBorder ? typeLabelBorderWidth : 0,
+  });
   const subLabelStyle: React.CSSProperties = isVerticalLayout
     ? {
         ...subLabelCommon,
         position: 'absolute',
         top: `calc(50% + ${subOffsetY}px)`,
-        left: `calc(100% + 6px + ${subOffsetX}px)`,
+        left: `calc(100% + ${6 + subShift}px + ${subOffsetX}px)`,
         transform: 'translateY(-50%)',
         writingMode: 'vertical-rl',
         textOrientation: subAsciiUpright ? 'upright' : 'mixed',
@@ -286,7 +292,7 @@ export function SDSGNode({ data, selected, id: nodeId }: NodeProps<SDSGNodeData>
     : {
         ...subLabelCommon,
         position: 'absolute',
-        top: `calc(100% + 6px + ${subOffsetY}px)`,
+        top: `calc(100% + ${6 + subShift}px + ${subOffsetY}px)`,
         left: `calc(50% + ${subOffsetX}px)`,
         transform: 'translateX(-50%)',
         writingMode: 'horizontal-tb',

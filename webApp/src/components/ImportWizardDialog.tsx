@@ -6,6 +6,7 @@
 // 3. 列の割当  : 列ごとに役割を選ぶ（ヘッダから自動推測、手で直せる）
 // 4. (MAXQDA)  : セグメントに集約したうえで、コードごとに Box / SD / SG / 時期 / タグを選ぶ
 // 5. 確認      : 件数と警告を見て実行
+// .pptx を渡されたら PptxImportDialog（PowerPoint の TEM 図の取り込み）へ切り替える。
 //
 // 既存の CSV 取り込み（CSVImportDialog）を列指定つきで置き換える入口。
 // Box などの組み立ては utils/csvImport の関数をそのまま使い、MAXQDA は utils/maxqdaImport。
@@ -29,6 +30,7 @@ import {
   type MaxqdaRole, type CodeAction, type CodePlan, type DedupeKeyMode, type MultiBoxMode,
 } from '../utils/maxqdaImport';
 import { SELECTABLE_BOX_TYPES } from '../utils/typeDisplay';
+import { PptxImportDialog } from './PptxImportDialog';
 import type { BoxType, Transcript } from '../types';
 
 type Mode = 'box' | 'line' | 'sdsg' | 'period' | 'transcript' | 'maxqda';
@@ -116,6 +118,8 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
   const [plans, setPlans] = useState<Record<string, CodePlan>>({});
   const [stackDocs, setStackDocs] = useState(true);
   const [multiBoxMode, setMultiBoxMode] = useState<MultiBoxMode>('stack');
+  // PowerPoint（.pptx）は図形の取り込みなので別ダイアログ
+  const [pptxFile, setPptxFile] = useState<File | null>(null);
 
   const rows = file?.sheets[sheetIdx]?.rows ?? [];
   const header = useMemo(() => (hasHeader && rows.length > 0 ? rows[0] : rows[0]?.map((_, i) => `列${i + 1}`) ?? []), [rows, hasHeader]);
@@ -131,6 +135,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
 
   const handleFile = async (f: File) => {
     setError(null);
+    if (/.pptx$/i.test(f.name)) { setPptxFile(f); return; }
     try {
       const parsed = await parseTabularFile(f);
       if (parsed.sheets.length === 0 || parsed.sheets.every((s) => s.rows.length === 0)) {
@@ -180,6 +185,29 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
     onClose();
   };
 
+  /**
+   * 反映してから結果を出す。新しいシートへ取り込むときはシートの切り替えを待って（setTimeout）反映し、
+   * 反映が終わってから成功を知らせる（先に「取り込みました」と出して失敗を隠さない）
+   */
+  const applyThenFinish = (apply: () => void, msg: string, warnings: string[]) => {
+    const done = () => {
+      try {
+        apply();
+      } catch (e) {
+        setError(`取り込みの途中で失敗しました: ${e instanceof Error ? e.message : String(e)}`);
+        return;
+      }
+      finish(msg, warnings);
+    };
+    if (toNewSheet && file) {
+      const id = addSheet(file.filename.replace(/\.[^.]+$/, ''));
+      setActiveSheet(id);
+      setTimeout(done, 0);
+    } else {
+      done();
+    }
+  };
+
   const runImport = () => {
     if (!file) return;
     setError(null);
@@ -201,10 +229,8 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           existingIds: toNewSheet ? new Set() : existingBoxIds, levelPx: LEVEL_PX,
         });
         if (result.boxes.length === 0) { setError('Box を作れませんでした。「ラベル」を割り当てた列はありますか？'); return; }
-        const doImport = () => importBoxes(result.boxes, result.lines);
-        if (toNewSheet) { const id = addSheet(file.filename.replace(/\.[^.]+$/, '')); setActiveSheet(id); setTimeout(doImport, 0); }
-        else doImport();
-        finish(`${result.boxes.length} 件の Box、${result.lines.length} 件の Line を取り込みました`, result.errors);
+        applyThenFinish(() => importBoxes(result.boxes, result.lines),
+          `${result.boxes.length} 件の Box、${result.lines.length} 件の Line を取り込みました`, result.errors);
         return;
       }
       if (mode === 'line') {
@@ -274,9 +300,8 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           if (result.periodLabels.length > 0) importPeriodLabels(result.periodLabels);
           result.sourceRefs.forEach((r) => addSourceRef(r.target, r.ref));
         };
-        if (toNewSheet) { const id = addSheet(file.filename.replace(/\.[^.]+$/, '')); setActiveSheet(id); setTimeout(apply, 0); }
-        else apply();
-        finish(
+        applyThenFinish(
+          apply,
           `逐語録 ${result.transcripts.length} 本（${maxqda.dedupe.segments.length} 段落）、Box ${result.boxes.length}、SD/SG ${result.sdsg.length}、時期ラベル ${result.periodLabels.length} を取り込みました`,
           result.warnings,
         );
@@ -287,6 +312,9 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
   };
 
   if (!open) return null;
+  if (pptxFile) {
+    return <PptxImportDialog open initialFile={pptxFile} onClose={() => { setPptxFile(null); reset(); onClose(); }} />;
+  }
 
   const roleLabels = labelsFor(mode);
   const requiredHint: Record<Mode, string> = {
@@ -311,7 +339,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           {step === 1 && (
             <section className="settings-section">
               <h4>1. ファイルを選ぶ</h4>
-              <p className="hint">CSV / TSV / Excel（.xlsx / .xls）。Excel は最初の非空シートを読み、あとで切り替えられます。</p>
+              <p className="hint">CSV / TSV / Excel（.xlsx / .xls）。Excel は最初の非空シートを読み、あとで切り替えられます。PowerPoint（.pptx）で描いた TEM 図も取り込めます（図形の役割を確かめる画面に進みます）。</p>
               <div
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) void handleFile(f); }}
@@ -319,7 +347,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
                 style={{ border: '2px dashed #b0b8c8', borderRadius: 6, padding: 28, textAlign: 'center', cursor: 'pointer', background: '#fafcff' }}
               >
                 ここにファイルをドロップ、またはクリックして選択
-                <input ref={fileInputRef} type="file" accept=".csv,.tsv,.txt,.xlsx,.xls,.xlsm" style={{ display: 'none' }}
+                <input ref={fileInputRef} type="file" accept=".csv,.tsv,.txt,.xlsx,.xls,.xlsm,.pptx" style={{ display: 'none' }}
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleFile(f); e.target.value = ''; }} />
               </div>
             </section>

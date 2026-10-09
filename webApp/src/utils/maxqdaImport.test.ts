@@ -142,6 +142,13 @@ describe('buildFromSegments', () => {
     expect(res.periodLabels.map((p) => p.label)).toEqual(['第1期']);
   });
 
+  it('時期ラベルは期間（1–6）に入る Box の中心の中点に置き、ID は取り込みごとに別になる', () => {
+    const res = build();
+    // A さんの Box は 0 と 100（幅 100）→ 中心 0.5 と 1.5 Level → 中点 1.0
+    expect(res.periodLabels[0].position).toBe(1);
+    expect(res.periodLabels[0].id).not.toBe(build().periodLabels[0].id);
+  });
+
   it('既存 ID と衝突しない', () => {
     const r = dedupeSegments(ROWS, { mapping: MAPPING, hasHeader: true });
     const res = buildFromSegments(r, {

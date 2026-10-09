@@ -5,7 +5,7 @@
 // ============================================================================
 
 import { useStore as useReactFlowStore } from 'reactflow';
-import { computePeriodLabels } from '../utils/periodLabels';
+import { computePeriodLabels, computePeriodBandBounds } from '../utils/periodLabels';
 import { renderVerticalAwareText } from '../utils/verticalText';
 import { useTEMView } from '../context/TEMViewContext';
 
@@ -90,20 +90,8 @@ export function PeriodLabelsOverlay({ onOpenSettings }: { onOpenSettings?: () =>
 
   // 帯スタイル: 端点 + 各ラベル境界で | を引き、ラベルを中央へ
   if (settings.bandStyle === 'band') {
-    // ラベルを time 順にソート（計算済み geom.items は入力順なので並び替え）
-    const sortedItems = [...geom.items].sort((a, b) => (isH ? a.x - b.x : a.y - b.y));
-    // 境界 time 位置リスト: 開始端 + 各ラベル境界 + 終了端
-    const bounds: number[] = [];
-    bounds.push(isH ? geom.startX : geom.startY);
-    // 各ラベルの前に境界、最後のラベルの後にも境界
-    sortedItems.forEach((it, i) => {
-      if (i === 0) return;
-      const prev = sortedItems[i - 1];
-      // 2ラベル間の中点
-      const mid = isH ? (prev.x + it.x) / 2 : (prev.y + it.y) / 2;
-      bounds.push(mid);
-    });
-    bounds.push(isH ? geom.endX : geom.endY);
+    // 区切り = 開始端 + 隣り合うラベルの中点 + 終了端（PPTX / SVG / 設定画面と共通）
+    const { sorted: sortedItems, bounds } = computePeriodBandBounds(geom);
     // 各ラベルは区切り間の中央
     return (
       <div

@@ -147,6 +147,11 @@ export function buildSVGDocuments(opts: SVGNativeExportOptions): string[] {
   return docs;
 }
 
+/** 矩形どうしが重なるか（端の接触も含む） */
+function rectsOverlap(a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }): boolean {
+  return a.x <= b.x + b.width && b.x <= a.x + a.width && a.y <= b.y + b.height && b.y <= a.y + a.height;
+}
+
 function renderPage(
   sheet: Sheet,
   settings: ProjectSettings,
@@ -166,8 +171,18 @@ function renderPage(
   drawTimeArrow(b, lineSourceSheet ?? sheet, settings.layout, settings.timeArrow, t, settings.sdsgSpace, settings.typeLabelVisibility, pageInnerRect);
   drawPeriodLabels(b, sheet, settings.layout, settings.periodLabels, settings.timeArrow, t, settings.sdsgSpace, settings.typeLabelVisibility);
   drawLines(b, lineSourceSheet ?? sheet, settings.layout, t, includeIds.line, pageInnerRect);
-  drawSDSGs(b, sheet, settings.layout, settings, t, includeIds.sdsg);
-  drawSDSGInfluence(b, sheet, settings, t);
+  // ページ分割時は SD/SG を図全体（lineSourceSheet）で計算し、描いた位置がこのページに重なるものだけ出す
+  // （以前は付いている Box がページ内のものだけ残し、Line に付けた SD/SG や別ページにまたがる幅モードが消えていた）
+  if (lineSourceSheet && pageInnerRect) {
+    const onPage = new Set(collectSDSGRects(lineSourceSheet, settings.layout, settings)
+      .filter((r) => rectsOverlap(r.rect, pageInnerRect))
+      .map((r) => r.sdsg.id));
+    drawSDSGs(b, lineSourceSheet, settings.layout, settings, t, includeIds.sdsg, onPage);
+    drawSDSGInfluence(b, lineSourceSheet, settings, t, onPage);
+  } else {
+    drawSDSGs(b, sheet, settings.layout, settings, t, includeIds.sdsg);
+    drawSDSGInfluence(b, sheet, settings, t);
+  }
   drawBoxes(b, sheet, settings.layout, settings, t, includeIds.box);
   drawNotes(b, sheet, settings, t);
   drawLegend(b, sheet, settings.layout, settings.legend, t, settings.locale);
@@ -1079,6 +1094,8 @@ function computeLineSegment(
 function drawSDSGs(
   b: SVGBuilder, sheet: Sheet, layout: LayoutDirection, settings: ProjectSettings, t: Transform,
   includeIds = false,
+  /** ページ分割時: このページに描く SD/SG の ID。位置と帯の段は sheet（図全体）で計算する */
+  visibleIds?: Set<string>,
 ) {
   const isH = layout === 'horizontal';
 
@@ -1121,6 +1138,7 @@ function drawSDSGs(
   const bandLayout = computeSDSGBandLayout(sheet, layout, settings, { top: topTotal, bottom: bottomTotal });
 
   for (const sg of sheet.sdsg) {
+    if (visibleIds && !visibleIds.has(sg.id)) continue;
     let wx: number, wy: number, w: number, h: number;
 
     const bk = sdsgBandKey(sg);
@@ -1537,8 +1555,9 @@ function placePeriodLabel(
 // ----------------------------------------------------------------------------
 
 // 幅を持つ SD/SG → 影響先 Box への太い矢印
-function drawSDSGInfluence(b: SVGBuilder, sheet: Sheet, settings: ProjectSettings, t: Transform) {
+function drawSDSGInfluence(b: SVGBuilder, sheet: Sheet, settings: ProjectSettings, t: Transform, visibleIds?: Set<string>) {
   collectInfluenceSegments(sheet, settings.layout, settings).forEach((s) => {
+    if (visibleIds && !visibleIds.has(s.sdsgId)) return;
     const sw = t.toLen(s.strokeWidth);
     const x1 = t.toX(s.x1), y1 = t.toY(s.y1), x2 = t.toX(s.x2), y2 = t.toY(s.y2);
     b.line(x1, y1, x2, y2, { stroke: s.color, strokeWidth: sw });

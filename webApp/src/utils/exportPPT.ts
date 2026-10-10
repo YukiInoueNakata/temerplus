@@ -161,8 +161,12 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array 
     drawPeriodLabels(pres, slide, pageSheet, layout, opts.settings.periodLabels, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility);
     // Line の端点解決と精密クリップのため、常に原シートの全 Box を持つ opts.sheet を渡す
     drawLines(pres, slide, opts.sheet, layout, t, page, mode, showMarkers);
-    drawSDSGs(pres, slide, pageSheet, layout, opts.settings, t);
-    drawSDSGInfluence(pres, slide, pageSheet, opts.settings, t);
+    // SD/SG は図全体（opts.sheet）で位置・帯の段を計算し、描いた位置がこのページに重なるものだけ出す。
+    // 以前は「付いている Box がこのページに見えている」ものだけ残しており、矢印（Line）に付けた SD/SG や
+    // 両端の Box が別ページにある幅モードの SD/SG が全ページで消えていた（2026-10-10 利用者の報告）
+    const sdsgOnPage = sdsgIdsOnPage(opts.sheet, layout, opts.settings, page);
+    drawSDSGs(pres, slide, opts.sheet, layout, opts.settings, t, sdsgOnPage);
+    drawSDSGInfluence(pres, slide, opts.sheet, opts.settings, t, sdsgOnPage);
     drawBoxes(pres, slide, pageSheet, layout, opts.settings, t);
     drawNotes(pres, slide, pageSheet, opts.settings, t);
     // 凡例は全スライドに表示（SPEC）
@@ -262,6 +266,13 @@ function drawIdBadges(
  *   drawLines 側で Liang-Barsky クリップと続マーカーで処理する。
  * Box / SDSG / 時期ラベルの扱いは両モード共通。
  */
+/** ページ分割: 描いた SD/SG（画面と同じ矩形）がこのページの描画窓に重なるものの ID */
+function sdsgIdsOnPage(sheet: Sheet, layout: LayoutDirection, settings: ProjectSettings, page: PageBounds): Set<string> {
+  return new Set(collectSDSGRects(sheet, layout, settings)
+    .filter((r) => rectIntersectsPage(r.rect, page))
+    .map((r) => r.sdsg.id));
+}
+
 function filterSheetForPage(
   sheet: Sheet,
   page: PageBounds,
@@ -747,8 +758,9 @@ function drawBoxSubLabel(slide: PptxGenJS.Slide, b: Box, layout: LayoutDirection
 // ----------------------------------------------------------------------------
 
 // 幅を持つ SD/SG → 影響先 Box への太い矢印
-function drawSDSGInfluence(pres: PptxGenJS, slide: PptxGenJS.Slide, sheet: Sheet, settings: ProjectSettings, t: Transform) {
+function drawSDSGInfluence(pres: PptxGenJS, slide: PptxGenJS.Slide, sheet: Sheet, settings: ProjectSettings, t: Transform, visibleIds?: Set<string>) {
   collectInfluenceSegments(sheet, settings.layout, settings).forEach((s) => {
+    if (visibleIds && !visibleIds.has(s.sdsgId)) return;
     const x1 = t.toX(s.x1), y1 = t.toY(s.y1), x2 = t.toX(s.x2), y2 = t.toY(s.y2);
     slide.addShape(pres.ShapeType.line, {
       x: Math.min(x1, x2), y: Math.min(y1, y2),
@@ -930,6 +942,8 @@ function drawSDSGs(
   layout: LayoutDirection,
   settings: ProjectSettings,
   t: Transform,
+  /** ページ分割時: このページに描く SD/SG の ID。位置と帯の段は sheet（図全体）で計算する */
+  visibleIds?: Set<string>,
 ) {
   const isH = layout === 'horizontal';
   const boxById = new Map(sheet.boxes.map((b) => [b.id, b]));
@@ -970,6 +984,7 @@ function drawSDSGs(
   const bandLayout = computeSDSGBandLayout(sheet, layout, settings, { top: topTotal, bottom: bottomTotal });
 
   for (const sg of sheet.sdsg) {
+    if (visibleIds && !visibleIds.has(sg.id)) continue;
     let wx: number, wy: number, w: number, h: number;
 
     // band モード（機能 OFF なら single モードへ falls through）

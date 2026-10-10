@@ -1602,9 +1602,9 @@ function drawNotes(b: SVGBuilder, sheet: Sheet, settings: ProjectSettings, t: Tr
       const pad = t.toLen(isText ? NOTE_TEXT_PADDING_PX : NOTE_PADDING_PX);
       b.text(x, y, w, h, n.text, {
         fontSize: fontSizeScaled(fs, t), color: normalizeColor(n.color, '#333333'),
-        alignH: isText ? 'center' : 'left', alignV: isText ? 'middle' : 'top',
+        alignH: 'left', alignV: isText ? 'middle' : 'top',
         fontFamily: settings.defaultFont === 'system-ui' ? undefined : settings.defaultFont,
-        wrap: true, paddingX: pad, paddingY: pad, lineHeightRatio: NOTE_LINE_HEIGHT,
+        wrap: !isText, paddingX: pad, paddingY: pad, lineHeightRatio: NOTE_LINE_HEIGHT,
       });
     }
   });

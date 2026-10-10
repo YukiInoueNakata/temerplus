@@ -109,10 +109,11 @@ export function NoteNode({ data, selected }: NodeProps<NoteNodeData>) {
           fontSize,
           lineHeight: NOTE_LINE_HEIGHT,
           color: textColor,
-          whiteSpace: 'pre-wrap',
-          // 文字だけのメモは記号を枠の中央に置き、大きめの記号が枠で切れないようにする
+          // 文字だけのメモは「★ 重要」のように記号の後ろに文字を書けるよう、自動では折り返さない（改行のみ）
+          whiteSpace: isText ? 'pre' : 'pre-wrap',
+          // 文字だけのメモは記号を置いた位置から右へ文字が伸びるよう左揃え（縦は中央）。大きめの記号が枠で切れないようにする
           overflow: isText ? 'visible' : 'hidden',
-          ...(isText ? { display: 'grid', placeItems: 'center', textAlign: 'center' as const } : {}),
+          ...(isText ? { display: 'grid', alignItems: 'center', justifyItems: 'start', textAlign: 'left' as const } : {}),
           boxShadow: selected ? '0 0 0 2px #2684ff' : isText ? 'none' : '1px 1px 3px rgba(0,0,0,0.15)',
           position: 'relative',
         }}
@@ -138,7 +139,7 @@ export function NoteNode({ data, selected }: NodeProps<NoteNodeData>) {
             style={{
               width: '100%', height: '100%', border: 'none', outline: 'none', resize: 'none',
               background: 'transparent', fontSize, lineHeight: NOTE_LINE_HEIGHT, fontFamily: 'inherit', color: textColor,
-              textAlign: isText ? 'center' : undefined,
+              textAlign: isText ? 'left' : undefined,
             }}
           />
         ) : (

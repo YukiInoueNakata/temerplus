@@ -371,7 +371,7 @@ export interface Note {
   text: string;
   /**
    * 既定 'note'（付箋風）。'callout' = 白地の吹き出し風。
-   * 'text' = 枠も背景も無い文字だけ（★・〇 など強調の記号を置く用。中央揃え）
+   * 'text' = 枠も背景も無い文字だけ（★・〇 など強調の記号を置く用。左揃え・自動で折り返さない）
    */
   style?: 'callout' | 'note' | 'text';
   zIndex?: number;

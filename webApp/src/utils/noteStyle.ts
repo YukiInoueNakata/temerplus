@@ -10,3 +10,13 @@ export const NOTE_TEXT_PADDING_PX = 2;
 export const NOTE_LINE_HEIGHT = 1.4;
 /** 「文字だけ」メモで置きやすい記号（強調の後付け用） */
 export const NOTE_SYMBOLS = ['★', '☆', '○', '●', '◎', '△', '▲', '□', '■', '◇', '◆', '※'];
+
+/**
+ * 「文字だけ」メモで記号パレットを押したときの本文。先頭の記号だけを入れ替え、後ろの文字は残す
+ * （「★ 重要」→ ◎ を押す →「◎ 重要」）。先頭が記号でなければ記号を先頭に足す
+ */
+export function applySymbolToText(text: string, sym: string): string {
+  const head = Array.from(text)[0];
+  if (head && NOTE_SYMBOLS.includes(head)) return sym + text.slice(head.length);
+  return text ? `${sym} ${text}` : sym;
+}

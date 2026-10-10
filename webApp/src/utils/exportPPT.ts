@@ -805,7 +805,9 @@ function drawNotes(pres: PptxGenJS, slide: PptxGenJS.Slide, sheet: Sheet, settin
       fontFace: settings.defaultFont,
       color: rgbToHex(n.color ?? '#333333'),
       lineSpacing: fsPt * NOTE_LINE_HEIGHT,
-      align: isText ? 'center' : 'left', valign: isText ? 'middle' : 'top',
+      // 文字だけのメモは画面と同じく自動では折り返さない
+      ...(isText ? { wrap: false } : {}),
+      align: 'left', valign: isText ? 'middle' : 'top',
       margin: pxToPt(isText ? NOTE_TEXT_PADDING_PX : NOTE_PADDING_PX, t.scale),
       ...(isText ? {} : {
         fill: { color: isCallout ? 'FFFFFF' : 'FFF8C5' },

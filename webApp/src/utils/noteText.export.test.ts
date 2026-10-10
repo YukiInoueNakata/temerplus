@@ -18,7 +18,7 @@ const settings: ProjectSettings = {
 };
 
 describe('文字だけのメモ', () => {
-  it('PPTX: 枠・塗りなしで、記号を中央に、指定の色で書く', async () => {
+  it('PPTX: 枠・塗りなしで、指定の色で書く（縦は中央）', async () => {
     const bytes = await exportToPPTX({ sheet, settings, scale: false, returnBytes: true });
     const zip = await JSZip.loadAsync(bytes as Uint8Array);
     const xml = await zip.file('ppt/slides/slide1.xml')!.async('string');
@@ -27,7 +27,6 @@ describe('文字だけのメモ', () => {
     const sp = xml.slice(xml.lastIndexOf('<p:sp>', at), at);
     expect(sp).not.toMatch(/<a:solidFill><a:srgbClr val="FFF8C5"/);
     expect(sp).toMatch(/<a:ln[^>]*>\s*<a:noFill\s*\/>|<a:ln[^/]*\/>|^((?!<a:ln).)*$/s);
-    expect(sp).toMatch(/algn="ctr"/);
     expect(sp).toMatch(/anchor="ctr"/);
     // 3 桁の色（#d33）は 6 桁に広げる（以前は黒になっていた）
     expect(sp).toMatch(/srgbClr val="DD3333"/);
@@ -38,5 +37,20 @@ describe('文字だけのメモ', () => {
     expect(svg).toMatch(/<text[^>]*fill="#d33"[^>]*>★<\/text>/);
     // 付箋の黄色・吹き出しの枠色の矩形が無い
     expect(svg).not.toMatch(/fill="#fff8c5"/);
+  });
+});
+
+describe('記号のあとに文字を書く', () => {
+  it('パレットは先頭の記号だけを入れ替え、後ろの文字は残す', async () => {
+    const { applySymbolToText } = await import('./noteStyle');
+    expect(applySymbolToText('★ 重要', '◎')).toBe('◎ 重要');
+    expect(applySymbolToText('★', '○')).toBe('○');
+    expect(applySymbolToText('重要', '★')).toBe('★ 重要');
+    expect(applySymbolToText('', '★')).toBe('★');
+  });
+  it('SVG: 文字だけのメモは枠が狭くても折り返さず 1 行で書く', () => {
+    const s2 = { ...sheet, notes: [{ ...sheet.notes[0], text: '★ 重要な転機' }] } as unknown as Sheet;
+    const svg = buildSVGDocuments({ sheet: s2, settings, scale: false })[0];
+    expect(svg).toMatch(/<text[^>]*>★ 重要な転機<\/text>/);
   });
 });

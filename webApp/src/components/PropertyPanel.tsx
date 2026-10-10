@@ -5,7 +5,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import type { Box, BoxType, SDSG, Line, AutoFitBoxMode, Note } from '../types';
-import { NOTE_SYMBOLS } from '../utils/noteStyle';
+import { NOTE_SYMBOLS, applySymbolToText } from '../utils/noteStyle';
 import { BOX_TYPE_LABELS } from '../store/defaults';
 import {
   FontFamilyRow,
@@ -2089,9 +2089,9 @@ function NoteProperties({ notes }: { notes: Note[] }) {
               key={sym}
               className="row-btn"
               style={{ minWidth: 26, fontSize: '1.05em' }}
-              title={'「文字だけ」のメモは記号を置き換え、ほかのメモは本文の末尾に足す'}
+              title={'「文字だけ」のメモは先頭の記号を入れ替える（後ろの文字は残る）。ほかのメモは本文の末尾に足す'}
               onClick={() => notes.forEach((n) => updateNotes([n.id], {
-                text: n.style === 'text' ? sym : `${n.text}${sym}`,
+                text: n.style === 'text' ? applySymbolToText(n.text, sym) : `${n.text}${sym}`,
               }))}
             >{sym}</button>
           ))}

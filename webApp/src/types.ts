@@ -73,6 +73,11 @@ export interface Box {
   height: number;
   shape?: BoxShape;                   // 既定: 'rect'（BFPで 'ellipse' 選択可）
   textOrientation?: TextOrientation;  // 既定: 'horizontal'
+  /**
+   * まとめ枠: ほかの Box をまとめて囲む大きな枠として使う（例: 複数の具体的な中身をまとめた P-EFP）。
+   * 種別・番号・凡例・矢印の接続は通常の Box と同じ。常に背面に描き、枠を動かすと中の Box も一緒に動く
+   */
+  isGroup?: boolean;
   autoFitText?: boolean;               // 文字サイズを Box に収まるよう自動縮小
   autoFitBox?: boolean;                // 互換用（true = fit-content 的動作）
   // Box 自動拡張モード:

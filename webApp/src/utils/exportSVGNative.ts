@@ -56,6 +56,7 @@ import { checkAborted, type ProgressCallback } from './exportProgress';
 import { resolveAttachedAnchor, anchorCenter } from './sdsgAttach';
 import { resolveBetweenEndpoint } from './sdsgBetween';
 import { clipPolylineToRect } from './lineClip';
+import { boxesInPaintOrder } from './groupFrame';
 import { sdsgPentagonPoints, sdsgSubLabelShift, SDSG_LABEL_GAP } from './sdsgShape';
 import { APP_FONT_STACK, resolvePptFontFace, measureNormalLineRatio } from './pptText';
 import { wrapLines, canvasMeasurer } from './textMeasure';
@@ -170,6 +171,8 @@ function renderPage(
   // TimeArrow は原シートのレイアウトで計算してページにクリップする
   drawTimeArrow(b, lineSourceSheet ?? sheet, settings.layout, settings.timeArrow, t, settings.sdsgSpace, settings.typeLabelVisibility, pageInnerRect);
   drawPeriodLabels(b, sheet, settings.layout, settings.periodLabels, settings.timeArrow, t, settings.sdsgSpace, settings.typeLabelVisibility);
+  // まとめ枠は矢印・SD/SG・ほかの Box より先に描く（背面）
+  drawBoxes(b, sheet, settings.layout, settings, t, includeIds.box, 'groups');
   drawLines(b, lineSourceSheet ?? sheet, settings.layout, t, includeIds.line, pageInnerRect);
   // ページ分割時は SD/SG を図全体（lineSourceSheet）で計算し、描いた位置がこのページに重なるものだけ出す
   // （以前は付いている Box がページ内のものだけ残し、Line に付けた SD/SG や別ページにまたがる幅モードが消えていた）
@@ -183,7 +186,7 @@ function renderPage(
     drawSDSGs(b, sheet, settings.layout, settings, t, includeIds.sdsg);
     drawSDSGInfluence(b, sheet, settings, t);
   }
-  drawBoxes(b, sheet, settings.layout, settings, t, includeIds.box);
+  drawBoxes(b, sheet, settings.layout, settings, t, includeIds.box, 'others');
   drawNotes(b, sheet, settings, t);
   drawLegend(b, sheet, settings.layout, settings.legend, t, settings.locale);
   return b.build();
@@ -684,8 +687,14 @@ function drawArrowHead(
 // Box
 // ----------------------------------------------------------------------------
 
-function drawBoxes(b: SVGBuilder, sheet: Sheet, layout: LayoutDirection, settings: ProjectSettings, t: Transform, includeIds = false) {
-  for (const bx of sheet.boxes) {
+function drawBoxes(
+  b: SVGBuilder, sheet: Sheet, layout: LayoutDirection, settings: ProjectSettings, t: Transform, includeIds = false,
+  /** 'groups' = まとめ枠だけ（矢印より先に描いて背面に）、'others' = それ以外 */
+  layer?: 'groups' | 'others',
+) {
+  const list = boxesInPaintOrder(sheet.boxes)
+    .filter((bx) => layer === undefined || (layer === 'groups' ? bx.isGroup : !bx.isGroup));
+  for (const bx of list) {
     renderBox(b, bx, layout, settings, sheet, t);
     if (includeIds) drawBoxIdBadge(b, bx, t);
   }

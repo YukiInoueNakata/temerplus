@@ -41,6 +41,7 @@ import {
 import { resolveAttachedAnchor, anchorCenter } from '../utils/sdsgAttach';
 import { resolveBetweenEndpoint } from '../utils/sdsgBetween';
 import { useTEMView } from '../context/TEMViewContext';
+import { itemsInsideGroup } from '../utils/groupFrame';
 
 const nodeTypes = { box: BoxNode, sdsg: SDSGNode, note: NoteNode };
 const edgeTypes = { line: LineEdge };
@@ -236,7 +237,8 @@ function CanvasInner({
         asciiUpright: b.asciiUpright,
         autoFitBoxMode: b.autoFitBoxMode,
       } as BoxNodeData,
-      style: { width: b.width, height: b.height, zIndex: b.zIndex ?? 0 },
+      // まとめ枠は常にほかの Box より背面
+      style: { width: b.width, height: b.height, zIndex: (b.zIndex ?? 0) - (b.isGroup ? 1000 : 0) },
     }));
   }, [sheet, storeBoxIds]);
 
@@ -742,12 +744,28 @@ function CanvasInner({
             const itemOff = shouldRound ? ((Math.round(rawItem / 5) * 5) || 0) : rawItem;
             updateSDSG(ch.id, { timeOffset: timeOff, itemOffset: itemOff });
           } else {
+            // まとめ枠を動かしたら、枠の中の Box・メモも同じだけ動かす（同時に動いているものは除く）
+            const moving = sheet.boxes.find((b) => b.id === ch.id);
+            if (moving?.isGroup && (x !== moving.x || y !== moving.y)) {
+              const ddx = x - moving.x;
+              const ddy = y - moving.y;
+              const movingIds = new Set(changes.filter((c) => c.type === 'position').map((c) => c.id));
+              const inside = itemsInsideGroup(moving, sheet.boxes, sheet.notes ?? []);
+              inside.boxIds.filter((id) => !movingIds.has(id)).forEach((id) => {
+                const b = sheet.boxes.find((o) => o.id === id)!;
+                updateBox(id, { x: b.x + ddx, y: b.y + ddy });
+              });
+              inside.noteIds.filter((id) => !movingIds.has(id)).forEach((id) => {
+                const n = (sheet.notes ?? []).find((o) => o.id === id)!;
+                updateNote(id, { x: n.x + ddx, y: n.y + ddy });
+              });
+            }
             updateBox(ch.id, { x, y });
           }
         }
       }
     },
-    [sheet, updateBox, updateSDSG, snapEnabled, gridPx, layout, settings, sdsgBandComputation]
+    [sheet, updateBox, updateSDSG, updateNote, snapEnabled, gridPx, layout, settings, sdsgBandComputation]
   );
 
   const onConnect = useCallback(

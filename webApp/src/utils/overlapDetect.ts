@@ -20,6 +20,7 @@ import {
 } from './elementRects';
 import { canvasMeasurer, type TextMeasurer } from './textMeasure';
 import type { Pt } from './linePath';
+import { rectInside } from './groupFrame';
 
 export type OverlapCheck = 'labelLabel' | 'boxBox' | 'textOverflow' | 'lineLabel';
 
@@ -160,6 +161,11 @@ export function detectOverlaps(
 
   const bodies = rects.filter((r) => BODY_PARTS.includes(r.part));
   const labels = rects.filter((r) => LABEL_PARTS.includes(r.part));
+  // まとめ枠（Box.isGroup）は中の要素を囲むのが役目なので、枠の本体と、その中に収まる要素の重なりは問題にしない
+  const groupIds = new Set(sheet.boxes.filter((b) => b.isGroup).map((b) => b.id));
+  const isGroupBody = (r: ElementRect) => r.part === 'box' && groupIds.has(r.id);
+  const containedInGroup = (a: ElementRect, b: ElementRect) =>
+    (isGroupBody(a) && rectInside(b.rect, a.rect)) || (isGroupBody(b) && rectInside(a.rect, b.rect));
 
   // --- テキストのはみ出し ---
   if (checks.textOverflow) {
@@ -190,6 +196,7 @@ export function detectOverlaps(
     pairs.forEach(([a, b]) => {
       // 同じ要素に属する部位どうしは対象外（設計上そもそも離して置いている）
       if (a.id === b.id) return;
+      if (containedInGroup(a, b)) return;
       const hit = intersection(shrink(a.rect, tolerance / 2), shrink(b.rect, tolerance / 2));
       if (!hit) return;
       issues.push({
@@ -211,6 +218,7 @@ export function detectOverlaps(
       for (let j = i + 1; j < bodies.length; j++) {
         const a = bodies[i];
         const b = bodies[j];
+        if (containedInGroup(a, b)) continue;
         const hit = intersection(shrink(a.rect, tolerance / 2), shrink(b.rect, tolerance / 2));
         if (!hit) continue;
         issues.push({
@@ -236,8 +244,8 @@ export function detectOverlaps(
       const endpoints = new Set([line?.from, line?.to].filter(Boolean) as string[]);
       const candidates = [
         ...labels,
-        // 始点・終点の Box は通って当然なので除く
-        ...bodies.filter((b) => !endpoints.has(b.id)),
+        // 始点・終点の Box は通って当然なので除く。まとめ枠の本体も、中の Box へ向かう矢印が通るので除く
+        ...bodies.filter((b) => !endpoints.has(b.id) && !isGroupBody(b)),
       ];
       candidates.forEach((target) => {
         const r = shrink(target.rect, tolerance / 2);

@@ -166,7 +166,7 @@ function Inner({
         autoFitBoxMode: 'none',  // プレビュー中は自動拡張・自動文字調整を停止
         autoFitText: false,
       },
-      style: { width: b.width, height: b.height, zIndex: b.zIndex ?? 0 },
+      style: { width: b.width, height: b.height, zIndex: (b.zIndex ?? 0) - (b.isGroup ? 1000 : 0) },
     }));
 
     // band / between モードも考慮した SDSG レンダリング（Canvas.tsx と同じ計算を使用）

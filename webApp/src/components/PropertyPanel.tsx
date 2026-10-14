@@ -394,6 +394,19 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
             ))}
           </select>
         </div>
+        <div className="prop-row">
+          <label title="ほかの Box をまとめて囲む大きな枠にする（例: 複数の具体的な中身をまとめた P-EFP）。常に背面に描き、枠を動かすと中の Box も一緒に動く。オンにすると文字を横書き・上寄せ（見出し）にする">まとめ枠</label>
+          <input
+            type="checkbox"
+            checked={boxes.every((b) => b.isGroup)}
+            onChange={(e) => {
+              const on = e.target.checked;
+              boxes.forEach((b) => updateBox(b.id, on
+                ? { isGroup: true, textOrientation: 'horizontal', style: { ...(b.style ?? {}), verticalAlign: 'top' } }
+                : { isGroup: undefined }));
+            }}
+          />
+        </div>
         {/* 併記種別: 主種別に加えてもう 1 つの種別を採番・凡例に出す（例: 分岐点かつ必須通過点） */}
         {commonType !== undefined && commonType !== 'other' && (
           <div className="prop-row">

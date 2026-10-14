@@ -60,6 +60,7 @@ import { resolveBetweenEndpoint } from './sdsgBetween';
 import { clipPolylineToRect, type Pt as ClipPt } from './lineClip';
 import { applyPptTextDefaults, pxToPt } from './pptText';
 import { NOTE_LINE_HEIGHT, NOTE_PADDING_PX, NOTE_TEXT_PADDING_PX } from './noteStyle';
+import { boxesInPaintOrder } from './groupFrame';
 import { sdsgPptRotation, sdsgSubLabelShift, SDSG_LABEL_GAP, PPTX_SDSG_NAME_PREFIX } from './sdsgShape';
 
 // ----------------------------------------------------------------------------
@@ -134,10 +135,12 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array 
     const slide = applyPptTextDefaults(pres.addSlide());
     drawTimeArrow(pres, slide, opts.sheet, layout, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility);
     drawPeriodLabels(pres, slide, opts.sheet, layout, opts.settings.periodLabels, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility);
+    // まとめ枠は矢印・SD/SG・ほかの Box より先に描く（背面）
+    drawBoxes(pres, slide, opts.sheet, layout, opts.settings, t, 'groups');
     drawLines(pres, slide, opts.sheet, layout, t);
     drawSDSGs(pres, slide, opts.sheet, layout, opts.settings, t);
     drawSDSGInfluence(pres, slide, opts.sheet, opts.settings, t);
-    drawBoxes(pres, slide, opts.sheet, layout, opts.settings, t);
+    drawBoxes(pres, slide, opts.sheet, layout, opts.settings, t, 'others');
     drawNotes(pres, slide, opts.sheet, opts.settings, t);
     drawLegend(pres, slide, opts.sheet, layout, opts.settings.legend, t, opts.settings.locale);
     drawIdBadges(slide, opts.sheet, layout, t, includeIds);
@@ -159,6 +162,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array 
     const pageSheet = filterSheetForPage(opts.sheet, page, layout, mode);
     drawTimeArrow(pres, slide, pageSheet, layout, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility, page, mode, showMarkers);
     drawPeriodLabels(pres, slide, pageSheet, layout, opts.settings.periodLabels, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility);
+    drawBoxes(pres, slide, pageSheet, layout, opts.settings, t, 'groups');
     // Line の端点解決と精密クリップのため、常に原シートの全 Box を持つ opts.sheet を渡す
     drawLines(pres, slide, opts.sheet, layout, t, page, mode, showMarkers);
     // SD/SG は図全体（opts.sheet）で位置・帯の段を計算し、描いた位置がこのページに重なるものだけ出す。
@@ -167,7 +171,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array 
     const sdsgOnPage = sdsgIdsOnPage(opts.sheet, layout, opts.settings, page);
     drawSDSGs(pres, slide, opts.sheet, layout, opts.settings, t, sdsgOnPage);
     drawSDSGInfluence(pres, slide, opts.sheet, opts.settings, t, sdsgOnPage);
-    drawBoxes(pres, slide, pageSheet, layout, opts.settings, t);
+    drawBoxes(pres, slide, pageSheet, layout, opts.settings, t, 'others');
     drawNotes(pres, slide, pageSheet, opts.settings, t);
     // 凡例は全スライドに表示（SPEC）
     drawLegend(pres, slide, pageSheet, layout, opts.settings.legend, t, opts.settings.locale);
@@ -505,8 +509,12 @@ function drawBoxes(
   layout: LayoutDirection,
   settings: ProjectSettings,
   t: Transform,
+  /** 'groups' = まとめ枠だけ（矢印より先に描いて背面に）、'others' = それ以外 */
+  layer?: 'groups' | 'others',
 ) {
-  for (const b of sheet.boxes) {
+  const list = boxesInPaintOrder(sheet.boxes)
+    .filter((b) => layer === undefined || (layer === 'groups' ? b.isGroup : !b.isGroup));
+  for (const b of list) {
     renderBox(pres, slide, b, layout, settings, sheet, t);
   }
 }

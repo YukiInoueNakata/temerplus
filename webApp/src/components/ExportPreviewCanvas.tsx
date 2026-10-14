@@ -101,6 +101,7 @@ function Inner({
     view: {
       zoom: 1, panX: 0, panY: 0,
       showGrid,
+      showHandles: false,
       showPaperGuides: showPaperGuide,
       showLegend: true,
       showComments: false,
@@ -469,6 +470,8 @@ function Inner({
           }}
         >
           <ReactFlow
+            // 出力プレビュー（PNG・PDF はこれを写し取る）では接続点を常に隠す
+            className="temer-hide-handles"
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}

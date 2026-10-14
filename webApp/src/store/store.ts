@@ -248,6 +248,7 @@ interface Actions {
   toggleDataSheet: () => void;
   togglePropertyPanel: () => void;
   toggleGrid: () => void;
+  toggleHandles: () => void;
   toggleSnap: () => void;
   togglePaperGuides: () => void;
   toggleCommentMode: () => void;
@@ -2090,6 +2091,7 @@ export const useTEMStore = create<Store>()(
       toggleDataSheet: () => set((state) => ({ view: { ...state.view, dataSheetVisible: !state.view.dataSheetVisible } })),
       togglePropertyPanel: () => set((state) => ({ view: { ...state.view, propertyPanelVisible: !state.view.propertyPanelVisible } })),
       toggleGrid: () => set((state) => ({ view: { ...state.view, showGrid: !state.view.showGrid } })),
+      toggleHandles: () => set((state) => ({ view: { ...state.view, showHandles: !(state.view.showHandles ?? true) } })),
       toggleSnap: () => set((state) => {
         const next = !state.view.snapEnabled;
         writeSnapEnabled(next);

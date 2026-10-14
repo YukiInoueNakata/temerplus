@@ -172,6 +172,7 @@ export const DEFAULT_VIEW_STATE: ViewState = {
   panX: 0,
   panY: 0,
   showGrid: true,
+  showHandles: true,
   showPaperGuides: false,
   showLegend: true,
   showComments: true,

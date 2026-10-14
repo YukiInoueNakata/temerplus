@@ -1069,3 +1069,9 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
   color: #888;
   background: #fafafa;
 }
+
+/* 接続点（Box の左右の丸）を隠す。「表示 > 接続点」を外したとき・出力プレビュー。
+   見えないだけで、その位置からドラッグすれば矢印はつなげる */
+.temer-hide-handles .react-flow__handle {
+  opacity: 0;
+}

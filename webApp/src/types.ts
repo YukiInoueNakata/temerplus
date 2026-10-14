@@ -810,6 +810,8 @@ export interface ViewState {
   panX: number;
   panY: number;
   showGrid: boolean;
+  /** Box の左右の接続点（矢印をつなぐ丸）を表示するか。発表で画面共有するときに隠せる。出力には常に出ない */
+  showHandles: boolean;
   showPaperGuides: boolean;
   showLegend: boolean;
   showComments: boolean;

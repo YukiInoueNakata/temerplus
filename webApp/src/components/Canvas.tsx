@@ -103,6 +103,7 @@ function CanvasInner({
   const updateSDSG = useTEMStore((s) => s.updateSDSG);
   const canvasMode = useTEMStore((s) => s.view.canvasMode);
   const showGrid = useTEMStore((s) => s.view.showGrid);
+  const showHandles = useTEMStore((s) => s.view.showHandles ?? true);
   const showPaperGuides = useTEMStore((s) => s.view.showPaperGuides);
   const showTopRuler = useTEMStore((s) => s.view.showTopRuler);
   const showLeftRuler = useTEMStore((s) => s.view.showLeftRuler);
@@ -879,6 +880,7 @@ function CanvasInner({
         {showLeftRuler && <LeftRuler layout={layout} />}
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
           <ReactFlow
+            className={showHandles ? undefined : 'temer-hide-handles'}
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}

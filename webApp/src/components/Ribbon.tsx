@@ -698,6 +698,7 @@ function getIconForBoxType(type: BoxType): string {
 function ViewTab({ onOpenPeriodSettings, onOpenPeriodLabels: _onOpenPeriodLabels }: { onOpenPeriodSettings: () => void; onOpenPeriodLabels: () => void }) {
   const view = useTEMStore((s) => s.view);
   const toggleGrid = useTEMStore((s) => s.toggleGrid);
+  const toggleHandles = useTEMStore((s) => s.toggleHandles);
   const toggleSnap = useTEMStore((s) => s.toggleSnap);
   const togglePaperGuides = useTEMStore((s) => s.togglePaperGuides);
   const toggleDataSheet = useTEMStore((s) => s.toggleDataSheet);
@@ -777,6 +778,13 @@ function ViewTab({ onOpenPeriodSettings, onOpenPeriodLabels: _onOpenPeriodLabels
     <>
       <RibbonGroup title="表示">
         <RibbonButton label={view.showGrid ? 'グリッド ✓' : 'グリッド'} icon="⊞" onClick={toggleGrid} active={view.showGrid} />
+        <RibbonButton
+          label={(view.showHandles ?? true) ? '接続点 ✓' : '接続点'}
+          icon="⦿"
+          onClick={toggleHandles}
+          active={view.showHandles ?? true}
+          title="Box の左右の接続点（矢印をつなぐ丸）の表示を切り替える。文字に重なるときや発表で画面共有するときに隠せる（隠しても矢印はつなげる。出力には常に出ない）"
+        />
         <RibbonButton label={view.snapEnabled ? 'スナップ ✓' : 'スナップ'} icon="⊡" onClick={toggleSnap} active={view.snapEnabled} />
         <RibbonButton label={view.showPaperGuides ? '用紙枠 ✓' : '用紙枠'} icon="▭" onClick={togglePaperGuides} active={view.showPaperGuides} />
         {(() => {

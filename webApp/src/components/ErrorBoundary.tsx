@@ -8,7 +8,7 @@ import { Component, type ReactNode, type ErrorInfo } from 'react';
 interface Props {
   children: ReactNode;
   /** フォールバック UI。関数形式ならエラー情報を受け取って JSX を返す */
-  fallback?: ReactNode | ((err: Error) => ReactNode);
+  fallback?: ReactNode | ((err: Error, info: ErrorInfo | null) => ReactNode);
   /** ラベル（デバッグログ識別用） */
   label?: string;
   /** リセット用キー。変わると子ツリーを再マウントしエラー状態を解除 */
@@ -17,30 +17,33 @@ interface Props {
 
 interface State {
   error: Error | null;
+  /** componentDidCatch で受け取る部品の位置（どの部品で起きたか） */
+  info: ErrorInfo | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  state: State = { error: null };
+  state: State = { error: null, info: null };
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): Partial<State> {
     return { error };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
     const label = this.props.label ? `[${this.props.label}] ` : '';
     console.error(`${label}ErrorBoundary caught`, error, info);
+    this.setState({ info });
   }
 
   componentDidUpdate(prevProps: Props): void {
     if (this.state.error && prevProps.resetKey !== this.props.resetKey) {
-      this.setState({ error: null });
+      this.setState({ error: null, info: null });
     }
   }
 
   render(): ReactNode {
     if (this.state.error) {
       const { fallback } = this.props;
-      if (typeof fallback === 'function') return fallback(this.state.error);
+      if (typeof fallback === 'function') return fallback(this.state.error, this.state.info);
       if (fallback !== undefined) return fallback;
       return (
         <div style={{ padding: 16, color: '#c00', fontFamily: 'sans-serif', fontSize: 14 }}>

@@ -53,6 +53,17 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
 }
 
 .ribbon-tab:hover { background: #e0e0e0; }
+/* 「更新情報」に未読の更新があるときの印 */
+.ribbon-new-badge {
+  margin-left: 4px;
+  padding: 0 4px;
+  font-size: 10px;
+  line-height: 14px;
+  color: #fff;
+  background: #d1242f;
+  border-radius: 7px;
+  vertical-align: 1px;
+}
 .ribbon-tab.active {
   background: #fff;
   border: 1px solid #ccc;

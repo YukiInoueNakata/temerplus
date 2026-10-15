@@ -9,6 +9,17 @@ import { useTEMStore } from '../store/store';
 import type { BoxType } from '../types';
 import { BOX_TYPE_LABELS } from '../store/defaults';
 import { pickBetweenAnchors } from '../utils/sdsgBetween';
+import { ChangelogDialog } from './ChangelogDialog';
+import changelogData from '../data/changelog.json';
+import { hasUnseen, CHANGELOG_SEEN_KEY, type ChangelogEntry } from '../utils/changelog';
+
+const readLastSeen = () => {
+  try {
+    return localStorage.getItem(CHANGELOG_SEEN_KEY);
+  } catch {
+    return null;
+  }
+};
 
 type RibbonTab = 'file' | 'home' | 'insert' | 'arrange' | 'view' | 'help';
 
@@ -55,6 +66,13 @@ export function Ribbon({
 }) {
   const [activeTab, setActiveTab] = useState<RibbonTab>('home');
   const { t } = useTranslation();
+  const [changelogOpen, setChangelogOpen] = useState(false);
+  // 前回「更新情報」を開いてから新しい更新があれば、ヘルプタブと更新情報ボタンに「新」を付ける
+  const [unseen, setUnseen] = useState(() => hasUnseen(changelogData as ChangelogEntry[], readLastSeen()));
+  const openChangelog = () => {
+    setChangelogOpen(true);
+    setUnseen(false);
+  };
 
   return (
     <div className="ribbon">
@@ -66,6 +84,7 @@ export function Ribbon({
             onClick={() => setActiveTab(tab)}
           >
             {t(`ribbon.tabs.${tab}`)}
+            {tab === 'help' && unseen && <span className="ribbon-new-badge" title="新しい更新があります">新</span>}
           </button>
         ))}
         <div style={{ flex: 1 }} />
@@ -79,8 +98,9 @@ export function Ribbon({
         {activeTab === 'insert' && <InsertTab onOpenInsertBetween={onOpenInsertBetween} onOpenPeriodLabels={onOpenPeriodLabels} />}
         {activeTab === 'arrange' && <ArrangeTab onOpenOverlapCheck={onOpenOverlapCheck} />}
         {activeTab === 'view' && <ViewTab onOpenPeriodSettings={onOpenPeriodSettings} onOpenPeriodLabels={onOpenPeriodLabels} />}
-        {activeTab === 'help' && <HelpTab onOpenWizard={onOpenWizard} />}
+        {activeTab === 'help' && <HelpTab onOpenWizard={onOpenWizard} onOpenChangelog={openChangelog} unseen={unseen} />}
       </div>
+      <ChangelogDialog open={changelogOpen} onClose={() => setChangelogOpen(false)} />
     </div>
   );
 }
@@ -841,13 +861,14 @@ function ViewTab({ onOpenPeriodSettings, onOpenPeriodLabels: _onOpenPeriodLabels
   );
 }
 
-function HelpTab({ onOpenWizard }: { onOpenWizard?: () => void }) {
+function HelpTab({ onOpenWizard, onOpenChangelog, unseen }: { onOpenWizard?: () => void; onOpenChangelog: () => void; unseen: boolean }) {
   return (
     <RibbonGroup title="サポート">
       <RibbonButton label="起動ウィザード" icon="🪄" onClick={onOpenWizard} title="起動時のウィザードを再表示 (新規作成 / プロジェクトを開く / デモを開く)" />
       <RibbonButton label="ツアー" icon="🎓" disabled title="チュートリアルツアー (開発中)" />
       <RibbonButton label="マニュアル" icon="📘" disabled title="マニュアル (開発中)" />
       <RibbonButton label="動画" icon="🎬" disabled title="動画リンク (開発中)" />
+      <RibbonButton label={unseen ? '更新情報（新）' : '更新情報'} icon="📰" onClick={onOpenChangelog} title="最近の更新（新機能・改善・修正）の一覧" active={unseen} />
       <RibbonButton label="バージョン情報" icon="ℹ" onClick={() => alert('TEMer Plus v0.2.0-dev\n著者: 中田友貴\nライセンス: PolyForm Noncommercial 1.0.0')} />
     </RibbonGroup>
   );

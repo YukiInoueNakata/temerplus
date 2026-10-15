@@ -16,7 +16,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "bench": "vitest bench --run",
-    "gen-large-tem": "node scripts/gen-large-tem.mjs"
+    "gen-large-tem": "node scripts/gen-large-tem.mjs",
+    "changelog": "node scripts/gen-changelog.mjs"
   },
   "dependencies": {
     "@types/papaparse": "^5.5.2",

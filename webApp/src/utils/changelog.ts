@@ -2,7 +2,10 @@
 // changelog - 更新情報（正本は src/data/changelog.json）
 // - アプリ内の「更新情報」ダイアログ、README の「最近の更新」、別サイトに載せる文面を
 //   同じデータから作る。追記は changelog.json だけを直し、`npm run changelog` で README と
-//   別サイト用の文面（docs/changelog/・git 管理外）を作り直す
+//   別サイト用の文面（docs/changelog/・git 管理外）を作り直し、個人サイト
+//   （YukiInoueNakata.github.io の _data/temer_changelog.json・日英の詳細ページが読む）へ写す
+// - 個人サイトの英語ページのため、各項目に英語（en.title・en.detail）を必ず書く。
+//   アプリの画面は日本語だけなので、英文中のボタン名は「"接続点" (connection points)」のように日本語を添える
 // - README との食い違いは changelog.test.ts が止める（CI で落ちる）
 // - scripts/gen-changelog.mjs からも読むので、型注釈を消すだけで動く書き方に限る（enum 等は使わない）
 // ============================================================================
@@ -13,6 +16,8 @@ export interface ChangeItem {
   kind: ChangeKind;
   title: string;
   detail?: string;
+  /** 個人サイトの英語ページ用 */
+  en: { title: string; detail?: string };
 }
 
 export interface ChangelogEntry {
@@ -45,6 +50,8 @@ export function validateChangelog(entries: ChangelogEntry[]): string[] {
     for (const it of e.items ?? []) {
       if (!kinds.includes(it.kind)) errors.push(`種類が違う（新機能・改善・修正のどれか）: ${e.date} ${it.kind}`);
       if (!it.title?.trim()) errors.push(`見出しが空: ${e.date}`);
+      if (!it.en?.title?.trim()) errors.push(`英語の見出し（en.title）が無い: ${e.date} ${it.title}`);
+      if (it.detail && !it.en?.detail?.trim()) errors.push(`英語の説明（en.detail）が無い: ${e.date} ${it.title}`);
     }
   }
   return errors;

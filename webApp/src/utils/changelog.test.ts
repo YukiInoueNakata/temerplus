@@ -31,7 +31,7 @@ describe('更新情報', () => {
   });
 
   it('別サイト用の HTML は文字をエスケープする', () => {
-    const html = renderSiteHtml([{ date: '2026-01-01', items: [{ kind: '修正', title: '<b>&', detail: '"x"' }] }]);
+    const html = renderSiteHtml([{ date: '2026-01-01', items: [{ kind: '修正', title: '<b>&', detail: '"x"', en: { title: 'b', detail: 'x' } }] }]);
     expect(html).toContain('&lt;b&gt;&amp;');
     expect(html).toContain('&quot;x&quot;');
   });

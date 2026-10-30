@@ -469,12 +469,17 @@ export interface VisualConventionEntry {
   description?: string;
 }
 
+// 項目の並びと表示名は utils/visualConventions.ts の VISUAL_CONVENTION_ITEMS（論文 Block 4 の 9 項目）
 export interface VisualConventions {
-  horizontalLength?: VisualConventionEntry;
-  arrowAngle?: VisualConventionEntry;
-  verticalPosition?: VisualConventionEntry;
-  colors?: VisualConventionEntry;
-  lineWeight?: VisualConventionEntry;
+  horizontalLength?: VisualConventionEntry;   // 横軸（時間軸）の間隔
+  verticalPosition?: VisualConventionEntry;   // 縦軸（並置軸）の位置
+  arrowAngle?: VisualConventionEntry;         // 矢印の角度
+  arrowLength?: VisualConventionEntry;        // 矢印の距離（長さ）
+  boxWidth?: VisualConventionEntry;           // Box の横幅
+  boxHeight?: VisualConventionEntry;          // Box の高さ
+  lineWeight?: VisualConventionEntry;         // 線の太さ
+  colors?: VisualConventionEntry;             // 色の使用（塗り・枠線・文字）
+  boxShape?: VisualConventionEntry;           // Box の形状
   other?: Array<{ aspect: string; description: string }>;
 }
 
@@ -785,6 +790,8 @@ export interface TEMDocument {
     participantsInfo?: ParticipantsInfo;
     interview?: InterviewInfo;
     visualConventions?: VisualConventions;
+    /** 図中の記号（★・〇 など文字だけのメモの先頭の記号）の意味。論文用レポートの Block 1 に書く */
+    symbolMeanings?: Record<string, string>;
     reportNotes?: string;
   };
   history: HistoryEntry[];             // 最新50件

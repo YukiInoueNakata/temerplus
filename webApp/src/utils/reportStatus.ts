@@ -1,0 +1,160 @@
+// ============================================================================
+// reportStatus - 論文用レポートの出力前の確認（論文 04_report_format.md 4 節）
+// - 項目ごとの入力状況を「済／未／一部（例: Box の説明 10 件中 8 件）」で示す
+// - 図にあるメモ・記号・コメントを論文用レポートに載せるかを選ばせる（2026-10-30 ユーザー指示）
+// 強制はしない。「記入しない」まま出力することもできる
+// ============================================================================
+
+import type { Note, TEMDocument } from '../types';
+import { NOTE_SYMBOLS } from './noteStyle';
+import { VISUAL_CONVENTION_ITEMS, resolveConventionMeaning } from './visualConventions';
+
+export type ReportItemState = 'done' | 'partial' | 'missing';
+/** 「記入を続ける」で開くタブ */
+export type ReportTab = 'general' | 'notation' | 'participants' | 'interview' | 'visual' | 'export';
+
+export interface ReportStatusItem {
+  key: string;
+  label: string;
+  state: ReportItemState;
+  /** 一部のときの内訳など */
+  detail?: string;
+  /** 入力する場所（タブ）。要素の説明はプロパティパネルで書くので無し */
+  tab?: ReportTab;
+}
+
+/** メモを論文用レポートの「注記」にどう載せるか */
+export type ReportNotesChoice = 'all' | 'flagged' | 'none';
+
+export interface ReportContentChoices {
+  notes?: ReportNotesChoice;
+  /** 記号を図に残し、意味を Block 1（記号の宣言）に書く */
+  symbols?: boolean;
+  /** コメントを「コメント」の節に載せる */
+  comments?: boolean;
+}
+
+const filled = (s?: string) => !!s && s.trim().length > 0;
+
+const isSymbolNote = (n: Note) => n.style === 'text';
+
+/** 記号メモの「記号」（先頭が記号パレットの文字ならその 1 文字、そうでなければ本文） */
+export function symbolKeyOf(n: Note): string {
+  const t = (n.text ?? '').trim();
+  const head = Array.from(t)[0];
+  return head && NOTE_SYMBOLS.includes(head) ? head : t;
+}
+
+/** 文書の中で使っている記号（重複なし・出てきた順） */
+export function usedSymbols(doc: TEMDocument): string[] {
+  const out: string[] = [];
+  for (const sh of doc.sheets) {
+    for (const n of sh.notes ?? []) {
+      if (!isSymbolNote(n)) continue;
+      const k = symbolKeyOf(n);
+      if (k && !out.includes(k)) out.push(k);
+    }
+  }
+  return out;
+}
+
+function countState(label: string, total: number, done: number, key: string): ReportStatusItem | null {
+  if (total === 0) return null;
+  const state: ReportItemState = done === total ? 'done' : done === 0 ? 'missing' : 'partial';
+  return { key, label, state, detail: state === 'partial' ? `${total} 件中 ${done} 件` : `${total} 件` };
+}
+
+/** 図にあるメモ・記号・コメントの件数 */
+export function reportContentCounts(doc: TEMDocument) {
+  let notes = 0;
+  let flaggedNotes = 0;
+  let symbols = 0;
+  let comments = 0;
+  for (const sh of doc.sheets) {
+    for (const n of sh.notes ?? []) {
+      if (isSymbolNote(n)) symbols++;
+      else if (filled(n.text)) {
+        notes++;
+        if (n.includeInReport) flaggedNotes++;
+      }
+    }
+    comments += sh.comments?.length ?? 0;
+  }
+  return { notes, flaggedNotes, symbols, comments };
+}
+
+/** 選ばないと出力できない項目（図にあるものだけ）の表示名 */
+export function missingReportChoices(doc: TEMDocument, choices: ReportContentChoices): string[] {
+  const c = reportContentCounts(doc);
+  const out: string[] = [];
+  if (c.notes > 0 && !choices.notes) out.push('メモ');
+  if (c.symbols > 0 && choices.symbols === undefined) out.push('記号');
+  if (c.comments > 0 && choices.comments === undefined) out.push('コメント');
+  return out;
+}
+
+/** 項目ごとの入力状況 */
+export function computeReportStatus(doc: TEMDocument, choices: ReportContentChoices = {}): ReportStatusItem[] {
+  const m = doc.metadata;
+  const items: ReportStatusItem[] = [];
+
+  // Block 1 記号体系
+  const ns = m.notationSystem;
+  items.push({
+    key: 'notation', label: '記号体系の宣言', tab: 'notation',
+    state: !ns ? 'missing' : ns.base !== 'Arakawa2012' && !filled(ns.customDescription) ? 'partial' : 'done',
+    detail: ns && ns.base !== 'Arakawa2012' && !filled(ns.customDescription) ? '独自・その他の説明が空' : undefined,
+  });
+  // 記号の意味（記号を載せると選んだときだけ）
+  if (choices.symbols) {
+    const syms = usedSymbols(doc);
+    const meant = syms.filter((s) => filled(m.symbolMeanings?.[s])).length;
+    const it = countState('記号の意味', syms.length, meant, 'symbolMeanings');
+    if (it) items.push({ ...it, tab: 'notation' });
+  }
+
+  // Block 2 協力者
+  const pi = m.participantsInfo;
+  const piParts = [!!pi && pi.count > 0, filled(pi?.description)];
+  items.push({
+    key: 'participants', label: '協力者情報', tab: 'participants',
+    state: piParts.every(Boolean) ? 'done' : piParts.some(Boolean) ? 'partial' : 'missing',
+    detail: piParts.some(Boolean) && !piParts.every(Boolean) ? (piParts[0] ? '属性などの記述が空' : '協力者数が 0') : undefined,
+  });
+
+  // Block 3 インタビュー
+  const iv = m.interview;
+  const ivAny = filled(iv?.method) || filled(iv?.durationDescription) || (iv?.timesCount ?? 0) > 0;
+  items.push({
+    key: 'interview', label: 'インタビュー方法', tab: 'interview',
+    state: filled(iv?.method) ? 'done' : ivAny ? 'partial' : 'missing',
+    detail: !filled(iv?.method) && ivAny ? '方法が空' : undefined,
+  });
+
+  // Block 4 表記方針（項目ごと）
+  for (const it of VISUAL_CONVENTION_ITEMS) {
+    const ent = m.visualConventions?.[it.key];
+    const meaning = ent ? resolveConventionMeaning(ent) : undefined;
+    const needsDesc = meaning === 'yes' || meaning === 'loose';
+    items.push({
+      key: `visual.${it.key}`, label: `表記方針: ${it.label}`, tab: 'visual',
+      state: !ent ? 'missing' : needsDesc && !filled(ent.description) ? 'partial' : 'done',
+      detail: ent && needsDesc && !filled(ent.description) ? '説明が空' : undefined,
+    });
+  }
+
+  // Block 5 要素の説明（説明か「説明不要」があれば済）
+  const described = (x: { description?: string; noDescriptionNeeded?: boolean }) => filled(x.description) || !!x.noDescriptionNeeded;
+  const boxes = doc.sheets.flatMap((s) => s.boxes);
+  const lines = doc.sheets.flatMap((s) => s.lines);
+  const sdsg = doc.sheets.flatMap((s) => s.sdsg);
+  for (const it of [
+    countState('Box の説明', boxes.length, boxes.filter(described).length, 'desc.box'),
+    countState('径路の説明', lines.length, lines.filter(described).length, 'desc.line'),
+    countState('SD/SG の説明', sdsg.length, sdsg.filter(described).length, 'desc.sdsg'),
+  ]) if (it) items.push(it);
+
+  return items;
+}
+
+export const REPORT_STATE_LABEL: Record<ReportItemState, string> = { done: '済', partial: '一部', missing: '未' };

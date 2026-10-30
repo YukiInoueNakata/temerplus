@@ -12,7 +12,7 @@ import { useTEMStore } from '../../store/store';
 import { useTEMView } from '../../context/TEMViewContext';
 import type { Note } from '../../types';
 import { collectSDSGRects } from '../../utils/elementRects';
-import { NOTE_PADDING_PX, NOTE_TEXT_PADDING_PX, NOTE_LINE_HEIGHT } from '../../utils/noteStyle';
+import { NOTE_PADDING_PX, NOTE_TEXT_PADDING_PX, NOTE_LINE_HEIGHT, noteKindClass } from '../../utils/noteStyle';
 
 export interface NoteNodeData {
   id: string;
@@ -162,7 +162,7 @@ export function NoteLeaderOverlay() {
   const [panX, panY, zoom] = transform;
   const toScreen = (x: number, y: number) => ({ x: x * zoom + panX, y: y * zoom + panY });
 
-  const segments: Array<{ id: string; x1: number; y1: number; x2: number; y2: number }> = [];
+  const segments: Array<{ id: string; cls: string; x1: number; y1: number; x2: number; y2: number }> = [];
   const needSdsg = sheet.notes.some((n) => n.showLeader && n.leaderTo && sheet.sdsg.some((s) => s.id === n.leaderTo));
   const sdsgRects = needSdsg ? collectSDSGRects(sheet, view.settings.layout, view.settings) : [];
   sheet.notes.forEach((n) => {
@@ -177,7 +177,7 @@ export function NoteLeaderOverlay() {
     if (tx === undefined || ty === undefined) return;
     const from = toScreen(n.x + n.width / 2, n.y + n.height / 2);
     const to = toScreen(tx, ty);
-    segments.push({ id: n.id, x1: from.x, y1: from.y, x2: to.x, y2: to.y });
+    segments.push({ id: n.id, cls: noteKindClass(n.style), x1: from.x, y1: from.y, x2: to.x, y2: to.y });
   });
   if (segments.length === 0) return null;
 
@@ -188,6 +188,7 @@ export function NoteLeaderOverlay() {
       {segments.map((s) => (
         <line
           key={s.id}
+          className={s.cls}
           x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2}
           stroke="#888" strokeWidth={1.2} strokeDasharray="5,4"
         />

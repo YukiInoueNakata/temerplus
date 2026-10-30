@@ -28,6 +28,13 @@ import {
   type ExportPreset,
   type ExportPresetOptions,
 } from '../utils/exportPresets';
+import {
+  applyExportContent,
+  choiceCautions,
+  detectExportContent,
+  missingChoices,
+  type ExportContentChoices,
+} from '../utils/exportContent';
 
 type Format = 'png' | 'svg' | 'pdf' | 'pptx';
 type OutputMethod = Format | 'print';
@@ -221,8 +228,22 @@ export function ExportPreviewDialog({
     };
   }, [dragging]);
 
-  // 変換後 doc（プレビュー / エクスポート両方で使用）
-  const transformed = useMemo(() => applyExportTransform(doc, xf), [doc, xf]);
+  // 出力に含める要素（メモ・記号・コメント・凡例・時期ラベル）。開くたびにすべて未選択から始める
+  const [contentChoices, setContentChoices] = useState<ExportContentChoices>({});
+  useEffect(() => {
+    if (open) setContentChoices({});
+  }, [open]);
+  const contentReport = useMemo(
+    () => detectExportContent(doc.sheets.find((s) => s.id === doc.activeSheetId)),
+    [doc],
+  );
+  const contentMissing = missingChoices(contentReport, contentChoices);
+
+  // 変換後 doc（プレビュー / エクスポート両方で使用）。含める要素の選択もここで当てる
+  const transformed = useMemo(() => {
+    const t = applyExportTransform(doc, xf);
+    return { ...t, doc: applyExportContent(t.doc, contentChoices) };
+  }, [doc, xf, contentChoices]);
 
   // ページ境界を計算（プレビュー / 実出力で共用）
   const pageBounds = useMemo(() => {
@@ -261,6 +282,7 @@ export function ExportPreviewDialog({
     : { width: 1000, maxWidth: '95vw' };
 
   const runExport = async () => {
+    if (contentMissing.length > 0) return;
     setBusy(true);
     setNotice(null);
     const ac = new AbortController();
@@ -348,6 +370,7 @@ export function ExportPreviewDialog({
   };
 
   const runPrint = async () => {
+    if (contentMissing.length > 0) return;
     setBusy(true);
     setNotice(null);
     const ac = new AbortController();
@@ -980,6 +1003,12 @@ export function ExportPreviewDialog({
             </div>
           </div>
         </div>
+        <ExportContentPanel
+          report={contentReport}
+          choices={contentChoices}
+          onChange={(kind, v) => setContentChoices((c) => ({ ...c, [kind]: v }))}
+          disabled={busy}
+        />
         <div
           className="modal-footer"
           style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px' }}
@@ -996,10 +1025,12 @@ export function ExportPreviewDialog({
             <button
               className="ribbon-btn-primary"
               onClick={method === 'print' ? runPrint : runExport}
-              disabled={busy}
+              disabled={busy || contentMissing.length > 0}
               style={{ whiteSpace: 'nowrap', padding: '6px 16px' }}
               title={
-                method === 'print'
+                contentMissing.length > 0
+                  ? `出力に含めるかを選んでください: ${contentMissing.join('、')}`
+                  : method === 'print'
                   ? 'プリンターで印刷（新規ウィンドウを開いてブラウザの印刷ダイアログを表示）'
                   : `${method.toUpperCase()} ファイルとして保存`
               }
@@ -1013,6 +1044,69 @@ export function ExportPreviewDialog({
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ----------------------------------------------------------------------------
+// 出力に含める要素の確認（毎回すべて未選択から。選び終えるまで保存・印刷できない）
+// ----------------------------------------------------------------------------
+
+function ExportContentPanel({
+  report,
+  choices,
+  onChange,
+  disabled,
+}: {
+  report: ReturnType<typeof detectExportContent>;
+  choices: ExportContentChoices;
+  onChange: (kind: keyof ExportContentChoices, value: boolean) => void;
+  disabled: boolean;
+}) {
+  const missing = missingChoices(report, choices);
+  const cautions = [...report.cautions, ...choiceCautions(choices)];
+  return (
+    <div
+      className="export-content-panel"
+      style={{ borderTop: '1px solid #ddd', padding: '8px 14px', background: missing.length ? '#fff8e1' : '#f6f8fa', fontSize: '0.85em' }}
+    >
+      <div style={{ fontWeight: 600, marginBottom: 4 }}>
+        出力に含める要素の確認{missing.length > 0 ? `（あと ${missing.length} 件選んでください）` : '（選択済み）'}
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 20px' }}>
+        {report.items.map((it) => (
+          <div key={it.kind} style={{ display: 'flex', alignItems: 'center', gap: 6 }} title={it.hint}>
+            <span style={{ color: choices[it.kind] === undefined ? '#b36b00' : undefined }}>
+              {it.label}{it.kind !== 'legend' ? `（${it.count} 件）` : ''}
+            </span>
+            {!it.cannotDraw && (
+              <label style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <input
+                  type="radio"
+                  name={`export-content-${it.kind}`}
+                  checked={choices[it.kind] === true}
+                  onChange={() => onChange(it.kind, true)}
+                  disabled={disabled}
+                />
+                含める
+              </label>
+            )}
+            <label style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <input
+                type="radio"
+                name={`export-content-${it.kind}`}
+                checked={choices[it.kind] === false}
+                onChange={() => onChange(it.kind, false)}
+                disabled={disabled}
+              />
+              {it.cannotDraw ? '含めない（図には描けません）' : '含めない'}
+            </label>
+          </div>
+        ))}
+      </div>
+      {cautions.map((c) => (
+        <div key={c} style={{ color: '#b36b00', marginTop: 4 }}>注意: {c}</div>
+      ))}
     </div>
   );
 }

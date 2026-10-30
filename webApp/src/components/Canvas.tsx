@@ -42,6 +42,7 @@ import { resolveAttachedAnchor, anchorCenter } from '../utils/sdsgAttach';
 import { resolveBetweenEndpoint } from '../utils/sdsgBetween';
 import { useTEMView } from '../context/TEMViewContext';
 import { itemsInsideGroup } from '../utils/groupFrame';
+import { noteKindClass } from '../utils/noteStyle';
 
 const nodeTypes = { box: BoxNode, sdsg: SDSGNode, note: NoteNode };
 const edgeTypes = { line: LineEdge };
@@ -479,6 +480,8 @@ function CanvasInner({
     return (sheet.notes ?? []).map((n) => ({
       id: n.id,
       type: 'note',
+      // 論文用レポートの図で、メモ・記号を含めないと選んだときに除くための印（utils/noteStyle.ts）
+      className: noteKindClass(n.style),
       position: { x: n.x, y: n.y },
       selected: sel.has(n.id),
       data: { id: n.id, text: n.text, width: n.width, height: n.height, style: n.style, fontSize: n.fontSize, color: n.color },

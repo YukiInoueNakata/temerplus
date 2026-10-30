@@ -4,7 +4,25 @@
 // - 旧 .tem（hasMeaning: boolean のみ）との相互運用もここに閉じ込める
 // ============================================================================
 
-import type { VisualConventionEntry, VisualConventionMeaning } from '../types';
+import type { VisualConventionEntry, VisualConventionMeaning, VisualConventions } from '../types';
+
+export type VisualConventionKey = Exclude<keyof VisualConventions, 'other'>;
+
+/**
+ * 表記方針の項目（論文 04_report_format.md Block 4 の 9 項目・この順に並べる）。
+ * 入力画面・論文報告の Word 出力・出力前の確認画面がこの一覧を使う
+ */
+export const VISUAL_CONVENTION_ITEMS: { key: VisualConventionKey; label: string; hint?: string }[] = [
+  { key: 'horizontalLength', label: '横軸（時間軸）の間隔' },
+  { key: 'verticalPosition', label: '縦軸（並置軸）の位置' },
+  { key: 'arrowAngle', label: '矢印の角度' },
+  { key: 'arrowLength', label: '矢印の距離（長さ）' },
+  { key: 'boxWidth', label: 'Box の横幅', hint: '時間軸上の位置を Box のどこで読むか（左辺・中心など）も書く' },
+  { key: 'boxHeight', label: 'Box の高さ', hint: '文字量に合わせた（テキスト駆動）か意味を持たせた（意味駆動）か、比べるときの基準（中心など）も書く' },
+  { key: 'lineWeight', label: '線の太さ' },
+  { key: 'colors', label: '色の使用（塗り・枠線・文字）' },
+  { key: 'boxShape', label: 'Box の形状（角丸・直角・楕円）' },
+];
 
 export const CONVENTION_MEANINGS: VisualConventionMeaning[] = ['yes', 'loose', 'no'];
 

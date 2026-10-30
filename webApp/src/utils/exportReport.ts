@@ -16,8 +16,11 @@ import {
   ImageRun,
 } from 'docx';
 import { toPng } from 'html-to-image';
-import { resolveConventionMeaning } from './visualConventions';
+import { resolveConventionMeaning, VISUAL_CONVENTION_ITEMS } from './visualConventions';
 import { boxHasType } from './typeDisplay';
+import { buildFilter } from './exportImage';
+import { NOTE_MEMO_CLASS, NOTE_SYMBOL_CLASS } from './noteStyle';
+import { usedSymbols, type ReportContentChoices } from './reportStatus';
 import type {
   TEMDocument,
   Sheet,
@@ -44,6 +47,13 @@ export interface PaperReportOptions {
    *                     APA 風の括弧引用。協力者 + 回 + 段落番号
    */
   sourceRefStyle?: 'bracket' | 'apa';
+  /**
+   * 未入力の項目を出力に含めないか（既定 true＝論文 04_report_format.md 4 節のとおり含めない）。
+   * false なら「（未入力）」「（説明未記入）」と書いて含める（Word で清書するときに抜けが分かる）
+   */
+  omitMissing?: boolean;
+  /** 図にあるメモ・記号・コメントをどう載せるか（出力前の確認画面で選ぶ）。未指定はメモ＝「載せる」にしたものだけ */
+  content?: ReportContentChoices;
 }
 
 // ----------------------------------------------------------------------------
@@ -111,10 +121,13 @@ const BOX_TYPE_ORDER: BoxType[] = [
 // 各種フォーマッタ
 // ----------------------------------------------------------------------------
 
+// 未入力を書かない（omitMissing）かどうか。exportPaperReport の間だけ切り替える
+let omitMissingNow = true;
+
 function descSuffix(description?: string, noDescriptionNeeded?: boolean): string {
   if (description && description.trim()) return ` — 説明: ${description.trim()}`;
-  if (noDescriptionNeeded) return ' — （説明不要）';
-  return ' — （説明未記入）';
+  if (noDescriptionNeeded) return omitMissingNow ? '' : ' — （説明不要）';
+  return omitMissingNow ? '' : ' — （説明未記入）';
 }
 
 // 原文引用を 1 行で要約。スタイルは bracket / apa を切替可能
@@ -302,6 +315,7 @@ function buildSheetResults(
   participantsLookup: Map<string, string>,
   includeRefs: boolean,
   style: 'bracket' | 'apa',
+  content: ReportContentChoices,
 ): Paragraph[] {
   const out: Paragraph[] = [];
   if (multiSheet) {
@@ -331,13 +345,32 @@ function buildSheetResults(
   // SD / SG
   out.push(...formatSdsg(sheet.sdsg, sheet.boxes, sheet.lines, transcripts, participantsLookup, includeRefs, style));
 
-  // 図上のメモ（includeInReport のものだけ。既定 OFF）
-  const reportNotes = (sheet.notes ?? []).filter((n) => n.includeInReport && (n.text ?? '').trim());
+  // 図上のメモ（記号＝文字だけのメモは除く）。確認画面の選択: すべて／「載せる」にしたものだけ／載せない
+  const notesChoice = content.notes ?? 'flagged';
+  const reportNotes = notesChoice === 'none' ? [] : (sheet.notes ?? []).filter((n) =>
+    n.style !== 'text' && (n.text ?? '').trim() && (notesChoice === 'all' || n.includeInReport));
   if (reportNotes.length > 0) {
     out.push(heading('注記（図上のメモ）', HeadingLevel.HEADING_3));
     reportNotes.forEach((n) => {
       const target = n.showLeader && n.leaderTo ? `（→ ${n.leaderTo}）` : '';
       out.push(bullet(`${n.id}${target} ${n.text.trim().replace(/\s*\n\s*/g, ' ')}`));
+    });
+    out.push(para(''));
+  }
+
+  // コメント（確認画面で「載せる」を選んだときだけ）
+  if (content.comments && (sheet.comments?.length ?? 0) > 0) {
+    out.push(heading('コメント', HeadingLevel.HEADING_3));
+    const nameOf = (id: string) => {
+      const b = sheet.boxes.find((x) => x.id === id);
+      if (b) return `${b.id}〈${(b.label ?? '').trim() || '（ラベル未設定）'}〉`;
+      return id;
+    };
+    const oneLine = (t: string) => t.trim().replace(/\s*\n\s*/g, ' ');
+    sheet.comments.forEach((c) => {
+      const st = c.resolved ? '（解決済み）' : '';
+      out.push(bullet(`${nameOf(c.targetId)}: ${oneLine(c.text)}${st}`));
+      (c.replies ?? []).forEach((r) => out.push(bullet(`返信: ${oneLine(r.text)}`, 1)));
     });
     out.push(para(''));
   }
@@ -349,9 +382,9 @@ function buildSheetResults(
 // 用語凡例
 // ----------------------------------------------------------------------------
 
-function buildGlossary(): Paragraph[] {
+function buildGlossary(sectionTitle: string): Paragraph[] {
   const out: Paragraph[] = [];
-  out.push(heading('用語凡例（図中略語の説明）', HeadingLevel.HEADING_1));
+  out.push(heading(sectionTitle, HeadingLevel.HEADING_1));
   out.push(para('図中で用いた略語は以下のとおりである。'));
   const items: Array<[string, string]> = [
     ['OPP', '必須通過点 (Obligatory Passage Point)'],
@@ -381,9 +414,11 @@ function buildResultsSection(
   doc: TEMDocument,
   includeRefs: boolean,
   style: 'bracket' | 'apa',
+  content: ReportContentChoices,
+  sectionTitle: string,
 ): Paragraph[] {
   const out: Paragraph[] = [];
-  out.push(heading('6. 結果', HeadingLevel.HEADING_1));
+  out.push(heading(sectionTitle, HeadingLevel.HEADING_1));
 
   // 協力者 ID → pseudonym のマップ（APA 引用用）
   const participantsLookup = new Map<string, string>();
@@ -405,7 +440,7 @@ function buildResultsSection(
 
   const multiSheet = doc.sheets.length > 1;
   for (const sheet of doc.sheets) {
-    out.push(...buildSheetResults(sheet, doc.settings.layout, multiSheet, doc.transcripts, participantsLookup, includeRefs, style));
+    out.push(...buildSheetResults(sheet, doc.settings.layout, multiSheet, doc.transcripts, participantsLookup, includeRefs, style, content));
   }
   return out;
 }
@@ -414,11 +449,11 @@ function buildResultsSection(
 // メイン
 // ----------------------------------------------------------------------------
 
-export async function exportPaperReport(
+/** レポートの段落を組み立てる（ダウンロードはしない。テストからも呼ぶ） */
+export async function buildPaperReportParagraphs(
   doc: TEMDocument,
   opts: PaperReportOptions,
-): Promise<void> {
-  const filename = opts.filename ?? 'TEMer_report.docx';
+): Promise<Paragraph[]> {
   const children: Paragraph[] = [];
 
   // タイトル
@@ -435,91 +470,124 @@ export async function exportPaperReport(
   }
   children.push(para(''));
 
-  // 1. 記号体系
+  omitMissingNow = opts.omitMissing !== false;
+  const omit = omitMissingNow;
+  const content = opts.content ?? {};
+  // 節の番号は出力する節だけで振る（未入力の節を省いても番号が飛ばないように）
+  let secNo = 0;
+  const section = (title: string) => children.push(heading(`${++secNo}. ${title}`, HeadingLevel.HEADING_1));
+  const missingPara = () => children.push(para('（未入力）', { italic: true }));
+
+  // 1. 記号体系（Block 1）
   const ns = doc.metadata.notationSystem;
-  children.push(heading('1. 記号体系の宣言', HeadingLevel.HEADING_1));
-  if (ns) {
-    children.push(para(
-      ns.base === 'Arakawa2012'
-        ? '本図は荒川・安田・サトウ（2012）の標準記号に準拠する。'
-        : ns.base === 'custom'
-          ? '本図は独自の記号体系を用いる（下記参照）。'
-          : 'その他の記号体系を用いる（下記参照）。'
-    ));
-    if (ns.customDescription) children.push(para(ns.customDescription));
-  } else {
-    children.push(para('（未入力）', { italic: true }));
-  }
-  children.push(para(''));
-
-  // 2. 協力者情報
-  const pi = doc.metadata.participantsInfo;
-  children.push(heading('2. 協力者情報', HeadingLevel.HEADING_1));
-  if (pi) {
-    if (pi.count > 0) children.push(para(`協力者数: ${pi.count} 名`));
-    if (pi.description) children.push(para(`記述: ${pi.description}`));
-    if (pi.hsiDescription) children.push(para(`HSI 水準: ${pi.hsiDescription}`));
-    if (pi.pseudonyms && pi.pseudonyms.length) {
-      children.push(para(`仮名: ${pi.pseudonyms.join(', ')}`));
+  const symbols = content.symbols ? usedSymbols(doc) : [];
+  const symbolMeanings = doc.metadata.symbolMeanings ?? {};
+  const symbolLines = symbols
+    .map((sym) => ({ sym, meaning: (symbolMeanings[sym] ?? '').trim() }))
+    .filter((x) => x.meaning || !omit);
+  if (ns || symbolLines.length > 0 || !omit) {
+    section('記号体系の宣言');
+    if (ns) {
+      // 「準拠」ではなく「参照」と書く（荒川ら 2012 は自らの手順を標準ではないとしている。論文 Block 1）
+      children.push(para(
+        ns.base === 'Arakawa2012'
+          ? '本図の記号は，荒川・安田・サトウ（2012）を参照した TEMerPlus の既定の表記による。'
+          : ns.base === 'custom'
+            ? '本図は独自の記号体系を用いる（下記参照）。'
+            : 'その他の記号体系を用いる（下記参照）。'
+      ));
+      if (ns.customDescription) children.push(para(ns.customDescription));
+    } else if (!omit) {
+      missingPara();
     }
-  } else {
-    children.push(para('（未入力）', { italic: true }));
-  }
-  children.push(para(''));
-
-  // 3. インタビュー
-  const iv = doc.metadata.interview;
-  children.push(heading('3. インタビュー方法', HeadingLevel.HEADING_1));
-  if (iv) {
-    if (iv.method) children.push(para(`方法: ${iv.method}`));
-    if (iv.durationDescription) children.push(para(`所要時間/期間: ${iv.durationDescription}`));
-    if (iv.timesCount > 0) children.push(para(`回数: ${iv.timesCount} 回`));
-    if (iv.analysisCombination) children.push(para(`分析の組合せ: ${iv.analysisCombination}`));
-    if (iv.notes) children.push(para(`備考: ${iv.notes}`));
-  } else {
-    children.push(para('（未入力）', { italic: true }));
-  }
-  children.push(para(''));
-
-  // 4. 表記方針
-  const vc = doc.metadata.visualConventions;
-  children.push(heading('4. 表記方針', HeadingLevel.HEADING_1));
-  const addConv = (label: string, ent?: VisualConventionEntry) => {
-    if (!ent) return;
-    const meaning = resolveConventionMeaning(ent);
-    const desc = ent.description ?? '';
-    const txt =
-      meaning === 'yes'   ? `${label}: 意味あり。${desc}` :
-      meaning === 'loose' ? `${label}: 緩やかに意味あり。${desc}` :
-                            `${label}: 意味なし（見栄えのみ）`;
-    children.push(para(txt));
-  };
-  if (vc) {
-    addConv('横軸の長さ',      vc.horizontalLength);
-    addConv('矢印の角度',      vc.arrowAngle);
-    addConv('縦の位置',        vc.verticalPosition);
-    addConv('色',              vc.colors);
-    addConv('線の太さ',        vc.lineWeight);
-    if (vc.other) {
-      vc.other.forEach((o) => children.push(para(`${o.aspect}: ${o.description}`)));
+    if (symbolLines.length > 0) {
+      children.push(para('図中の記号の意味は次のとおりである。'));
+      symbolLines.forEach((x) => children.push(bullet(`${x.sym}: ${x.meaning || '（意味未記入）'}`)));
     }
-  } else {
-    children.push(para('（未入力）', { italic: true }));
-  }
-  if (doc.metadata.reportNotes) {
     children.push(para(''));
-    children.push(heading('補足', HeadingLevel.HEADING_2));
-    children.push(para(doc.metadata.reportNotes));
   }
-  children.push(para(''));
+
+  // 2. 協力者情報（Block 2）
+  const pi = doc.metadata.participantsInfo;
+  const piLines: string[] = [];
+  if (pi) {
+    if (pi.count > 0) piLines.push(`協力者数: ${pi.count} 名`);
+    if (pi.description) piLines.push(`記述: ${pi.description}`);
+    if (pi.hsiDescription) piLines.push(`HSI 水準: ${pi.hsiDescription}`);
+    if (pi.pseudonyms && pi.pseudonyms.length) piLines.push(`仮名: ${pi.pseudonyms.join(', ')}`);
+  }
+  if (piLines.length > 0 || !omit) {
+    section('協力者情報');
+    if (piLines.length > 0) piLines.forEach((t) => children.push(para(t)));
+    else missingPara();
+    children.push(para(''));
+  }
+
+  // 3. インタビュー（Block 3）
+  const iv = doc.metadata.interview;
+  const ivLines: string[] = [];
+  if (iv) {
+    if (iv.method) ivLines.push(`方法: ${iv.method}`);
+    if (iv.durationDescription) ivLines.push(`所要時間/期間: ${iv.durationDescription}`);
+    if (iv.timesCount > 0) ivLines.push(`回数: ${iv.timesCount} 回`);
+    if (iv.analysisCombination) ivLines.push(`分析の組合せ: ${iv.analysisCombination}`);
+    if (iv.notes) ivLines.push(`備考: ${iv.notes}`);
+  }
+  if (ivLines.length > 0 || !omit) {
+    section('インタビュー方法');
+    if (ivLines.length > 0) ivLines.forEach((t) => children.push(para(t)));
+    else missingPara();
+    children.push(para(''));
+  }
+
+  // 4. 表記方針（Block 4・論文の 9 項目の順）
+  const vc = doc.metadata.visualConventions;
+  const convLines: string[] = [];
+  for (const it of VISUAL_CONVENTION_ITEMS) {
+    const ent: VisualConventionEntry | undefined = vc?.[it.key];
+    if (!ent) {
+      if (!omit) convLines.push(`${it.label}: （未入力）`);
+      continue;
+    }
+    const meaning = resolveConventionMeaning(ent);
+    const desc = (ent.description ?? '').trim();
+    const descOrMissing = desc || (omit ? '' : '（説明未記入）');
+    convLines.push(
+      meaning === 'yes'   ? `${it.label}: 意味あり。${descOrMissing}` :
+      meaning === 'loose' ? `${it.label}: 緩やかに意味あり。${descOrMissing}` :
+                            `${it.label}: 意味なし（見栄えのみ）`
+    );
+  }
+  vc?.other?.forEach((o) => convLines.push(`${o.aspect}: ${o.description}`));
+  if (convLines.length > 0 || doc.metadata.reportNotes || !omit) {
+    section('表記方針');
+    convLines.forEach((t) => children.push(para(t)));
+    if (doc.metadata.reportNotes) {
+      children.push(para(''));
+      children.push(heading('補足', HeadingLevel.HEADING_2));
+      children.push(para(doc.metadata.reportNotes));
+    }
+    children.push(para(''));
+  }
 
   // 5. 図（埋込）
   if (opts.includeDiagram && opts.diagramElementId) {
-    children.push(heading('5. TEM 図', HeadingLevel.HEADING_1));
+    section('TEM 図');
     try {
       const el = document.getElementById(opts.diagramElementId);
       if (el) {
-        const dataUrl = await toPng(el, { backgroundColor: '#ffffff', pixelRatio: 2 });
+        // 接続点・リサイズ枠などの編集用の部品は除き、載せないと選んだメモ・記号も除く
+        const base = buildFilter({ includeGrid: false, includePaperGuides: false, includeRulers: false, background: 'white' });
+        const hideMemo = (content.notes ?? 'flagged') === 'none';
+        const hideSymbol = content.symbols === false;
+        const filter = (node: HTMLElement) => {
+          if (!base(node)) return false;
+          if (!(node instanceof Element)) return true;
+          if (hideMemo && node.classList?.contains(NOTE_MEMO_CLASS)) return false;
+          if (hideSymbol && node.classList?.contains(NOTE_SYMBOL_CLASS)) return false;
+          return true;
+        };
+        const dataUrl = await toPng(el, { backgroundColor: '#ffffff', pixelRatio: 2, filter });
         const bytes = await fetchPngBytes(dataUrl);
         const rect = el.getBoundingClientRect();
         const maxW = 600;
@@ -549,11 +617,20 @@ export async function exportPaperReport(
   // 6. 結果（漏れなく図要素を列挙）
   const includeRefs = opts.includeSourceRefs !== false;   // 既定 true
   const style = opts.sourceRefStyle ?? 'bracket';
-  children.push(...buildResultsSection(doc, includeRefs, style));
+  children.push(...buildResultsSection(doc, includeRefs, style, content, `${++secNo}. 結果`));
 
   // 7. 用語凡例
-  children.push(...buildGlossary());
+  children.push(...buildGlossary(`${++secNo}. 用語凡例（図中略語の説明）`));
 
+  return children;
+}
+
+export async function exportPaperReport(
+  doc: TEMDocument,
+  opts: PaperReportOptions,
+): Promise<void> {
+  const filename = opts.filename ?? 'TEMer_report.docx';
+  const children = await buildPaperReportParagraphs(doc, opts);
   const docx = new Document({ sections: [{ children }] });
   const blob = await Packer.toBlob(docx);
   const url = URL.createObjectURL(blob);

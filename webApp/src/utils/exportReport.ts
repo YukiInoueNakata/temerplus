@@ -548,7 +548,7 @@ export async function buildPaperReportParagraphs(
     children.push(para(''));
   }
 
-  // 4. 表記方針（Block 4・論文の 9 項目の順）
+  // 4. 表記方針（Block 4・論文の表の順・11 項目）
   const vc = doc.metadata.visualConventions;
   const convLines: string[] = [];
   for (const it of VISUAL_CONVENTION_ITEMS) {

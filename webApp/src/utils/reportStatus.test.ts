@@ -36,11 +36,12 @@ async function reportText(doc: TEMDocument, opts: Partial<Parameters<typeof buil
     .filter(Boolean);
 }
 
-describe('表記方針は論文 Block 4 の 9 項目', () => {
+describe('表記方針は論文 Block 4 の表の 11 項目（影・立体感は TEMer に機能が無いので除く）', () => {
   it('項目と並び', () => {
     expect(VISUAL_CONVENTION_ITEMS.map((i) => i.key)).toEqual([
       'horizontalLength', 'verticalPosition', 'arrowAngle', 'arrowLength',
       'boxWidth', 'boxHeight', 'lineWeight', 'colors', 'boxShape',
+      'fontDecoration', 'textAlignment',
     ]);
   });
 });
@@ -49,7 +50,10 @@ describe('出力前の確認: 入力状況', () => {
   it('何も書いていなければ未。Box の説明は件数つき', () => {
     const st = computeReportStatus(fresh());
     expect(st.find((s) => s.key === 'notation')?.state).toBe('missing');
-    expect(st.filter((s) => s.key.startsWith('visual.'))).toHaveLength(9);
+    // 出力前の確認画面にも 11 項目すべてが並ぶ（足した フォント装飾・テキスト配置 も）
+    expect(st.filter((s) => s.key.startsWith('visual.'))).toHaveLength(11);
+    expect(st.map((s) => s.label)).toContain('表記方針: フォント装飾（太字・斜体・サイズ）');
+    expect(st.map((s) => s.label)).toContain('表記方針: テキスト配置（中央・左寄せなど）');
     expect(st.filter((s) => s.key.startsWith('visual.')).every((s) => s.state === 'missing')).toBe(true);
     expect(st.find((s) => s.key === 'desc.box')?.state).toBe('missing');
   });

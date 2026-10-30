@@ -9,8 +9,9 @@ import type { VisualConventionEntry, VisualConventionMeaning, VisualConventions 
 export type VisualConventionKey = Exclude<keyof VisualConventions, 'other'>;
 
 /**
- * 表記方針の項目（論文 04_report_format.md Block 4 の 9 項目・この順に並べる）。
- * 入力画面・論文報告の Word 出力・出力前の確認画面がこの一覧を使う
+ * 表記方針の項目（論文 04_report_format.md Block 4 の表の順に並べる）。
+ * 入力画面・論文報告の Word 出力・出力前の確認画面がこの一覧を使う。
+ * 表の 12 行のうち「影・立体感の付与」は TEMer に影の機能が無いので入れない（2026-10-30 ユーザー決定）
  */
 export const VISUAL_CONVENTION_ITEMS: { key: VisualConventionKey; label: string; hint?: string }[] = [
   { key: 'horizontalLength', label: '横軸（時間軸）の間隔' },
@@ -22,6 +23,8 @@ export const VISUAL_CONVENTION_ITEMS: { key: VisualConventionKey; label: string;
   { key: 'lineWeight', label: '線の太さ' },
   { key: 'colors', label: '色の使用（塗り・枠線・文字）' },
   { key: 'boxShape', label: 'Box の形状（角丸・直角・楕円）' },
+  { key: 'fontDecoration', label: 'フォント装飾（太字・斜体・サイズ）' },
+  { key: 'textAlignment', label: 'テキスト配置（中央・左寄せなど）' },
 ];
 
 export const CONVENTION_MEANINGS: VisualConventionMeaning[] = ['yes', 'loose', 'no'];

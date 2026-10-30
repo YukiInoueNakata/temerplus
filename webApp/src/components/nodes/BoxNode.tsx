@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Handle, NodeResizer, Position, type NodeProps } from 'reactflow';
 import type { Box } from '../../types';
 import { BOX_RENDER_SPECS } from '../../store/defaults';
-import { resolveBoxVisuals } from '../../utils/boxPreset';
+import { resolveBoxVisuals, resolveBoxBorderDraw } from '../../utils/boxPreset';
 import { computeBoxDisplay } from '../../utils/typeDisplay';
 import { renderVerticalAwareText } from '../../utils/verticalText';
 import { renderRichText } from '../../utils/richText';
@@ -54,6 +54,8 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
   // 優先順位: box 個別値 > preset > 工場出荷時 (BOX_RENDER_SPECS)
   const boxForPreset = view.sheet?.boxes.find((b) => b.id === data.id);
   const visuals = boxForPreset ? resolveBoxVisuals(boxForPreset, view.settings) : null;
+  // テーマで線種・太さを指定しているか（P-EFP の二重の点線を使うかの判定。utils/boxPreset.ts resolveBoxBorderDraw）
+  const hasPresetBorder = !!boxForPreset && resolveBoxBorderDraw(boxForPreset, view.settings).kind !== 'factory';
   const shape = visuals?.shape ?? data.shape ?? spec.defaultShape;
   const isTextVertical = data.textOrientation === 'vertical';
   const isVerticalLayout = layout === 'vertical';
@@ -265,7 +267,8 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
     // width/height auto で box 内の子サイズを自然に、grid justifyItems/alignItems で配置
   };
 
-  const isPEfp = data.type === 'P-EFP' || data.type === 'P-2nd-EFP';
+  // P-EFP の二重の点線は、テーマで線種・太さを指定していないときだけ（指定があればその指定どおり）
+  const isPEfp = (data.type === 'P-EFP' || data.type === 'P-2nd-EFP') && !hasPresetBorder;
   const borderStyle: React.CSSProperties = shape === 'ellipse'
     ? { borderRadius: '50%', border: `${specBorderWidth}px ${specBorderStyle} ${borderColor}` }
     : isPEfp

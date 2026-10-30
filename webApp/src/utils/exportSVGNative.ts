@@ -44,7 +44,7 @@ import {
   computeAngleEndpoints,
   clampAngleDeg,
 } from './lineDirection';
-import { resolveBoxVisuals } from './boxPreset';
+import { resolveBoxVisuals, resolveBoxBorderDraw } from './boxPreset';
 import {
   computeLinePath,
   applyLinePathMargins,
@@ -744,7 +744,15 @@ function renderBox(
     }
   };
 
-  switch (bx.type) {
+  // テーマで線種・太さを指定しているときはその指定どおり（画面と同じ）。指定が無ければ種別ごとの既定の描き方
+  const border = resolveBoxBorderDraw(bx, settings);
+  if (border.kind === 'single') {
+    drawShape(x, y, w, h, border.width, border.style === 'dashed' ? '5 3' : border.style === 'dotted' ? '2 2' : undefined, fill);
+  } else if (border.kind === 'double') {
+    drawShape(x, y, w, h, 1, undefined, fill);
+    const ins = Math.max(1.5, 0.025 * Math.min(w, h));
+    drawShape(x + ins, y + ins, Math.max(0.5, w - ins * 2), Math.max(0.5, h - ins * 2), 1, undefined, 'none');
+  } else switch (bx.type) {
     case 'EFP':
     case '2nd-EFP': {
       drawShape(x, y, w, h, 1, undefined, fill);

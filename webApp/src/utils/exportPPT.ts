@@ -46,7 +46,7 @@ import {
   computeAngleEndpoints,
   clampAngleDeg,
 } from './lineDirection';
-import { resolveBoxVisuals } from './boxPreset';
+import { resolveBoxVisuals, resolveBoxBorderDraw } from './boxPreset';
 import {
   computeLinePath,
   applyLinePathMargins,
@@ -538,7 +538,28 @@ function renderBox(
   const isEllipse = visuals.shape === 'ellipse';
   const shapeType = isEllipse ? pres.ShapeType.ellipse : pres.ShapeType.rect;
 
-  switch (b.type) {
+  // テーマで線種・太さを指定しているときはその指定どおり（画面と同じ）。指定が無ければ種別ごとの既定の描き方
+  const border = resolveBoxBorderDraw(b, settings);
+  if (border.kind === 'single') {
+    slide.addShape(shapeType, {
+      x, y, w, h,
+      fill,
+      line: {
+        color: borderColor, width: border.width,
+        dashType: border.style === 'dashed' ? 'dash' : border.style === 'dotted' ? 'sysDot' : undefined,
+      },
+    });
+  } else if (border.kind === 'double') {
+    slide.addShape(shapeType, { x, y, w, h, fill, line: { color: borderColor, width: 1 } });
+    const ins = Math.max(0.015, 0.025 * Math.min(w, h));
+    slide.addShape(shapeType, {
+      x: x + ins, y: y + ins,
+      w: Math.max(0.01, w - ins * 2),
+      h: Math.max(0.01, h - ins * 2),
+      fill: { color: 'FFFFFF', transparency: 100 },
+      line: { color: borderColor, width: 1 },
+    });
+  } else switch (b.type) {
     case 'EFP':
     case '2nd-EFP': {
       // 二重線: 外枠 + 内枠の 2 矩形重ね描き（PptxGenJS が cmpd='dbl' を未サポート）

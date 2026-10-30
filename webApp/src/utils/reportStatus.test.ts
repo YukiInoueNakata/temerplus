@@ -27,8 +27,8 @@ function fresh(edit?: (d: TEMDocument) => void): TEMDocument {
 const active = (d: TEMDocument) => d.sheets.find((s) => s.id === d.activeSheetId)!;
 
 /** 生成した Word の本文（段落ごと） */
-async function reportText(doc: TEMDocument, opts: Parameters<typeof buildPaperReportParagraphs>[1]): Promise<string[]> {
-  const children = await buildPaperReportParagraphs(doc, { includeDiagram: false, ...opts });
+async function reportText(doc: TEMDocument, opts: Partial<Parameters<typeof buildPaperReportParagraphs>[1]>): Promise<string[]> {
+  const children = await buildPaperReportParagraphs(doc, { ...opts, includeDiagram: false });
   const buf = await Packer.toBuffer(new Document({ sections: [{ children }] }));
   const xml = await (await JSZip.loadAsync(buf)).file('word/document.xml')!.async('string');
   return [...xml.matchAll(/<w:p[ >][\s\S]*?<\/w:p>/g)]
@@ -98,8 +98,11 @@ describe('論文用レポートの Word', () => {
     const t = await reportText(d, {});
     expect(t).not.toContain('（未入力）');
     expect(t.some((p) => p.includes('説明未記入'))).toBe(false);
-    expect(t).toContain('1. インタビュー方法');
-    expect(t).toContain('2. 結果');
+    // 記号の宣言は図の線種から書くので必ず出る。協力者・表記方針は未入力なので出さず、番号を詰める
+    expect(t).toContain('1. 記号体系の宣言');
+    expect(t).toContain('2. インタビュー方法');
+    expect(t).toContain('3. 結果');
+    expect(t.some((p) => p.startsWith('協力者') || p.endsWith('協力者情報'))).toBe(false);
   });
 
   it('「（未入力）」と書いて含める: 9 項目すべてと要素の説明の抜けが分かる', async () => {

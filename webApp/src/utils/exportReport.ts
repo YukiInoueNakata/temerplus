@@ -21,6 +21,7 @@ import { boxHasType } from './typeDisplay';
 import { buildFilter } from './exportImage';
 import { NOTE_MEMO_CLASS, NOTE_SYMBOL_CLASS } from './noteStyle';
 import { usedSymbols, type ReportContentChoices } from './reportStatus';
+import { describeNotation } from './notationDescribe';
 import type {
   TEMDocument,
   Sheet,
@@ -485,7 +486,9 @@ export async function buildPaperReportParagraphs(
   const symbolLines = symbols
     .map((sym) => ({ sym, meaning: (symbolMeanings[sym] ?? '').trim() }))
     .filter((x) => x.meaning || !omit);
-  if (ns || symbolLines.length > 0 || !omit) {
+  // 各要素の線種と線種が表す意味は、今の図の実際の線種から書く（設定画面のテーマで選んだ表記がそのまま出る）
+  const notation = describeNotation(doc);
+  if (ns || notation || symbolLines.length > 0 || !omit) {
     section('記号体系の宣言');
     if (ns) {
       // 「準拠」ではなく「参照」と書く（荒川ら 2012 は自らの手順を標準ではないとしている。論文 Block 1）
@@ -499,6 +502,11 @@ export async function buildPaperReportParagraphs(
       if (ns.customDescription) children.push(para(ns.customDescription));
     } else if (!omit) {
       missingPara();
+    }
+    if (notation) {
+      children.push(para(notation.meaning));
+      children.push(para('各要素の枠の線種は次のとおりである。'));
+      notation.lines.forEach((l) => children.push(bullet(l)));
     }
     if (symbolLines.length > 0) {
       children.push(para('図中の記号の意味は次のとおりである。'));

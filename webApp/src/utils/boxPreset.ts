@@ -79,3 +79,24 @@ export function resolveBoxVisuals(box: Box, settings: ProjectSettings): Resolved
     subLabelBorderWidth: box.subLabelBorderWidth ?? preset.subLabelBorderWidth,
   };
 }
+
+/**
+ * Box の枠の描き方（画面・PPTX・SVG で共通）。
+ * - 'factory': テーマ（boxTypePresets）で線種も太さも指定していない。種別ごとの既定の描き方
+ *   （EFP の二重線・P-EFP の二重の点線など）をそのまま使う
+ * - 'single' / 'double': テーマの指定どおりに描く。
+ *   以前は PPTX・SVG がテーマの線種・太さを見ずに種別で決め打ちしており、画面と食い違っていた
+ *   （記号の簡素化方式＝線種を実在性だけに使うテーマ を入れたときに判明。2026-10-30）
+ */
+export type BoxBorderDraw =
+  | { kind: 'factory' }
+  | { kind: 'single'; style: 'solid' | 'dashed' | 'dotted'; width: number }
+  | { kind: 'double'; width: number };
+
+export function resolveBoxBorderDraw(box: Box, settings: ProjectSettings): BoxBorderDraw {
+  const p = getBoxPreset(box.type, settings);
+  if (p.borderStyle === undefined && p.borderWidth === undefined) return { kind: 'factory' };
+  const v = resolveBoxVisuals(box, settings);
+  if (v.borderStyle === 'double') return { kind: 'double', width: v.borderWidth };
+  return { kind: 'single', style: v.borderStyle, width: v.borderWidth };
+}

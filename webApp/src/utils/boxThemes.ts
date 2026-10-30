@@ -69,6 +69,26 @@ export const BUILTIN_THEMES: BoxStyleTheme[] = [
     },
   },
   {
+    // 記号の簡素化方式（論文 04_report_format.md 補論）: 線種は実在性だけを表す。
+    // 観察された経験（通常・BFP・EFP・OPP・2nd EFP・その他）は同じ実線、観察されなかった経験（潜在経験）は点線。
+    // P-EFP・P-2nd EFP も点線（観察されなかった側。2026-10-30 ユーザー決定）。種別は種別ラベル（自動採番）で示す
+    id: 'theme-simplified-reality',
+    name: '簡素化方式（線種は実在性だけ・種別はラベル）',
+    description: '実線＝観察された、点線＝観察されなかった。EFP・OPP などの種別は線種でなく種別ラベルで示す。論文用レポートの記号体系の宣言にそのまま書き出す。',
+    builtin: true,
+    presets: {
+      normal:      { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
+      other:       { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
+      BFP:         { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
+      OPP:         { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
+      EFP:         { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
+      '2nd-EFP':   { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
+      'P-EFP':     { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'dashed' },
+      'P-2nd-EFP': { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'dashed' },
+      annotation:  { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'dashed' },
+    },
+  },
+  {
     id: 'theme-paper-bold',
     name: '論文向け（太枠モノクロ）',
     description: 'モノクロ + 太枠で印刷時の視認性を確保。',

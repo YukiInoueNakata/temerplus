@@ -1,5 +1,16 @@
 [
   {
+    "date": "2026-10-30",
+    "items": [
+      {"kind":"新機能","title":"出力の前に、含める要素を確認","detail":"出力プレビューで、メモ・記号・コメント・凡例・時期ラベルを図に含めるかを毎回選びます。選び終えるまで保存できません。時期ラベルが無いときや、凡例を含めないときは注意が出ます。","en":{"title":"Confirm what to include before exporting","detail":"In the export preview, choose each time whether to include notes, symbols, comments, the legend and period labels. Saving is disabled until every choice is made, and a caution appears when there are no period labels or the legend is left out."}},
+      {"kind":"新機能","title":"論文用レポートの出力前の確認画面","detail":"項目ごとの入力状況を「済・未・一部（Box の説明 37 件中 8 件 など）」で示し、「記入を続ける」か「このまま出力する」かを選べます。図にあるメモ・記号・コメントを載せるか、未入力の項目を出力に含めるかもここで選びます。","en":{"title":"Check screen before the paper report","detail":"Shows the status of each item as done, missing or partial (e.g., box descriptions: 8 of 37) and lets you continue editing or export as is. You also choose here whether to include notes, symbols and comments, and whether to include missing items."}},
+      {"kind":"改善","title":"表記方針を 9 項目に","detail":"論文用レポートの表記方針に、矢印の距離・Box の横幅・Box の高さ・Box の形状を足しました。","en":{"title":"Nine items in the visual conventions","detail":"Arrow length, box width, box height and box shape were added to the visual conventions in the paper report."}},
+      {"kind":"新機能","title":"記号の簡素化方式（線種は実在性だけ）","detail":"設定の Box スタイルのテーマに「簡素化方式」を足しました。実線＝観察された、点線＝観察されなかった経験とし、EFP・OPP などの種別は種別ラベルで示します。論文用レポートの記号体系の宣言には、今の図の線種がそのまま書き出されます。","en":{"title":"Simplified notation (line style shows reality only)","detail":"A \"簡素化方式\" (simplified) theme was added to the box style themes in Settings. Solid lines mean observed and dashed lines mean not observed; types such as EFP and OPP are shown by type labels. The paper report's notation declaration describes the line styles actually used in the diagram."}},
+      {"kind":"修正","title":"Box のテーマの線種が PPTX・SVG に出ない不具合","detail":"テーマで指定した枠の線種・太さを、PPTX・SVG でも画面と同じに描くようにしました。","en":{"title":"Box theme line styles missing from PPTX and SVG","detail":"Border styles and widths set by a theme are now drawn in PPTX and SVG the same as on screen."}},
+      {"kind":"修正","title":"凡例・時期ラベルの出力が形式によって食い違う不具合","detail":"PNG・PDF と PPTX・SVG とで、凡例や時期ラベルが出るかどうかが食い違うことがあったのを揃えました。","en":{"title":"Legend and period labels differing between export formats","detail":"Whether the legend and period labels appear is now the same in PNG, PDF, PPTX and SVG."}}
+    ]
+  },
+  {
     "date": "2026-10-15",
     "items": [
       {"kind":"新機能","title":"まとめ枠","detail":"Box のプロパティで「まとめ枠」にチェックすると、中に置いた Box をまとめて囲む枠になります（例: いくつかの潜在経験をまとめた P-EFP）。枠を動かすと中の Box とメモも一緒に動きます。","en":{"title":"Group frame","detail":"Tick \"まとめ枠\" (group frame) in a box's properties to turn it into a frame that encloses the boxes placed inside it (e.g., a P-EFP grouping several latent experiences). Moving the frame moves the boxes and notes inside it as well."}},

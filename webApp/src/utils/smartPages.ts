@@ -60,8 +60,19 @@ export function computeSmartPagesForDoc(doc: TEMDocument, opts: SmartPagesOption
     if (items.length > 0) {
       const cols = computeLegendColumns(lg, doc.settings.layout, items.length);
       const est = estimateLegendSize(lg, items, cols);
-      const svgW = ((lg.sampleWidth ?? 32) + 16 + Math.max(100, lg.fontSize * 10)) * cols + (cols - 1) * 12 + 20;
-      legendSize = { w: Math.max(est.w, svgW, lg.minWidth), h: est.h };
+      // SVG の凡例（exportSVGNative の drawLegend）と同じ寸法の決め方。各ページにはこれを重ねる
+      // （画面の凡例の見積もりだけだと、説明文つきなどで実際より小さく、下端・右端ではみ出しえた。pass-3）
+      const fs = lg.fontSize;
+      const tfs = lg.titleFontSize ?? fs * 1.15;
+      const showTitle = lg.showTitle !== false;
+      const rows = Math.ceil(items.length / cols);
+      const rowH = Math.max(fs * (lg.showDescriptions ? 2 : 1) * 1.4 + 4, (lg.sampleHeight ?? 18) + 4);
+      const gridW = cols * ((lg.sampleWidth ?? 32) + 16 + Math.max(100, fs * 10)) + (cols - 1) * 12;
+      const gridH = rows * rowH + (rows - 1) * 4;
+      const titleTop = (lg.titlePosition ?? 'top') === 'top';
+      const svgW = titleTop ? gridW + 20 : gridW + 20 + (showTitle ? Math.max(60, tfs * 6) + 12 : 0);
+      const svgH = titleTop ? gridH + 20 + (showTitle ? tfs * 1.4 + 6 : 0) : Math.max(gridH + 20, tfs * 2);
+      legendSize = { w: Math.max(est.w, svgW, lg.minWidth) + 2, h: Math.max(est.h, svgH) + 2 };
     }
   }
   return computeSmartPageBounds({

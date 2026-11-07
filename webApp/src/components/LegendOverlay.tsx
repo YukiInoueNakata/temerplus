@@ -350,6 +350,8 @@ export function LegendOverlay({ onOpenSettings }: { onOpenSettings?: () => void 
       onDoubleClick={openSettings}
       onClick={onSingleClick}
       title="クリックで選択、ダブルクリックで凡例設定"
+      // 複数ページの画像出力で、画面の凡例を写さず各ページに描き直すときの目印（exportImage の LEGEND_OVERLAY_CLASS と同じ）
+      className="temer-legend-overlay"
       style={wrapperStyle}
     >
       {bareHandle}

@@ -14,6 +14,59 @@ export interface ExportOptions {
   includeGrid?: boolean;         // 既定 false
   includePaperGuides?: boolean;  // 既定 false
   background?: 'white' | 'transparent'; // 既定 'white'
+  /** 画面の凡例を写さない（複数ページで、各ページにそのページの凡例を重ねるとき） */
+  excludeLegend?: boolean;
+}
+
+/** 画面の凡例（LegendOverlay）の外枠に付けた目印 */
+export const LEGEND_OVERLAY_CLASS = 'temer-legend-overlay';
+
+/**
+ * 1 枚に写した帯から 1 ページを切り出す（PNG・PDF・印刷の複数ページで共用）。
+ * - 描く範囲（clipStart〜clipEnd）の外は白（透明）で消す。境目を Box の間の空いた所に置いたので、
+ *   その先の Box はこのページに描かない（2026-11-07「案 B」）
+ * - そのページの凡例（legendImage）を legendAt に重ねる
+ */
+export async function cropPageToCanvas(
+  img: HTMLImageElement,
+  strip: { x: number; y: number; width: number; height: number },
+  page: PageBounds,
+  ratioX: number,
+  ratioY: number,
+  background: 'white' | 'transparent' | undefined,
+): Promise<HTMLCanvasElement> {
+  const sx = Math.round((page.innerX - strip.x) * ratioX);
+  const sy = Math.round((page.innerY - strip.y) * ratioY);
+  const sw = Math.round(page.innerWidth * ratioX);
+  const sh = Math.round(page.innerHeight * ratioY);
+  const canvas = document.createElement('canvas');
+  canvas.width = sw;
+  canvas.height = sh;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('canvas 2d context not available');
+  const blank = (x: number, y: number, w: number, h: number) => {
+    if (w <= 0 || h <= 0) return;
+    if (background === 'transparent') ctx.clearRect(x, y, w, h);
+    else { ctx.fillStyle = '#ffffff'; ctx.fillRect(x, y, w, h); }
+  };
+  blank(0, 0, sw, sh);
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+  if (page.axis === 'x') {
+    if (page.clipStart != null) blank(0, 0, Math.round((page.clipStart - page.innerX) * ratioX), sh);
+    if (page.clipEnd != null) { const x1 = Math.round((page.clipEnd - page.innerX) * ratioX); blank(x1, 0, sw - x1, sh); }
+  } else if (page.axis === 'y') {
+    if (page.clipStart != null) blank(0, 0, sw, Math.round((page.clipStart - page.innerY) * ratioY));
+    if (page.clipEnd != null) { const y1 = Math.round((page.clipEnd - page.innerY) * ratioY); blank(0, y1, sw, sh - y1); }
+  }
+  if (page.legendImage && page.legendAt) {
+    const li = await loadImage(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(page.legendImage.svg)}`);
+    ctx.drawImage(
+      li,
+      (page.legendAt.x - page.innerX) * ratioX, (page.legendAt.y - page.innerY) * ratioY,
+      page.legendImage.w * ratioX, page.legendImage.h * ratioY,
+    );
+  }
+  return canvas;
 }
 
 /**
@@ -47,6 +100,7 @@ export function buildFilter(opts: ExportOptions) {
     }
     // ページ分割のガイド線は常に出力から除外（プレビュー専用）
     if (el.classList?.contains('page-split-overlay')) return false;
+    if (opts.excludeLegend && el.classList?.contains(LEGEND_OVERLAY_CLASS)) return false;
     return true;
   };
 }
@@ -193,21 +247,7 @@ export async function exportToPNGPages(
   for (let i = 0; i < pages.length; i++) {
     checkAborted(signal);
     onProgress?.({ current: i + 1, total, label: `ページ ${i + 1} / ${pages.length} をクロップ中` });
-    const page = pages[i];
-    const sx = Math.round((page.innerX - strip.x) * ratioX);
-    const sy = Math.round((page.innerY - strip.y) * ratioY);
-    const sw = Math.round(page.innerWidth * ratioX);
-    const sh = Math.round(page.innerHeight * ratioY);
-    const canvas = document.createElement('canvas');
-    canvas.width = sw;
-    canvas.height = sh;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('canvas 2d context not available');
-    if (opts.background !== 'transparent') {
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, sw, sh);
-    }
-    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+    const canvas = await cropPageToCanvas(img, strip, pages[i], ratioX, ratioY, opts.background);
     const blob = await canvasToBlob(canvas, 'image/png');
     const pageNum = String(i + 1).padStart(String(pages.length).length, '0');
     zip.file(`${baseName}_page${pageNum}.png`, blob);

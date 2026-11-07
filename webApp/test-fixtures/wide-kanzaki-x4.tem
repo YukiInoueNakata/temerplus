@@ -1,0 +1,3086 @@
+{
+  "version": "0.3",
+  "sheets": [
+    {
+      "id": "WIDE",
+      "name": "横長テスト（詳細版 × 4）",
+      "type": "individual",
+      "order": 1,
+      "boxes": [
+        {
+          "id": "A_1_1_1",
+          "type": "normal",
+          "label": "きついからかいにあう",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 100,
+          "y": -320,
+          "width": 80,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_1_2_1",
+          "type": "normal",
+          "label": "関係がどうにもならず\n「もう無理だ」となる",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 220,
+          "y": -320,
+          "width": 100,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_1_3_1",
+          "type": "normal",
+          "label": "同級生に会わない形で\n別室登校",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 360,
+          "y": -320,
+          "width": 110,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_1_1_1",
+          "type": "normal",
+          "label": "転校することになる",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 220,
+          "y": -200,
+          "width": 90,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_1_2_1",
+          "type": "normal",
+          "label": "学校に行けなくなる",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 360,
+          "y": -200,
+          "width": 90,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_1_1",
+          "type": "normal",
+          "label": "犬猿の仲であった\n同級生とペアを組まれる",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 100,
+          "y": -50,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_2_1",
+          "type": "normal",
+          "label": "組んで数か月で\n上位に入る",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 250,
+          "y": -50,
+          "width": 100,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_3_1",
+          "type": "normal",
+          "label": "顧問が「3年生の思い出\n作りのため引いてくれ」\nと言い出す",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 380,
+          "y": -50,
+          "width": 130,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_4_1",
+          "type": "normal",
+          "label": "ペアの子が、親の都合で\n海外に行ってしまう",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 530,
+          "y": -50,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_5_1",
+          "type": "normal",
+          "label": "部活を抜ける",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 680,
+          "y": -50,
+          "width": 80,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_1_1",
+          "type": "normal",
+          "label": "学校に行くと大人しく\nなってしまう",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 100,
+          "y": 150,
+          "width": 110,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_2_1",
+          "type": "normal",
+          "label": "課題も部活動も授業での\n発表も一所懸命にやる",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 230,
+          "y": 150,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_3_1",
+          "type": "normal",
+          "label": "本格的に休むように\nなって、学校を休み始める",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 380,
+          "y": 150,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_4_1",
+          "type": "normal",
+          "label": "1つひとつの事が重荷に\nなり、病院に通い始める",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 530,
+          "y": 150,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_5_1",
+          "type": "normal",
+          "label": "発達障害だと診断される",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 680,
+          "y": 150,
+          "width": 130,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "BFP_A_1_1",
+          "type": "BFP",
+          "label": "本を借りて読む\nようになる",
+          "subLabel": "A 分岐点",
+          "participantId": "p_A",
+          "x": 500,
+          "y": -320,
+          "width": 100,
+          "height": 80,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "BFP_B_1_1",
+          "type": "BFP",
+          "label": "E 先生を\n尊敬するように\nなる",
+          "subLabel": "B 分岐点",
+          "participantId": "p_B",
+          "x": 500,
+          "y": -180,
+          "width": 100,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP_KOKO_1",
+          "type": "OPP",
+          "label": "X 高校に\n入学する",
+          "x": 850,
+          "y": -80,
+          "width": 100,
+          "height": 130,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP_HITO_1",
+          "type": "OPP",
+          "label": "自然と人と関わる",
+          "x": 1000,
+          "y": -80,
+          "width": 130,
+          "height": 80,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_2_1_1",
+          "type": "normal",
+          "label": "放課後にママになり、\nオンラインゲームを始める",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 1170,
+          "y": -300,
+          "width": 160,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_2_1_1",
+          "type": "normal",
+          "label": "ユーモアを持って\n話せるようになる",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 1170,
+          "y": -100,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_2_1_1",
+          "type": "normal",
+          "label": "善意の人たちに\nもまれていく",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 1170,
+          "y": 80,
+          "width": 120,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_2_1_1",
+          "type": "normal",
+          "label": "クラスの中に同じような\n価値観の人がいる",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 1170,
+          "y": 220,
+          "width": 140,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP_KADAI_1",
+          "type": "OPP",
+          "label": "学校の課題を\n頼りに自己変容\nする",
+          "x": 1400,
+          "y": -80,
+          "width": 130,
+          "height": 130,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_3_1_1",
+          "type": "normal",
+          "label": "大学に入っても考えを\n得るため色々なことを\nやる",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 1580,
+          "y": -320,
+          "width": 140,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_3_1_1",
+          "type": "normal",
+          "label": "やる気のある人のなかで\n何か作り出したい",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 1580,
+          "y": -150,
+          "width": 150,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_3_1_1",
+          "type": "normal",
+          "label": "E 先生を超えられるよう\nに頑張ろう",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 1580,
+          "y": 30,
+          "width": 140,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_3_1_1",
+          "type": "normal",
+          "label": "その人たちに悪意が\nだわって色々な必要が\nない",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 1580,
+          "y": 200,
+          "width": 140,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_A_1",
+          "type": "2nd-EFP",
+          "label": "スタンスの合わない人も\n巻き込みながら色々な\nことに挑戦する",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 1800,
+          "y": -320,
+          "width": 160,
+          "height": 100,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_C_1",
+          "type": "2nd-EFP",
+          "label": "やる気のある集団の\n中で成長して自分で何かを\n作り出していきたい",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 1800,
+          "y": -150,
+          "width": 170,
+          "height": 100,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_B_1",
+          "type": "2nd-EFP",
+          "label": "善悪の判断をつけて\nはっきりとモノを言う\n人になる",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 1800,
+          "y": 30,
+          "width": 160,
+          "height": 100,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_D_1",
+          "type": "2nd-EFP",
+          "label": "ひとつに凝り固まらない\nような生き方をしたい",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 1800,
+          "y": 200,
+          "width": 160,
+          "height": 80,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_1_1_2",
+          "type": "normal",
+          "label": "きついからかいにあう",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 2200,
+          "y": -320,
+          "width": 80,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_1_2_2",
+          "type": "normal",
+          "label": "関係がどうにもならず\n「もう無理だ」となる",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 2320,
+          "y": -320,
+          "width": 100,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_1_3_2",
+          "type": "normal",
+          "label": "同級生に会わない形で\n別室登校",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 2460,
+          "y": -320,
+          "width": 110,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_1_1_2",
+          "type": "normal",
+          "label": "転校することになる",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 2320,
+          "y": -200,
+          "width": 90,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_1_2_2",
+          "type": "normal",
+          "label": "学校に行けなくなる",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 2460,
+          "y": -200,
+          "width": 90,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_1_2",
+          "type": "normal",
+          "label": "犬猿の仲であった\n同級生とペアを組まれる",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 2200,
+          "y": -50,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_2_2",
+          "type": "normal",
+          "label": "組んで数か月で\n上位に入る",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 2350,
+          "y": -50,
+          "width": 100,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_3_2",
+          "type": "normal",
+          "label": "顧問が「3年生の思い出\n作りのため引いてくれ」\nと言い出す",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 2480,
+          "y": -50,
+          "width": 130,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_4_2",
+          "type": "normal",
+          "label": "ペアの子が、親の都合で\n海外に行ってしまう",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 2630,
+          "y": -50,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_5_2",
+          "type": "normal",
+          "label": "部活を抜ける",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 2780,
+          "y": -50,
+          "width": 80,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_1_2",
+          "type": "normal",
+          "label": "学校に行くと大人しく\nなってしまう",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 2200,
+          "y": 150,
+          "width": 110,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_2_2",
+          "type": "normal",
+          "label": "課題も部活動も授業での\n発表も一所懸命にやる",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 2330,
+          "y": 150,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_3_2",
+          "type": "normal",
+          "label": "本格的に休むように\nなって、学校を休み始める",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 2480,
+          "y": 150,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_4_2",
+          "type": "normal",
+          "label": "1つひとつの事が重荷に\nなり、病院に通い始める",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 2630,
+          "y": 150,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_5_2",
+          "type": "normal",
+          "label": "発達障害だと診断される",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 2780,
+          "y": 150,
+          "width": 130,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "BFP_A_1_2",
+          "type": "BFP",
+          "label": "本を借りて読む\nようになる",
+          "subLabel": "A 分岐点",
+          "participantId": "p_A",
+          "x": 2600,
+          "y": -320,
+          "width": 100,
+          "height": 80,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "BFP_B_1_2",
+          "type": "BFP",
+          "label": "E 先生を\n尊敬するように\nなる",
+          "subLabel": "B 分岐点",
+          "participantId": "p_B",
+          "x": 2600,
+          "y": -180,
+          "width": 100,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP_KOKO_2",
+          "type": "OPP",
+          "label": "X 高校に\n入学する",
+          "x": 2950,
+          "y": -80,
+          "width": 100,
+          "height": 130,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP_HITO_2",
+          "type": "OPP",
+          "label": "自然と人と関わる",
+          "x": 3100,
+          "y": -80,
+          "width": 130,
+          "height": 80,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_2_1_2",
+          "type": "normal",
+          "label": "放課後にママになり、\nオンラインゲームを始める",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 3270,
+          "y": -300,
+          "width": 160,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_2_1_2",
+          "type": "normal",
+          "label": "ユーモアを持って\n話せるようになる",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 3270,
+          "y": -100,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_2_1_2",
+          "type": "normal",
+          "label": "善意の人たちに\nもまれていく",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 3270,
+          "y": 80,
+          "width": 120,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_2_1_2",
+          "type": "normal",
+          "label": "クラスの中に同じような\n価値観の人がいる",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 3270,
+          "y": 220,
+          "width": 140,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP_KADAI_2",
+          "type": "OPP",
+          "label": "学校の課題を\n頼りに自己変容\nする",
+          "x": 3500,
+          "y": -80,
+          "width": 130,
+          "height": 130,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_3_1_2",
+          "type": "normal",
+          "label": "大学に入っても考えを\n得るため色々なことを\nやる",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 3680,
+          "y": -320,
+          "width": 140,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_3_1_2",
+          "type": "normal",
+          "label": "やる気のある人のなかで\n何か作り出したい",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 3680,
+          "y": -150,
+          "width": 150,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_3_1_2",
+          "type": "normal",
+          "label": "E 先生を超えられるよう\nに頑張ろう",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 3680,
+          "y": 30,
+          "width": 140,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_3_1_2",
+          "type": "normal",
+          "label": "その人たちに悪意が\nだわって色々な必要が\nない",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 3680,
+          "y": 200,
+          "width": 140,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_A_2",
+          "type": "2nd-EFP",
+          "label": "スタンスの合わない人も\n巻き込みながら色々な\nことに挑戦する",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 3900,
+          "y": -320,
+          "width": 160,
+          "height": 100,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_C_2",
+          "type": "2nd-EFP",
+          "label": "やる気のある集団の\n中で成長して自分で何かを\n作り出していきたい",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 3900,
+          "y": -150,
+          "width": 170,
+          "height": 100,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_B_2",
+          "type": "2nd-EFP",
+          "label": "善悪の判断をつけて\nはっきりとモノを言う\n人になる",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 3900,
+          "y": 30,
+          "width": 160,
+          "height": 100,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_D_2",
+          "type": "2nd-EFP",
+          "label": "ひとつに凝り固まらない\nような生き方をしたい",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 3900,
+          "y": 200,
+          "width": 160,
+          "height": 80,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_1_1_3",
+          "type": "normal",
+          "label": "きついからかいにあう",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 4300,
+          "y": -320,
+          "width": 80,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_1_2_3",
+          "type": "normal",
+          "label": "関係がどうにもならず\n「もう無理だ」となる",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 4420,
+          "y": -320,
+          "width": 100,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_1_3_3",
+          "type": "normal",
+          "label": "同級生に会わない形で\n別室登校",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 4560,
+          "y": -320,
+          "width": 110,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_1_1_3",
+          "type": "normal",
+          "label": "転校することになる",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 4420,
+          "y": -200,
+          "width": 90,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_1_2_3",
+          "type": "normal",
+          "label": "学校に行けなくなる",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 4560,
+          "y": -200,
+          "width": 90,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_1_3",
+          "type": "normal",
+          "label": "犬猿の仲であった\n同級生とペアを組まれる",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 4300,
+          "y": -50,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_2_3",
+          "type": "normal",
+          "label": "組んで数か月で\n上位に入る",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 4450,
+          "y": -50,
+          "width": 100,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_3_3",
+          "type": "normal",
+          "label": "顧問が「3年生の思い出\n作りのため引いてくれ」\nと言い出す",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 4580,
+          "y": -50,
+          "width": 130,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_4_3",
+          "type": "normal",
+          "label": "ペアの子が、親の都合で\n海外に行ってしまう",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 4730,
+          "y": -50,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_5_3",
+          "type": "normal",
+          "label": "部活を抜ける",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 4880,
+          "y": -50,
+          "width": 80,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_1_3",
+          "type": "normal",
+          "label": "学校に行くと大人しく\nなってしまう",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 4300,
+          "y": 150,
+          "width": 110,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_2_3",
+          "type": "normal",
+          "label": "課題も部活動も授業での\n発表も一所懸命にやる",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 4430,
+          "y": 150,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_3_3",
+          "type": "normal",
+          "label": "本格的に休むように\nなって、学校を休み始める",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 4580,
+          "y": 150,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_4_3",
+          "type": "normal",
+          "label": "1つひとつの事が重荷に\nなり、病院に通い始める",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 4730,
+          "y": 150,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_5_3",
+          "type": "normal",
+          "label": "発達障害だと診断される",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 4880,
+          "y": 150,
+          "width": 130,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "BFP_A_1_3",
+          "type": "BFP",
+          "label": "本を借りて読む\nようになる",
+          "subLabel": "A 分岐点",
+          "participantId": "p_A",
+          "x": 4700,
+          "y": -320,
+          "width": 100,
+          "height": 80,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "BFP_B_1_3",
+          "type": "BFP",
+          "label": "E 先生を\n尊敬するように\nなる",
+          "subLabel": "B 分岐点",
+          "participantId": "p_B",
+          "x": 4700,
+          "y": -180,
+          "width": 100,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP_KOKO_3",
+          "type": "OPP",
+          "label": "X 高校に\n入学する",
+          "x": 5050,
+          "y": -80,
+          "width": 100,
+          "height": 130,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP_HITO_3",
+          "type": "OPP",
+          "label": "自然と人と関わる",
+          "x": 5200,
+          "y": -80,
+          "width": 130,
+          "height": 80,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_2_1_3",
+          "type": "normal",
+          "label": "放課後にママになり、\nオンラインゲームを始める",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 5370,
+          "y": -300,
+          "width": 160,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_2_1_3",
+          "type": "normal",
+          "label": "ユーモアを持って\n話せるようになる",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 5370,
+          "y": -100,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_2_1_3",
+          "type": "normal",
+          "label": "善意の人たちに\nもまれていく",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 5370,
+          "y": 80,
+          "width": 120,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_2_1_3",
+          "type": "normal",
+          "label": "クラスの中に同じような\n価値観の人がいる",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 5370,
+          "y": 220,
+          "width": 140,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP_KADAI_3",
+          "type": "OPP",
+          "label": "学校の課題を\n頼りに自己変容\nする",
+          "x": 5600,
+          "y": -80,
+          "width": 130,
+          "height": 130,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_3_1_3",
+          "type": "normal",
+          "label": "大学に入っても考えを\n得るため色々なことを\nやる",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 5780,
+          "y": -320,
+          "width": 140,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_3_1_3",
+          "type": "normal",
+          "label": "やる気のある人のなかで\n何か作り出したい",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 5780,
+          "y": -150,
+          "width": 150,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_3_1_3",
+          "type": "normal",
+          "label": "E 先生を超えられるよう\nに頑張ろう",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 5780,
+          "y": 30,
+          "width": 140,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_3_1_3",
+          "type": "normal",
+          "label": "その人たちに悪意が\nだわって色々な必要が\nない",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 5780,
+          "y": 200,
+          "width": 140,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_A_3",
+          "type": "2nd-EFP",
+          "label": "スタンスの合わない人も\n巻き込みながら色々な\nことに挑戦する",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 6000,
+          "y": -320,
+          "width": 160,
+          "height": 100,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_C_3",
+          "type": "2nd-EFP",
+          "label": "やる気のある集団の\n中で成長して自分で何かを\n作り出していきたい",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 6000,
+          "y": -150,
+          "width": 170,
+          "height": 100,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_B_3",
+          "type": "2nd-EFP",
+          "label": "善悪の判断をつけて\nはっきりとモノを言う\n人になる",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 6000,
+          "y": 30,
+          "width": 160,
+          "height": 100,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_D_3",
+          "type": "2nd-EFP",
+          "label": "ひとつに凝り固まらない\nような生き方をしたい",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 6000,
+          "y": 200,
+          "width": 160,
+          "height": 80,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_1_1_4",
+          "type": "normal",
+          "label": "きついからかいにあう",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 6400,
+          "y": -320,
+          "width": 80,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_1_2_4",
+          "type": "normal",
+          "label": "関係がどうにもならず\n「もう無理だ」となる",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 6520,
+          "y": -320,
+          "width": 100,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_1_3_4",
+          "type": "normal",
+          "label": "同級生に会わない形で\n別室登校",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 6660,
+          "y": -320,
+          "width": 110,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_1_1_4",
+          "type": "normal",
+          "label": "転校することになる",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 6520,
+          "y": -200,
+          "width": 90,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_1_2_4",
+          "type": "normal",
+          "label": "学校に行けなくなる",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 6660,
+          "y": -200,
+          "width": 90,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_1_4",
+          "type": "normal",
+          "label": "犬猿の仲であった\n同級生とペアを組まれる",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 6400,
+          "y": -50,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_2_4",
+          "type": "normal",
+          "label": "組んで数か月で\n上位に入る",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 6550,
+          "y": -50,
+          "width": 100,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_3_4",
+          "type": "normal",
+          "label": "顧問が「3年生の思い出\n作りのため引いてくれ」\nと言い出す",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 6680,
+          "y": -50,
+          "width": 130,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_4_4",
+          "type": "normal",
+          "label": "ペアの子が、親の都合で\n海外に行ってしまう",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 6830,
+          "y": -50,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_1_5_4",
+          "type": "normal",
+          "label": "部活を抜ける",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 6980,
+          "y": -50,
+          "width": 80,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_1_4",
+          "type": "normal",
+          "label": "学校に行くと大人しく\nなってしまう",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 6400,
+          "y": 150,
+          "width": 110,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_2_4",
+          "type": "normal",
+          "label": "課題も部活動も授業での\n発表も一所懸命にやる",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 6530,
+          "y": 150,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_3_4",
+          "type": "normal",
+          "label": "本格的に休むように\nなって、学校を休み始める",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 6680,
+          "y": 150,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_4_4",
+          "type": "normal",
+          "label": "1つひとつの事が重荷に\nなり、病院に通い始める",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 6830,
+          "y": 150,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_1_5_4",
+          "type": "normal",
+          "label": "発達障害だと診断される",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 6980,
+          "y": 150,
+          "width": 130,
+          "height": 60,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "BFP_A_1_4",
+          "type": "BFP",
+          "label": "本を借りて読む\nようになる",
+          "subLabel": "A 分岐点",
+          "participantId": "p_A",
+          "x": 6800,
+          "y": -320,
+          "width": 100,
+          "height": 80,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "BFP_B_1_4",
+          "type": "BFP",
+          "label": "E 先生を\n尊敬するように\nなる",
+          "subLabel": "B 分岐点",
+          "participantId": "p_B",
+          "x": 6800,
+          "y": -180,
+          "width": 100,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP_KOKO_4",
+          "type": "OPP",
+          "label": "X 高校に\n入学する",
+          "x": 7150,
+          "y": -80,
+          "width": 100,
+          "height": 130,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP_HITO_4",
+          "type": "OPP",
+          "label": "自然と人と関わる",
+          "x": 7300,
+          "y": -80,
+          "width": 130,
+          "height": 80,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_2_1_4",
+          "type": "normal",
+          "label": "放課後にママになり、\nオンラインゲームを始める",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 7470,
+          "y": -300,
+          "width": 160,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_2_1_4",
+          "type": "normal",
+          "label": "ユーモアを持って\n話せるようになる",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 7470,
+          "y": -100,
+          "width": 130,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_2_1_4",
+          "type": "normal",
+          "label": "善意の人たちに\nもまれていく",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 7470,
+          "y": 80,
+          "width": 120,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_2_1_4",
+          "type": "normal",
+          "label": "クラスの中に同じような\n価値観の人がいる",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 7470,
+          "y": 220,
+          "width": 140,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP_KADAI_4",
+          "type": "OPP",
+          "label": "学校の課題を\n頼りに自己変容\nする",
+          "x": 7700,
+          "y": -80,
+          "width": 130,
+          "height": 130,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "A_3_1_4",
+          "type": "normal",
+          "label": "大学に入っても考えを\n得るため色々なことを\nやる",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 7880,
+          "y": -320,
+          "width": 140,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "C_3_1_4",
+          "type": "normal",
+          "label": "やる気のある人のなかで\n何か作り出したい",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 7880,
+          "y": -150,
+          "width": 150,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "B_3_1_4",
+          "type": "normal",
+          "label": "E 先生を超えられるよう\nに頑張ろう",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 7880,
+          "y": 30,
+          "width": 140,
+          "height": 70,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "D_3_1_4",
+          "type": "normal",
+          "label": "その人たちに悪意が\nだわって色々な必要が\nない",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 7880,
+          "y": 200,
+          "width": 140,
+          "height": 90,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_A_4",
+          "type": "2nd-EFP",
+          "label": "スタンスの合わない人も\n巻き込みながら色々な\nことに挑戦する",
+          "subLabel": "A",
+          "participantId": "p_A",
+          "x": 8100,
+          "y": -320,
+          "width": 160,
+          "height": 100,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_C_4",
+          "type": "2nd-EFP",
+          "label": "やる気のある集団の\n中で成長して自分で何かを\n作り出していきたい",
+          "subLabel": "C",
+          "participantId": "p_C",
+          "x": 8100,
+          "y": -150,
+          "width": 170,
+          "height": 100,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_B_4",
+          "type": "2nd-EFP",
+          "label": "善悪の判断をつけて\nはっきりとモノを言う\n人になる",
+          "subLabel": "B",
+          "participantId": "p_B",
+          "x": 8100,
+          "y": 30,
+          "width": 160,
+          "height": 100,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP2_D_4",
+          "type": "2nd-EFP",
+          "label": "ひとつに凝り固まらない\nような生き方をしたい",
+          "subLabel": "D",
+          "participantId": "p_D",
+          "x": 8100,
+          "y": 200,
+          "width": 160,
+          "height": 80,
+          "textOrientation": "horizontal"
+        }
+      ],
+      "lines": [
+        {
+          "id": "L_1_1",
+          "type": "RLine",
+          "from": "A_1_1_1",
+          "to": "A_1_2_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_2_1",
+          "type": "RLine",
+          "from": "A_1_2_1",
+          "to": "A_1_3_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_3_1",
+          "type": "RLine",
+          "from": "A_1_3_1",
+          "to": "BFP_A_1_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_4_1",
+          "type": "RLine",
+          "from": "BFP_A_1_1",
+          "to": "OPP_KOKO_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_5_1",
+          "type": "RLine",
+          "from": "OPP_KOKO_1",
+          "to": "OPP_HITO_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_6_1",
+          "type": "RLine",
+          "from": "OPP_HITO_1",
+          "to": "A_2_1_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_7_1",
+          "type": "RLine",
+          "from": "A_2_1_1",
+          "to": "OPP_KADAI_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_8_1",
+          "type": "RLine",
+          "from": "OPP_KADAI_1",
+          "to": "A_3_1_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_9_1",
+          "type": "RLine",
+          "from": "A_3_1_1",
+          "to": "EFP2_A_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_10_1",
+          "type": "RLine",
+          "from": "B_1_1_1",
+          "to": "B_1_2_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_11_1",
+          "type": "RLine",
+          "from": "B_1_2_1",
+          "to": "BFP_B_1_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_12_1",
+          "type": "RLine",
+          "from": "BFP_B_1_1",
+          "to": "OPP_KOKO_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_13_1",
+          "type": "RLine",
+          "from": "OPP_HITO_1",
+          "to": "B_2_1_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_14_1",
+          "type": "RLine",
+          "from": "B_2_1_1",
+          "to": "OPP_KADAI_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_15_1",
+          "type": "RLine",
+          "from": "OPP_KADAI_1",
+          "to": "B_3_1_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_16_1",
+          "type": "RLine",
+          "from": "B_3_1_1",
+          "to": "EFP2_B_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_17_1",
+          "type": "RLine",
+          "from": "C_1_1_1",
+          "to": "C_1_2_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_18_1",
+          "type": "RLine",
+          "from": "C_1_2_1",
+          "to": "C_1_3_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_19_1",
+          "type": "RLine",
+          "from": "C_1_3_1",
+          "to": "C_1_4_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_20_1",
+          "type": "RLine",
+          "from": "C_1_4_1",
+          "to": "C_1_5_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_21_1",
+          "type": "RLine",
+          "from": "C_1_5_1",
+          "to": "OPP_KOKO_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_22_1",
+          "type": "RLine",
+          "from": "OPP_HITO_1",
+          "to": "C_2_1_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_23_1",
+          "type": "RLine",
+          "from": "C_2_1_1",
+          "to": "OPP_KADAI_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_24_1",
+          "type": "RLine",
+          "from": "OPP_KADAI_1",
+          "to": "C_3_1_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_25_1",
+          "type": "RLine",
+          "from": "C_3_1_1",
+          "to": "EFP2_C_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_26_1",
+          "type": "RLine",
+          "from": "D_1_1_1",
+          "to": "D_1_2_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_27_1",
+          "type": "RLine",
+          "from": "D_1_2_1",
+          "to": "D_1_3_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_28_1",
+          "type": "RLine",
+          "from": "D_1_3_1",
+          "to": "D_1_4_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_29_1",
+          "type": "RLine",
+          "from": "D_1_4_1",
+          "to": "D_1_5_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_30_1",
+          "type": "RLine",
+          "from": "D_1_5_1",
+          "to": "OPP_KOKO_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_31_1",
+          "type": "RLine",
+          "from": "OPP_HITO_1",
+          "to": "D_2_1_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_32_1",
+          "type": "RLine",
+          "from": "D_2_1_1",
+          "to": "OPP_KADAI_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_33_1",
+          "type": "RLine",
+          "from": "OPP_KADAI_1",
+          "to": "D_3_1_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_34_1",
+          "type": "RLine",
+          "from": "D_3_1_1",
+          "to": "EFP2_D_1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_1_2",
+          "type": "RLine",
+          "from": "A_1_1_2",
+          "to": "A_1_2_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_2_2",
+          "type": "RLine",
+          "from": "A_1_2_2",
+          "to": "A_1_3_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_3_2",
+          "type": "RLine",
+          "from": "A_1_3_2",
+          "to": "BFP_A_1_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_4_2",
+          "type": "RLine",
+          "from": "BFP_A_1_2",
+          "to": "OPP_KOKO_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_5_2",
+          "type": "RLine",
+          "from": "OPP_KOKO_2",
+          "to": "OPP_HITO_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_6_2",
+          "type": "RLine",
+          "from": "OPP_HITO_2",
+          "to": "A_2_1_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_7_2",
+          "type": "RLine",
+          "from": "A_2_1_2",
+          "to": "OPP_KADAI_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_8_2",
+          "type": "RLine",
+          "from": "OPP_KADAI_2",
+          "to": "A_3_1_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_9_2",
+          "type": "RLine",
+          "from": "A_3_1_2",
+          "to": "EFP2_A_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_10_2",
+          "type": "RLine",
+          "from": "B_1_1_2",
+          "to": "B_1_2_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_11_2",
+          "type": "RLine",
+          "from": "B_1_2_2",
+          "to": "BFP_B_1_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_12_2",
+          "type": "RLine",
+          "from": "BFP_B_1_2",
+          "to": "OPP_KOKO_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_13_2",
+          "type": "RLine",
+          "from": "OPP_HITO_2",
+          "to": "B_2_1_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_14_2",
+          "type": "RLine",
+          "from": "B_2_1_2",
+          "to": "OPP_KADAI_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_15_2",
+          "type": "RLine",
+          "from": "OPP_KADAI_2",
+          "to": "B_3_1_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_16_2",
+          "type": "RLine",
+          "from": "B_3_1_2",
+          "to": "EFP2_B_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_17_2",
+          "type": "RLine",
+          "from": "C_1_1_2",
+          "to": "C_1_2_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_18_2",
+          "type": "RLine",
+          "from": "C_1_2_2",
+          "to": "C_1_3_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_19_2",
+          "type": "RLine",
+          "from": "C_1_3_2",
+          "to": "C_1_4_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_20_2",
+          "type": "RLine",
+          "from": "C_1_4_2",
+          "to": "C_1_5_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_21_2",
+          "type": "RLine",
+          "from": "C_1_5_2",
+          "to": "OPP_KOKO_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_22_2",
+          "type": "RLine",
+          "from": "OPP_HITO_2",
+          "to": "C_2_1_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_23_2",
+          "type": "RLine",
+          "from": "C_2_1_2",
+          "to": "OPP_KADAI_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_24_2",
+          "type": "RLine",
+          "from": "OPP_KADAI_2",
+          "to": "C_3_1_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_25_2",
+          "type": "RLine",
+          "from": "C_3_1_2",
+          "to": "EFP2_C_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_26_2",
+          "type": "RLine",
+          "from": "D_1_1_2",
+          "to": "D_1_2_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_27_2",
+          "type": "RLine",
+          "from": "D_1_2_2",
+          "to": "D_1_3_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_28_2",
+          "type": "RLine",
+          "from": "D_1_3_2",
+          "to": "D_1_4_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_29_2",
+          "type": "RLine",
+          "from": "D_1_4_2",
+          "to": "D_1_5_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_30_2",
+          "type": "RLine",
+          "from": "D_1_5_2",
+          "to": "OPP_KOKO_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_31_2",
+          "type": "RLine",
+          "from": "OPP_HITO_2",
+          "to": "D_2_1_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_32_2",
+          "type": "RLine",
+          "from": "D_2_1_2",
+          "to": "OPP_KADAI_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_33_2",
+          "type": "RLine",
+          "from": "OPP_KADAI_2",
+          "to": "D_3_1_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_34_2",
+          "type": "RLine",
+          "from": "D_3_1_2",
+          "to": "EFP2_D_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "LINK_2",
+          "type": "XLine",
+          "from": "EFP2_A_1",
+          "to": "A_1_1_2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_1_3",
+          "type": "RLine",
+          "from": "A_1_1_3",
+          "to": "A_1_2_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_2_3",
+          "type": "RLine",
+          "from": "A_1_2_3",
+          "to": "A_1_3_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_3_3",
+          "type": "RLine",
+          "from": "A_1_3_3",
+          "to": "BFP_A_1_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_4_3",
+          "type": "RLine",
+          "from": "BFP_A_1_3",
+          "to": "OPP_KOKO_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_5_3",
+          "type": "RLine",
+          "from": "OPP_KOKO_3",
+          "to": "OPP_HITO_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_6_3",
+          "type": "RLine",
+          "from": "OPP_HITO_3",
+          "to": "A_2_1_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_7_3",
+          "type": "RLine",
+          "from": "A_2_1_3",
+          "to": "OPP_KADAI_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_8_3",
+          "type": "RLine",
+          "from": "OPP_KADAI_3",
+          "to": "A_3_1_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_9_3",
+          "type": "RLine",
+          "from": "A_3_1_3",
+          "to": "EFP2_A_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_10_3",
+          "type": "RLine",
+          "from": "B_1_1_3",
+          "to": "B_1_2_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_11_3",
+          "type": "RLine",
+          "from": "B_1_2_3",
+          "to": "BFP_B_1_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_12_3",
+          "type": "RLine",
+          "from": "BFP_B_1_3",
+          "to": "OPP_KOKO_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_13_3",
+          "type": "RLine",
+          "from": "OPP_HITO_3",
+          "to": "B_2_1_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_14_3",
+          "type": "RLine",
+          "from": "B_2_1_3",
+          "to": "OPP_KADAI_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_15_3",
+          "type": "RLine",
+          "from": "OPP_KADAI_3",
+          "to": "B_3_1_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_16_3",
+          "type": "RLine",
+          "from": "B_3_1_3",
+          "to": "EFP2_B_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_17_3",
+          "type": "RLine",
+          "from": "C_1_1_3",
+          "to": "C_1_2_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_18_3",
+          "type": "RLine",
+          "from": "C_1_2_3",
+          "to": "C_1_3_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_19_3",
+          "type": "RLine",
+          "from": "C_1_3_3",
+          "to": "C_1_4_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_20_3",
+          "type": "RLine",
+          "from": "C_1_4_3",
+          "to": "C_1_5_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_21_3",
+          "type": "RLine",
+          "from": "C_1_5_3",
+          "to": "OPP_KOKO_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_22_3",
+          "type": "RLine",
+          "from": "OPP_HITO_3",
+          "to": "C_2_1_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_23_3",
+          "type": "RLine",
+          "from": "C_2_1_3",
+          "to": "OPP_KADAI_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_24_3",
+          "type": "RLine",
+          "from": "OPP_KADAI_3",
+          "to": "C_3_1_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_25_3",
+          "type": "RLine",
+          "from": "C_3_1_3",
+          "to": "EFP2_C_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_26_3",
+          "type": "RLine",
+          "from": "D_1_1_3",
+          "to": "D_1_2_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_27_3",
+          "type": "RLine",
+          "from": "D_1_2_3",
+          "to": "D_1_3_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_28_3",
+          "type": "RLine",
+          "from": "D_1_3_3",
+          "to": "D_1_4_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_29_3",
+          "type": "RLine",
+          "from": "D_1_4_3",
+          "to": "D_1_5_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_30_3",
+          "type": "RLine",
+          "from": "D_1_5_3",
+          "to": "OPP_KOKO_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_31_3",
+          "type": "RLine",
+          "from": "OPP_HITO_3",
+          "to": "D_2_1_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_32_3",
+          "type": "RLine",
+          "from": "D_2_1_3",
+          "to": "OPP_KADAI_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_33_3",
+          "type": "RLine",
+          "from": "OPP_KADAI_3",
+          "to": "D_3_1_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_34_3",
+          "type": "RLine",
+          "from": "D_3_1_3",
+          "to": "EFP2_D_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "LINK_3",
+          "type": "XLine",
+          "from": "EFP2_A_2",
+          "to": "A_1_1_3",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_1_4",
+          "type": "RLine",
+          "from": "A_1_1_4",
+          "to": "A_1_2_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_2_4",
+          "type": "RLine",
+          "from": "A_1_2_4",
+          "to": "A_1_3_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_3_4",
+          "type": "RLine",
+          "from": "A_1_3_4",
+          "to": "BFP_A_1_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_4_4",
+          "type": "RLine",
+          "from": "BFP_A_1_4",
+          "to": "OPP_KOKO_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_5_4",
+          "type": "RLine",
+          "from": "OPP_KOKO_4",
+          "to": "OPP_HITO_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_6_4",
+          "type": "RLine",
+          "from": "OPP_HITO_4",
+          "to": "A_2_1_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_7_4",
+          "type": "RLine",
+          "from": "A_2_1_4",
+          "to": "OPP_KADAI_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_8_4",
+          "type": "RLine",
+          "from": "OPP_KADAI_4",
+          "to": "A_3_1_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_9_4",
+          "type": "RLine",
+          "from": "A_3_1_4",
+          "to": "EFP2_A_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_10_4",
+          "type": "RLine",
+          "from": "B_1_1_4",
+          "to": "B_1_2_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_11_4",
+          "type": "RLine",
+          "from": "B_1_2_4",
+          "to": "BFP_B_1_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_12_4",
+          "type": "RLine",
+          "from": "BFP_B_1_4",
+          "to": "OPP_KOKO_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_13_4",
+          "type": "RLine",
+          "from": "OPP_HITO_4",
+          "to": "B_2_1_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_14_4",
+          "type": "RLine",
+          "from": "B_2_1_4",
+          "to": "OPP_KADAI_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_15_4",
+          "type": "RLine",
+          "from": "OPP_KADAI_4",
+          "to": "B_3_1_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_16_4",
+          "type": "RLine",
+          "from": "B_3_1_4",
+          "to": "EFP2_B_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_17_4",
+          "type": "RLine",
+          "from": "C_1_1_4",
+          "to": "C_1_2_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_18_4",
+          "type": "RLine",
+          "from": "C_1_2_4",
+          "to": "C_1_3_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_19_4",
+          "type": "RLine",
+          "from": "C_1_3_4",
+          "to": "C_1_4_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_20_4",
+          "type": "RLine",
+          "from": "C_1_4_4",
+          "to": "C_1_5_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_21_4",
+          "type": "RLine",
+          "from": "C_1_5_4",
+          "to": "OPP_KOKO_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_22_4",
+          "type": "RLine",
+          "from": "OPP_HITO_4",
+          "to": "C_2_1_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_23_4",
+          "type": "RLine",
+          "from": "C_2_1_4",
+          "to": "OPP_KADAI_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_24_4",
+          "type": "RLine",
+          "from": "OPP_KADAI_4",
+          "to": "C_3_1_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_25_4",
+          "type": "RLine",
+          "from": "C_3_1_4",
+          "to": "EFP2_C_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_26_4",
+          "type": "RLine",
+          "from": "D_1_1_4",
+          "to": "D_1_2_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_27_4",
+          "type": "RLine",
+          "from": "D_1_2_4",
+          "to": "D_1_3_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_28_4",
+          "type": "RLine",
+          "from": "D_1_3_4",
+          "to": "D_1_4_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_29_4",
+          "type": "RLine",
+          "from": "D_1_4_4",
+          "to": "D_1_5_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_30_4",
+          "type": "RLine",
+          "from": "D_1_5_4",
+          "to": "OPP_KOKO_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_31_4",
+          "type": "RLine",
+          "from": "OPP_HITO_4",
+          "to": "D_2_1_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_32_4",
+          "type": "RLine",
+          "from": "D_2_1_4",
+          "to": "OPP_KADAI_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_33_4",
+          "type": "RLine",
+          "from": "OPP_KADAI_4",
+          "to": "D_3_1_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "L_34_4",
+          "type": "RLine",
+          "from": "D_3_1_4",
+          "to": "EFP2_D_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "LINK_4",
+          "type": "XLine",
+          "from": "EFP2_A_3",
+          "to": "A_1_1_4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        }
+      ],
+      "sdsg": [
+        {
+          "id": "SD_KOKO_1",
+          "type": "SD",
+          "label": "SD",
+          "attachedTo": "OPP_KOKO_1",
+          "attachedType": "box",
+          "itemOffset": -380,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "中学校の不適応\n別室登校の孤立感"
+        },
+        {
+          "id": "SG_KOKO_1",
+          "type": "SG",
+          "label": "SG",
+          "attachedTo": "OPP_KOKO_1",
+          "attachedType": "box",
+          "itemOffset": 320,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "X 高校の自由\n不登校生徒受入れ"
+        },
+        {
+          "id": "SD_KADAI_1",
+          "type": "SD",
+          "label": "SD",
+          "attachedTo": "OPP_KADAI_1",
+          "attachedType": "box",
+          "itemOffset": -380,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "進路情報の不足\n不安"
+        },
+        {
+          "id": "SG_KADAI_1",
+          "type": "SG",
+          "label": "SG",
+          "attachedTo": "OPP_KADAI_1",
+          "attachedType": "box",
+          "itemOffset": 320,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "学校の課題\nボランティアの対話"
+        },
+        {
+          "id": "SD_KOKO_2",
+          "type": "SD",
+          "label": "SD",
+          "attachedTo": "OPP_KOKO_2",
+          "attachedType": "box",
+          "itemOffset": -380,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "中学校の不適応\n別室登校の孤立感"
+        },
+        {
+          "id": "SG_KOKO_2",
+          "type": "SG",
+          "label": "SG",
+          "attachedTo": "OPP_KOKO_2",
+          "attachedType": "box",
+          "itemOffset": 320,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "X 高校の自由\n不登校生徒受入れ"
+        },
+        {
+          "id": "SD_KADAI_2",
+          "type": "SD",
+          "label": "SD",
+          "attachedTo": "OPP_KADAI_2",
+          "attachedType": "box",
+          "itemOffset": -380,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "進路情報の不足\n不安"
+        },
+        {
+          "id": "SG_KADAI_2",
+          "type": "SG",
+          "label": "SG",
+          "attachedTo": "OPP_KADAI_2",
+          "attachedType": "box",
+          "itemOffset": 320,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "学校の課題\nボランティアの対話"
+        },
+        {
+          "id": "SD_KOKO_3",
+          "type": "SD",
+          "label": "SD",
+          "attachedTo": "OPP_KOKO_3",
+          "attachedType": "box",
+          "itemOffset": -380,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "中学校の不適応\n別室登校の孤立感"
+        },
+        {
+          "id": "SG_KOKO_3",
+          "type": "SG",
+          "label": "SG",
+          "attachedTo": "OPP_KOKO_3",
+          "attachedType": "box",
+          "itemOffset": 320,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "X 高校の自由\n不登校生徒受入れ"
+        },
+        {
+          "id": "SD_KADAI_3",
+          "type": "SD",
+          "label": "SD",
+          "attachedTo": "OPP_KADAI_3",
+          "attachedType": "box",
+          "itemOffset": -380,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "進路情報の不足\n不安"
+        },
+        {
+          "id": "SG_KADAI_3",
+          "type": "SG",
+          "label": "SG",
+          "attachedTo": "OPP_KADAI_3",
+          "attachedType": "box",
+          "itemOffset": 320,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "学校の課題\nボランティアの対話"
+        },
+        {
+          "id": "SD_KOKO_4",
+          "type": "SD",
+          "label": "SD",
+          "attachedTo": "OPP_KOKO_4",
+          "attachedType": "box",
+          "itemOffset": -380,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "中学校の不適応\n別室登校の孤立感"
+        },
+        {
+          "id": "SG_KOKO_4",
+          "type": "SG",
+          "label": "SG",
+          "attachedTo": "OPP_KOKO_4",
+          "attachedType": "box",
+          "itemOffset": 320,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "X 高校の自由\n不登校生徒受入れ"
+        },
+        {
+          "id": "SD_KADAI_4",
+          "type": "SD",
+          "label": "SD",
+          "attachedTo": "OPP_KADAI_4",
+          "attachedType": "box",
+          "itemOffset": -380,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "進路情報の不足\n不安"
+        },
+        {
+          "id": "SG_KADAI_4",
+          "type": "SG",
+          "label": "SG",
+          "attachedTo": "OPP_KADAI_4",
+          "attachedType": "box",
+          "itemOffset": 320,
+          "timeOffset": 0,
+          "width": 120,
+          "height": 50,
+          "subLabel": "学校の課題\nボランティアの対話"
+        }
+      ],
+      "notes": [],
+      "comments": [],
+      "periodLabels": [
+        {
+          "id": "PD1_1",
+          "position": 4,
+          "label": "1 巡目 第1期 統制できない状況に直面する"
+        },
+        {
+          "id": "PD2_1",
+          "position": 10,
+          "label": "1 巡目 第2期 統制感を得る"
+        },
+        {
+          "id": "PD3_1",
+          "position": 15,
+          "label": "1 巡目 第3期 進路選択への自己変容"
+        },
+        {
+          "id": "PD4_1",
+          "position": 20,
+          "label": "1 巡目 第4期 2nd 等至点 (進路の選択)"
+        },
+        {
+          "id": "PD1_2",
+          "position": 25,
+          "label": "2 巡目 第1期 統制できない状況に直面する"
+        },
+        {
+          "id": "PD2_2",
+          "position": 31,
+          "label": "2 巡目 第2期 統制感を得る"
+        },
+        {
+          "id": "PD3_2",
+          "position": 36,
+          "label": "2 巡目 第3期 進路選択への自己変容"
+        },
+        {
+          "id": "PD4_2",
+          "position": 41,
+          "label": "2 巡目 第4期 2nd 等至点 (進路の選択)"
+        },
+        {
+          "id": "PD1_3",
+          "position": 46,
+          "label": "3 巡目 第1期 統制できない状況に直面する"
+        },
+        {
+          "id": "PD2_3",
+          "position": 52,
+          "label": "3 巡目 第2期 統制感を得る"
+        },
+        {
+          "id": "PD3_3",
+          "position": 57,
+          "label": "3 巡目 第3期 進路選択への自己変容"
+        },
+        {
+          "id": "PD4_3",
+          "position": 62,
+          "label": "3 巡目 第4期 2nd 等至点 (進路の選択)"
+        },
+        {
+          "id": "PD1_4",
+          "position": 67,
+          "label": "4 巡目 第1期 統制できない状況に直面する"
+        },
+        {
+          "id": "PD2_4",
+          "position": 73,
+          "label": "4 巡目 第2期 統制感を得る"
+        },
+        {
+          "id": "PD3_4",
+          "position": 78,
+          "label": "4 巡目 第3期 進路選択への自己変容"
+        },
+        {
+          "id": "PD4_4",
+          "position": 83,
+          "label": "4 巡目 第4期 2nd 等至点 (進路の選択)"
+        }
+      ]
+    }
+  ],
+  "activeSheetId": "WIDE",
+  "participants": [
+    {
+      "id": "Part_moioi0bb_irkn3",
+      "pseudonym": "A"
+    }
+  ],
+  "settings": {
+    "layout": "horizontal",
+    "locale": "ja",
+    "gridSize": 10,
+    "snap": {
+      "alignGuides": true,
+      "distanceSnap": true,
+      "distancePx": 20,
+      "gridSnap": false,
+      "gridPx": 10
+    },
+    "showLegend": true,
+    "legendPosition": "right",
+    "timelineLabel": {
+      "ja": "非可逆的時間",
+      "en": "Irreversible time"
+    },
+    "timelineAutoInsert": true,
+    "defaultFont": "system-ui",
+    "defaultFontSize": 13,
+    "defaultBoxSize": {
+      "width": 60,
+      "height": 100
+    },
+    "defaultAutoFitText": false,
+    "defaultAutoFitBox": false,
+    "defaultAutoFitBoxMode": "width-fixed",
+    "paperGuides": [
+      {
+        "enabled": false,
+        "size": "A4-landscape",
+        "baseSize": "A4",
+        "color": "#000000",
+        "pageCount": 2,
+        "maskOutside": true
+      }
+    ],
+    "uiFontSize": 13,
+    "ribbonFontSize": 12,
+    "levelStep": 0.5,
+    "timeArrow": {
+      "autoInsert": true,
+      "alwaysVisible": true,
+      "timeStartExtension": -0.5,
+      "timeEndExtension": 0.5,
+      "itemReference": "min",
+      "itemOffset": 0,
+      "label": "非可逆的時間",
+      "strokeWidth": 2.5,
+      "fontSize": 14,
+      "labelSideHorizontal": "bottom",
+      "labelSideVertical": "left",
+      "labelBold": false,
+      "labelItalic": false,
+      "labelUnderline": false,
+      "labelOffset": 4,
+      "labelAlignHorizontal": "center",
+      "labelAlignVertical": "center"
+    },
+    "legend": {
+      "autoGenerate": true,
+      "alwaysVisible": true,
+      "includeInExport": true,
+      "position": {
+        "x": 0,
+        "y": 500
+      },
+      "includeBoxes": true,
+      "includeLines": true,
+      "includeSDSG": true,
+      "includeTimeArrow": false,
+      "title": "凡例",
+      "fontSize": 11,
+      "minWidth": 200,
+      "showDescriptions": false,
+      "columns": 1,
+      "columnsHorizontal": 1,
+      "columnsVertical": 1,
+      "showTitle": true,
+      "titleBold": true,
+      "titleItalic": false,
+      "titleUnderline": false,
+      "titleAlign": "left",
+      "titlePosition": "top",
+      "titleWritingMode": "horizontal",
+      "titleVerticalAlign": "top",
+      "backgroundStyle": "white",
+      "borderWidth": 1,
+      "borderColor": "#999",
+      "sampleWidth": 32,
+      "sampleHeight": 18,
+      "titleSeparatorVisible": true,
+      "titleSeparatorColor": "#dddddd",
+      "itemOverrides": {}
+    },
+    "periodLabels": {
+      "alwaysVisible": true,
+      "includeInExport": true,
+      "itemReference": "max",
+      "itemOffset": 0,
+      "fontSize": 13,
+      "showDividers": true,
+      "dividerStrokeWidth": 1,
+      "bandStyle": "band",
+      "labelSideHorizontal": "top",
+      "labelSideVertical": "right"
+    },
+    "typeLabelVisibility": {
+      "BFP": true,
+      "EFP": true,
+      "P-EFP": true,
+      "OPP": true,
+      "2nd-EFP": true,
+      "P-2nd-EFP": true,
+      "SD": true,
+      "SG": true
+    },
+    "sdsgSpace": {
+      "enabled": true,
+      "bands": {
+        "top": {
+          "enabled": true,
+          "heightMode": "auto",
+          "heightLevel": 1.5,
+          "reference": "boxes",
+          "offsetLevel": 0.2,
+          "showBorder": true,
+          "borderColor": "#9b59b6",
+          "fillStyle": "tinted",
+          "labelPosition": "top-left",
+          "shrinkToFitRow": false,
+          "autoExpandHeight": false
+        },
+        "bottom": {
+          "enabled": true,
+          "heightMode": "auto",
+          "heightLevel": 1.5,
+          "reference": "boxes",
+          "offsetLevel": 0.2,
+          "showBorder": true,
+          "borderColor": "#27ae60",
+          "fillStyle": "tinted",
+          "labelPosition": "top-left",
+          "shrinkToFitRow": false,
+          "autoExpandHeight": false
+        }
+      },
+      "autoPlaceSD": "top",
+      "autoPlaceSG": "bottom",
+      "allowMismatchedPlacement": false,
+      "autoArrange": true,
+      "autoFlipDirectionInBand": false
+    }
+  },
+  "metadata": {
+    "title": "横長テスト（神崎・鈴木 2021 × 4）",
+    "author": "中田友貴",
+    "createdAt": "2026-04-28T13:45:28.343Z",
+    "modifiedAt": "2026-04-28T13:46:50.343Z",
+    "description": "発達心理学研究 32(3), 113-125 の Figure 1 を可能な限り原図に近い形で再現したサンプル。協力者 4 名 (A/B/C/D) の各時期の出来事を個別に配置。X 高校入学・自然と人と関わる・学校の課題を頼りに自己変容する を共通 OPP として配置。最終到達点 (2nd EFP) も 4 名個別。"
+  },
+  "history": []
+}

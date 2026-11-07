@@ -9,7 +9,7 @@ import { toPng } from 'html-to-image';
 import type { PageBounds } from './pageSplit';
 import { getPaperInch, type PaperSizeKey } from './paperSizes';
 import { checkAborted, type ProgressCallback } from './exportProgress';
-import { captureRatio, buildFilter as imageFilter } from './exportImage';
+import { captureRatio, cropPageToCanvas, buildFilter as imageFilter } from './exportImage';
 
 export interface PrintOptions {
   /** N ページ分割（未指定 or 1 枚なら単一ページ印刷） */
@@ -25,6 +25,8 @@ export interface PrintOptions {
   includeGrid?: boolean;
   includePaperGuides?: boolean;
   includeRulers?: boolean;
+  /** 画面の凡例を写さない（複数ページで、各ページにそのページの凡例を重ねるとき） */
+  excludeLegend?: boolean;
   onProgress?: ProgressCallback;
   signal?: AbortSignal;
   /**
@@ -98,20 +100,8 @@ export async function printDiagram(
       idx++;
       checkAborted(opts.signal);
       opts.onProgress?.({ current: 1 + idx, total: totalSteps, label: `ページ ${idx} / ${opts.pages.length} をクロップ中` });
-      const sx = Math.round((page.innerX - strip.x) * ratioX);
-      const sy = Math.round((page.innerY - strip.y) * ratioY);
-      const sw = Math.round(page.innerWidth * ratioX);
-      const sh = Math.round(page.innerHeight * ratioY);
-      const canvas = document.createElement('canvas');
-      canvas.width = sw;
-      canvas.height = sh;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('canvas 2d context not available');
-      if (opts.background !== 'transparent') {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, sw, sh);
-      }
-      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+      // 描く範囲の外を消し、そのページの凡例を重ねる（PNG・PDF と共用）
+      const canvas = await cropPageToCanvas(img, strip, page, ratioX, ratioY, opts.background);
       pageDataUrls.push(canvas.toDataURL('image/png'));
     }
   } else {

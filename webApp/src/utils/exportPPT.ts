@@ -40,7 +40,7 @@ import { BOX_RENDER_SPECS } from '../store/defaults';
 import { computeBoxDisplay } from './typeDisplay';
 import { getPaperInch, type PaperSizeKey } from './paperSizes';
 import type { PageBounds } from './pageSplit';
-import { rectIntersectsPage } from './pageSplit';
+import { rectIntersectsPage, pageClipRect } from './pageSplit';
 import {
   resolveLineDirection,
   computeAngleEndpoints,
@@ -159,22 +159,32 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array 
       width: page.innerWidth, height: page.innerHeight,
     };
     const t = buildTransform(pageBbox, slideWpx, slideHpx, false, 0);
-    const pageSheet = filterSheetForPage(opts.sheet, page, layout, mode);
-    drawTimeArrow(pres, slide, pageSheet, layout, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility, page, mode, showMarkers);
+    // 要素を選ぶ・線を切るのは描く範囲（境目から境目まで。clip が無ければページ全体）で行う（2026-11-07「案 B」）。
+    // 図の位置を決める変換（t）は元のページのまま
+    const clip = pageClipRect(page, layout);
+    const page2: PageBounds = {
+      ...page, x: clip.x, y: clip.y, width: clip.width, height: clip.height,
+      innerX: clip.x, innerY: clip.y, innerWidth: clip.width, innerHeight: clip.height,
+    };
+    const pageSettings = page.legendAt
+      ? { ...opts.settings, legend: { ...opts.settings.legend, position: page.legendAt } }
+      : opts.settings;
+    const pageSheet = filterSheetForPage(opts.sheet, page2, layout, mode);
+    drawTimeArrow(pres, slide, pageSheet, layout, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility, page2, mode, showMarkers);
     drawPeriodLabels(pres, slide, pageSheet, layout, opts.settings.periodLabels, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility);
     drawBoxes(pres, slide, pageSheet, layout, opts.settings, t, 'groups');
     // Line の端点解決と精密クリップのため、常に原シートの全 Box を持つ opts.sheet を渡す
-    drawLines(pres, slide, opts.sheet, layout, t, page, mode, showMarkers);
+    drawLines(pres, slide, opts.sheet, layout, t, page2, mode, showMarkers);
     // SD/SG は図全体（opts.sheet）で位置・帯の段を計算し、描いた位置がこのページに重なるものだけ出す。
     // 以前は「付いている Box がこのページに見えている」ものだけ残しており、矢印（Line）に付けた SD/SG や
     // 両端の Box が別ページにある幅モードの SD/SG が全ページで消えていた（2026-10-10 利用者の報告）
-    const sdsgOnPage = sdsgIdsOnPage(opts.sheet, layout, opts.settings, page);
+    const sdsgOnPage = sdsgIdsOnPage(opts.sheet, layout, opts.settings, page2);
     drawSDSGs(pres, slide, opts.sheet, layout, opts.settings, t, sdsgOnPage);
     drawSDSGInfluence(pres, slide, opts.sheet, opts.settings, t, sdsgOnPage);
     drawBoxes(pres, slide, pageSheet, layout, opts.settings, t, 'others');
     drawNotes(pres, slide, pageSheet, opts.settings, t);
     // 凡例は全スライドに表示（SPEC）
-    drawLegend(pres, slide, pageSheet, layout, opts.settings.legend, t, opts.settings.locale, opts.settings);
+    drawLegend(pres, slide, pageSheet, layout, pageSettings.legend, t, opts.settings.locale, pageSettings);
     drawIdBadges(slide, pageSheet, layout, t, includeIds);
   }
   return finishPresentation(pres, filename, opts.returnBytes);
@@ -302,6 +312,8 @@ function filterSheetForPage(
     sdsg: visibleSDSGs,
     lines: visibleLines,
     periodLabels: visiblePeriodLabels,
+    // メモも描く範囲で選ぶ（以前は全スライドに描き、隣のページにまで出た）
+    notes: (sheet.notes ?? []).filter((n) => rectIntersectsPage({ x: n.x, y: n.y, width: n.width, height: n.height }, page)),
   };
 }
 

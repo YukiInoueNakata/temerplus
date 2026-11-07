@@ -22,6 +22,110 @@ export interface PageBounds {
   innerY: number;
   innerWidth: number;
   innerHeight: number;
+  /**
+   * このページで描く範囲（長辺方向の図の座標）。境目を Box どうしの間の空いた所に置き、
+   * 境目より先はこのページに描かない（computeSmartPageBounds）。未指定ならページ全体を描く
+   */
+  clipStart?: number;
+  clipEnd?: number;
+  /** このページに描く凡例の位置（図の座標）。各ページに、そのページに出てくる種類だけで描く */
+  legendAt?: { x: number; y: number };
+  /** clipStart・clipEnd の向き（横型 'x'・縦型 'y'） */
+  axis?: 'x' | 'y';
+  /** 画像の出力（PNG・PDF・印刷）で各ページに重ねる凡例（renderLegendSVG の結果。出力の画面が付ける） */
+  legendImage?: { svg: string; w: number; h: number };
+}
+
+/** ページで描く範囲を矩形で（clip が無ければページ全体） */
+export function pageClipRect(page: PageBounds, layout: LayoutDirection): { x: number; y: number; width: number; height: number } {
+  const isH = layout === 'horizontal';
+  const s = page.clipStart ?? (isH ? page.innerX : page.innerY);
+  const e = page.clipEnd ?? (isH ? page.innerX + page.innerWidth : page.innerY + page.innerHeight);
+  return isH
+    ? { x: s, y: page.innerY, width: Math.max(0, e - s), height: page.innerHeight }
+    : { x: page.innerX, y: s, width: page.innerWidth, height: Math.max(0, e - s) };
+}
+
+export interface SmartPageInput {
+  paperWidth: number;
+  paperHeight: number;
+  layout: LayoutDirection;
+  pageCount: number;
+  /** 各ページの両端に空ける余白（図の座標）。境目の前後の余白にも使う */
+  marginPx: number;
+  /** 切ってはいけない要素の長辺方向の区間 [start, end]（Box・SD/SG・メモ） */
+  solids: [number, number][];
+  /** 図の長辺方向の始まりと終わり */
+  contentStart: number;
+  contentEnd: number;
+  /** 凡例の位置（図の座標）。各ページの同じ位置に描く */
+  legend?: { x: number; y: number };
+}
+
+/**
+ * 境目を Box どうしの間の空いた所に置くページ分割（2026-11-07 ユーザー決定「案 B」）。
+ * - 1 ページ目は図の始まりから（左寄せ）。各ページは用紙 1 枚分の窓で、窓の右端から余白を引いた所までに、
+ *   要素の切れ目（solids の外）があればそこを境目にする。見つからなければ余白の所で切る
+ * - 次のページは「境目 − 余白」から始め、境目から描く（境目の前は空ける）
+ * - 境目は窓の半分より先で探す（ページが短くなりすぎないように）
+ * 返すページ数は pageCount。図が入りきらないときは最後のページの終わりで切れる
+ */
+export function computeSmartPageBounds(input: SmartPageInput): PageBounds[] {
+  const { paperWidth, paperHeight, layout, marginPx, solids, contentStart, contentEnd } = input;
+  const n = Math.max(1, Math.floor(input.pageCount));
+  const isH = layout === 'horizontal';
+  const W = isH ? paperWidth : paperHeight;
+  // 要素の中、または要素から 8px 以内は境目にしない
+  const insideSolid = (x: number) => solids.some(([a, b]) => x > a - 8 && x < b + 8);
+  const pages: PageBounds[] = [];
+  // 1 ページ目の窓の始まり: 図の始まり − 余白
+  let winStart = contentStart - marginPx;
+  let clipStart = -Infinity;
+  const legendOffset = input.legend
+    ? (isH ? input.legend.x : input.legend.y) - winStart
+    : 0;
+  for (let i = 0; i < n; i++) {
+    const last = i === n - 1;
+    let cut = winStart + W - marginPx;
+    if (!last && cut < contentEnd) {
+      // 窓の右端側から左へ、要素の切れ目を探す（solids の端の外側を候補にする）
+      const lo = winStart + W * 0.5;
+      // 要素から 10px 離す（2px だと描画の丸めで隣の Box の縁が細く残った）
+      const candidates = [cut, ...solids.flatMap(([a, b]) => [a - 10, b + 10])]
+        .filter((x) => x >= lo && x <= cut && !insideSolid(x))
+        .sort((a, b) => b - a);
+      if (candidates.length > 0) cut = candidates[0];
+    }
+    const cEnd = last ? Infinity : cut;
+    const innerMain = winStart;
+    const legendAt = input.legend
+      ? (isH ? { x: winStart + legendOffset, y: input.legend.y } : { x: input.legend.x, y: winStart + legendOffset })
+      : undefined;
+    pages.push(isH
+      ? {
+          index: i, x: innerMain, y: -paperHeight / 2, width: paperWidth, height: paperHeight,
+          innerX: innerMain, innerY: -paperHeight / 2, innerWidth: paperWidth, innerHeight: paperHeight,
+          clipStart: Number.isFinite(clipStart) ? clipStart : undefined,
+          clipEnd: Number.isFinite(cEnd) ? cEnd : undefined,
+          legendAt, axis: 'x',
+        }
+      : {
+          index: i, x: -paperWidth / 2, y: innerMain, width: paperWidth, height: paperHeight,
+          innerX: -paperWidth / 2, innerY: innerMain, innerWidth: paperWidth, innerHeight: paperHeight,
+          clipStart: Number.isFinite(clipStart) ? clipStart : undefined,
+          clipEnd: Number.isFinite(cEnd) ? cEnd : undefined,
+          legendAt, axis: 'y',
+        });
+    clipStart = cut;
+    winStart = cut - marginPx;
+  }
+  return pages;
+}
+
+/** 図を用紙の高さ（短辺）に合わせたときに、境目を空いた所に置いて何ページ要るかの目安 */
+export function estimatePagesNeeded(contentLength: number, pageLength: number, marginPx: number): number {
+  const usable = Math.max(1, pageLength - marginPx * 2);
+  return Math.max(1, contentLength / usable);
 }
 
 export interface PageLayoutInput {

@@ -7,7 +7,7 @@
 import { jsPDF } from 'jspdf';
 import { toPng } from 'html-to-image';
 import { getPaperInch, type PaperSizeKey } from './paperSizes';
-import { buildFilter, type ExportOptions } from './exportImage';
+import { buildFilter, cropPageToCanvas, type ExportOptions } from './exportImage';
 import type { PageBounds } from './pageSplit';
 import { checkAborted, type ProgressCallback } from './exportProgress';
 
@@ -40,10 +40,16 @@ export async function exportToPDF(
   // PNG をまず生成（ピクセル解像度は用紙サイズ × DPI）。図を用紙に収めて文字を縮めても読めるよう 300dpi
   // （以前は 150dpi。2026-11-07）。大きすぎる canvas は Safari で作れないので、辺と面積に上限を置く
   const dpi = 300;
-  const targetPx = { w: paper.width * dpi, h: paper.height * dpi };
   const nodeRect = node.getBoundingClientRect();
   const rw = Math.max(1, nodeRect.width);
   const rh = Math.max(1, nodeRect.height);
+  // 複数ページは帯（全ページ分）を写すので、帯の長さに対して 300dpi にする（以前は用紙 1 枚分で、
+  // 1 ページあたりの解像度が 300dpi ÷ ページ数に下がっていた）
+  const multiPages = opts.pages && opts.pages.length > 1 ? opts.pages : null;
+  const stripForRatio = multiPages ? (opts.stripBounds ?? computeStripFromPages(multiPages)) : null;
+  const targetPx = stripForRatio
+    ? { w: (stripForRatio.width / 96) * dpi, h: (stripForRatio.height / 96) * dpi }
+    : { w: paper.width * dpi, h: paper.height * dpi };
   const ratio = Math.max(1, Math.min(
     targetPx.w / rw,
     targetPx.h / rh,
@@ -102,22 +108,10 @@ export async function exportToPDF(
     if (i > 0) {
       pdf.addPage([paper.width, paper.height], paper.width >= paper.height ? 'landscape' : 'portrait');
     }
-    // クロップ範囲（撮影画像 px）
-    const sx = Math.round((page.innerX - strip.x) * ratioX);
-    const sy = Math.round((page.innerY - strip.y) * ratioY);
-    const sw = Math.round(page.innerWidth * ratioX);
-    const sh = Math.round(page.innerHeight * ratioY);
-    // オフスクリーン canvas にクロップ描画
-    const canvas = document.createElement('canvas');
-    canvas.width = sw;
-    canvas.height = sh;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('canvas 2d context not available');
-    if (opts.background !== 'transparent') {
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, sw, sh);
-    }
-    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+    // ページを切り出す（描く範囲の外を消し、そのページの凡例を重ねる。PNG・印刷と共用）
+    const canvas = await cropPageToCanvas(img, strip, page, ratioX, ratioY, opts.background);
+    const sw = canvas.width;
+    const sh = canvas.height;
     const pageDataUrl = canvas.toDataURL('image/png');
 
     // コンテンツ領域にアスペクト維持で fit

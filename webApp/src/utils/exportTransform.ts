@@ -149,7 +149,18 @@ export function applyExportTransform(
   const fitScale = bounds
     ? computeFitScale(bounds, xf.paperSize, xf.fitMode, xf.paperMarginRatio, undefined, undefined, doc.settings.layout)
     : 1;
-  const effectiveScale = xf.fitMode === 'manual' ? xf.globalScale : fitScale;
+  let effectiveScale = xf.fitMode === 'manual' ? xf.globalScale : fitScale;
+  // 複数ページの「短辺だけ収める」は、長辺も N ページ（各ページの両端の余白を引いた分）に入るよう抑える。
+  // 以前は高さだけで決め、長い図は最後のページからはみ出した。境目を空いた所へずらす分のゆとりも見る（2026-11-07）
+  if (xf.fitMode === 'fit-short' && (xf.pageCount ?? 1) > 1 && bounds) {
+    const paper = getPaperPx(xf.paperSize);
+    const isH = doc.settings.layout !== 'vertical';
+    const pageLen = isH ? paper.width : paper.height;
+    const margin = pageLen * (xf.paperMarginRatio ?? 0.05);
+    const capacity = xf.pageCount * (pageLen - margin * 2) * 0.9;
+    const len = isH ? bounds.width : bounds.height;
+    effectiveScale = Math.min(effectiveScale, capacity / Math.max(1, len));
+  }
 
   // 中心基準で Box gap を広げる（x/y 独立）
   // 後方互換: boxGapScale が指定されていれば H/V の両方に適用

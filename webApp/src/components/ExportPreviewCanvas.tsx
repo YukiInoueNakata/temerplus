@@ -451,7 +451,10 @@ function Inner({
           style={{
             width: innerW,
             height: innerH,
-            border: '1px solid #999',
+            // 枠は outline で描く（大きさに入れない）。border だと写す要素が 2px 小さくなって縦横比が帯からずれ、
+            // 図が左右に余白を残して収まる一方、切り出しは「写した幅 = 帯の幅」と計算するので、
+            // 複数ページの後ろのページほど切り出しがずれた（4 ページで約 5%。2026-11-07）
+            outline: '1px solid #999',
             boxShadow: '0 2px 10px rgba(0,0,0,0.15)',
             position: 'relative',
             overflow: 'hidden',
@@ -598,7 +601,8 @@ function PageSplitOverlay({
   for (let i = 1; i < pages.length; i++) {
     const prev = pages[i - 1];
     if (isH) {
-      const splitX = (prev.innerX + prev.innerWidth) * zoom + panX;
+      // 境目を空いた所に置いた分割（clipEnd あり）は、その境目に線を引く
+      const splitX = (prev.clipEnd ?? prev.innerX + prev.innerWidth) * zoom + panX;
       const topY = prev.innerY * zoom + panY;
       const h = prev.innerHeight * zoom;
       elements.push(
@@ -617,7 +621,7 @@ function PageSplitOverlay({
         />,
       );
     } else {
-      const splitY = (prev.innerY + prev.innerHeight) * zoom + panY;
+      const splitY = (prev.clipEnd ?? prev.innerY + prev.innerHeight) * zoom + panY;
       const leftX = prev.innerX * zoom + panX;
       const w = prev.innerWidth * zoom;
       elements.push(
@@ -639,7 +643,31 @@ function PageSplitOverlay({
   }
 
   // 非アクティブページのマスク（highlightIndex 指定時のみ）
-  if (highlightIndex != null) {
+  if (highlightIndex != null && pages[highlightIndex]?.axis) {
+    // 境目を空いた所に置いた分割: 窓が重なるので、今のページで描く範囲の外を暗くする
+    const a = pages[highlightIndex];
+    const xs = pages.flatMap((p) => [p.innerX, p.innerX + p.innerWidth]);
+    const ys = pages.flatMap((p) => [p.innerY, p.innerY + p.innerHeight]);
+    const sx0 = Math.min(...xs), sx1 = Math.max(...xs), sy0 = Math.min(...ys), sy1 = Math.max(...ys);
+    const s = a.clipStart ?? (isH ? sx0 : sy0);
+    const e = a.clipEnd ?? (isH ? sx1 : sy1);
+    const rects = isH
+      ? [[sx0, sy0, s - sx0, sy1 - sy0], [e, sy0, sx1 - e, sy1 - sy0]]
+      : [[sx0, sy0, sx1 - sx0, s - sy0], [sx0, e, sx1 - sx0, sy1 - e]];
+    rects.forEach(([x, y, w, h], k) => {
+      if (w <= 0 || h <= 0) return;
+      elements.push(
+        <div
+          key={`mask-clip-${k}`}
+          style={{
+            position: 'absolute', left: x * zoom + panX, top: y * zoom + panY,
+            width: w * zoom, height: h * zoom,
+            background: 'rgba(0,0,0,0.18)', pointerEvents: 'none', zIndex: 9,
+          }}
+        />,
+      );
+    });
+  } else if (highlightIndex != null) {
     pages.forEach((p, i) => {
       if (i === highlightIndex) return;
       const x = p.innerX * zoom + panX;

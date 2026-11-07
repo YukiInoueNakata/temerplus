@@ -20,6 +20,7 @@ import { CollapsibleSection } from './CollapsibleSection';
 import type { ExportOptions } from '../utils/exportImage';
 import { computePageBounds } from '../utils/pageSplit';
 import { openPrintWindow } from '../utils/printWindow';
+import { computeSmartPagesForDoc, pagesNeededForDoc } from '../utils/smartPages';
 import {
   BUILTIN_PRESETS,
   deleteUserPreset,
@@ -249,8 +250,17 @@ export function ExportPreviewDialog({
   );
 
   // ページ境界を計算（プレビュー / 実出力で共用）
+  // 複数ページは、図の始まりを 1 ページ目に合わせ、境目を Box どうしの間の空いた所に置く（2026-11-07「案 B」）。
+  // SPEC 方式（duplicate）は従来の等間隔の分割のまま
   const pageBounds = useMemo(() => {
     const paper = getPaperPx(xf.paperSize);
+    if (xf.pageCount > 1 && xf.pageSplitMode !== 'duplicate') {
+      return computeSmartPagesForDoc(transformed.doc, {
+        paperSize: xf.paperSize,
+        pageCount: xf.pageCount,
+        paperMarginRatio: xf.paperMarginRatio,
+      });
+    }
     return computePageBounds({
       paperWidth: paper.width,
       paperHeight: paper.height,
@@ -258,7 +268,14 @@ export function ExportPreviewDialog({
       pageCount: Math.max(1, xf.pageCount),
       overlapPx: xf.pageOverlapPx,
     });
-  }, [xf.paperSize, xf.pageCount, xf.pageOverlapPx, transformed.doc.settings.layout]);
+  }, [xf.paperSize, xf.pageCount, xf.pageOverlapPx, xf.pageSplitMode, xf.paperMarginRatio, transformed.doc]);
+
+  // 図を用紙の短辺に合わせたときに何ページ分あるか（ページ数を選ぶ目安）
+  const pagesNeeded = useMemo(() => {
+    if (exportMode !== 'multi') return null;
+    const t = applyExportTransform(applyExportContent(doc, contentChoices), { ...xf, fitMode: 'fit-short', pageCount: 1 });
+    return pagesNeededForDoc(t.doc, { paperSize: xf.paperSize, pageCount: 1, paperMarginRatio: xf.paperMarginRatio });
+  }, [exportMode, doc, contentChoices, xf]);
 
   // layout に応じた用紙サイズ選択肢
   // 【重要】フックは早期 return より前に置くこと。open が false→true で
@@ -301,10 +318,20 @@ export function ExportPreviewDialog({
         background,
       };
       const multi = exportMode === 'multi' && xf.pageCount > 1 ? pageBounds : null;
+      // 複数ページの画像（PNG・PDF）は、画面の凡例を写さず、各ページにそのページの凡例を重ねる
+      const legendPerPage = !!multi && multi.some((p) => p.legendAt);
+      imgOpts.excludeLegend = legendPerPage;
+      const pagesWithLegend = async () => {
+        if (!multi || !legendPerPage) return multi;
+        const sheet = transformed.doc.sheets.find((s) => s.id === transformed.doc.activeSheetId);
+        if (!sheet) return multi;
+        const { attachLegendImages } = await import('../utils/exportSVGNative');
+        return attachLegendImages(multi, sheet, transformed.doc.settings);
+      };
       if (format === 'png') {
         if (multi) {
           const { exportToPNGPages } = await import('../utils/exportImage');
-          await exportToPNGPages(PREVIEW_ID, baseName, multi, 'auto', imgOpts, onProg, ac.signal);
+          await exportToPNGPages(PREVIEW_ID, baseName, (await pagesWithLegend())!, 'auto', imgOpts, onProg, ac.signal);
         } else {
           const { exportToPNG, captureRatio } = await import('../utils/exportImage');
           // 用紙の上で 300dpi になる倍率で写す（以前は 2 倍に固定で、解像度がプレビューの枠で決まっていた）
@@ -338,7 +365,8 @@ export function ExportPreviewDialog({
           includeGrid,
           includePaperGuides,
           includeRulers: false,
-          pages: multi ?? undefined,
+          excludeLegend: legendPerPage,
+          pages: (await pagesWithLegend()) ?? undefined,
           onProgress: onProg,
           signal: ac.signal,
         });
@@ -386,7 +414,14 @@ export function ExportPreviewDialog({
     setProgress({ current: 0, total: 1, label: '準備中...' });
     const onProg = (p: { current: number; total: number; label: string }) => setProgress(p);
     try {
-      const multi = exportMode === 'multi' && xf.pageCount > 1 ? pageBounds : null;
+      let multi = exportMode === 'multi' && xf.pageCount > 1 ? pageBounds : null;
+      // 複数ページは画面の凡例を写さず、各ページにそのページの凡例を重ねる（PNG・PDF と同じ）
+      const legendPerPage = !!multi && multi.some((p) => p.legendAt);
+      const sheet = transformed.doc.sheets.find((s) => s.id === transformed.doc.activeSheetId);
+      if (multi && legendPerPage && sheet) {
+        const { attachLegendImages } = await import('../utils/exportSVGNative');
+        multi = attachLegendImages(multi, sheet, transformed.doc.settings);
+      }
       const { printDiagram } = await import('../utils/printing');
       await printDiagram(PREVIEW_ID, {
         paperSize: xf.paperSize,
@@ -394,6 +429,7 @@ export function ExportPreviewDialog({
         includeGrid,
         includePaperGuides,
         includeRulers: false,
+        excludeLegend: legendPerPage,
         pages: multi ?? undefined,
         onProgress: onProg,
         signal: ac.signal,
@@ -671,6 +707,15 @@ export function ExportPreviewDialog({
                     style={{ width: 80 }}
                   />
                 </div>
+                {pagesNeeded != null && (
+                  <p className="hint" style={{ marginTop: 0 }}>
+                    用紙の{doc.settings.layout === 'horizontal' ? '高さ' : '幅'}に合わせると，この図は約 {pagesNeeded.toFixed(1)} ページ分です
+                    {Math.ceil(pagesNeeded) <= 1
+                      ? '（1 ページに収まります。単一印刷でも足ります）'
+                      : Math.ceil(pagesNeeded) < xf.pageCount ? `（${Math.ceil(pagesNeeded)} ページで足ります）` : ''}
+                    {pagesNeeded > xf.pageCount ? '（このページ数では図を縮めて収めます）' : ''}
+                  </p>
+                )}
                 <div className="setting-row">
                   <label>分割方式</label>
                   <select
@@ -678,11 +723,11 @@ export function ExportPreviewDialog({
                     onChange={(e) => update({ pageSplitMode: e.target.value as 'overlap' | 'duplicate' })}
                     style={{ maxWidth: 220 }}
                   >
-                    <option value="overlap">オーバーラップ方式（単純クロップ）</option>
+                    <option value="overlap">Box の間の空いた所で区切る（凡例は各ページ）</option>
                     <option value="duplicate">SPEC方式（Box複製+続マーカー、PPTX 限定）</option>
                   </select>
                 </div>
-                <div className="setting-row">
+                {xf.pageSplitMode === 'duplicate' && <div className="setting-row">
                   <label>オーバーラップ量 (px)</label>
                   <input
                     type="number"
@@ -693,7 +738,7 @@ export function ExportPreviewDialog({
                     onChange={(e) => update({ pageOverlapPx: Math.max(0, Number(e.target.value) || 0) })}
                     style={{ width: 80 }}
                   />
-                </div>
+                </div>}
                 {xf.pageSplitMode === 'duplicate' && (
                   <>
                     <div className="setting-row">

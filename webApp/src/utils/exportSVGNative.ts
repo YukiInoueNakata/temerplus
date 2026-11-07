@@ -38,7 +38,7 @@ import { BOX_RENDER_SPECS } from '../store/defaults';
 import { computeBoxDisplay } from './typeDisplay';
 import { getPaperPx, type PaperSizeKey } from './paperSizes';
 import type { PageBounds } from './pageSplit';
-import { rectIntersectsPage } from './pageSplit';
+import { pageClipRect } from './pageSplit';
 import {
   resolveLineDirection,
   computeAngleEndpoints,
@@ -137,11 +137,17 @@ export function buildSVGDocuments(opts: SVGNativeExportOptions): string[] {
     const page = pages[i];
     const pageBbox = { x: page.innerX, y: page.innerY, width: page.innerWidth, height: page.innerHeight };
     const t = buildTransform(pageBbox, paperW, paperH, false, 0);
-    const pageSheet = filterSheetForPage(opts.sheet, page, layout);
-    // Line は原シートの全 Box を使って polyline を構築し、pageInnerRect で精密クリップ
+    // 描く範囲は境目から境目まで（clip が無ければページ全体）。Box・SD/SG・Line はこの範囲で選んで切る
+    const clip = pageClipRect(page, layout);
+    const pageSheet = filterSheetForPage(opts.sheet, clip, layout);
+    // 凡例は各ページの同じ位置に、そのページに出てくる種類だけで描く（2026-11-07）
+    const pageSettings = page.legendAt
+      ? { ...opts.settings, legend: { ...opts.settings.legend, position: page.legendAt } }
+      : opts.settings;
+    // Line は原シートの全 Box を使って polyline を構築し、描く範囲で精密クリップ
     const svg = renderPage(
-      pageSheet, opts.settings, t, paperW, paperH, opts.background, includeIds,
-      opts.sheet, pageBbox,
+      pageSheet, pageSettings, t, paperW, paperH, opts.background, includeIds,
+      opts.sheet, clip,
     );
     docs.push(svg);
   }
@@ -192,18 +198,18 @@ function renderPage(
   return b.build();
 }
 
-function filterSheetForPage(sheet: Sheet, page: PageBounds, layout: LayoutDirection): Sheet {
+function filterSheetForPage(sheet: Sheet, clip: { x: number; y: number; width: number; height: number }, layout: LayoutDirection): Sheet {
   const visibleBoxes = sheet.boxes.filter((bx) =>
-    rectIntersectsPage({ x: bx.x, y: bx.y, width: bx.width, height: bx.height }, page),
+    rectsOverlap({ x: bx.x, y: bx.y, width: bx.width, height: bx.height }, clip),
   );
   const visibleBoxIds = new Set(visibleBoxes.map((bx) => bx.id));
   const visibleSDSGs = sheet.sdsg.filter((sg) => visibleBoxIds.has(sg.attachedTo));
   const visibleLines = sheet.lines.filter((l) => visibleBoxIds.has(l.from) && visibleBoxIds.has(l.to));
   const LEVEL = 100;
-  const tStart = layout === 'horizontal' ? page.innerX / LEVEL : page.innerY / LEVEL;
+  const tStart = layout === 'horizontal' ? clip.x / LEVEL : clip.y / LEVEL;
   const tEnd = layout === 'horizontal'
-    ? (page.innerX + page.innerWidth) / LEVEL
-    : (page.innerY + page.innerHeight) / LEVEL;
+    ? (clip.x + clip.width) / LEVEL
+    : (clip.y + clip.height) / LEVEL;
   const visiblePeriodLabels = sheet.periodLabels.filter((p) => p.position >= tStart && p.position <= tEnd);
   return {
     ...sheet,
@@ -211,6 +217,8 @@ function filterSheetForPage(sheet: Sheet, page: PageBounds, layout: LayoutDirect
     sdsg: visibleSDSGs,
     lines: visibleLines,
     periodLabels: visiblePeriodLabels,
+    // メモも描く範囲で選ぶ（以前は全ページに描き、境目を越えて隣のページにも出た）
+    notes: (sheet.notes ?? []).filter((n) => rectsOverlap({ x: n.x, y: n.y, width: n.width, height: n.height }, clip)),
   };
 }
 
@@ -1634,10 +1642,10 @@ function drawNotes(b: SVGBuilder, sheet: Sheet, settings: ProjectSettings, t: Tr
 function drawLegend(
   b: SVGBuilder, sheet: Sheet, layout: LayoutDirection, lg: LegendSettings, t: Transform,
   locale: Locale = 'ja', settings?: ProjectSettings,
-) {
-  if (!lg || !lg.includeInExport) return;
+): { w: number; h: number } | null {
+  if (!lg || !lg.includeInExport) return null;
   const items = computeLegendItems(sheet, lg, locale);
-  if (items.length === 0) return;
+  if (items.length === 0) return null;
 
   const cols = computeLegendColumns(lg, layout, items.length);
   const showDesc = lg.showDescriptions === true;
@@ -1771,6 +1779,34 @@ function drawLegend(
         },
       );
     }
+  });
+  return { w: boxW, h: boxH };
+}
+
+/**
+ * 凡例だけの SVG（左上が凡例の左上）。複数ページの PNG・PDF・印刷で、各ページにそのページの凡例を重ねるのに使う。
+ * w・h は図の座標（px）
+ */
+export function renderLegendSVG(sheet: Sheet, settings: ProjectSettings): { svg: string; w: number; h: number } | null {
+  const lg = { ...settings.legend, position: { x: 0, y: 0 } };
+  const id: Transform = { toX: (x) => x, toY: (y) => y, toLen: (p) => p, scale: 1 };
+  const size = drawLegend(new SVGBuilder(1, 1), sheet, settings.layout, lg, id, settings.locale, settings);
+  if (!size) return null;
+  const b = new SVGBuilder(size.w + 2, size.h + 2);
+  drawLegend(b, sheet, settings.layout, lg, id, settings.locale, settings);
+  return { svg: b.build(), w: size.w + 2, h: size.h + 2 };
+}
+
+/**
+ * 複数ページの各ページに、そのページに出てくる種類だけの凡例の画像を付ける（PNG・PDF・印刷用）。
+ * legendAt の無いページ（凡例を出さない・従来の分割）はそのまま返す
+ */
+export function attachLegendImages(pages: PageBounds[], sheet: Sheet, settings: ProjectSettings): PageBounds[] {
+  return pages.map((p) => {
+    if (!p.legendAt) return p;
+    const pageSheet = filterSheetForPage(sheet, pageClipRect(p, settings.layout), settings.layout);
+    const img = renderLegendSVG(pageSheet, settings);
+    return img ? { ...p, legendImage: img } : p;
   });
 }
 

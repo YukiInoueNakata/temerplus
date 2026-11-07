@@ -1,6 +1,6 @@
 [
   {
-    "date": "2026-10-30",
+    "date": "2026-11-07",
     "items": [
       {"kind":"新機能","title":"出力の前に、含める要素を確認","detail":"出力プレビューで、メモ・記号・コメント・凡例・時期ラベルを図に含めるかを毎回選びます。選び終えるまで保存できません。時期ラベルが無いときや、凡例を含めないときは注意が出ます。","en":{"title":"Confirm what to include before exporting","detail":"In the export preview, choose each time whether to include notes, symbols, comments, the legend and period labels. Saving is disabled until every choice is made, and a caution appears when there are no period labels or the legend is left out."}},
       {"kind":"新機能","title":"論文用レポートの出力前の確認画面","detail":"項目ごとの入力状況を「済・未・一部（Box の説明 37 件中 8 件 など）」で示し、「記入を続ける」か「このまま出力する」かを選べます。図にあるメモ・記号・コメントを載せるか、未入力の項目を出力に含めるかもここで選びます。","en":{"title":"Check screen before the paper report","detail":"Shows the status of each item as done, missing or partial (e.g., box descriptions: 8 of 37) and lets you continue editing or export as is. You also choose here whether to include notes, symbols and comments, and whether to include missing items."}},

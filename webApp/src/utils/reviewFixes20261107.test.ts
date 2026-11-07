@@ -140,3 +140,46 @@ describe('#4 凡例を含めると選んだら、凡例も入れて用紙に収�
     expect(withLegend).toBeLessThan(without);
   });
 });
+
+// ---- pass-2（Codex）の新規指摘 ----
+describe('pass-2 #1 singleLine の無い保存済みの簡素化方式でも P-EFP は 1 本', () => {
+  it('EFP を実線にしたテーマは、印が無くても 1 本', () => {
+    const d = doc('theme-simplified-reality');
+    delete d.settings.boxTypePresets!['P-EFP']!.singleLine;
+    expect(resolveBoxBorderDraw({ type: 'P-EFP' } as Box, d.settings).kind).toBe('single');
+  });
+});
+
+describe('pass-2 #2 楕円の P-EFP も出力は二重の点線（画面と同じ）', () => {
+  it('SVG: 点線の楕円が 2 つ', () => {
+    const d = doc('theme-monochrome');
+    const sh = active(d);
+    const box: Box = { ...sh.boxes[0], id: 'T1', type: 'P-EFP', shape: 'ellipse', secondaryType: undefined, x: 100, y: 100, width: 120, height: 60, label: 'x' };
+    const sheet = { ...sh, boxes: [box], lines: [], sdsg: [], notes: [], periodLabels: [] };
+    const settings = { ...d.settings, legend: { ...d.settings.legend, includeInExport: false } };
+    const [svg] = buildSVGDocuments({ sheet, settings, paperSize: 'A4-landscape', scale: false, offset: 0 });
+    expect([...svg.matchAll(/<ellipse [^>]*stroke-dasharray[^>]*>/g)]).toHaveLength(2);
+  });
+});
+
+describe('pass-2 #3 種別「その他」の凡例もテーマに従う', () => {
+  it('other:<種別名> のキーで other のテーマを引く', async () => {
+    const { legendBorderDraw } = await import('./boxPreset');
+    const d = doc();
+    d.settings.boxTypePresets = { other: { borderStyle: 'dashed', borderWidth: 1.5 } };
+    expect(legendBorderDraw('other:転機', d.settings)).toEqual({ kind: 'single', style: 'dashed', width: 1.5 });
+  });
+});
+
+describe('pass-2 #4 通常の経験への併記は種別ラベルが出ないので「示す」と書かない', () => {
+  it('通常の経験に OPP を併記しただけなら「図には示していない」', () => {
+    const d = doc();
+    const sh = active(d);
+    const b0 = sh.boxes[0];
+    d.sheets.forEach((s) => { s.boxes = []; });
+    sh.boxes = [{ ...b0, type: 'normal', secondaryType: 'OPP' }];
+    const n = describeNotation(d)!;
+    expect(n.lines.join('\n')).toContain('必須通過点（OPP）: 図には示していない');
+    expect(n.meaning).not.toContain('枠を主の種別の線で描き');
+  });
+});

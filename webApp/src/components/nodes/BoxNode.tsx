@@ -271,8 +271,16 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
   const isPEfp = borderDraw.kind === 'double-dashed'
     || ((data.type === 'P-EFP' || data.type === 'P-2nd-EFP') && borderDraw.kind === 'factory');
   const pEfpWidth = borderDraw.kind === 'double-dashed' ? borderDraw.width : 1.5;
+  // 楕円でも P-EFP は二重の点線（PPTX・SVG は楕円を 2 つ描く。outline は角丸に沿う。pass-2 新規 #2）
   const borderStyle: React.CSSProperties = shape === 'ellipse'
-    ? { borderRadius: '50%', border: `${specBorderWidth}px ${specBorderStyle} ${borderColor}` }
+    ? isPEfp
+      ? {
+          borderRadius: '50%',
+          border: `${pEfpWidth}px dashed ${borderColor}`,
+          outline: `${pEfpWidth}px dashed ${borderColor}`,
+          outlineOffset: '2px',
+        }
+      : { borderRadius: '50%', border: `${specBorderWidth}px ${specBorderStyle} ${borderColor}` }
     : isPEfp
       ? {
           border: `${pEfpWidth}px dashed ${borderColor}`,

@@ -69,7 +69,10 @@ export function describeNotation(doc: TEMDocument): NotationDescription | null {
   // 線種を書くのは枠に現れる種別だけ。併記にしか使っていない種別は「種別ラベルだけで示す」と書く（レビュー #6）
   const drawn = drawnBoxTypes(doc);
   const secondaryOnly = types.filter((t) => !drawn.includes(t));
-  const hasSecondary = doc.sheets.some((s) => s.boxes.some((b) => !!b.secondaryType && b.secondaryType !== b.type));
+  // 主の種別が通常の経験・潜在経験の Box には種別ラベルが出ない（BoxNode・SVG・PPTX）。そこへの併記は図に現れない（pass-2 新規 #4）
+  const allBoxes = doc.sheets.flatMap((s) => s.boxes);
+  const labelShown = (b: Box) => b.type !== 'normal' && b.type !== 'annotation';
+  const hasSecondary = allBoxes.some((b) => !!b.secondaryType && b.secondaryType !== b.type && labelShown(b));
   const strokes = drawn.map((t) => ({ type: t, ...strokeOf(t, settings) }));
   // 太さは、使っている種別でいちばん多い太さを基準に「太い・細い」で言う
   const widthCount = new Map<number, number>();
@@ -82,7 +85,12 @@ export function describeNotation(doc: TEMDocument): NotationDescription | null {
   };
   const named = strokes.map((s) => ({ type: s.type, name: nameOf(s) }));
   const lines = named.map((n) => `${BOX_TYPE_NAME_JA[n.type]}: ${n.name}`);
-  for (const t of secondaryOnly) lines.push(`${BOX_TYPE_NAME_JA[t]}: 併記の種別ラベルだけで示す（枠は主の種別の線）`);
+  for (const t of secondaryOnly) {
+    const visible = allBoxes.some((b) => b.secondaryType === t && labelShown(b));
+    lines.push(visible
+      ? `${BOX_TYPE_NAME_JA[t]}: 併記の種別ラベルだけで示す（枠は主の種別の線）`
+      : `${BOX_TYPE_NAME_JA[t]}: 図には示していない（通常の経験・潜在経験の Box への併記で，種別ラベルが出ないため）`);
+  }
 
   const observed = named.filter((n) => !UNOBSERVED.includes(n.type));
   const unobserved = named.filter((n) => UNOBSERVED.includes(n.type));

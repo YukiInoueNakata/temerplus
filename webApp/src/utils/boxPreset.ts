@@ -102,7 +102,9 @@ export type BoxBorderDraw =
  */
 export function legendBorderDraw(key: string, settings: ProjectSettings | undefined): BoxBorderDraw {
   if (!settings) return { kind: 'factory' };
-  return resolveBoxBorderDraw({ type: key as BoxType } as Box, settings);
+  // 種別「その他」の凡例のキーは other:<種別名>（pass-2 新規 #3）
+  const type = (key.startsWith('other:') ? 'other' : key) as BoxType;
+  return resolveBoxBorderDraw({ type } as Box, settings);
 }
 
 /**
@@ -113,12 +115,22 @@ export function doubleStrokeWidth(totalWidth: number): number {
   return Math.max(1, totalWidth / 3);
 }
 
+/**
+ * P-EFP を点線 1 本で描くテーマか。singleLine の印のほか、EFP を実線と指定したテーマ
+ * （＝線種で種別を示さない方式）も 1 本とみなす。singleLine を足す前に簡素化方式を当てて保存した
+ * .tem・利用者のテーマには印が無いため（pass-2 新規 #1）
+ */
+function singleLineTheme(p: BoxTypePreset, settings: ProjectSettings): boolean {
+  if (p.singleLine) return true;
+  return settings.boxTypePresets?.EFP?.borderStyle === 'solid';
+}
+
 export function resolveBoxBorderDraw(box: Box, settings: ProjectSettings): BoxBorderDraw {
   const p = getBoxPreset(box.type, settings);
   if (p.borderStyle === undefined && p.borderWidth === undefined) return { kind: 'factory' };
   const v = resolveBoxVisuals(box, settings);
   if (v.borderStyle === 'double') return { kind: 'double', width: v.borderWidth };
   const isPEfp = box.type === 'P-EFP' || box.type === 'P-2nd-EFP';
-  if (isPEfp && v.borderStyle === 'dashed' && !p.singleLine) return { kind: 'double-dashed', width: v.borderWidth };
+  if (isPEfp && v.borderStyle === 'dashed' && !singleLineTheme(p, settings)) return { kind: 'double-dashed', width: v.borderWidth };
   return { kind: 'single', style: v.borderStyle, width: v.borderWidth };
 }

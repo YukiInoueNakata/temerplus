@@ -19,8 +19,10 @@ export function legendSheetForClip(sheet: Sheet, clip: Rect, layout: LayoutDirec
     const f = byId.get(l.from);
     const t = byId.get(l.to);
     if (!f || !t) return false;
-    const s = Math.min(isH ? f.x : f.y, isH ? t.x : t.y);
-    const e = Math.max(isH ? f.x + f.width : f.y + f.height, isH ? t.x + t.width : t.y + t.height);
+    // 両端の Box と曲線の制御点の範囲（曲線だけが隣のページへ張り出す場合も入れる）
+    const cps = (l.controlPoints ?? []).map((p) => (isH ? p.x : p.y));
+    const s = Math.min(isH ? f.x : f.y, isH ? t.x : t.y, ...cps);
+    const e = Math.max(isH ? f.x + f.width : f.y + f.height, isH ? t.x + t.width : t.y + t.height, ...cps);
     return s <= c1 && e >= c0;
   });
   const onPage = new Set(collectSDSGRects(sheet, layout, settings).filter((r) => overlap(r.rect, clip)).map((r) => r.sdsg.id));

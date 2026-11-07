@@ -140,6 +140,45 @@ describe('時間矢印の頭が 1 ページ目に入る（Medium）', () => {
   });
 });
 
+// ---- pass-2（Codex）の指摘 ----
+describe('図の外へ張り出した曲線の制御点もページに入る（pass-2 High）', () => {
+  it('最後の Box より 600px 先に制御点を置く', () => {
+    const d0 = load(wideRaw);
+    const sh = d0.sheets[0];
+    const maxX = Math.max(...sh.boxes.map((b) => b.x + b.width));
+    const l = sh.lines[0];
+    l.shape = 'curve';
+    l.controlPoints = [{ x: maxX + 600, y: 0 }, { x: maxX + 600, y: 100 }];
+    const d = applyExportContent(d0, { legend: true, periodLabels: true });
+    const xf = { ...DEFAULT_EXPORT_TRANSFORM, fitMode: 'fit-short' as const, pageCount: 4 };
+    const t = applyExportTransform(d, xf);
+    const pages = computeSmartPagesForDoc(t.doc, { paperSize: xf.paperSize, pageCount: 4, paperMarginRatio: xf.paperMarginRatio });
+    const cp = t.doc.sheets[0].lines.find((x) => x.id === l.id)!.controlPoints!;
+    const last = pages[3];
+    expect(Math.max(...cp.map((p) => p.x))).toBeLessThanOrEqual(last.innerX + last.innerWidth);
+  });
+});
+
+describe('凡例の全体が各ページの用紙に入る（pass-2 Medium）', () => {
+  it('凡例を図の右端・下端に置く', () => {
+    const d0 = load(wideRaw);
+    const sh = d0.sheets[0];
+    const maxX = Math.max(...sh.boxes.map((b) => b.x + b.width));
+    d0.settings.legend = { ...d0.settings.legend, position: { x: maxX, y: 2000 } };
+    const d = applyExportContent(d0, { legend: true, periodLabels: true });
+    const xf = { ...DEFAULT_EXPORT_TRANSFORM, fitMode: 'fit-short' as const, pageCount: 4 };
+    const t = applyExportTransform(d, xf);
+    const pages = computeSmartPagesForDoc(t.doc, { paperSize: xf.paperSize, pageCount: 4, paperMarginRatio: xf.paperMarginRatio });
+    const lg = t.doc.settings.legend;
+    pages.forEach((p) => {
+      // 凡例の幅は minWidth 以上。右端・下端が用紙の中
+      expect(p.legendAt!.x + lg.minWidth).toBeLessThanOrEqual(p.innerX + p.innerWidth);
+      expect(p.legendAt!.y).toBeLessThan(p.innerY + p.innerHeight);
+      expect(p.legendAt!.y).toBeGreaterThanOrEqual(p.innerY);
+    });
+  });
+});
+
 describe('SVG: 各ページに、そのページの種類だけの凡例を描く', () => {
   it('横長テスト 4 ページの全ページに凡例の枠がある', () => {
     const { doc, pages } = pagesFor(wideRaw, 4);

@@ -33,6 +33,12 @@ export function computeContentBounds(
     ys.push(rect.y, rect.y + rect.height);
   });
 
+  // 曲線の制御点（ベジェ曲線は端と制御点の囲む範囲に収まるので、含めれば張り出しも収まる。
+  // 以前は含めず、図の外へ張り出した曲線が用紙からはみ出した。2026-11-07 Codex レビュー）
+  sheet.lines.forEach((l) => {
+    (l.controlPoints ?? []).forEach((p) => { xs.push(p.x); ys.push(p.y); });
+  });
+
   // 図上のメモ
   (sheet.notes ?? []).forEach((n) => {
     xs.push(n.x, n.x + n.width);

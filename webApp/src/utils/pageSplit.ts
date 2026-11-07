@@ -60,6 +60,8 @@ export interface SmartPageInput {
   contentEnd: number;
   /** 凡例の位置（図の座標）。各ページの同じ位置に描く */
   legend?: { x: number; y: number };
+  /** 凡例の大きさの見積もり（図の座標）。凡例の全体が用紙に入るよう位置を抑えるのに使う */
+  legendSize?: { w: number; h: number };
 }
 
 /**
@@ -81,10 +83,18 @@ export function computeSmartPageBounds(input: SmartPageInput): PageBounds[] {
   // 1 ページ目の窓の始まり: 図の始まり − 余白
   let winStart = contentStart - marginPx;
   let clipStart = -Infinity;
-  // 凡例の、ページの窓の始まりからの位置。図の始まりより手前にある凡例は窓の外に出るので、
-  // 窓の中（始まりから余白の 1/4 以降、終わりから余白分より前）に抑える
+  // 凡例の、ページの窓の始まりからの位置。凡例の全体が用紙に入るよう、長辺・短辺とも
+  // 「端から余白の 1/4」の内側に抑える（以前は左上だけを見て、右端や上下で凡例がはみ出した）
+  const pad = marginPx * 0.25;
+  const S = isH ? paperHeight : paperWidth; // 短辺の長さ（窓は短辺方向に -S/2..S/2）
+  const lgLong = input.legendSize ? (isH ? input.legendSize.w : input.legendSize.h) : 0;
+  const lgShort = input.legendSize ? (isH ? input.legendSize.h : input.legendSize.w) : 0;
+  const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), Math.max(lo, hi));
   const legendOffset = input.legend
-    ? Math.min(Math.max((isH ? input.legend.x : input.legend.y) - winStart, marginPx * 0.25), W - marginPx * 2)
+    ? clamp((isH ? input.legend.x : input.legend.y) - winStart, pad, W - lgLong - pad)
+    : 0;
+  const legendShort = input.legend
+    ? clamp(isH ? input.legend.y : input.legend.x, -S / 2 + pad, S / 2 - lgShort - pad)
     : 0;
   for (let i = 0; i < n; i++) {
     const last = i === n - 1;
@@ -108,7 +118,7 @@ export function computeSmartPageBounds(input: SmartPageInput): PageBounds[] {
     const cEnd = last ? Infinity : cut;
     const innerMain = winStart;
     const legendAt = input.legend
-      ? (isH ? { x: winStart + legendOffset, y: input.legend.y } : { x: input.legend.x, y: winStart + legendOffset })
+      ? (isH ? { x: winStart + legendOffset, y: legendShort } : { x: legendShort, y: winStart + legendOffset })
       : undefined;
     pages.push(isH
       ? {

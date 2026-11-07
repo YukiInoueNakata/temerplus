@@ -3,6 +3,8 @@ import type { TEMDocument } from '../types';
 import { collectSDSGRects } from './elementRects';
 import { computeTimeArrow } from './timeArrow';
 import { computePeriodLabels } from './periodLabels';
+import { computeLegendItems, computeLegendColumns } from './legend';
+import { estimateLegendSize } from './fitBounds';
 import { computeSmartPageBounds, estimatePagesNeeded, type PageBounds } from './pageSplit';
 import { getPaperPx, type PaperSizeKey } from './paperSizes';
 
@@ -36,6 +38,8 @@ export function solidSpans(doc: TEMDocument): { solids: [number, number][]; star
     const g = computePeriodLabels(sheet, st.layout, st.periodLabels, st.timeArrow, st.sdsgSpace, st.typeLabelVisibility);
     if (g) ends.push(...(isH ? [g.startX, g.endX] : [g.startY, g.endY]));
   }
+  // 曲線の制御点（図の外へ張り出した曲線もページに入れる）
+  sheet.lines.forEach((l) => (l.controlPoints ?? []).forEach((p) => ends.push(isH ? p.x : p.y)));
   const finite = ends.filter((v) => Number.isFinite(v));
   return { solids, start: Math.min(...finite), end: Math.max(...finite) };
 }
@@ -48,6 +52,18 @@ export function computeSmartPagesForDoc(doc: TEMDocument, opts: SmartPagesOption
   const spans = solidSpans(doc);
   const lg = doc.settings.legend;
   const legend = lg && lg.alwaysVisible && lg.includeInExport !== false ? { x: lg.position.x, y: lg.position.y } : undefined;
+  // 凡例の大きさ。各ページには SVG の凡例（文字の欄が 100px 以上）を重ねるので、幅はその作りとの大きいほう
+  let legendSize: { w: number; h: number } | undefined;
+  const sheet = doc.sheets.find((s) => s.id === doc.activeSheetId);
+  if (legend && lg && sheet) {
+    const items = computeLegendItems(sheet, lg, doc.settings.locale);
+    if (items.length > 0) {
+      const cols = computeLegendColumns(lg, doc.settings.layout, items.length);
+      const est = estimateLegendSize(lg, items, cols);
+      const svgW = ((lg.sampleWidth ?? 32) + 16 + Math.max(100, lg.fontSize * 10)) * cols + (cols - 1) * 12 + 20;
+      legendSize = { w: Math.max(est.w, svgW, lg.minWidth), h: est.h };
+    }
+  }
   return computeSmartPageBounds({
     paperWidth: paper.width,
     paperHeight: paper.height,
@@ -58,6 +74,7 @@ export function computeSmartPagesForDoc(doc: TEMDocument, opts: SmartPagesOption
     contentStart: spans?.start ?? 0,
     contentEnd: spans?.end ?? pageLen,
     legend,
+    legendSize,
   });
 }
 

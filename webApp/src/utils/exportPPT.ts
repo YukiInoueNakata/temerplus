@@ -171,7 +171,9 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array 
       ? { ...opts.settings, legend: { ...opts.settings.legend, position: page.legendAt } }
       : opts.settings;
     const pageSheet = filterSheetForPage(opts.sheet, page2, layout, mode);
-    drawTimeArrow(pres, slide, pageSheet, layout, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility, page2, mode, showMarkers);
+    // 時間矢印は図全体（opts.sheet）で計算し、このページの範囲で切る（ページ内の Box から計算し直すと、
+    // Box の無いページで矢印が消えた。SVG と同じやり方。2026-11-07 Codex レビュー）
+    drawTimeArrow(pres, slide, opts.sheet, layout, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility, page2, mode, showMarkers);
     drawPeriodLabels(pres, slide, pageSheet, layout, opts.settings.periodLabels, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility);
     drawBoxes(pres, slide, pageSheet, layout, opts.settings, t, 'groups');
     // Line の端点解決と精密クリップのため、常に原シートの全 Box を持つ opts.sheet を渡す

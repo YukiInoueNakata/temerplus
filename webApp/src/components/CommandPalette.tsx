@@ -426,7 +426,7 @@ function useCommands(callbacks: CommandPaletteCallbacks): Command[] {
 
       // === Help ===
       { id: 'help.about', label: 'バージョン情報', keywords: 'about version バージョン', category: 'help',
-        run: () => alert('TEMer Plus v0.2.0-dev\n著者: 中田友貴\nライセンス: PolyForm Noncommercial 1.0.0') },
+        run: () => alert('TEMer Plus v0.2.0\n著者: 中田友貴\nライセンス: PolyForm Noncommercial 1.0.0') },
     ];
 
     return cmds;

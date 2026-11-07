@@ -870,7 +870,7 @@ function HelpTab({ onOpenWizard, onOpenChangelog, unseen }: { onOpenWizard?: () 
       <RibbonButton label="マニュアル" icon="📘" disabled title="マニュアル (開発中)" />
       <RibbonButton label="動画" icon="🎬" disabled title="動画リンク (開発中)" />
       <RibbonButton label={unseen ? '更新情報（新）' : '更新情報'} icon="📰" onClick={onOpenChangelog} title="最近の更新（新機能・改善・修正）の一覧" active={unseen} />
-      <RibbonButton label="バージョン情報" icon="ℹ" onClick={() => alert('TEMer Plus v0.2.0-dev\n著者: 中田友貴\nライセンス: PolyForm Noncommercial 1.0.0')} />
+      <RibbonButton label="バージョン情報" icon="ℹ" onClick={() => alert('TEMer Plus v0.2.0\n著者: 中田友貴\nライセンス: PolyForm Noncommercial 1.0.0')} />
     </RibbonGroup>
   );
 }

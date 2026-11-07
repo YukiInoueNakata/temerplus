@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below. / このソフトウェアを使った場合は、以下のとおり引用してください。"
+title: "TEMer Plus: a drawing tool for the Trajectory Equifinality Model (TEM)"
+abstract: "TEMer Plus is a browser-based tool for drawing diagrams of the Trajectory Equifinality Model (TEM), a qualitative research method in cultural psychology. It supports boxes, paths, social direction and social guidance, period labels, transcript links, and export to PNG, SVG, PDF, PPTX and a Word report for papers."
+type: software
+authors:
+  - family-names: Nakata
+    given-names: Yuki Inoue
+    affiliation: Ritsumeikan University
+version: 0.2.0
+date-released: 2026-11-08
+repository-code: "https://github.com/YukiInoueNakata/temerplus"
+url: "https://yukiinouenakata.github.io/temerplus/"
+keywords:
+  - Trajectory Equifinality Model
+  - TEM
+  - TEA
+  - qualitative research
+  - cultural psychology
+  - diagram

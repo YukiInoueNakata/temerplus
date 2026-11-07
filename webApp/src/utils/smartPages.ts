@@ -1,6 +1,8 @@
 // 出力の複数ページ: 変換後の図から、境目を空いた所に置いたページの範囲を作る（2026-11-07「案 B」）
 import type { TEMDocument } from '../types';
 import { collectSDSGRects } from './elementRects';
+import { computeTimeArrow } from './timeArrow';
+import { computePeriodLabels } from './periodLabels';
 import { computeSmartPageBounds, estimatePagesNeeded, type PageBounds } from './pageSplit';
 import { getPaperPx, type PaperSizeKey } from './paperSizes';
 
@@ -22,11 +24,20 @@ export function solidSpans(doc: TEMDocument): { solids: [number, number][]; star
   });
   (sheet.notes ?? []).forEach((n) => solids.push(isH ? [n.x, n.x + n.width] : [n.y, n.y + n.height]));
   if (solids.length === 0) return null;
-  return {
-    solids,
-    start: Math.min(...solids.map((s) => s[0])),
-    end: Math.max(...solids.map((s) => s[1])),
-  };
+  // 図の始まり・終わりには時間矢印と時期区分も含める（Box より手前から始まる矢印の頭が、どのページにも
+  // 出なかった。2026-11-07 Codex レビュー）。これらは境目で切ってよいので solids には入れない
+  const ends: number[] = solids.flatMap((s) => [s[0], s[1]]);
+  const st = doc.settings;
+  if (st.timeArrow) {
+    const a = computeTimeArrow(sheet, st.layout, st.timeArrow, st.sdsgSpace, st.typeLabelVisibility);
+    if (a) ends.push(...(isH ? [a.startX, a.endX, a.labelX] : [a.startY, a.endY, a.labelY]));
+  }
+  if (st.periodLabels && sheet.periodLabels.length > 0) {
+    const g = computePeriodLabels(sheet, st.layout, st.periodLabels, st.timeArrow, st.sdsgSpace, st.typeLabelVisibility);
+    if (g) ends.push(...(isH ? [g.startX, g.endX] : [g.startY, g.endY]));
+  }
+  const finite = ends.filter((v) => Number.isFinite(v));
+  return { solids, start: Math.min(...finite), end: Math.max(...finite) };
 }
 
 export function computeSmartPagesForDoc(doc: TEMDocument, opts: SmartPagesOptions): PageBounds[] {

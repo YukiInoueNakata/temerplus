@@ -81,19 +81,28 @@ export function computeSmartPageBounds(input: SmartPageInput): PageBounds[] {
   // 1 ページ目の窓の始まり: 図の始まり − 余白
   let winStart = contentStart - marginPx;
   let clipStart = -Infinity;
+  // 凡例の、ページの窓の始まりからの位置。図の始まりより手前にある凡例は窓の外に出るので、
+  // 窓の中（始まりから余白の 1/4 以降、終わりから余白分より前）に抑える
   const legendOffset = input.legend
-    ? (isH ? input.legend.x : input.legend.y) - winStart
+    ? Math.min(Math.max((isH ? input.legend.x : input.legend.y) - winStart, marginPx * 0.25), W - marginPx * 2)
     : 0;
   for (let i = 0; i < n; i++) {
     const last = i === n - 1;
     let cut = winStart + W - marginPx;
     if (!last && cut < contentEnd) {
+      // この位置で切ったとき、残りのページで図の終わりまで届くか。次の窓は「境目 − 余白」から始まり、
+      // 途中のページは 1 枚で最大「用紙 − 余白 × 2」進み、最後のページは窓の端まで描く。
+      // 届かない境目を選ぶと最後のページで図の終わりが欠けた（2026-11-07 Codex レビュー High）
+      const left = n - 1 - i;
+      const reach = (c: number) => c + (left - 1) * (W - marginPx * 2) + (W - marginPx);
+      const feasible = (c: number) => contentEnd <= reach(c) - 4;
       // 窓の右端側から左へ、要素の切れ目を探す（solids の端の外側を候補にする）
       const lo = winStart + W * 0.5;
       // 要素から 10px 離す（2px だと描画の丸めで隣の Box の縁が細く残った）
       const candidates = [cut, ...solids.flatMap(([a, b]) => [a - 10, b + 10])]
-        .filter((x) => x >= lo && x <= cut && !insideSolid(x))
+        .filter((x) => x >= lo && x <= cut && !insideSolid(x) && feasible(x))
         .sort((a, b) => b - a);
+      // 空いた所で届く境目が無ければ、いちばん先まで進む位置で切る（図の終わりが欠けないことを優先）
       if (candidates.length > 0) cut = candidates[0];
     }
     const cEnd = last ? Infinity : cut;

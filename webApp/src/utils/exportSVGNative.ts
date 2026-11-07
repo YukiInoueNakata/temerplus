@@ -39,6 +39,7 @@ import { computeBoxDisplay } from './typeDisplay';
 import { getPaperPx, type PaperSizeKey } from './paperSizes';
 import type { PageBounds } from './pageSplit';
 import { pageClipRect } from './pageSplit';
+import { legendSheetForClip } from './pageLegend';
 import {
   resolveLineDirection,
   computeAngleEndpoints,
@@ -194,7 +195,11 @@ function renderPage(
   }
   drawBoxes(b, sheet, settings.layout, settings, t, includeIds.box, 'others');
   drawNotes(b, sheet, settings, t);
-  drawLegend(b, sheet, settings.layout, settings.legend, t, settings.locale, settings);
+  // 複数ページの凡例は、このページで実際に描くもの（境目をまたぐ矢印・矢印に付いた SD/SG を含む）から決める
+  const legendSheet = lineSourceSheet && pageInnerRect
+    ? legendSheetForClip(lineSourceSheet, pageInnerRect, settings.layout, settings)
+    : sheet;
+  drawLegend(b, legendSheet, settings.layout, settings.legend, t, settings.locale, settings);
   return b.build();
 }
 
@@ -1804,7 +1809,7 @@ export function renderLegendSVG(sheet: Sheet, settings: ProjectSettings): { svg:
 export function attachLegendImages(pages: PageBounds[], sheet: Sheet, settings: ProjectSettings): PageBounds[] {
   return pages.map((p) => {
     if (!p.legendAt) return p;
-    const pageSheet = filterSheetForPage(sheet, pageClipRect(p, settings.layout), settings.layout);
+    const pageSheet = legendSheetForClip(sheet, pageClipRect(p, settings.layout), settings.layout, settings);
     const img = renderLegendSVG(pageSheet, settings);
     return img ? { ...p, legendImage: img } : p;
   });

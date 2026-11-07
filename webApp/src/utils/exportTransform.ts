@@ -345,6 +345,13 @@ function transformNote(n: Note, scale: number, settings: ProjectSettings) {
 function transformLine(l: Line, scale: number) {
   // 曲線の制御点は図の座標そのもの
   if (l.controlPoints) l.controlPoints = l.controlPoints.map((p) => ({ x: p.x * scale, y: p.y * scale }));
+  // 端の位置の調整（px）も縮める（Box は縮めるので、縮めないと端だけ元の長さでずれた）
+  l.startMargin = mul(l.startMargin, scale);
+  l.endMargin = mul(l.endMargin, scale);
+  l.startOffsetTime = mul(l.startOffsetTime, scale);
+  l.startOffsetItem = mul(l.startOffsetItem, scale);
+  l.endOffsetTime = mul(l.endOffsetTime, scale);
+  l.endOffsetItem = mul(l.endOffsetItem, scale);
   l.idFontSize = (l.idFontSize ?? DEF_ID_FS) * scale;
   l.idOffsetX = mul(l.idOffsetX, scale);
   l.idOffsetY = mul(l.idOffsetY, scale);

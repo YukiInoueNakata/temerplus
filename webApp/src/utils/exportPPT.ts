@@ -41,6 +41,7 @@ import { computeBoxDisplay } from './typeDisplay';
 import { getPaperInch, type PaperSizeKey } from './paperSizes';
 import type { PageBounds } from './pageSplit';
 import { rectIntersectsPage, pageClipRect } from './pageSplit';
+import { legendSheetForClip } from './pageLegend';
 import {
   resolveLineDirection,
   computeAngleEndpoints,
@@ -184,7 +185,8 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array 
     drawBoxes(pres, slide, pageSheet, layout, opts.settings, t, 'others');
     drawNotes(pres, slide, pageSheet, opts.settings, t);
     // 凡例は全スライドに表示（SPEC）
-    drawLegend(pres, slide, pageSheet, layout, pageSettings.legend, t, opts.settings.locale, pageSettings);
+    // 凡例は、このページで実際に描くもの（境目をまたぐ矢印・矢印に付いた SD/SG を含む）から決める
+    drawLegend(pres, slide, legendSheetForClip(opts.sheet, clip, layout, opts.settings), layout, pageSettings.legend, t, opts.settings.locale, pageSettings);
     drawIdBadges(slide, pageSheet, layout, t, includeIds);
   }
   return finishPresentation(pres, filename, opts.returnBytes);

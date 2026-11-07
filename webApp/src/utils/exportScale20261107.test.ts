@@ -74,6 +74,16 @@ describe('全体の倍率で文字も縮める', () => {
     expect(cp[1].y - b1.y).toBeCloseTo(40 * s, 5);
   });
 
+  it('線の端の位置の調整（px）も縮める', () => {
+    const d = demo();
+    const l = active(d).lines[0];
+    l.startMargin = 10; l.endOffsetTime = 20; l.startOffsetItem = -8;
+    const { doc: out } = applyExportTransform(d, manual(0.5));
+    const l1 = active(out).lines.find((x) => x.id === l.id)!;
+    expect([l1.startMargin, l1.endOffsetTime, l1.startOffsetItem]).toEqual([5, 10, -4]);
+    expect(l1.endMargin).toBeUndefined();
+  });
+
   it('テーマで決めた文字の大きさを出力で既定値に戻さない', () => {
     const d = demo();
     const b0 = active(d).boxes.find((b) => b.type === 'normal' && b.style?.fontSize == null)!;

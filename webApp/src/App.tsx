@@ -362,24 +362,27 @@ export default function App() {
         target.isContentEditable;
 
       const ctrl = e.ctrlKey || e.metaKey;
+      // キーの名前は小文字にそろえて見る。Shift や Caps Lock で大文字（'Z' など）が来ると、
+      // Ctrl+Shift+Z（Mac の ⇧⌘Z）のやり直しなどが効かなかった（2026-11-08）
+      const k = (e.key ?? '').length === 1 ? e.key.toLowerCase() : e.key;
 
       // Ctrl+K: コマンドパレット (編集中でも有効、ただし Ctrl 必須なのでリスクなし)
-      if (ctrl && e.key === 'k') { e.preventDefault(); setPaletteOpen(true); return; }
-      if (ctrl && !e.shiftKey && e.key === 's') { e.preventDefault(); handleSave(); return; }
-      if (ctrl && e.shiftKey && e.key === 'S') { e.preventDefault(); handleSaveAs(); return; }
-      if (ctrl && e.key === 'o') { e.preventDefault(); handleOpen(); return; }
-      if (ctrl && !e.shiftKey && e.key === 'n') {
+      if (ctrl && k === 'k') { e.preventDefault(); setPaletteOpen(true); return; }
+      if (ctrl && !e.shiftKey && k === 's') { e.preventDefault(); handleSave(); return; }
+      if (ctrl && e.shiftKey && k === 's') { e.preventDefault(); handleSaveAs(); return; }
+      if (ctrl && k === 'o') { e.preventDefault(); handleOpen(); return; }
+      if (ctrl && !e.shiftKey && k === 'n') {
         if (isEditing) return;
         e.preventDefault();
         handleNew();
         return;
       }
-      if (ctrl && !e.shiftKey && e.key === 'z') { e.preventDefault(); temporal.undo(); return; }
-      if ((ctrl && e.shiftKey && e.key === 'z') || (ctrl && e.key === 'y')) { e.preventDefault(); temporal.redo(); return; }
-      if (ctrl && e.key === 'a' && !isEditing) { e.preventDefault(); store.selectAll(); return; }
-      if (ctrl && e.key === 'c' && !isEditing) { e.preventDefault(); store.copyToClipboard(); return; }
-      if (ctrl && e.key === 'v' && !isEditing) { e.preventDefault(); store.pasteFromClipboard(); return; }
-      if (ctrl && e.key === 'd' && !isEditing) { e.preventDefault(); store.copyToClipboard(); store.pasteFromClipboard(); return; }
+      if (ctrl && !e.shiftKey && k === 'z') { e.preventDefault(); temporal.undo(); return; }
+      if ((ctrl && e.shiftKey && k === 'z') || (ctrl && k === 'y')) { e.preventDefault(); temporal.redo(); return; }
+      if (ctrl && k === 'a' && !isEditing) { e.preventDefault(); store.selectAll(); return; }
+      if (ctrl && k === 'c' && !isEditing) { e.preventDefault(); store.copyToClipboard(); return; }
+      if (ctrl && k === 'v' && !isEditing) { e.preventDefault(); store.pasteFromClipboard(); return; }
+      if (ctrl && k === 'd' && !isEditing) { e.preventDefault(); store.copyToClipboard(); store.pasteFromClipboard(); return; }
       if ((e.key === 'Delete' || e.key === 'Backspace') && !isEditing) {
         e.preventDefault();
         const sel = store.selection;
@@ -389,7 +392,7 @@ export default function App() {
         if (sel.noteIds.length > 0) store.removeNotes(sel.noteIds);
         return;
       }
-      if (ctrl && e.shiftKey && e.key === 'T') { e.preventDefault(); store.addSheet(); return; }
+      if (ctrl && e.shiftKey && k === 't') { e.preventDefault(); store.addSheet(); return; }
       // Enter / F2: 選択中の Box / SD・SG が 1 つならラベル編集を開始
       // （ダブルクリックが効きにくい環境向けのキーボード入口）
       if ((e.key === 'Enter' || e.key === 'F2') && !isEditing && !ctrl) {

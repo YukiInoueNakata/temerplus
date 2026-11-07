@@ -9,6 +9,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import { computeContentBounds } from '../utils/fitBounds';
+import { shortcutLabel } from '../utils/platform';
 import {
   PAPER_SIZE_OPTIONS,
   getPaperPx,
@@ -119,7 +120,7 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
       : scaleMode === 'size-only'
         ? '\n（位置は維持、Box サイズと文字のみ調整）'
         : '';
-    if (!confirm(`${msg}${modeLabel}\n（Ctrl+Z で取り消し可能）`)) return;
+    if (!confirm(`${msg}${modeLabel}\n（${shortcutLabel('Ctrl+Z')} で取り消し可能）`)) return;
     resize({ xScale, yScale }, { includeFontSize, mode: scaleMode });
     onClose();
   };
@@ -140,7 +141,7 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
           <p className="hint" style={{ marginTop: 0 }}>
             アクティブシートの図全体（Box 座標・サイズ、Line、SDSG、時期ラベル位置）を一度にリサイズします。
             <br />
-            実データを変更します。Ctrl+Z で取り消せます。
+            実データを変更します。{shortcutLabel('Ctrl+Z')} で取り消せます。
           </p>
           <section className="settings-section">
             <div className="setting-row">

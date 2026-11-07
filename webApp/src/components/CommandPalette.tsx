@@ -7,6 +7,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { useTEMStore } from '../store/store';
 import type { BoxType, SDSGType } from '../types';
 import { pickBetweenAnchors } from '../utils/sdsgBetween';
+import { shortcutLabel } from '../utils/platform';
 
 export interface CommandPaletteCallbacks {
   onNew: () => void;
@@ -221,27 +222,27 @@ function useCommands(callbacks: CommandPaletteCallbacks): Command[] {
 
     const cmds: Command[] = [
       // === File ===
-      { id: 'file.new', label: '新規作成', keywords: 'new file 新規 ファイル', category: 'file', shortcut: 'Ctrl+N',
+      { id: 'file.new', label: '新規作成', keywords: 'new file 新規 ファイル', category: 'file', shortcut: shortcutLabel('Ctrl+N'),
         run: callbacks.onNew },
-      { id: 'file.open', label: '開く...', keywords: 'open file 開く 読み込み load', category: 'file', shortcut: 'Ctrl+O',
+      { id: 'file.open', label: '開く...', keywords: 'open file 開く 読み込み load', category: 'file', shortcut: shortcutLabel('Ctrl+O'),
         run: callbacks.onOpen },
-      { id: 'file.save', label: '保存', keywords: 'save file 保存', category: 'file', shortcut: 'Ctrl+S',
+      { id: 'file.save', label: '保存', keywords: 'save file 保存', category: 'file', shortcut: shortcutLabel('Ctrl+S'),
         run: callbacks.onSave },
-      { id: 'file.save-as', label: '名前を付けて保存...', keywords: 'save as 名前 保存', category: 'file', shortcut: 'Ctrl+Shift+S',
+      { id: 'file.save-as', label: '名前を付けて保存...', keywords: 'save as 名前 保存', category: 'file', shortcut: shortcutLabel('Ctrl+Shift+S'),
         run: callbacks.onSaveAs },
 
       // === Edit ===
-      { id: 'edit.undo', label: '元に戻す', keywords: 'undo 元に戻す', category: 'edit', shortcut: 'Ctrl+Z',
+      { id: 'edit.undo', label: '元に戻す', keywords: 'undo 元に戻す', category: 'edit', shortcut: shortcutLabel('Ctrl+Z'),
         run: () => temporal().undo() },
-      { id: 'edit.redo', label: 'やり直し', keywords: 'redo やり直し', category: 'edit', shortcut: 'Ctrl+Y',
+      { id: 'edit.redo', label: 'やり直し', keywords: 'redo やり直し', category: 'edit', shortcut: shortcutLabel('Ctrl+Y', 'Ctrl+Shift+Z'),
         run: () => temporal().redo() },
-      { id: 'edit.select-all', label: '全選択', keywords: 'select all 全選択', category: 'edit', shortcut: 'Ctrl+A',
+      { id: 'edit.select-all', label: '全選択', keywords: 'select all 全選択', category: 'edit', shortcut: shortcutLabel('Ctrl+A'),
         run: () => store().selectAll() },
-      { id: 'edit.copy', label: 'コピー', keywords: 'copy コピー clipboard', category: 'edit', shortcut: 'Ctrl+C',
+      { id: 'edit.copy', label: 'コピー', keywords: 'copy コピー clipboard', category: 'edit', shortcut: shortcutLabel('Ctrl+C'),
         run: () => store().copyToClipboard() },
-      { id: 'edit.paste', label: '貼り付け', keywords: 'paste 貼り付け clipboard', category: 'edit', shortcut: 'Ctrl+V',
+      { id: 'edit.paste', label: '貼り付け', keywords: 'paste 貼り付け clipboard', category: 'edit', shortcut: shortcutLabel('Ctrl+V'),
         run: () => store().pasteFromClipboard() },
-      { id: 'edit.duplicate', label: '複製', keywords: 'duplicate 複製 copy', category: 'edit', shortcut: 'Ctrl+D',
+      { id: 'edit.duplicate', label: '複製', keywords: 'duplicate 複製 copy', category: 'edit', shortcut: shortcutLabel('Ctrl+D'),
         run: () => { store().copyToClipboard(); store().pasteFromClipboard(); } },
       { id: 'edit.delete', label: '削除 (選択中)', keywords: 'delete 削除', category: 'edit', shortcut: 'Delete',
         run: () => {

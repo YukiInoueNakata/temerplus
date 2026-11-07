@@ -8,6 +8,7 @@ import { useTEMStore, useActiveSheet } from '../store/store';
 import type { BoxType } from '../types';
 import { BOX_TYPE_LABELS, LEVEL_PX } from '../store/defaults';
 import { SELECTABLE_BOX_TYPES } from '../utils/typeDisplay';
+import { shortcutLabel } from '../utils/platform';
 import { xyToTimeLevel, xyToItemLevel, setTimeLevelOnly, setItemLevelOnly } from '../utils/coords';
 
 type DataTab = 'box' | 'line' | 'sdsg';
@@ -392,7 +393,7 @@ function BoxTable() {
                       checked={selectedBoxIds.includes(b.id)}
                       onClick={(e) => handleSelectClick(idx, b.id, e)}
                       onChange={() => { /* handled by onClick */ }}
-                      title="クリック: 単独選択 / Ctrl+クリック: 追加 / Shift+クリック: 範囲選択"
+                      title={`クリック: 単独選択 / ${shortcutLabel('Ctrl+')}クリック: 追加 / Shift+クリック: 範囲選択`}
                     />
                   </td>
                   <td>

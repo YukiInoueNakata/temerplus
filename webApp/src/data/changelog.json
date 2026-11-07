@@ -1,5 +1,13 @@
 [
   {
+    "date": "2026-11-08",
+    "items": [
+      {"kind":"改善","title":"Mac ではショートカットを ⌘ で表示","detail":"ボタンやコマンドパレットのショートカットを、Mac では「⌘Z」「⇧⌘S」のように表示します。やり直しは Mac では ⇧⌘Z です。","en":{"title":"Shortcuts shown with ⌘ on Mac","detail":"On a Mac, shortcuts on buttons and in the command palette are shown as ⌘Z, ⇧⌘S and so on. Redo is ⇧⌘Z on a Mac."}},
+      {"kind":"修正","title":"Shift を使うショートカットが効かないことがある","detail":"やり直し（Ctrl+Shift+Z）などが、Shift や Caps Lock の状態によって効きませんでした。","en":{"title":"Shortcuts with Shift sometimes did not work","detail":"Redo (Ctrl+Shift+Z) and similar shortcuts could fail depending on Shift or Caps Lock."}},
+      {"kind":"修正","title":"ブラウザによって Box の文字の折り返しが変わる","detail":"Chrome・Edge は行の端のかっこ（「」）を詰めて表示し、Safari とは折り返しが変わることがありました。どのブラウザでも詰めない表示にそろえました。","en":{"title":"Box text wrapped differently across browsers","detail":"Chrome and Edge squeezed brackets at line ends, so text could wrap differently from Safari. All browsers now keep the brackets unsqueezed."}}
+    ]
+  },
+  {
     "date": "2026-11-07",
     "items": [
       {"kind":"改善","title":"複数ページの出力を作り直し","detail":"図の始まりを 1 ページ目に合わせ、ページの境目を Box どうしの間の空いた所に置くので、Box が途中で切れません。凡例は各ページに、そのページに出てくる種類だけで付きます。図がページ数に入りきらないときは少し縮めて収め、「この図は約 3.4 ページ分です」のような目安も出ます。","en":{"title":"Rebuilt multi-page export","detail":"The diagram now starts on the first page and page breaks fall in the gaps between boxes, so no box is cut in half. Each page gets its own legend listing only what appears on it. If the diagram does not fit the chosen number of pages it is shrunk to fit, and a hint shows roughly how many pages it needs."}},

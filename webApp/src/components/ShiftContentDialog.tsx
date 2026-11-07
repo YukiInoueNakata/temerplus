@@ -8,6 +8,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTEMStore } from '../store/store';
+import { shortcutLabel } from '../utils/platform';
 
 type ShiftTarget = 'selected' | 'all';
 
@@ -105,7 +106,7 @@ export function ShiftContentDialog({ open, onClose }: { open: boolean; onClose: 
         <div className="modal-body">
           <p className="hint" style={{ marginTop: 0 }}>
             ▲▼ を押すと {step} Level 単位で即時に移動。数値を直接指定する場合は「移動」ボタンで反映。
-            Ctrl+Z で取り消し可。
+            {shortcutLabel('Ctrl+Z')} で取り消し可。
           </p>
           <section className="settings-section">
             {/* 対象切替 */}

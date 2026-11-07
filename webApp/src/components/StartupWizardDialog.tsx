@@ -12,6 +12,7 @@
 // ============================================================================
 
 import { useState } from 'react';
+import { shortcutLabel } from '../utils/platform';
 
 export type StartupWizardChoice =
   | { kind: 'open-tem' }                  // 既存 .tem を開く
@@ -74,7 +75,7 @@ export function StartupWizardDialog({
                 <Card
                   emoji="📂"
                   title="プロジェクトを開く"
-                  desc="保存済の .tem ファイルを開く (Ctrl+O 相当)"
+                  desc={`保存済の .tem ファイルを開く (${shortcutLabel('Ctrl+O')} 相当)`}
                   onClick={() => choose({ kind: 'open-tem' })}
                 />
                 <Card

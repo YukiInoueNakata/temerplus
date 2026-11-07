@@ -12,6 +12,7 @@ import { pickBetweenAnchors } from '../utils/sdsgBetween';
 import { ChangelogDialog } from './ChangelogDialog';
 import changelogData from '../data/changelog.json';
 import { hasUnseen, CHANGELOG_SEEN_KEY, type ChangelogEntry } from '../utils/changelog';
+import { shortcutLabel } from '../utils/platform';
 
 const readLastSeen = () => {
   try {
@@ -156,7 +157,7 @@ function LayoutToggle() {
 function SaveButton({ onSave }: { onSave: () => void }) {
   const dirty = useTEMStore((s) => s.dirty);
   return (
-    <button className="ribbon-btn-primary" onClick={onSave} title="保存 (Ctrl+S)">
+    <button className="ribbon-btn-primary" onClick={onSave} title={`保存 (${shortcutLabel('Ctrl+S')})`}>
       {dirty ? '● 保存' : '保存'}
     </button>
   );
@@ -183,10 +184,10 @@ function FileTab({ onSave, onSaveAs, onOpen, onOpenAsNewSheets, onNew, onOpenExp
   return (
     <>
       <RibbonGroup title="ファイル操作">
-        <RibbonButton label="新規 (Ctrl+N)" icon="📄" onClick={onNew} title="空のシートで新規作成" />
-        <RibbonButton label="開く (Ctrl+O)" icon="📂" onClick={onOpen} title="現在のシートを破棄して開く" />
+        <RibbonButton label={`新規 (${shortcutLabel('Ctrl+N')})`} icon="📄" onClick={onNew} title="空のシートで新規作成" />
+        <RibbonButton label={`開く (${shortcutLabel('Ctrl+O')})`} icon="📂" onClick={onOpen} title="現在のシートを破棄して開く" />
         <RibbonButton label="別シートとして開く" icon="📂+" onClick={onOpenAsNewSheets} title="現状のシートはそのまま、ファイル内のシートを追加" />
-        <RibbonButton label="保存 (Ctrl+S)" icon="💾" onClick={onSave} />
+        <RibbonButton label={`保存 (${shortcutLabel('Ctrl+S')})`} icon="💾" onClick={onSave} />
         <RibbonButton label="名前を付けて保存" icon="💾+" onClick={onSaveAs} />
         <RibbonButton label="リサイズ..." icon="⤡" onClick={onOpenResize} title="シート全体を用紙サイズや任意の倍率でリサイズ" />
         <RibbonButton label="移動..." icon="✥" onClick={onOpenShiftContent} title="選択中の Box または全体を Time/Item 方向に移動" />
@@ -260,8 +261,8 @@ function HomeTab() {
         />
       </RibbonGroup>
       <RibbonGroup title="基本操作">
-        <RibbonButton label="元に戻す (Ctrl+Z)" icon="↶" onClick={() => useTEMStore.temporal.getState().undo()} />
-        <RibbonButton label="進む (Ctrl+Y)" icon="↷" onClick={() => useTEMStore.temporal.getState().redo()} />
+        <RibbonButton label={`元に戻す (${shortcutLabel('Ctrl+Z')})`} icon="↶" onClick={() => useTEMStore.temporal.getState().undo()} />
+        <RibbonButton label={`進む (${shortcutLabel('Ctrl+Y', 'Ctrl+Shift+Z')})`} icon="↷" onClick={() => useTEMStore.temporal.getState().redo()} />
         <RibbonButton
           label="コピー"
           icon="📋"

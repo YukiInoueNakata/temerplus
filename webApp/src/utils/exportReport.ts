@@ -19,7 +19,7 @@ import { toPng } from 'html-to-image';
 import { resolveConventionMeaning, VISUAL_CONVENTION_ITEMS } from './visualConventions';
 import { boxHasType } from './typeDisplay';
 import { buildFilter } from './exportImage';
-import { NOTE_MEMO_CLASS, NOTE_SYMBOL_CLASS } from './noteStyle';
+import { NOTE_MEMO_CLASS, NOTE_SYMBOL_CLASS, NOTE_UNFLAGGED_CLASS } from './noteStyle';
 import { usedSymbols, type ReportContentChoices } from './reportStatus';
 import { describeNotation } from './notationDescribe';
 import type {
@@ -122,13 +122,33 @@ const BOX_TYPE_ORDER: BoxType[] = [
 // 各種フォーマッタ
 // ----------------------------------------------------------------------------
 
-// 未入力を書かない（omitMissing）かどうか。exportPaperReport の間だけ切り替える
-let omitMissingNow = true;
-
-function descSuffix(description?: string, noDescriptionNeeded?: boolean): string {
+// omit: 未入力を書かない。以前はモジュール変数で持ち、2 つのレポートを同時に作ると混ざった（レビュー #8）
+function descSuffix(omit: boolean, description?: string, noDescriptionNeeded?: boolean): string {
   if (description && description.trim()) return ` — 説明: ${description.trim()}`;
-  if (noDescriptionNeeded) return omitMissingNow ? '' : ' — （説明不要）';
-  return omitMissingNow ? '' : ' — （説明未記入）';
+  if (noDescriptionNeeded) return omit ? '' : ' — （説明不要）';
+  return omit ? '' : ' — （説明未記入）';
+}
+
+/**
+ * 論文用レポートに埋め込む図の画像から除くもの（載せないと選んだメモ・記号）。
+ * 「載せるにしたものだけ」（flagged）では、載せるの印の無いメモも除く（以前は none のときしか除かず、
+ * 載せないメモが図に残った。レビュー #1）
+ */
+export function reportFigureFilter(
+  content: ReportContentChoices,
+  base: (node: HTMLElement) => boolean = () => true,
+): (node: HTMLElement) => boolean {
+  const notes = content.notes ?? 'flagged';
+  const hideSymbol = content.symbols === false;
+  return (node: HTMLElement) => {
+    if (!base(node)) return false;
+    const cl = (node as Element).classList;
+    if (!cl) return true;
+    if (notes === 'none' && cl.contains(NOTE_MEMO_CLASS)) return false;
+    if (notes === 'flagged' && cl.contains(NOTE_UNFLAGGED_CLASS)) return false;
+    if (hideSymbol && cl.contains(NOTE_SYMBOL_CLASS)) return false;
+    return true;
+  };
 }
 
 // 原文引用を 1 行で要約。スタイルは bracket / apa を切替可能
@@ -185,6 +205,7 @@ function formatBoxesByType(
   participantsLookup: Map<string, string>,
   includeRefs: boolean,
   style: 'bracket' | 'apa',
+  omit: boolean,
 ): Paragraph[] {
   // 併記種別を持つ Box は両方の見出しに載せる（主種別でない側には併記であることを添える）
   const subset = boxes.filter((b) => boxHasType(b, type));
@@ -201,7 +222,7 @@ function formatBoxesByType(
     // この見出しが併記種別側なら、主種別を添える
     const asSecondary = b.type !== type
       ? `（主種別: ${BOX_TYPE_LABEL_JA[b.type]} との併記）` : '';
-    out.push(bullet(`${b.id}${sub} 〈${lab}〉${custom}${asSecondary}${descSuffix(b.description, b.noDescriptionNeeded)}${refSfx}`));
+    out.push(bullet(`${b.id}${sub} 〈${lab}〉${custom}${asSecondary}${descSuffix(omit, b.description, b.noDescriptionNeeded)}${refSfx}`));
   });
   out.push(para(''));
   return out;
@@ -220,6 +241,7 @@ function formatLines(
   participantsLookup: Map<string, string>,
   includeRefs: boolean,
   style: 'bracket' | 'apa',
+  omit: boolean,
 ): Paragraph[] {
   if (lines.length === 0) return [];
   const out: Paragraph[] = [];
@@ -243,7 +265,7 @@ function formatLines(
     g.items.forEach((l) => {
       const labelPart = l.label && l.label.trim() ? ` 〈${l.label.trim()}〉` : '';
       const refSfx = includeRefs ? sourceRefSuffix(l.sourceRefs, transcripts, participantsLookup, style) : '';
-      out.push(bullet(`${l.id}${labelPart}: ${labelOf(l.from)} → ${labelOf(l.to)}${descSuffix(l.description, l.noDescriptionNeeded)}${refSfx}`, 1));
+      out.push(bullet(`${l.id}${labelPart}: ${labelOf(l.from)} → ${labelOf(l.to)}${descSuffix(omit, l.description, l.noDescriptionNeeded)}${refSfx}`, 1));
     });
   }
   out.push(para(''));
@@ -264,6 +286,7 @@ function formatSdsg(
   participantsLookup: Map<string, string>,
   includeRefs: boolean,
   style: 'bracket' | 'apa',
+  omit: boolean,
 ): Paragraph[] {
   if (sdsgs.length === 0) return [];
   const out: Paragraph[] = [];
@@ -297,7 +320,7 @@ function formatSdsg(
       const lab = (s.label && s.label.trim()) ? s.label.trim() : '（ラベル未設定）';
       const sub = s.subLabel && s.subLabel.trim() ? ` [${s.subLabel.trim()}]` : '';
       const refSfx = includeRefs ? sourceRefSuffix(s.sourceRefs, transcripts, participantsLookup, style) : '';
-      out.push(bullet(`${s.id}${sub} 〈${lab}〉  対象: ${attachedLabel(s)}${descSuffix(s.description, s.noDescriptionNeeded)}${refSfx}`));
+      out.push(bullet(`${s.id}${sub} 〈${lab}〉  対象: ${attachedLabel(s)}${descSuffix(omit, s.description, s.noDescriptionNeeded)}${refSfx}`));
     });
     out.push(para(''));
   }
@@ -317,6 +340,7 @@ function buildSheetResults(
   includeRefs: boolean,
   style: 'bracket' | 'apa',
   content: ReportContentChoices,
+  omit: boolean,
 ): Paragraph[] {
   const out: Paragraph[] = [];
   if (multiSheet) {
@@ -337,14 +361,14 @@ function buildSheetResults(
 
   // Box 種別ごと
   for (const t of BOX_TYPE_ORDER) {
-    out.push(...formatBoxesByType(sheet.boxes, t, transcripts, participantsLookup, includeRefs, style));
+    out.push(...formatBoxesByType(sheet.boxes, t, transcripts, participantsLookup, includeRefs, style, omit));
   }
 
   // 径路
-  out.push(...formatLines(sheet.lines, sheet.boxes, transcripts, participantsLookup, includeRefs, style));
+  out.push(...formatLines(sheet.lines, sheet.boxes, transcripts, participantsLookup, includeRefs, style, omit));
 
   // SD / SG
-  out.push(...formatSdsg(sheet.sdsg, sheet.boxes, sheet.lines, transcripts, participantsLookup, includeRefs, style));
+  out.push(...formatSdsg(sheet.sdsg, sheet.boxes, sheet.lines, transcripts, participantsLookup, includeRefs, style, omit));
 
   // 図上のメモ（記号＝文字だけのメモは除く）。確認画面の選択: すべて／「載せる」にしたものだけ／載せない
   const notesChoice = content.notes ?? 'flagged';
@@ -417,6 +441,7 @@ function buildResultsSection(
   style: 'bracket' | 'apa',
   content: ReportContentChoices,
   sectionTitle: string,
+  omit: boolean,
 ): Paragraph[] {
   const out: Paragraph[] = [];
   out.push(heading(sectionTitle, HeadingLevel.HEADING_1));
@@ -441,7 +466,7 @@ function buildResultsSection(
 
   const multiSheet = doc.sheets.length > 1;
   for (const sheet of doc.sheets) {
-    out.push(...buildSheetResults(sheet, doc.settings.layout, multiSheet, doc.transcripts, participantsLookup, includeRefs, style, content));
+    out.push(...buildSheetResults(sheet, doc.settings.layout, multiSheet, doc.transcripts, participantsLookup, includeRefs, style, content, omit));
   }
   return out;
 }
@@ -471,8 +496,7 @@ export async function buildPaperReportParagraphs(
   }
   children.push(para(''));
 
-  omitMissingNow = opts.omitMissing !== false;
-  const omit = omitMissingNow;
+  const omit = opts.omitMissing !== false;
   const content = opts.content ?? {};
   // 節の番号は出力する節だけで振る（未入力の節を省いても番号が飛ばないように）
   let secNo = 0;
@@ -586,15 +610,7 @@ export async function buildPaperReportParagraphs(
       if (el) {
         // 接続点・リサイズ枠などの編集用の部品は除き、載せないと選んだメモ・記号も除く
         const base = buildFilter({ includeGrid: false, includePaperGuides: false, includeRulers: false, background: 'white' });
-        const hideMemo = (content.notes ?? 'flagged') === 'none';
-        const hideSymbol = content.symbols === false;
-        const filter = (node: HTMLElement) => {
-          if (!base(node)) return false;
-          if (!(node instanceof Element)) return true;
-          if (hideMemo && node.classList?.contains(NOTE_MEMO_CLASS)) return false;
-          if (hideSymbol && node.classList?.contains(NOTE_SYMBOL_CLASS)) return false;
-          return true;
-        };
+        const filter = reportFigureFilter(content, base);
         const dataUrl = await toPng(el, { backgroundColor: '#ffffff', pixelRatio: 2, filter });
         const bytes = await fetchPngBytes(dataUrl);
         const rect = el.getBoundingClientRect();
@@ -625,7 +641,7 @@ export async function buildPaperReportParagraphs(
   // 6. 結果（漏れなく図要素を列挙）
   const includeRefs = opts.includeSourceRefs !== false;   // 既定 true
   const style = opts.sourceRefStyle ?? 'bracket';
-  children.push(...buildResultsSection(doc, includeRefs, style, content, `${++secNo}. 結果`));
+  children.push(...buildResultsSection(doc, includeRefs, style, content, `${++secNo}. 結果`, omit));
 
   // 7. 用語凡例
   children.push(...buildGlossary(`${++secNo}. 用語凡例（図中略語の説明）`));

@@ -35,6 +35,7 @@ function strokeOf(type: BoxType, settings: ProjectSettings): { stroke: Stroke; w
   const d = resolveBoxBorderDraw({ type } as Box, settings);
   if (d.kind === 'single') return { stroke: d.style, width: d.width };
   if (d.kind === 'double') return { stroke: 'double', width: d.width };
+  if (d.kind === 'double-dashed') return { stroke: 'double-dashed', width: d.width };
   const f = BOX_RENDER_SPECS[type] ?? BOX_RENDER_SPECS.normal;
   if (type === 'P-EFP' || type === 'P-2nd-EFP') return { stroke: 'double-dashed', width: f.borderWidth };
   return { stroke: f.borderStyle, width: f.borderWidth };
@@ -55,11 +56,21 @@ export interface NotationDescription {
   realityOnly: boolean;
 }
 
+/** 枠の線として図に現れる種別（主の種別）。併記の種別は枠に出ない（枠は主の種別の線で描く） */
+function drawnBoxTypes(doc: TEMDocument): BoxType[] {
+  const boxes = doc.sheets.flatMap((s) => s.boxes).filter((b) => !b.isGroup || b.type !== 'normal');
+  return ORDER.filter((t) => boxes.some((b) => b.type === t));
+}
+
 export function describeNotation(doc: TEMDocument): NotationDescription | null {
   const types = usedBoxTypes(doc);
   if (types.length === 0) return null;
   const settings = doc.settings;
-  const strokes = types.map((t) => ({ type: t, ...strokeOf(t, settings) }));
+  // 線種を書くのは枠に現れる種別だけ。併記にしか使っていない種別は「種別ラベルだけで示す」と書く（レビュー #6）
+  const drawn = drawnBoxTypes(doc);
+  const secondaryOnly = types.filter((t) => !drawn.includes(t));
+  const hasSecondary = doc.sheets.some((s) => s.boxes.some((b) => !!b.secondaryType && b.secondaryType !== b.type));
+  const strokes = drawn.map((t) => ({ type: t, ...strokeOf(t, settings) }));
   // 太さは、使っている種別でいちばん多い太さを基準に「太い・細い」で言う
   const widthCount = new Map<number, number>();
   strokes.forEach((s) => widthCount.set(s.width, (widthCount.get(s.width) ?? 0) + 1));
@@ -71,6 +82,7 @@ export function describeNotation(doc: TEMDocument): NotationDescription | null {
   };
   const named = strokes.map((s) => ({ type: s.type, name: nameOf(s) }));
   const lines = named.map((n) => `${BOX_TYPE_NAME_JA[n.type]}: ${n.name}`);
+  for (const t of secondaryOnly) lines.push(`${BOX_TYPE_NAME_JA[t]}: 併記の種別ラベルだけで示す（枠は主の種別の線）`);
 
   const observed = named.filter((n) => !UNOBSERVED.includes(n.type));
   const unobserved = named.filter((n) => UNOBSERVED.includes(n.type));
@@ -90,5 +102,6 @@ export function describeNotation(doc: TEMDocument): NotationDescription | null {
   } else {
     meaning = 'Box の線種は，要素の種別と実在性（観察されたか否か）の両方を表す。';
   }
+  if (hasSecondary) meaning += '2 つの種別を併記した Box は，枠を主の種別の線で描き，併記した種別は種別ラベルで示す。';
   return { lines, meaning, realityOnly };
 }

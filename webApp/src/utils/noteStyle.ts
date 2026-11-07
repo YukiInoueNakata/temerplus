@@ -14,8 +14,11 @@ export const NOTE_LINE_HEIGHT = 1.4;
  */
 export const NOTE_MEMO_CLASS = 'temer-note-memo';
 export const NOTE_SYMBOL_CLASS = 'temer-note-symbol';
-export function noteKindClass(style?: string): string {
-  return style === 'text' ? NOTE_SYMBOL_CLASS : NOTE_MEMO_CLASS;
+/** 「論文用レポートに載せる」を付けていないメモ（記号は除く）。「載せるにしたものだけ」で図から除く（レビュー #1） */
+export const NOTE_UNFLAGGED_CLASS = 'temer-note-unflagged';
+export function noteKindClass(style?: string, includeInReport?: boolean): string {
+  if (style === 'text') return NOTE_SYMBOL_CLASS;
+  return includeInReport ? NOTE_MEMO_CLASS : `${NOTE_MEMO_CLASS} ${NOTE_UNFLAGGED_CLASS}`;
 }
 
 /** 「文字だけ」メモで置きやすい記号（強調の後付け用） */

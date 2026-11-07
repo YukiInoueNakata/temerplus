@@ -44,7 +44,7 @@ import {
   computeAngleEndpoints,
   clampAngleDeg,
 } from './lineDirection';
-import { resolveBoxVisuals, resolveBoxBorderDraw } from './boxPreset';
+import { resolveBoxVisuals, resolveBoxBorderDraw, doubleStrokeWidth, legendBorderDraw } from './boxPreset';
 import {
   computeLinePath,
   applyLinePathMargins,
@@ -188,7 +188,7 @@ function renderPage(
   }
   drawBoxes(b, sheet, settings.layout, settings, t, includeIds.box, 'others');
   drawNotes(b, sheet, settings, t);
-  drawLegend(b, sheet, settings.layout, settings.legend, t, settings.locale);
+  drawLegend(b, sheet, settings.layout, settings.legend, t, settings.locale, settings);
   return b.build();
 }
 
@@ -748,10 +748,14 @@ function renderBox(
   const border = resolveBoxBorderDraw(bx, settings);
   if (border.kind === 'single') {
     drawShape(x, y, w, h, border.width, border.style === 'dashed' ? '5 3' : border.style === 'dotted' ? '2 2' : undefined, fill);
-  } else if (border.kind === 'double') {
-    drawShape(x, y, w, h, 1, undefined, fill);
-    const ins = Math.max(1.5, 0.025 * Math.min(w, h));
-    drawShape(x + ins, y + ins, Math.max(0.5, w - ins * 2), Math.max(0.5, h - ins * 2), 1, undefined, 'none');
+  } else if (border.kind === 'double' || border.kind === 'double-dashed') {
+    // 二重線・二重の点線。1 本の太さはテーマの太さの 3 分の 1（画面の CSS double と同じ）
+    const dashed = border.kind === 'double-dashed';
+    const lw = dashed ? border.width : doubleStrokeWidth(border.width);
+    const dash = dashed ? '5 3' : undefined;
+    drawShape(x, y, w, h, lw, dash, fill);
+    const ins = Math.max(1.5, (dashed ? 0.03 : 0.025) * Math.min(w, h), lw * 2);
+    drawShape(x + ins, y + ins, Math.max(0.5, w - ins * 2), Math.max(0.5, h - ins * 2), lw, dash, 'none');
   } else switch (bx.type) {
     case 'EFP':
     case '2nd-EFP': {
@@ -1629,7 +1633,7 @@ function drawNotes(b: SVGBuilder, sheet: Sheet, settings: ProjectSettings, t: Tr
 
 function drawLegend(
   b: SVGBuilder, sheet: Sheet, layout: LayoutDirection, lg: LegendSettings, t: Transform,
-  locale: Locale = 'ja',
+  locale: Locale = 'ja', settings?: ProjectSettings,
 ) {
   if (!lg || !lg.includeInExport) return;
   const items = computeLegendItems(sheet, lg, locale);
@@ -1736,7 +1740,7 @@ function drawLegend(
     const cellY = gridOriginY + row * (rowHpx + rowGap);
     const iconX = cellX + (iconColMinPx - sampleW) / 2;
     const iconY = cellY + (rowHpx - sampleH) / 2;
-    drawLegendIcon(b, item, iconX, iconY, sampleW, sampleH, t);
+    drawLegendIcon(b, item, iconX, iconY, sampleW, sampleH, t, settings);
 
     const overrideKey = `${item.category}:${item.key}`;
     const ov = lg.itemOverrides?.[overrideKey];
@@ -1772,9 +1776,25 @@ function drawLegend(
 
 function drawLegendIcon(
   b: SVGBuilder, item: LegendItem, x: number, y: number, w: number, h: number, t: Transform,
+  settings?: ProjectSettings,
 ) {
   const X = t.toX(x), Y = t.toY(y), W = t.toLen(w), H = t.toLen(h);
   if (item.category === 'box') {
+    // テーマで線種を指定していれば、図の Box と同じ線で描く
+    const draw = legendBorderDraw(item.key, settings);
+    if (draw.kind !== 'factory') {
+      const dash = draw.kind === 'double-dashed' || (draw.kind === 'single' && draw.style === 'dashed') ? '4 2'
+        : draw.kind === 'single' && draw.style === 'dotted' ? '2 2' : undefined;
+      const lw = draw.kind === 'double' ? doubleStrokeWidth(draw.width) : Math.min(draw.width, 2.5);
+      b.rect(X, Y, W, H, { fill: '#ffffff', stroke: '#222', strokeWidth: lw, strokeDasharray: dash });
+      if (draw.kind !== 'single') {
+        const inset = 2;
+        b.rect(X + inset, Y + inset, Math.max(1, W - inset * 2), Math.max(1, H - inset * 2), {
+          fill: 'none', stroke: '#222', strokeWidth: lw, strokeDasharray: dash,
+        });
+      }
+      return;
+    }
     const isPEfp = item.key === 'P-EFP' || item.key === 'P-2nd-EFP';
     if (isPEfp) {
       b.rect(X, Y, W, H, { fill: '#ffffff', stroke: '#222', strokeWidth: 1.2, strokeDasharray: '4 2' });

@@ -83,8 +83,8 @@ export const BUILTIN_THEMES: BoxStyleTheme[] = [
       OPP:         { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
       EFP:         { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
       '2nd-EFP':   { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
-      'P-EFP':     { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'dashed' },
-      'P-2nd-EFP': { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'dashed' },
+      'P-EFP':     { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'dashed', singleLine: true },
+      'P-2nd-EFP': { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'dashed', singleLine: true },
       annotation:  { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'dashed' },
     },
   },
@@ -200,6 +200,7 @@ function sanitizePreset(input: unknown): BoxTypePreset | null {
   if (fs !== undefined) out.fontSize = fs;
   if (typeof raw.bold === 'boolean') out.bold = raw.bold;
   if (typeof raw.italic === 'boolean') out.italic = raw.italic;
+  if (raw.singleLine === true) out.singleLine = true;
   const tlbw = clampNum(raw.typeLabelBorderWidth, 0, 10);
   if (tlbw !== undefined) out.typeLabelBorderWidth = tlbw;
   const slbw = clampNum(raw.subLabelBorderWidth, 0, 10);

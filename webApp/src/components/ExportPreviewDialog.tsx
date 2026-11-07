@@ -239,11 +239,13 @@ export function ExportPreviewDialog({
   );
   const contentMissing = missingChoices(contentReport, contentChoices);
 
-  // 変換後 doc（プレビュー / エクスポート両方で使用）。含める要素の選択もここで当てる
-  const transformed = useMemo(() => {
-    const t = applyExportTransform(doc, xf);
-    return { ...t, doc: applyExportContent(t.doc, contentChoices) };
-  }, [doc, xf, contentChoices]);
+  // 変換後 doc（プレビュー / エクスポート両方で使用）。含める要素の選択を先に当ててから、
+  // 用紙に収める・中央に寄せる計算をする（逆の順だと、含めると選んだ凡例を見ずに収めてしまい、
+  // 凡例が用紙の外に出ることがあった。除いたメモの分の余白も残った。レビュー #4）
+  const transformed = useMemo(
+    () => applyExportTransform(applyExportContent(doc, contentChoices), xf),
+    [doc, xf, contentChoices],
+  );
 
   // ページ境界を計算（プレビュー / 実出力で共用）
   const pageBounds = useMemo(() => {

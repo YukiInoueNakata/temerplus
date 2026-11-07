@@ -46,7 +46,7 @@ import {
   computeAngleEndpoints,
   clampAngleDeg,
 } from './lineDirection';
-import { resolveBoxVisuals, resolveBoxBorderDraw } from './boxPreset';
+import { resolveBoxVisuals, resolveBoxBorderDraw, doubleStrokeWidth, legendBorderDraw } from './boxPreset';
 import {
   computeLinePath,
   applyLinePathMargins,
@@ -142,7 +142,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array 
     drawSDSGInfluence(pres, slide, opts.sheet, opts.settings, t);
     drawBoxes(pres, slide, opts.sheet, layout, opts.settings, t, 'others');
     drawNotes(pres, slide, opts.sheet, opts.settings, t);
-    drawLegend(pres, slide, opts.sheet, layout, opts.settings.legend, t, opts.settings.locale);
+    drawLegend(pres, slide, opts.sheet, layout, opts.settings.legend, t, opts.settings.locale, opts.settings);
     drawIdBadges(slide, opts.sheet, layout, t, includeIds);
     return finishPresentation(pres, filename, opts.returnBytes);
   }
@@ -174,7 +174,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array 
     drawBoxes(pres, slide, pageSheet, layout, opts.settings, t, 'others');
     drawNotes(pres, slide, pageSheet, opts.settings, t);
     // 凡例は全スライドに表示（SPEC）
-    drawLegend(pres, slide, pageSheet, layout, opts.settings.legend, t, opts.settings.locale);
+    drawLegend(pres, slide, pageSheet, layout, opts.settings.legend, t, opts.settings.locale, opts.settings);
     drawIdBadges(slide, pageSheet, layout, t, includeIds);
   }
   return finishPresentation(pres, filename, opts.returnBytes);
@@ -549,15 +549,19 @@ function renderBox(
         dashType: border.style === 'dashed' ? 'dash' : border.style === 'dotted' ? 'sysDot' : undefined,
       },
     });
-  } else if (border.kind === 'double') {
-    slide.addShape(shapeType, { x, y, w, h, fill, line: { color: borderColor, width: 1 } });
-    const ins = Math.max(0.015, 0.025 * Math.min(w, h));
+  } else if (border.kind === 'double' || border.kind === 'double-dashed') {
+    // 二重線・二重の点線: 外枠 + 内枠の 2 つを重ねる。1 本の太さはテーマの太さの 3 分の 1（画面の CSS double と同じ）
+    const dashed = border.kind === 'double-dashed';
+    const lw = dashed ? border.width : doubleStrokeWidth(border.width);
+    const dashType = dashed ? 'dash' as const : undefined;
+    slide.addShape(shapeType, { x, y, w, h, fill, line: { color: borderColor, width: lw, dashType } });
+    const ins = Math.max(dashed ? 0.02 : 0.015, (dashed ? 0.03 : 0.025) * Math.min(w, h), (lw * 2) / 72);
     slide.addShape(shapeType, {
       x: x + ins, y: y + ins,
       w: Math.max(0.01, w - ins * 2),
       h: Math.max(0.01, h - ins * 2),
       fill: { color: 'FFFFFF', transparency: 100 },
-      line: { color: borderColor, width: 1 },
+      line: { color: borderColor, width: lw, dashType },
     });
   } else switch (b.type) {
     case 'EFP':
@@ -1600,6 +1604,7 @@ function drawLegend(
   lg: LegendSettings,
   t: Transform,
   locale: Locale = 'ja',
+  settings?: ProjectSettings,
 ) {
   if (!lg || !lg.includeInExport) return;
   const items = computeLegendItems(sheet, lg, locale);
@@ -1730,7 +1735,7 @@ function drawLegend(
     // アイコン（中央揃え）
     const iconX = cellX + (iconColMinPx - sampleW) / 2;
     const iconY = cellY + (rowHpx - sampleH) / 2;
-    drawLegendIcon(pres, slide, item, iconX, iconY, sampleW, sampleH, t);
+    drawLegendIcon(pres, slide, item, iconX, iconY, sampleW, sampleH, t, settings);
 
     // テキスト（左揃え）
     const overrideKey = `${item.category}:${item.key}`;
@@ -1780,8 +1785,29 @@ function drawLegendIcon(
   w: number,
   h: number,
   t: Transform,
+  settings?: ProjectSettings,
 ) {
   if (item.category === 'box') {
+    // テーマで線種を指定していれば、図の Box と同じ線で描く
+    const draw = legendBorderDraw(item.key, settings);
+    if (draw.kind !== 'factory') {
+      const dashed = draw.kind === 'double-dashed' || (draw.kind === 'single' && draw.style !== 'solid');
+      const dashType = !dashed ? undefined : draw.kind === 'single' && draw.style === 'dotted' ? 'sysDot' as const : 'dash' as const;
+      const lw = draw.kind === 'double' ? doubleStrokeWidth(draw.width) : Math.min(draw.width, 2.5);
+      slide.addShape(pres.ShapeType.rect, {
+        x: t.toX(x), y: t.toY(y), w: t.toLen(w), h: t.toLen(h),
+        fill: { color: 'FFFFFF' }, line: { color: '222222', width: lw, dashType },
+      });
+      if (draw.kind !== 'single') {
+        const inset = 2;
+        slide.addShape(pres.ShapeType.rect, {
+          x: t.toX(x + inset), y: t.toY(y + inset),
+          w: t.toLen(Math.max(1, w - inset * 2)), h: t.toLen(Math.max(1, h - inset * 2)),
+          fill: { color: 'FFFFFF', transparency: 100 }, line: { color: '222222', width: lw, dashType },
+        });
+      }
+      return;
+    }
     const isPEfp = item.key === 'P-EFP' || item.key === 'P-2nd-EFP';
     if (isPEfp) {
       // 二重点線: 外枠と内枠

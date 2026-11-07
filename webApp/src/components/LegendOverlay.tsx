@@ -11,6 +11,8 @@ import { useStore as useReactFlowStore } from 'reactflow';
 import { useTEMStore } from '../store/store';
 import { computeLegendItems, computeLegendColumns, type LegendItem } from '../utils/legend';
 import { BOX_RENDER_SPECS } from '../store/defaults';
+import { legendBorderDraw } from '../utils/boxPreset';
+import type { ProjectSettings } from '../types';
 import { useTEMView } from '../context/TEMViewContext';
 
 export function LegendOverlay({ onOpenSettings }: { onOpenSettings?: () => void }) {
@@ -172,7 +174,7 @@ export function LegendOverlay({ onOpenSettings }: { onOpenSettings?: () => void 
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <LegendSampleIcon item={item} zoom={zoom} width={sampleW} height={sampleH} />
+              <LegendSampleIcon item={item} zoom={zoom} width={sampleW} height={sampleH} settings={view.settings} />
             </div>
             <div style={{ textAlign: 'left', lineHeight: 1.2, minWidth: 0 }}>
               <div style={{ fontWeight: 600 }}>{label}</div>
@@ -408,16 +410,26 @@ function LegendSampleIcon({
   zoom,
   width = 32,
   height = 18,
+  settings,
 }: {
   item: LegendItem;
   zoom: number;
   width?: number;
   height?: number;
+  settings?: ProjectSettings;
 }) {
   const w = width * zoom;
   const h = height * zoom;
 
   if (item.category === 'box') {
+    // テーマで線種を指定していれば、図の Box と同じ線で描く（簡素化方式など）
+    const draw = legendBorderDraw(item.key, settings);
+    if (draw.kind === 'single') {
+      return <div style={{ width: w, height: h, border: `${Math.min(draw.width, 2.5) * zoom}px ${draw.style} #222`, background: '#fff', flexShrink: 0 }} />;
+    }
+    if (draw.kind === 'double') {
+      return <div style={{ width: w, height: h, border: `${Math.max(3, draw.width) * zoom}px double #222`, background: '#fff', flexShrink: 0 }} />;
+    }
     const isPEfp = item.key === 'P-EFP' || item.key === 'P-2nd-EFP';
     if (isPEfp) {
       return (

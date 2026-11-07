@@ -54,8 +54,8 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
   // 優先順位: box 個別値 > preset > 工場出荷時 (BOX_RENDER_SPECS)
   const boxForPreset = view.sheet?.boxes.find((b) => b.id === data.id);
   const visuals = boxForPreset ? resolveBoxVisuals(boxForPreset, view.settings) : null;
-  // テーマで線種・太さを指定しているか（P-EFP の二重の点線を使うかの判定。utils/boxPreset.ts resolveBoxBorderDraw）
-  const hasPresetBorder = !!boxForPreset && resolveBoxBorderDraw(boxForPreset, view.settings).kind !== 'factory';
+  // 枠の描き方（P-EFP の二重の点線を使うかの判定。utils/boxPreset.ts resolveBoxBorderDraw）
+  const borderDraw = boxForPreset ? resolveBoxBorderDraw(boxForPreset, view.settings) : { kind: 'factory' as const };
   const shape = visuals?.shape ?? data.shape ?? spec.defaultShape;
   const isTextVertical = data.textOrientation === 'vertical';
   const isVerticalLayout = layout === 'vertical';
@@ -267,14 +267,16 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
     // width/height auto で box 内の子サイズを自然に、grid justifyItems/alignItems で配置
   };
 
-  // P-EFP の二重の点線は、テーマで線種・太さを指定していないときだけ（指定があればその指定どおり）
-  const isPEfp = (data.type === 'P-EFP' || data.type === 'P-2nd-EFP') && !hasPresetBorder;
+  // P-EFP の二重の点線: テーマの指定が無いとき、またはテーマが点線と指定したとき（簡素化方式の singleLine だけ 1 本）
+  const isPEfp = borderDraw.kind === 'double-dashed'
+    || ((data.type === 'P-EFP' || data.type === 'P-2nd-EFP') && borderDraw.kind === 'factory');
+  const pEfpWidth = borderDraw.kind === 'double-dashed' ? borderDraw.width : 1.5;
   const borderStyle: React.CSSProperties = shape === 'ellipse'
     ? { borderRadius: '50%', border: `${specBorderWidth}px ${specBorderStyle} ${borderColor}` }
     : isPEfp
       ? {
-          border: `1.5px dashed ${borderColor}`,
-          outline: `1.5px dashed ${borderColor}`,
+          border: `${pEfpWidth}px dashed ${borderColor}`,
+          outline: `${pEfpWidth}px dashed ${borderColor}`,
           outlineOffset: '2px',
           borderRadius: 0,
         }

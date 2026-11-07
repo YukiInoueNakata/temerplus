@@ -481,7 +481,7 @@ function CanvasInner({
       id: n.id,
       type: 'note',
       // 論文用レポートの図で、メモ・記号を含めないと選んだときに除くための印（utils/noteStyle.ts）
-      className: noteKindClass(n.style),
+      className: noteKindClass(n.style, n.includeInReport),
       position: { x: n.x, y: n.y },
       selected: sel.has(n.id),
       data: { id: n.id, text: n.text, width: n.width, height: n.height, style: n.style, fontSize: n.fontSize, color: n.color },

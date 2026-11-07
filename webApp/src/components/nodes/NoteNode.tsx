@@ -177,7 +177,7 @@ export function NoteLeaderOverlay() {
     if (tx === undefined || ty === undefined) return;
     const from = toScreen(n.x + n.width / 2, n.y + n.height / 2);
     const to = toScreen(tx, ty);
-    segments.push({ id: n.id, cls: noteKindClass(n.style), x1: from.x, y1: from.y, x2: to.x, y2: to.y });
+    segments.push({ id: n.id, cls: noteKindClass(n.style, n.includeInReport), x1: from.x, y1: from.y, x2: to.x, y2: to.y });
   });
   if (segments.length === 0) return null;
 

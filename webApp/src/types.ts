@@ -686,6 +686,8 @@ export interface BoxTypePreset {
   // 枠線（BOX_RENDER_SPECS の borderStyle / borderWidth を上書き）
   borderStyle?: 'solid' | 'double' | 'dashed' | 'dotted';
   borderWidth?: number;
+  // P-EFP・P-2nd EFP を点線 1 本で描く（既定は二重の点線。記号の簡素化方式のテーマが使う。2026-11-07）
+  singleLine?: boolean;
   // 形状（BOX_RENDER_SPECS.defaultShape を上書き）
   shape?: BoxShape;
   // 本体の色 / 文字

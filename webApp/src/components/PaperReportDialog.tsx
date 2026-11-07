@@ -66,6 +66,15 @@ export function PaperReportDialog({
   const [content, setContent] = useState<ReportContentChoices>({});
   const doc = useTEMStore((s) => s.doc);
 
+  // 開くたびに確認画面を閉じ、メモ・記号・コメントの選択と未入力の扱いを最初に戻す
+  // （以前は確認画面のまま閉じて開き直すと前回の選択が残り、そのまま出力できた。レビュー #2）
+  useEffect(() => {
+    if (!open) return;
+    setConfirming(false);
+    setContent({});
+    setOmitMissing(true);
+  }, [open]);
+
   useEffect(() => {
     if (!dragging) return;
     const onMove = (e: MouseEvent) => {

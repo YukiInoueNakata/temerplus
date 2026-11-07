@@ -19,6 +19,7 @@ import { ExportPreviewCanvas } from './ExportPreviewCanvas';
 import { CollapsibleSection } from './CollapsibleSection';
 import type { ExportOptions } from '../utils/exportImage';
 import { computePageBounds } from '../utils/pageSplit';
+import { openPrintWindow } from '../utils/printWindow';
 import {
   BUILTIN_PRESETS,
   deleteUserPreset,
@@ -376,6 +377,8 @@ export function ExportPreviewDialog({
 
   const runPrint = async () => {
     if (contentMissing.length > 0) return;
+    // 窓はクリックの直後に開く（await の後だと Safari がポップアップとして止める）
+    const printWin = openPrintWindow();
     setBusy(true);
     setNotice(null);
     const ac = new AbortController();
@@ -394,8 +397,11 @@ export function ExportPreviewDialog({
         pages: multi ?? undefined,
         onProgress: onProg,
         signal: ac.signal,
+        targetWindow: printWin,
       });
     } catch (e) {
+      // 失敗・取り消しのときは、先に開いた準備中の窓を閉じる
+      if (printWin && !printWin.closed) printWin.close();
       if (e instanceof DOMException && e.name === 'AbortError') {
         setNotice('印刷準備をキャンセルしました');
       } else {

@@ -73,25 +73,62 @@ export function computeContentBounds(
     }
   }
 
-  // 凡例（近似：位置 + minWidth + 行数による高さ）
+  // 凡例（LegendOverlay の描き方に合わせた見積もり）
   if (settings.legend && settings.legend.alwaysVisible) {
     const items = computeLegendItems(sheet, settings.legend, settings.locale);
     if (items.length > 0) {
-      const lg = settings.legend;
-      const cols = computeLegendColumns(lg, layout, items.length);
-      const rows = Math.ceil(items.length / cols);
-      const showDesc = lg.showDescriptions === true;
-      const titleH = lg.showTitle !== false ? (lg.titleFontSize ?? lg.fontSize * 1.15) * 1.4 + 6 : 0;
-      const textRowH = lg.fontSize * (showDesc ? 2 : 1) * 1.4 + 4;
-      const rowH = Math.max(textRowH, (lg.sampleHeight ?? 18) + 4);
-      const approxH = titleH + rows * rowH + 20;
-      const approxW = Math.max(lg.minWidth, ((lg.sampleWidth ?? 32) + 80) * cols) + 16;
-      xs.push(lg.position.x, lg.position.x + approxW);
-      ys.push(lg.position.y, lg.position.y + approxH);
+      const { w, h } = estimateLegendSize(settings.legend, items, computeLegendColumns(settings.legend, layout, items.length));
+      xs.push(settings.legend.position.x, settings.legend.position.x + w);
+      ys.push(settings.legend.position.y, settings.legend.position.y + h);
     }
   }
 
   if (xs.length === 0 || ys.length === 0) return null;
+  return finish(xs, ys);
+}
+
+/**
+ * 凡例の大きさの見積もり（図の座標）。LegendOverlay の作りに合わせる:
+ * 外枠の padding 8・枠線、タイトル（行の高さ 1.2 + 下の余白 4 + 線 4 + 区切り 1）、
+ * 項目は行の間 4・列の間 12、見本は sampleHeight に Box の枠の太さ（上下で最大 8）が足される。
+ * 余白・枠の太さは出力で縮めないので、縮めた図では文字や見本より大きく効く。
+ * 以前は行の高さを文字から決め、Box の見本の枠と余白を数えておらず、複数ページの出力で凡例の下が
+ * 用紙からはみ出した（2026-11-07）。
+ */
+export function estimateLegendSize(
+  lg: NonNullable<ProjectSettings['legend']>,
+  items: { category: string; label: string }[],
+  cols: number,
+): { w: number; h: number } {
+  if (lg.width != null && lg.height != null) return { w: lg.width, h: lg.height };
+  const pad = 8;
+  const bw = Math.max(0, lg.borderWidth ?? 1);
+  const fs = lg.fontSize;
+  const tfs = lg.titleFontSize ?? fs * 1.15;
+  const sampleW = lg.sampleWidth ?? 32;
+  const sampleH = lg.sampleHeight ?? 18;
+  const showTitle = lg.showTitle !== false;
+  const titleSide = (lg.titlePosition ?? 'top') !== 'top';
+  const labelH = fs * 1.2 * (lg.showDescriptions ? 1 + 0.85 : 1);
+  const iconH = (c: string) => (c === 'box' ? sampleH + 8 : sampleH);
+  const rows: number[] = [];
+  items.forEach((it, i) => {
+    const r = Math.floor(i / cols);
+    rows[r] = Math.max(rows[r] ?? 0, labelH, iconH(it.category));
+  });
+  const itemsH = rows.reduce((a, b) => a + b, 0) + Math.max(0, rows.length - 1) * 4;
+  // 実測（Edge・2026-11-07）でタイトルの部分は文字の行 + 約 12（下の余白・線・区切り・行の上下）
+  const titleH = showTitle && !titleSide ? tfs * 1.2 + 12 : 0;
+  const maxLabel = Math.max(...items.map((it) => it.label.length));
+  const colW = sampleW + 8 + 8 + maxLabel * fs * 1.05;
+  const titleW = showTitle && titleSide ? tfs * 1.5 + 12 : 0;
+  const contentW = Math.max(lg.minWidth, cols * colW + (cols - 1) * 12 + titleW);
+  const h = lg.height ?? (pad * 2 + bw * 2 + Math.max(itemsH + titleH, titleSide && showTitle ? tfs * 1.2 * 2 : 0) + 4);
+  const w = lg.width ?? (contentW + pad * 2 + bw * 2);
+  return { w, h };
+}
+
+function finish(xs: number[], ys: number[]) {
   const minX = Math.min(...xs);
   const maxX = Math.max(...xs);
   const minY = Math.min(...ys);

@@ -3,13 +3,13 @@
 exports[`computeContentBounds（ゴールデン） > 日本語デモの各シートの bbox が変わらない 1`] = `
 [
   {
-    "height": 715,
+    "height": 757,
     "width": 820,
     "x": 0,
     "y": 27,
   },
   {
-    "height": 1211,
+    "height": 1245,
     "width": 2111,
     "x": 0,
     "y": -513,
@@ -20,13 +20,13 @@ exports[`computeContentBounds（ゴールデン） > 日本語デモの各シー
 exports[`computeContentBounds（ゴールデン） > 英語デモの各シートの bbox が変わらない 1`] = `
 [
   {
-    "height": 715,
+    "height": 757,
     "width": 850,
     "x": 0,
     "y": 27,
   },
   {
-    "height": 1211,
+    "height": 1245,
     "width": 2193,
     "x": 0,
     "y": -513,

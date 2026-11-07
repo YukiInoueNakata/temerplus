@@ -9,7 +9,7 @@ import { toPng } from 'html-to-image';
 import type { PageBounds } from './pageSplit';
 import { getPaperInch, type PaperSizeKey } from './paperSizes';
 import { checkAborted, type ProgressCallback } from './exportProgress';
-import { captureRatio } from './exportImage';
+import { captureRatio, buildFilter as imageFilter } from './exportImage';
 
 export interface PrintOptions {
   /** N ページ分割（未指定 or 1 枚なら単一ページ印刷） */
@@ -27,28 +27,17 @@ export interface PrintOptions {
   includeRulers?: boolean;
   onProgress?: ProgressCallback;
   signal?: AbortSignal;
+  /**
+   * 先に開いておいた印刷用の窓。クリックの直後（await の前）に開かないと、Safari は画像を作り終えた
+   * 後の window.open をポップアップとして止め、印刷できなかった（2026-11-07 Mac の確認で発見）。
+   * openPrintWindow() で開いて渡す。未指定ならここで開く（Chrome・Edge は通る）
+   */
+  targetWindow?: Window | null;
 }
 
-function buildFilter(opts: PrintOptions) {
-  return (el: HTMLElement) => {
-    if (!(el instanceof HTMLElement)) return true;
-    if (el.classList?.contains('react-flow__controls')) return false;
-    if (el.classList?.contains('react-flow__minimap')) return false;
-    if (el.classList?.contains('react-flow__attribution')) return false;
-    if (el.classList?.contains('scrollbar-h')) return false;
-    if (el.classList?.contains('scrollbar-v')) return false;
-    if (!opts.includeRulers) {
-      if (el.classList?.contains('canvas-rulers')) return false;
-      if (el.classList?.contains('ruler-vertical')) return false;
-      if (el.classList?.contains('ruler-horizontal')) return false;
-      if (el.classList?.contains('ruler-corner')) return false;
-    }
-    if (!opts.includeGrid && el.classList?.contains('react-flow__background')) return false;
-    if (!opts.includePaperGuides && el.classList?.contains('paper-guide-overlay')) return false;
-    if (el.classList?.contains('page-split-overlay')) return false;
-    return true;
-  };
-}
+// 出力（PNG・PDF）と同じ判定を使う。以前は印刷だけ別の判定で、接続点（Box の左右の丸）と
+// リサイズ枠を除いておらず、印刷にだけ写っていた（2026-11-07）
+const buildFilter = (opts: PrintOptions) => imageFilter(opts);
 
 function loadImage(dataUrl: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -171,12 +160,17 @@ export async function printDiagram(
     font-size: 12px;
     z-index: 9999;
   }
-  @media print { .instructions { display: none; } }
+  /* Safari は @page の size・margin を使わず、自分の余白とヘッダ・フッタを足す。用紙ぴったりの高さだと
+     はみ出して何も無いページができたので、印刷のときは印刷できる範囲（100vw × 100vh）に合わせる（2026-11-07） */
+  @media print {
+    .instructions { display: none; }
+    .page { width: 100vw; height: 100vh; }
+  }
 </style>
 </head>
 <body>
   <div class="instructions">
-    印刷ダイアログで「用紙サイズ」「向き」がこの用紙に合っているか確認してください。
+    印刷ダイアログで「用紙サイズ」「向き」がこの用紙に合っているか確認してください。${paper.width > paper.height ? 'Safari は向きを自動で合わせないので「横」を選んでください。' : ''}
     ダイアログを閉じたらこのウィンドウも閉じて構いません。
   </div>
 ${pageDataUrls.map((u, i) => `  <div class="page"><img src="${u}" alt="page ${i + 1}"/></div>`).join('\n')}
@@ -184,7 +178,9 @@ ${pageDataUrls.map((u, i) => `  <div class="page"><img src="${u}" alt="page ${i 
 </html>`;
 
   opts.onProgress?.({ current: totalSteps, total: totalSteps, label: '印刷ウィンドウを開きます' });
-  const win = window.open('', '_blank', 'width=960,height=720');
+  const win = opts.targetWindow && !opts.targetWindow.closed
+    ? opts.targetWindow
+    : window.open('', '_blank', 'width=960,height=720');
   if (!win) {
     throw new Error('ポップアップがブロックされました。ブラウザのポップアップブロックを解除してください。');
   }

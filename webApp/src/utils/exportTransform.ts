@@ -12,8 +12,20 @@ import type {
   Box,
   Line,
   SDSG,
+  Note,
+  ProjectSettings,
+  Sheet,
 } from '../types';
 import { computeContentBounds } from './fitBounds';
+import { getBoxPreset } from './boxPreset';
+
+// 描画側の既定値（BoxNode・SDSGNode・NoteNode と同じ）。倍率を掛けるときに未指定を補う
+const DEF_TYPE_LABEL_FS = 11;
+const DEF_SUB_LABEL_FS = 10;
+const DEF_ID_FS = 9;
+const DEF_SDSG_W = 70;
+const DEF_SDSG_H = 40;
+const DEF_NOTE_FS = 13; // NoteNode: min(defaultFontSize, NOTE_DEFAULT_FONT_SIZE + 1)
 import { getPaperPx, type PaperSizeKey } from './paperSizes';
 
 export type FitMode = 'manual' | 'fit-width' | 'fit-height' | 'fit-both' | 'fit-short';
@@ -175,10 +187,14 @@ export function applyExportTransform(
         });
       }
 
-      // 2) 全体スケール: Box 座標・サイズ（SDSG / 時期ラベル含む）
+      // 2) 全体スケール: 座標・大きさ・文字の大きさを同じ倍率で（SDSG / 時期ラベル / メモ / 曲線の制御点も）。
+      //    以前は位置と大きさだけを縮めて文字を縮めず、「両方に収める」で文字が枠からあふれた
+      //    （2026-11-07 Mac の確認で発見。メモと制御点は縮めも寄せもしていなかった）
       if (effectiveScale !== 1) {
-        sh.boxes.forEach((b) => transformBox(b, effectiveScale));
+        sh.boxes.forEach((b) => transformBox(b, effectiveScale, d.settings));
         sh.sdsg.forEach((sg) => transformSDSG(sg, effectiveScale));
+        (sh.notes ?? []).forEach((n) => transformNote(n, effectiveScale, d.settings));
+        sh.lines.forEach((l) => transformLine(l, effectiveScale));
         // 時期ラベル position（Level 値）は座標スケールに合わせて乗算
         sh.periodLabels.forEach((p) => {
           p.position = p.position * effectiveScale;
@@ -186,7 +202,7 @@ export function applyExportTransform(
       }
 
       // 3) Box 微調整
-      sh.boxes.forEach((b) => applyBoxAdjust(b, d.settings.defaultFontSize, xf));
+      sh.boxes.forEach((b) => applyBoxAdjust(b, d.settings, xf));
       // 4) Line 微調整
       sh.lines.forEach((l) => applyLineAdjust(l, xf));
       // 5) SDSG 微調整
@@ -226,7 +242,7 @@ export function applyExportTransform(
     if (Math.abs(ox) > 0.5 || Math.abs(oy) > 0.5) {
       finalDoc = produce(newDoc, (d) => {
         for (const sh of d.sheets) {
-          sh.boxes.forEach((b) => { b.x += ox; b.y += oy; });
+          shiftSheet(sh, ox, oy);
           sh.periodLabels.forEach((p) => {
             p.position += (isH ? ox : oy) / 100; // LEVEL_PX = 100
           });
@@ -248,7 +264,7 @@ export function applyExportTransform(
   if (offX !== 0 || offY !== 0) {
     finalDoc = produce(finalDoc, (d) => {
       for (const sh of d.sheets) {
-        sh.boxes.forEach((b) => { b.x += offX; b.y += offY; });
+        shiftSheet(sh, offX, offY);
         sh.periodLabels.forEach((p) => {
           p.position += (newDoc.settings.layout === 'horizontal' ? offX : offY) / 100;
         });
@@ -265,22 +281,75 @@ export function applyExportTransform(
   return { doc: finalDoc, effectiveScale, bbox: newBounds };
 }
 
-function transformBox(b: Box, scale: number) {
+/** Box の本文の文字の大きさ（Box 個別 → テーマ → 既定）。描画側の resolveBoxVisuals と同じ順 */
+function boxFontSize(b: Box, settings: ProjectSettings): number {
+  return b.style?.fontSize ?? getBoxPreset(b.type, settings).fontSize ?? settings.defaultFontSize ?? 13;
+}
+
+const mul = (v: number | undefined, s: number) => (v == null ? v : v * s);
+
+function transformBox(b: Box, scale: number, settings: ProjectSettings) {
   b.x *= scale;
   b.y *= scale;
   b.width *= scale;
   b.height *= scale;
+  b.style = { ...(b.style ?? {}), fontSize: boxFontSize(b, settings) * scale };
+  b.typeLabelFontSize = (b.typeLabelFontSize ?? DEF_TYPE_LABEL_FS) * scale;
+  b.subLabelFontSize = (b.subLabelFontSize ?? DEF_SUB_LABEL_FS) * scale;
+  b.idFontSize = (b.idFontSize ?? DEF_ID_FS) * scale;
+  b.subLabelOffsetX = mul(b.subLabelOffsetX, scale);
+  b.subLabelOffsetY = mul(b.subLabelOffsetY, scale);
+  b.idOffsetX = mul(b.idOffsetX, scale);
+  b.idOffsetY = mul(b.idOffsetY, scale);
 }
 
 function transformSDSG(sg: SDSG, scale: number) {
-  if (sg.width != null) sg.width *= scale;
-  if (sg.height != null) sg.height *= scale;
+  // 大きさの指定が無い SD/SG は既定の 70×40 で描かれるので、既定値に倍率を掛けて持たせる
+  sg.width = (sg.width ?? DEF_SDSG_W) * scale;
+  sg.height = (sg.height ?? DEF_SDSG_H) * scale;
+  sg.spaceWidth = mul(sg.spaceWidth, scale);
+  sg.spaceHeight = mul(sg.spaceHeight, scale);
   sg.timeOffset = (sg.timeOffset ?? 0) * scale;
   sg.itemOffset = (sg.itemOffset ?? 0) * scale;
+  sg.style = { ...(sg.style ?? {}), fontSize: (sg.style?.fontSize ?? 11) * scale };
+  sg.typeLabelFontSize = (sg.typeLabelFontSize ?? DEF_TYPE_LABEL_FS) * scale;
+  sg.subLabelFontSize = (sg.subLabelFontSize ?? DEF_SUB_LABEL_FS) * scale;
+  sg.idFontSize = (sg.idFontSize ?? DEF_ID_FS) * scale;
+  sg.labelOffsetX = mul(sg.labelOffsetX, scale);
+  sg.labelOffsetY = mul(sg.labelOffsetY, scale);
+  sg.subLabelOffsetX = mul(sg.subLabelOffsetX, scale);
+  sg.subLabelOffsetY = mul(sg.subLabelOffsetY, scale);
+  sg.idOffsetX = mul(sg.idOffsetX, scale);
+  sg.idOffsetY = mul(sg.idOffsetY, scale);
 }
 
-function applyBoxAdjust(b: Box, defaultFS: number, xf: ExportTransform) {
-  const curFS = b.style?.fontSize ?? defaultFS;
+function transformNote(n: Note, scale: number, settings: ProjectSettings) {
+  n.x *= scale;
+  n.y *= scale;
+  n.width *= scale;
+  n.height *= scale;
+  n.fontSize = (n.fontSize ?? Math.min(settings.defaultFontSize ?? 13, DEF_NOTE_FS)) * scale;
+}
+
+function transformLine(l: Line, scale: number) {
+  // 曲線の制御点は図の座標そのもの
+  if (l.controlPoints) l.controlPoints = l.controlPoints.map((p) => ({ x: p.x * scale, y: p.y * scale }));
+  l.idFontSize = (l.idFontSize ?? DEF_ID_FS) * scale;
+  l.idOffsetX = mul(l.idOffsetX, scale);
+  l.idOffsetY = mul(l.idOffsetY, scale);
+}
+
+/** 用紙の中央に寄せる・位置をずらすときに、図の座標を持つものをまとめて動かす */
+function shiftSheet(sh: Sheet, dx: number, dy: number) {
+  sh.boxes.forEach((b) => { b.x += dx; b.y += dy; });
+  (sh.notes ?? []).forEach((n) => { n.x += dx; n.y += dy; });
+  sh.lines.forEach((l) => {
+    if (l.controlPoints) l.controlPoints = l.controlPoints.map((p) => ({ x: p.x + dx, y: p.y + dy }));
+  });
+}
+
+function applyBoxAdjust(b: Box, settings: ProjectSettings, xf: ExportTransform) {
+  const curFS = boxFontSize(b, settings);
   const newFS = Math.max(xf.minFontSize, curFS * xf.fontSizeScale + xf.fontSizeDelta);
   const curTypeFS = b.typeLabelFontSize ?? 11;
   const curSubFS = b.subLabelFontSize ?? 10;
@@ -315,6 +384,11 @@ function applySDSGAdjust(sg: SDSG, xf: ExportTransform) {
 }
 
 function applyProjectAdjust(d: TEMDocument, xf: ExportTransform, effectiveScale: number) {
+  // 時間矢印・時期区分の文字も図と同じ倍率で縮める
+  if (effectiveScale !== 1) {
+    d.settings.timeArrow.fontSize *= effectiveScale;
+    d.settings.periodLabels.fontSize *= effectiveScale;
+  }
   // 時間矢印
   d.settings.timeArrow.fontSize = Math.max(
     xf.minFontSize,

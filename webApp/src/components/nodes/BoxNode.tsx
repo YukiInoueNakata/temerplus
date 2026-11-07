@@ -271,6 +271,9 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
   const isPEfp = borderDraw.kind === 'double-dashed'
     || ((data.type === 'P-EFP' || data.type === 'P-2nd-EFP') && borderDraw.kind === 'factory');
   const pEfpWidth = borderDraw.kind === 'double-dashed' ? borderDraw.width : 1.5;
+  // CSS の double は 3px 未満だと 1 本で描かれる。テーマの 1.5・2.0 の二重線が画面と PNG・PDF・Word の図で
+  // 1 本になり、PPTX・SVG（2 本）や記号体系の宣言と食い違った（2026-11-07 Mac の確認で発見）。凡例と同じく 3 以上にする
+  const cssBorderWidth = specBorderStyle === 'double' ? Math.max(3, specBorderWidth) : specBorderWidth;
   // 楕円でも P-EFP は二重の点線（PPTX・SVG は楕円を 2 つ描く。outline は角丸に沿う。pass-2 新規 #2）
   const borderStyle: React.CSSProperties = shape === 'ellipse'
     ? isPEfp
@@ -280,7 +283,7 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
           outline: `${pEfpWidth}px dashed ${borderColor}`,
           outlineOffset: '2px',
         }
-      : { borderRadius: '50%', border: `${specBorderWidth}px ${specBorderStyle} ${borderColor}` }
+      : { borderRadius: '50%', border: `${cssBorderWidth}px ${specBorderStyle} ${borderColor}` }
     : isPEfp
       ? {
           border: `${pEfpWidth}px dashed ${borderColor}`,
@@ -288,7 +291,7 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
           outlineOffset: '2px',
           borderRadius: 0,
         }
-      : { border: `${specBorderWidth}px ${specBorderStyle} ${borderColor}`, borderRadius: 0 };
+      : { border: `${cssBorderWidth}px ${specBorderStyle} ${borderColor}`, borderRadius: 0 };
 
   // IDバッジ
   // idOffsetX/Y は論理軸基準 (X=時間軸, Y=項目軸)、レイアウトに応じて画面軸へ変換

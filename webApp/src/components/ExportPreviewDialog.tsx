@@ -303,10 +303,13 @@ export function ExportPreviewDialog({
       if (format === 'png') {
         if (multi) {
           const { exportToPNGPages } = await import('../utils/exportImage');
-          await exportToPNGPages(PREVIEW_ID, baseName, multi, 2, imgOpts, onProg, ac.signal);
+          await exportToPNGPages(PREVIEW_ID, baseName, multi, 'auto', imgOpts, onProg, ac.signal);
         } else {
-          const { exportToPNG } = await import('../utils/exportImage');
-          await exportToPNG(PREVIEW_ID, `${baseName}.png`, 2, imgOpts);
+          const { exportToPNG, captureRatio } = await import('../utils/exportImage');
+          // 用紙の上で 300dpi になる倍率で写す（以前は 2 倍に固定で、解像度がプレビューの枠で決まっていた）
+          const node = document.getElementById(PREVIEW_ID);
+          const ratio = node ? captureRatio(node, getPaperPx(xf.paperSize).width) : 2;
+          await exportToPNG(PREVIEW_ID, `${baseName}.png`, ratio, imgOpts);
         }
       } else if (format === 'svg') {
         const { exportToSVGNative } = await import('../utils/exportSVGNative');

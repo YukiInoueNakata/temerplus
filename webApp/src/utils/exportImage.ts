@@ -51,6 +51,22 @@ export function buildFilter(opts: ExportOptions) {
   };
 }
 
+/**
+ * 画像に写すときの倍率。プレビューの要素（画面での大きさ）を、用紙の上で dpi になる解像度で写す。
+ * 以前は 2 倍に固定で、解像度がプレビューの枠の大きさで決まり、A4 で横 1170px ほどにしかならなかった
+ * （図を用紙に収めて文字を縮めると読めない。2026-11-07）。
+ * worldWidth: 要素が映している範囲の幅（図の座標・96dpi の px。1 ページなら用紙の幅）
+ * Safari などは大きすぎる canvas を作れないので、辺 16000px・面積 1600 万 px を上限にする。
+ */
+export function captureRatio(node: HTMLElement, worldWidth: number, dpi = 300): number {
+  const w = Math.max(1, node.offsetWidth);
+  const h = Math.max(1, node.offsetHeight);
+  const want = (dpi / 96) * Math.max(1, worldWidth) / w;
+  const maxBySide = 16000 / Math.max(w, h);
+  const maxByArea = Math.sqrt(16_000_000 / (w * h));
+  return Math.max(1, Math.min(want, maxBySide, maxByArea));
+}
+
 function bg(opts: ExportOptions): string | undefined {
   if (opts.background === 'transparent') return undefined;
   return '#ffffff';
@@ -143,14 +159,14 @@ export async function exportToPNGPages(
   elementId: string,
   baseName: string,
   pages: PageBounds[],
-  pixelRatio = 2,
+  pixelRatio: number | 'auto' = 2,
   opts: ExportOptions = {},
   onProgress?: ProgressCallback,
   signal?: AbortSignal,
 ): Promise<void> {
   if (!pages || pages.length <= 1) {
     onProgress?.({ current: 0, total: 1, label: 'キャプチャ中...' });
-    await exportToPNG(elementId, `${baseName}.png`, pixelRatio, opts);
+    await exportToPNG(elementId, `${baseName}.png`, pixelRatio === 'auto' ? 2 : pixelRatio, opts);
     onProgress?.({ current: 1, total: 1, label: '完了' });
     return;
   }
@@ -161,15 +177,15 @@ export async function exportToPNGPages(
   onProgress?.({ current: 0, total, label: 'プレビューをキャプチャ中...' });
   checkAborted(signal);
 
-  // 全体を 1 回キャプチャ
+  const strip = computeStripFromPages(pages);
+  // 全体を 1 回キャプチャ（'auto' は全ページを並べた幅から用紙の上で 300dpi になる倍率）
   const dataUrl = await toPng(node, {
     backgroundColor: bg(opts),
-    pixelRatio,
+    pixelRatio: pixelRatio === 'auto' ? captureRatio(node, strip.width) : pixelRatio,
     filter: buildFilter(opts),
   });
   checkAborted(signal);
   const img = await loadImage(dataUrl);
-  const strip = computeStripFromPages(pages);
   const ratioX = img.width / Math.max(1, strip.width);
   const ratioY = img.height / Math.max(1, strip.height);
 

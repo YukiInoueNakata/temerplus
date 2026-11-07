@@ -37,13 +37,18 @@ export async function exportToPDF(
   const contentW = Math.max(1, paper.width - margin * 2);
   const contentH = Math.max(1, paper.height - margin * 2);
 
-  // PNG をまず生成（ピクセル解像度は用紙サイズ × DPI）
-  const dpi = 150;
+  // PNG をまず生成（ピクセル解像度は用紙サイズ × DPI）。図を用紙に収めて文字を縮めても読めるよう 300dpi
+  // （以前は 150dpi。2026-11-07）。大きすぎる canvas は Safari で作れないので、辺と面積に上限を置く
+  const dpi = 300;
   const targetPx = { w: paper.width * dpi, h: paper.height * dpi };
   const nodeRect = node.getBoundingClientRect();
+  const rw = Math.max(1, nodeRect.width);
+  const rh = Math.max(1, nodeRect.height);
   const ratio = Math.max(1, Math.min(
-    targetPx.w / Math.max(1, nodeRect.width),
-    targetPx.h / Math.max(1, nodeRect.height),
+    targetPx.w / rw,
+    targetPx.h / rh,
+    16000 / Math.max(rw, rh),
+    Math.sqrt(16_000_000 / (rw * rh)),
   ));
 
   const dataUrl = await toPng(node, {

@@ -9,6 +9,7 @@ import { toPng } from 'html-to-image';
 import type { PageBounds } from './pageSplit';
 import { getPaperInch, type PaperSizeKey } from './paperSizes';
 import { checkAborted, type ProgressCallback } from './exportProgress';
+import { captureRatio } from './exportImage';
 
 export interface PrintOptions {
   /** N ページ分割（未指定 or 1 枚なら単一ページ印刷） */
@@ -84,10 +85,13 @@ export async function printDiagram(
   opts.onProgress?.({ current: 0, total: totalSteps, label: 'プレビューをキャプチャ中...' });
   checkAborted(opts.signal);
 
-  // 全体を 1 回キャプチャ
+  // 全体を 1 回キャプチャ。用紙の上で 300dpi になる倍率（以前は 2 倍に固定で、解像度がプレビューの枠で決まった）
+  const worldW = opts.pages && opts.pages.length > 1
+    ? computeStripFromPages(opts.pages).width
+    : paper.width * 96;
   const dataUrl = await toPng(node, {
     backgroundColor: opts.background === 'transparent' ? undefined : '#ffffff',
-    pixelRatio: 2,
+    pixelRatio: captureRatio(node, worldW),
     filter: buildFilter(opts),
   });
   checkAborted(opts.signal);

@@ -63,15 +63,16 @@ describe('英語の単数と複数', () => {
   });
 });
 
-describe('種類名の表記（両極化した等至点・第 2 等至点）', () => {
+describe('種類名の表記（両極化した等至点・セカンド等至点）', () => {
   it('画面の表記は新しい名前、取り込みは新旧どちらも引ける', () => {
     expect(BOX_TYPE_LABELS['P-EFP'].ja).toBe('両極化した等至点');
-    expect(BOX_TYPE_LABELS['2nd-EFP'].ja).toBe('第 2 等至点');
-    expect(BOX_TYPE_LABELS['P-2nd-EFP'].ja).toBe('両極化した第 2 等至点');
+    expect(BOX_TYPE_LABELS['2nd-EFP'].ja).toBe('セカンド等至点');
+    expect(BOX_TYPE_LABELS['P-2nd-EFP'].ja).toBe('両極化したセカンド等至点');
     for (const [raw, type] of [
       ['両極化した等至点', 'P-EFP'], ['両極化等至点', 'P-EFP'],
       ['第 2 等至点', '2nd-EFP'], ['第2等至点', '2nd-EFP'], ['第二等至点', '2nd-EFP'],
       ['両極化した第 2 等至点', 'P-2nd-EFP'], ['両極化第二等至点', 'P-2nd-EFP'],
+      ['セカンド等至点', '2nd-EFP'], ['両極化したセカンド等至点', 'P-2nd-EFP'],
     ] as const) expect(mapBoxType(raw)).toBe(type);
   });
   it('MAXQDA の部分一致は長い語から試す（短い語に先に当たらない）', () => {
@@ -125,6 +126,8 @@ describe('2 回目のレビューの指摘', () => {
     expect(detectTypePrefix('両極化した等至点 進学しない')?.type).toBe('P-EFP');
     expect(detectTypePrefix('両極化した第 2 等至点 転職しない')?.type).toBe('P-2nd-EFP');
     expect(detectTypePrefix('第 2 等至点 転職')?.type).toBe('2nd-EFP');
+    expect(detectTypePrefix('セカンド等至点 転職')?.type).toBe('2nd-EFP');
+    expect(detectTypePrefix('両極化したセカンド等至点 転職しない')?.type).toBe('P-2nd-EFP');
     expect(detectTypePrefix('両極化等至点 進学しない')?.type).toBe('P-EFP');
   });
   it('言語の好みが無くても、自動保存の図が残っていれば日本語にする', async () => {

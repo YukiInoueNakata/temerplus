@@ -48,8 +48,8 @@ const BOX_DESCRIPTIONS: Record<BoxType, string> = {
   'P-EFP':      '両極化した等至点 (Polarized EFP)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'OPP':        '必須通過点 (Obligatory Passage Point)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'annotation': '潜在経験 / 想定された未実現経験', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
-  '2nd-EFP':    '第 2 等至点', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
-  'P-2nd-EFP':  '両極化した第 2 等至点', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  '2nd-EFP':    'セカンド等至点', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  'P-2nd-EFP':  '両極化したセカンド等至点', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'other':      'その他', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
 };
 

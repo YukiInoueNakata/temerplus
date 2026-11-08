@@ -71,6 +71,8 @@ export const TYPE_DICT: Record<string, BoxType> = {
   '第2等至点': '2nd-EFP', // i18n-ok 利用者のファイルの値と照合
   '両極化した第 2 等至点': 'P-2nd-EFP', // i18n-ok 利用者のファイルの値と照合
   '両極化した第2等至点': 'P-2nd-EFP', // i18n-ok 利用者のファイルの値と照合
+  'セカンド等至点': '2nd-EFP', // i18n-ok 利用者のファイルの値と照合（正式な表記。2026-11-08）
+  '両極化したセカンド等至点': 'P-2nd-EFP', // i18n-ok 利用者のファイルの値と照合
   // 英語の用語名（terms.csv の英語）。MAXQDA の取り込みが部分一致で引くので、長い語（それを含む語）を先に置く
   'polarized second equifinality point': 'P-2nd-EFP',
   'second equifinality point': '2nd-EFP',

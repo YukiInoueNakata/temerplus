@@ -55,7 +55,7 @@ chooseFile,CSV ファイルを選択してください。1 行目にヘッダが
 spec.heading,仕様メモ ({{target}}):,Format notes ({{target}}):,CSV 取り込み > 列の決まりの見出し
 spec.box.required,必須列: ラベル（label）,Required column: label,CSV 取り込み > Box の列の決まり
 spec.box.optional,オプション列: 種別 / Time Level / Item Level / ID / サブラベル / 説明 / 幅 / 高さ,Optional columns: type / time level / item level / ID / sublabel / description / width / height,CSV 取り込み > Box の列の決まり
-spec.box.types,種別は英名（BFP / EFP / P-EFP / OPP / annotation / 2nd-EFP）または日本語（分岐点・等至点・両極化した等至点・必須通過点・潜在経験・第 2 等至点）,Type is an English code (BFP / EFP / P-EFP / OPP / annotation / 2nd-EFP) or a Japanese name (分岐点・等至点・両極化した等至点・必須通過点・潜在経験・第 2 等至点),CSV 取り込み > Box の列の決まり（日本語の種別名はファイルの中で使える語なので英語版でも日本語のまま）
+spec.box.types,種別は英名（BFP / EFP / P-EFP / OPP / annotation / 2nd-EFP）または日本語（分岐点・等至点・両極化した等至点・必須通過点・潜在経験・セカンド等至点）,Type is an English code (BFP / EFP / P-EFP / OPP / annotation / 2nd-EFP) or a Japanese name (分岐点・等至点・両極化した等至点・必須通過点・潜在経験・セカンド等至点),CSV 取り込み > Box の列の決まり（日本語の種別名はファイルの中で使える語なので英語版でも日本語のまま）
 spec.line.required,必須列: from（始点 Box ID）/ to（終点 Box ID）,Required columns: from (start Box ID) / to (end Box ID),CSV 取り込み > Line の列の決まり
 spec.line.optional,オプション列: ID / type (RLine/XLine) / shape (straight/elbow/curve) / label / 説明,Optional columns: ID / type (RLine/XLine) / shape (straight/elbow/curve) / label / description,CSV 取り込み > Line の列の決まり
 spec.line.before,from / to は,from / to must match a Box ID that exists on the ,CSV 取り込み > Line の列の決まり（太字の「現在のシート」の前）

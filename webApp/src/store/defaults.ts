@@ -464,8 +464,8 @@ export const BOX_TYPE_LABELS: Record<string, { ja: string; en: string; shortJa?:
   'P-EFP':     { ja: '両極化した等至点',       en: 'P-EFP',  shortJa: 'P-EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   OPP:         { ja: '必須通過点',         en: 'OPP',    shortJa: 'OPP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   annotation:  { ja: '潜在経験',           en: 'Latent', shortJa: '潜在' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
-  '2nd-EFP':   { ja: '第 2 等至点',         en: '2nd EFP', shortJa: '2nd EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
-  'P-2nd-EFP': { ja: '両極化した第 2 等至点',   en: 'P-2nd EFP', shortJa: 'P-2nd' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  '2nd-EFP':   { ja: 'セカンド等至点',         en: '2nd EFP', shortJa: '2nd EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  'P-2nd-EFP': { ja: '両極化したセカンド等至点',   en: 'P-2nd EFP', shortJa: 'P-2nd' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
 };
 
 // Exported for testing / other consumers

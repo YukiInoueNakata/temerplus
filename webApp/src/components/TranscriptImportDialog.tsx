@@ -28,6 +28,9 @@ export function TranscriptImportDialog({
   onImported?: (transcriptId: string) => void;
 }) {
   const { t } = useTranslation('transcriptImportDialog');
+  // 仮名の頭の既定は図の言語（図・逐語録のデータに入るため）
+  const docLocale = useTEMStore((s) => s.doc.settings.locale ?? 'ja');
+  const defaultPrefix = t('terms:participant', { lng: docLocale });
   const participants = useTEMStore((s) => s.doc.participants);
   const addTranscript = useTEMStore((s) => s.addTranscript);
 
@@ -46,7 +49,7 @@ export function TranscriptImportDialog({
   const [participantId, setParticipantId] = useState<string>('');
   const [sessionNumber, setSessionNumber] = useState<string>('');   // 文字列で保持、確定時に number へ
   const [anonymizeNames, setAnonymizeNames] = useState<string>(''); // コンマ区切りの匿名化対象
-  const [anonymizePrefix, setAnonymizePrefix] = useState<string>('協力者'); // i18n-ok 匿名化の仮名の既定値（逐語録のデータに入る）
+  const [anonymizePrefix, setAnonymizePrefix] = useState<string>(defaultPrefix);
 
   const reset = () => {
     setInitial(null);
@@ -143,7 +146,7 @@ export function TranscriptImportDialog({
       }
       // 取り込み時匿名化
       if (anonymizeNames.trim()) {
-        const map = buildAnonymizationMap(anonymizeNames, anonymizePrefix.trim() || '協力者'); // i18n-ok 匿名化の仮名の既定値（データ）
+        const map = buildAnonymizationMap(anonymizeNames, anonymizePrefix.trim() || defaultPrefix);
         transcript = anonymizeTranscript(transcript, map);
       }
       const id = addTranscript(transcript);
@@ -156,7 +159,7 @@ export function TranscriptImportDialog({
   };
 
   if (!open) return null;
-  const prefixShown = anonymizePrefix || '協力者'; // i18n-ok 匿名化の仮名の既定値（データ）
+  const prefixShown = anonymizePrefix || defaultPrefix;
 
   return (
     <div className="modal-backdrop" onClick={() => { reset(); onClose(); }}>
@@ -314,7 +317,7 @@ export function TranscriptImportDialog({
                       value={anonymizePrefix}
                       onChange={(e) => setAnonymizePrefix(e.target.value)}
                       style={{ width: 100, fontSize: 12 }}
-                      placeholder="協力者" // i18n-ok 匿名化の仮名の既定値（データ）
+                      placeholder={defaultPrefix}
                     />
                     <span style={{ fontSize: 11, color: '#666' }}>
                       → [{prefixShown}A], [{prefixShown}B], ...

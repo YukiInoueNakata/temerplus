@@ -18,9 +18,12 @@ export function AnonymizeExportDialog({
   onClose: () => void;
 }) {
   const { t } = useTranslation('anonymizeExportDialog');
+  // 仮名の頭の既定は図の言語（図・逐語録のデータに入るため）
+  const docLocale = useTEMStore((s) => s.doc.settings.locale ?? 'ja');
+  const defaultPrefix = t('terms:participant', { lng: docLocale });
   const doc = useTEMStore((s) => s.doc);
   const [additionalNames, setAdditionalNames] = useState('');
-  const [prefix, setPrefix] = useState('協力者'); // i18n-ok 仮名の既定値（図のデータに入る値）
+  const [prefix, setPrefix] = useState(defaultPrefix);
 
   // 既存の anonymizationMap を集約 (Transcript ごと)
   const existingMaps = useMemo(() => {
@@ -31,7 +34,7 @@ export function AnonymizeExportDialog({
     }));
   }, [doc.transcripts]);
 
-  const pfx = prefix || '協力者'; // i18n-ok 仮名の既定値（図のデータに入る値）
+  const pfx = prefix || defaultPrefix;
   const totalExistingEntries = existingMaps.reduce((acc, m) => acc + Object.keys(m.map).length, 0);
 
   const exportAnonymized = () => {
@@ -40,7 +43,7 @@ export function AnonymizeExportDialog({
     for (const m of existingMaps) Object.assign(merged, m.map);
     // 追加対象を加える
     const addMap = additionalNames.trim()
-      ? buildAnonymizationMap(additionalNames, prefix.trim() || '協力者') // i18n-ok 仮名の既定値（図のデータに入る値）
+      ? buildAnonymizationMap(additionalNames, prefix.trim() || defaultPrefix)
       : {};
     Object.assign(merged, addMap);
 

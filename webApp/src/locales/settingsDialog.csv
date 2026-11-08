@@ -73,7 +73,7 @@ lineDefaults.curveIntensity,曲率 (0〜1),Curvature (0–1),設定 > Line（矢
 lineDefaults.curveIntensity.tip,0=ほぼ直線、0.5=標準、1=大きく膨らむ,"0 = nearly straight, 0.5 = standard, 1 = strongly curved",設定 > Line（矢印）の既定 のツールチップ
 lineDefaults.color,線の色,Line color,設定 > Line（矢印）の既定 の項目名
 lineDefaults.strokeWidth,線の太さ (px),Line width (px),設定 > Line（矢印）の既定 の項目名
-general.language,言語,Language,設定 > 全体 の項目名（図の表記の言語）
+general.language,図の言語,Diagram language,設定 > 全体 の項目名（図の表記の言語）
 general.uiFontSize,UI フォントサイズ（px）,UI font size (px),設定 > 全体 の項目名
 general.ribbonFontSize,リボン文字サイズ（px）,Ribbon text size (px),設定 > 全体 の項目名
 general.editing,編集補助,Editing aids,設定 > 全体 の見出し

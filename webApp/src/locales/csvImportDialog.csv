@@ -92,3 +92,4 @@ options.XLineCode,点線（XLine）,Dashed (XLine),CSV 取り込み > 線の種�
 preview,プレビュー（先頭 5 行）,Preview (first 5 rows),CSV 取り込み > 見出し
 cancel,キャンセル,Cancel,CSV 取り込み > ボタン
 import,インポート,Import,CSV 取り込み > ボタン
+sheet.defaultName,CSV インポート,CSV import,CSV から取り込んで新しく作るシートの名前（図の言語で入る）

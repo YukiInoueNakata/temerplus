@@ -71,3 +71,13 @@ void i18n
   });
 
 export default i18n;
+
+// ページの題と <html lang> を画面の言語に合わせる（読み上げ・ブラウザの翻訳の判定・タブの名前のため）
+function syncDocumentLanguage(lng: string): void {
+  if (typeof document === 'undefined') return;
+  document.documentElement.lang = lng;
+  document.title = i18n.t('translation:app.title', { lng });
+}
+i18n.on('languageChanged', syncDocumentLanguage);
+if (i18n.isInitialized) syncDocumentLanguage(i18n.language);
+else i18n.on('initialized', () => syncDocumentLanguage(i18n.language));

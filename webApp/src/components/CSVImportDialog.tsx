@@ -215,7 +215,7 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
         return;
       }
       if (insertMode === 'new-sheet') {
-        const newId = addSheet('CSV インポート'); // i18n-ok 新しいシートの名前（図のデータ）
+        const newId = addSheet(t('sheet.defaultName', { lng: doc.settings.locale ?? 'ja' })); // 新しいシートの名前は図の言語
         switchSheet(newId);
         setTimeout(() => {
           importBoxes(result.boxes, result.lines);

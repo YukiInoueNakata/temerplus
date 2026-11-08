@@ -112,7 +112,7 @@ export function Ribbon({
 // ハンズオンで参加者が触るため）。翻訳を主要 UI（SettingsDialog / PropertyPanel /
 // 各ダイアログ）まで広げたら true に戻す。i18n の基盤（i18next / locales）は
 // そのまま残してある。
-const SHOW_LOCALE_TOGGLE = false;
+const SHOW_LOCALE_TOGGLE = true;
 
 // 画面の言語の切り替え（利用者の好み。ブラウザに保存し、図のファイルは変えない）
 function LocaleToggle() {

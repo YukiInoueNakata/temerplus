@@ -5,6 +5,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { sentenceGap } from '../utils/sentenceGap';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import { produce } from 'immer';
 import type {
@@ -487,7 +488,7 @@ function GeneralSection({ onOpenLineTab }: { onOpenLineTab?: () => void }) {
 
       <CollapsibleSection title={t('general.lineDefaults')} sectionKey="settings-general-line-defaults" defaultOpen={true}>
         <p className="hint">
-          {t('general.lineDefaults.hint1')}
+          {t('general.lineDefaults.hint1')}{sentenceGap()}
           {t('general.lineDefaults.hint2')}
         </p>
         <LineDefaultsBasicFields />
@@ -529,7 +530,7 @@ function PaperGuideSection() {
     <>
       <h4 style={{ marginTop: 16 }}>{t('paper.title')}</h4>
       <p className="hint" style={{ marginTop: 0 }}>
-        {t('paper.hint1')}
+        {t('paper.hint1')}{sentenceGap()}
         {t('paper.hint2')}
       </p>
       <div className="setting-row">
@@ -895,7 +896,7 @@ function BoxStyleSection() {
     <section className="settings-section">
       <h4>{t('boxStyle.title')}</h4>
       <p className="hint" style={{ marginBottom: 8 }}>
-        {t('boxStyle.hint1')}
+        {t('boxStyle.hint1')}{sentenceGap()}
         {t('boxStyle.hint2')}
       </p>
 
@@ -1287,7 +1288,7 @@ function SDSGSpaceSection() {
     <section className="settings-section">
       <h4>{t('sdsg.mode')}</h4>
       <p className="hint" style={{ marginTop: 0 }}>
-        {t('sdsg.mode.hint1')}
+        {t('sdsg.mode.hint1')}{sentenceGap()}
         {t('sdsg.mode.hint2')}
       </p>
       <div className="setting-row">
@@ -1525,7 +1526,7 @@ function SDSGSpaceSection() {
         />
       </div>
       <p className="hint">
-        {t('sdsg.autoExpandHeight.hint1')}
+        {t('sdsg.autoExpandHeight.hint1')}{sentenceGap()}
         {t('sdsg.autoExpandHeight.hint2')}
       </p>
       <div className="setting-row">
@@ -1623,7 +1624,7 @@ function ProjectSection() {
       <h4 style={{ marginTop: 20, borderTop: '1px solid #e0e0e0', paddingTop: 12 }}>{t('project.defaults')}</h4>
       <h5 style={{ margin: '8px 0 4px', fontSize: '0.92em', color: '#555' }}>{t('project.defaultBoxSize')}</h5>
       <p className="hint" style={{ marginTop: 0 }}>
-        {t('project.defaultBoxSize.hint1')}
+        {t('project.defaultBoxSize.hint1')}{sentenceGap()}
         {t('project.defaultBoxSize.hint2')}
       </p>
       <div className="setting-row">
@@ -2178,7 +2179,7 @@ export function LegendSettingsSection() {
       <section className="settings-section">
         <h4>{t('legend.fixedSize')}</h4>
         <p className="hint" style={{ marginTop: 0 }}>
-          {t('legend.fixedSize.hint1')}
+          {t('legend.fixedSize.hint1')}{sentenceGap()}
           {t('legend.fixedSize.hint2')}
         </p>
         <div className="setting-row">
@@ -2276,7 +2277,7 @@ export function LegendSettingsSection() {
       <section className="settings-section">
         <CollapsibleSection title={t('legend.overrides')} sectionKey="settings-legend-item-overrides" defaultOpen={false}>
         <p className="hint" style={{ marginBottom: 6 }}>
-          {t('legend.overrides.hint1')}
+          {t('legend.overrides.hint1')}{sentenceGap()}
           {t('legend.overrides.hint2')}
         </p>
         {currentItems.length > 0 && (

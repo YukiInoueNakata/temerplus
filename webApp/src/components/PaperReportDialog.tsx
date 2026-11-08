@@ -7,6 +7,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import { sentenceGap } from '../utils/sentenceGap';
 import { useTEMStore } from '../store/store';
 import {
   CONVENTION_MEANINGS,
@@ -231,7 +232,7 @@ export function PaperReportDialog({
                 <br />
                 {t('export.hint.glossary')}
                 <br />
-                {t('export.hint.description')}
+                {t('export.hint.description')}{sentenceGap()}
                 {t('export.hint.confirm')}
               </p>
               <div className="setting-row" style={{ justifyContent: 'flex-start' }}>

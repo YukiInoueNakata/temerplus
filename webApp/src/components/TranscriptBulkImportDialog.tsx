@@ -49,6 +49,9 @@ export function TranscriptBulkImportDialog({
   onClose: () => void;
 }) {
   const { t } = useTranslation('transcriptBulkImportDialog');
+  // 仮名の頭の既定は図の言語（図・逐語録のデータに入るため）
+  const docLocale = useTEMStore((s) => s.doc.settings.locale ?? 'ja');
+  const defaultPrefix = t('terms:participant', { lng: docLocale });
   const participants = useTEMStore((s) => s.doc.participants);
   const addTranscript = useTEMStore((s) => s.addTranscript);
 
@@ -58,7 +61,7 @@ export function TranscriptBulkImportDialog({
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [globalAnonymize, setGlobalAnonymize] = useState('');
-  const [anonymizePrefix, setAnonymizePrefix] = useState('協力者'); // i18n-ok 匿名化の仮名の既定値（逐語録のデータに入る）
+  const [anonymizePrefix, setAnonymizePrefix] = useState(defaultPrefix);
 
   const reset = () => {
     setRows([]);
@@ -173,7 +176,7 @@ export function TranscriptBulkImportDialog({
 
     // 各 Transcript を追加
     const anonMap = globalAnonymize.trim()
-      ? buildAnonymizationMap(globalAnonymize, anonymizePrefix.trim() || '協力者') // i18n-ok 匿名化の仮名の既定値（データ）
+      ? buildAnonymizationMap(globalAnonymize, anonymizePrefix.trim() || defaultPrefix)
       : null;
 
     for (const r of enabledRows) {

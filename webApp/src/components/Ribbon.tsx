@@ -877,6 +877,9 @@ function HelpTab({ onOpenWizard, onOpenChangelog, unseen }: { onOpenWizard?: () 
         title={t('help.manual.title')}
         onClick={() => window.open(t('help.manual.url'), '_blank', 'noopener')}
       />
+      {/* GitHub のリポジトリと作者の Web ページ（2026-11-08 ユーザー要望） */}
+      <RibbonButton label={t('help.github')} icon="⎇" title={t('help.github.title')} onClick={() => window.open(t('help.github.url'), '_blank', 'noopener')} />
+      <RibbonButton label={t('help.author')} icon="⌂" title={t('help.author.title')} onClick={() => window.open(t('help.author.url'), '_blank', 'noopener')} />
       <RibbonButton label={t('help.video')} icon="🎬" disabled title={t('help.video.title')} />
       <RibbonButton label={unseen ? t('help.changelog.unseen') : t('help.changelog')} icon="📰" onClick={onOpenChangelog} title={t('help.changelog.title')} active={unseen} />
       <RibbonButton label={t('help.about')} icon="ℹ" onClick={() => alert(t('help.about.message', { version: 'v0.2.0' }))} />

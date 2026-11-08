@@ -1,0 +1,35 @@
+﻿key,ja,en,note
+app.name,TEMer Plus,TEMer Plus,アプリの名前（訳さない）
+tem,複線径路等至性モデル（TEM）,Trajectory Equifinality Model (TEM),方法の名前
+tea,複線径路等至アプローチ（TEA）,Trajectory Equifinality Approach (TEA),方法の名前
+boxType.normal,通常,Normal,Box の種類（通常の経験・出来事）
+boxType.normal.long,通常の経験,Experience,Box の種類の説明
+boxType.annotation,潜在経験,Latent experience,Box の種類（想定された未実現の経験）
+boxType.BFP,分岐点,Bifurcation point,Box の種類。略号 BFP
+boxType.EFP,等至点,Equifinality point,Box の種類。略号 EFP
+boxType.P-EFP,両極化した等至点,Polarized equifinality point,Box の種類。略号 P-EFP
+boxType.OPP,必須通過点,Obligatory passage point,Box の種類。略号 OPP
+boxType.2nd-EFP,第 2 等至点,Second equifinality point,Box の種類。略号 2nd EFP
+boxType.P-2nd-EFP,両極化した第 2 等至点,Polarized second equifinality point,Box の種類。略号 P-2nd EFP
+boxType.other,その他,Other,Box の種類
+line.RLine,実線矢印,Solid arrow,実現した径路の矢印
+line.XLine,点線矢印,Dashed arrow,実現しなかった（想定された）径路の矢印
+path.realized,実現した径路,Realized path,径路の種類
+path.unrealized,実現しなかった径路,Unrealized path,径路の種類
+SD,社会的方向づけ（SD）,Social direction (SD),径路を妨げる力。略号 SD
+SG,社会的ガイド（SG）,Social guidance (SG),径路を後押しする力。略号 SG
+timeArrow,非可逆的時間,Irreversible time,時間軸の矢印
+period,時期区分,Period,時期の区切り
+periodLabel,時期ラベル,Period label,時期区分の名前
+legend,凡例,Legend,図の記号の説明
+sheet,シート,Sheet,1 つのファイルの中の 1 枚の図
+box,Box,Box,図の箱（訳さない）
+transcript,逐語録,Transcript,インタビューの書き起こし
+sourceRef,原文参照,Source reference,Box などと逐語録の箇所を結ぶリンク
+notationDeclaration,記号体系の宣言,Notation declaration,論文用レポートの節（Block 1）
+notationPolicy,表記方針,Notation policy,論文用レポートの節（11 項目）
+paperReport,論文用レポート,Paper report,Word に書き出すレポート
+layout.horizontal,横型,Horizontal,図の向き（時間軸が右へ）
+layout.vertical,縦型,Vertical,図の向き（時間軸が下へ）
+timeLevel,Time レベル,Time level,時間軸の上の位置
+itemLevel,Item レベル,Item level,項目軸の上の位置

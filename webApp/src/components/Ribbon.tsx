@@ -5,6 +5,7 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { saveUILanguage, type UILanguage } from '../utils/uiLanguage';
 import { useTEMStore } from '../store/store';
 import type { BoxType } from '../types';
 import { BOX_TYPE_LABELS } from '../store/defaults';
@@ -114,16 +115,21 @@ export function Ribbon({
 // そのまま残してある。
 const SHOW_LOCALE_TOGGLE = false;
 
+// 画面の言語の切り替え（利用者の好み。ブラウザに保存し、図のファイルは変えない）
 function LocaleToggle() {
-  const locale = useTEMStore((s) => s.doc.settings.locale);
-  const setLocale = useTEMStore((s) => s.setLocale);
+  const { i18n } = useTranslation();
+  const lang: UILanguage = i18n.language === 'en' ? 'en' : 'ja';
   return (
     <button
       className="ribbon-btn-small"
-      onClick={() => setLocale(locale === 'ja' ? 'en' : 'ja')}
-      title="Language"
+      onClick={() => {
+        const next: UILanguage = lang === 'ja' ? 'en' : 'ja';
+        saveUILanguage(next);
+        void i18n.changeLanguage(next);
+      }}
+      title="Language / 言語"
     >
-      {locale === 'ja' ? '日本語 ▼' : 'English ▼'}
+      {lang === 'ja' ? '日本語 / English' : 'English / 日本語'}
     </button>
   );
 }

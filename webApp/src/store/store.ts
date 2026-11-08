@@ -2189,14 +2189,11 @@ export const useTEMStore = create<Store>()(
           };
         });
       },
+      // 図の表記の言語（凡例など）。画面の言語は uiLanguage.ts（利用者の好み）で、ここでは変えない（2026-11-08）
       setLocale: (locale) => {
         set((state) => ({
           doc: produce(state.doc, (d) => { d.settings.locale = locale; }),
         }));
-        // i18next の言語も連動切替（dynamic import で循環依存を回避）
-        void import('../i18n').then(({ default: i18n }) => {
-          if (i18n.language !== locale) void i18n.changeLanguage(locale);
-        });
       },
       setUIFontSize: (size) => {
         const clamped = Math.max(10, Math.min(40, size));

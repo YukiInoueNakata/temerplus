@@ -397,6 +397,11 @@ export default function App() {
         }
       }
       if (e.key === 'Escape' && !isEditing) { store.clearSelection(); return; }
+      // 操作のモードの切り替え（2026-11-08 ユーザー要望）。作図ソフトでよく使う割り当て: V=選択・H=移動（手）・M=範囲選択
+      if (!isEditing && !ctrl && !e.altKey && !e.shiftKey) {
+        const mode = k === 'v' ? 'pointer' : k === 'h' ? 'move' : k === 'm' ? 'select' : null;
+        if (mode) { e.preventDefault(); store.setCanvasMode(mode); return; }
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);

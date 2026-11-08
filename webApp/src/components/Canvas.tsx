@@ -121,6 +121,7 @@ function CanvasInner({
   const fitMode = useTEMStore((s) => s.fitMode);
 
   const dragging = useRef(false);
+  const noteDragging = useRef(false);
   // 整列ガイド（world 座標）
   const [guides, setGuides] = useState<{ v: number[]; h: number[] }>({ v: [], h: [] });
   // band モード SDSG をドラッグ中のプレビュー情報 (row 境界表示用)
@@ -557,9 +558,17 @@ function CanvasInner({
       if (!sheet) return;
       const temporal = useTEMStore.temporal.getState();
       for (const ch of changes) {
-        // Note はスナップも帯も無関係。ドロップ時に位置を確定するだけ
-        if (ch.type === 'position' && ch.position && sheet.notes?.some((n) => n.id === ch.id)) {
-          if (ch.dragging === false) updateNote(ch.id, { x: ch.position.x, y: ch.position.y });
+        // Note（メモ・記号）はスナップも帯も無関係。Box と同じく、ドラッグの途中で位置を書き込む。
+        // React Flow 11 はドラッグを終えた知らせ（dragging=false）に位置を入れないので、以前の「ドロップ時に確定」では
+        // 位置が一度も書き込まれず、手を離すと元に戻っていた（メモ・記号が動かせなかった。2026-11-08 ユーザー指摘）
+        if (ch.type === 'position' && sheet.notes?.some((n) => n.id === ch.id)) {
+          if (ch.dragging === true && ch.position) {
+            if (!noteDragging.current) { noteDragging.current = true; temporal.pause(); }
+            updateNote(ch.id, { x: ch.position.x, y: ch.position.y });
+          } else if (ch.dragging === false) {
+            if (ch.position) updateNote(ch.id, { x: ch.position.x, y: ch.position.y });
+            if (noteDragging.current) { noteDragging.current = false; temporal.resume(); }
+          }
           continue;
         }
         if (ch.type === 'position' && ch.position) {
@@ -939,7 +948,9 @@ function CanvasInner({
             snapToGrid={false}
             snapGrid={[gridPx, gridPx]}
             fitView
-            fitViewOptions={{ padding: 0.2 }}
+            // 最初に図形が現れたときの自動の画面合わせは等倍より大きくしない（上限 5 倍のままだと、空の図に最初の
+            // メモや Box を足したとき 500% に拡大されていた。2026-11-08）
+            fitViewOptions={{ padding: 0.2, maxZoom: 1 }}
             // 倍率の範囲は横幅・縦幅フィット（0.1〜5）と同じにする。既定の下限 0.5 では、縦型など大きな図の「全体フィット」で
             // 全体が入らなかった（2026-11-08）
             minZoom={0.1}

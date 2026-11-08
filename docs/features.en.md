@@ -40,7 +40,7 @@ Names in parentheses are the ribbon tabs and buttons where each feature lives.
 
 ## Editing
 
-- **Modes**: Pan, Select, Area select (Edit > Mode).
+- **Modes**: Pan (move the view; key H), Select (move shapes; key V), Area select (key M) (Edit > Mode). Boxes, notes, symbols, and other shapes are moved by dragging them in Select mode.
 - **Basics**: undo and redo, copy, paste, duplicate, delete, select all (Edit).
 - **Size**: fit a Box's width and height to its text (Edit > Fit to text); match width, height, size, or font size (Arrange).
 - **Alignment**: align left, center, right, top, middle, bottom; distribute horizontally (Arrange > Align and size); bring to front or send to back (Arrange > Order).

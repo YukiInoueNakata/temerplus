@@ -2467,6 +2467,7 @@ export const useTEMStore = create<Store>()(
             const p = t.paragraphs[idx];
             const offset = Math.max(0, Math.min(p.text.length, splitOffset));
             if (offset === 0 || offset === p.text.length) return;   // 端では分割しない
+            const fullBefore = p.text;
             const before = p.text.slice(0, offset);
             const after = p.text.slice(offset);
             p.text = before;
@@ -2488,7 +2489,9 @@ export const useTEMStore = create<Store>()(
                 const next = refs.map((r) => {
                   if (r.paragraphId !== paragraphId) return r;
                   if (r.charStart === undefined || r.charEnd === undefined) {
-                    // 段落全体参照の場合、両方の段落に複製したくないので前段落に残す
+                    // 段落全体参照の場合、両方の段落に複製したくないので前段落に残す。
+                    // 引用が分ける前の全文なら前の段落の全文にする（そのあとの書き換えに付いていけるように。2026-11-08 再レビュー）
+                    if (r.quoteText === fullBefore) { mutated = true; return { ...r, quoteText: before }; }
                     return r;
                   }
                   if (r.charStart >= offset) {

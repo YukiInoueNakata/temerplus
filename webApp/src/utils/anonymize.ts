@@ -105,11 +105,18 @@ function escapeRegex(s: string): string {
  */
 /** 範囲（charStart・charEnd）を置き換えた後の位置に直す。範囲が無ければそのまま */
 function remapRange(
-  r: { charStart?: number; charEnd?: number },
-  m: { mapStart: (i: number) => number; mapEnd: (i: number) => number } | undefined,
-): { charStart?: number; charEnd?: number } {
+  r: { charStart?: number; charEnd?: number; quoteText?: string; unresolved?: boolean },
+  m: { text: string; mapStart: (i: number) => number; mapEnd: (i: number) => number } | undefined,
+): { charStart?: number; charEnd?: number; quoteText?: string } {
   if (!m || r.charStart === undefined || r.charEnd === undefined) return {};
-  return { charStart: m.mapStart(r.charStart), charEnd: m.mapEnd(r.charEnd) };
+  // 長さ 0 の範囲は 0 のまま（始まりと終わりを別々に寄せると語の全体に広がった）
+  if (r.charStart === r.charEnd) { const at = m.mapStart(r.charStart); return { charStart: at, charEnd: at }; }
+  const charStart = m.mapStart(r.charStart);
+  const charEnd = m.mapEnd(r.charEnd);
+  // 追えている参照は、引用を置き換えた後の段落から切り出し直す（置き換える語の一部だけを引用していると、
+  // 引用だけを置き換えたときに範囲と食い違った。2026-11-08 再レビュー）
+  if (!r.unresolved) return { charStart, charEnd, quoteText: m.text.slice(charStart, charEnd) };
+  return { charStart, charEnd };
 }
 
 export function anonymizeTranscript(
@@ -126,8 +133,8 @@ export function anonymizeTranscript(
   // 切片の引用・見出し・メモも置き換える（見出しの既定は引用の初めなので名前が入りうる。2026-11-08 レビュー）
   const segments = tr.segments?.map((sg) => ({
     ...sg,
-    ...remapRange(sg, mappers.get(sg.paragraphId)),
     quoteText: applyReplacements(sg.quoteText, replacements),
+    ...remapRange(sg, mappers.get(sg.paragraphId)),
     label: applyReplacements(sg.label, replacements),
     note: sg.note ? applyReplacements(sg.note, replacements) : sg.note,
   }));
@@ -157,8 +164,8 @@ export function anonymizeDocument(
   const mappers = new Map(doc.transcripts.flatMap((t) => t.paragraphs.map((p) => [p.id, applyReplacementsWithMap(p.text, replacements)] as const)));
   const replaceRef = (r: SourceRef): SourceRef => ({
     ...r,
-    ...remapRange(r, mappers.get(r.paragraphId)),
     quoteText: applyReplacements(r.quoteText, replacements),
+    ...remapRange(r, mappers.get(r.paragraphId)),
   });
   return {
     ...doc,

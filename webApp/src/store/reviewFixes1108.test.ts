@@ -158,3 +158,21 @@ describe('再レビュー（2026-11-08）', () => {
     expect(t.paragraphs[0].text.slice(sg.charStart, sg.charEnd)).toBe('会う');
   });
 });
+
+describe('3 回目の再レビュー（2026-11-08）', () => {
+  it('匿名化で、置き換える語の一部だけを引用していても、引用は範囲と同じ文字になる', () => {
+    useTEMStore.setState((s) => ({ doc: { ...s.doc, transcripts: [{ ...s.doc.transcripts[0], paragraphs: [{ id: 'P1', index: 0, text: '山田太郎に会う' }] }] } }));
+    const seg = st().addSegment('T1', { paragraphId: 'P1', charStart: 1, charEnd: 4, quoteText: '田太郎' });
+    const t = anonymizeDocument(st().doc, { 山田太郎: 'A' }).transcripts[0];
+    const sg = t.segments!.find((x) => x.id === seg)!;
+    expect(sg.quoteText).toBe(t.paragraphs[0].text.slice(sg.charStart, sg.charEnd));
+  });
+  it('段落全体の切片から作った Box は、段落を分けたあとに書き換えても追える', () => {
+    const seg = st().addSegment('T1', { paragraphId: 'P2', quoteText: 'それから変わった。' });
+    st().createBoxesFromSegments('T1', [seg]);
+    st().splitParagraph('T1', 'P2', 4);
+    expect(active().boxes[0].sourceRefs![0].quoteText).toBe('それから');
+    st().updateParagraphText('T1', 'P2', 'それからまた');
+    expect(active().boxes[0].sourceRefs![0].unresolved).toBeFalsy();
+  });
+});

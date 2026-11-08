@@ -101,6 +101,45 @@ npm run build      # webApp/dist/ に静的なファイルを書き出す
 - **非商用の利用は無償** — 研究・教育・個人での利用
 - **商用の利用には別のライセンスが必要** — [`COMMERCIAL.md`](./COMMERCIAL.md) を見てください
 
+## TEM を学ぶための文献
+
+これから TEM 図を描く人のための基本の文献です。
+書誌は CiNii・J-STAGE・Crossref・出版社のページで確かめました（2026 年 11 月）。
+
+### 日本語
+
+- サトウタツヤ・安田裕子・木戸彩恵・高田沙織・ヴァルシナー, J.（2006）．複線径路・等至性モデル：人生径路の多様性を描く質的心理学の新しい方法論を目指して　質的心理学研究，5，255–275．https://doi.org/10.24525/jaqp.5.1_255 （無料で読める） <br>
+  TEM を提唱した原典です。等至点・両極化した等至点・分岐点・必須通過点・非可逆的時間を定義しています。図の各要素の意味を確かめる出発点です。
+- 荒川歩・安田裕子・サトウタツヤ（2012）．複線径路・等至性モデルのTEM図の描き方の一例　立命館人間科学研究，25，95–107．https://doi.org/10.34382/00004276 （無料で読める） <br>
+  TEM 図を描く手順を、具体例で一歩ずつ示しています。作図の実務にいちばん直結する資料です。
+- 宮下太陽・上川多恵子・サトウタツヤ（2022）．TEM（複線径路等至性モデリング）の新たな理論的展開：記号圏とイマジネーション理論を踏まえて　立命館人間科学研究，44，49–64．https://doi.org/10.34382/00016829 （無料で読める） <br>
+  「複線径路等至性モデリング」という今の呼び方と、近年の理論の展開を解説しています。
+- サトウタツヤ（編著）（2009）．TEMではじめる質的研究：時間とプロセスを扱う研究をめざして　誠信書房 <br>
+  TEM の最初のまとまった入門書です。理論の解説と、研究例を TEM 図とともに載せています。
+- 安田裕子・滑田明暢・福田茉莉・サトウタツヤ（編）（2015）．ワードマップ TEA 理論編：複線径路等至性アプローチの基礎を学ぶ　新曜社 <br>
+  TEA の主な概念を項目ごとに短く解説しています。用語の意味をひくのに向いています。
+- 安田裕子・滑田明暢・福田茉莉・サトウタツヤ（編）（2015）．ワードマップ TEA 実践編：複線径路等至性アプローチを活用する　新曜社 <br>
+  TEA を各領域で使った研究の実例集です。
+- 安田裕子・サトウタツヤ（編著）（2022）．TEAによる対人援助プロセスと分岐の記述：保育，看護，臨床・障害分野の実践的研究　誠信書房 <br>
+  保育・看護・臨床・障害の対人援助の場で TEA を使った研究を集めています。
+- サトウタツヤ・安田裕子（監修）上川多恵子・宮下太陽・伊東美智子・小澤伊久美（編）（2023）．カタログTEA（複線径路等至性アプローチ）：図で響きあう　新曜社 <br>
+  さまざまな研究の TEM 図を集めた見本帳です。図の見せ方の幅を知るのに向いています。
+
+### 英語
+
+- Valsiner, J., & Sato, T. (2006). Historically structured sampling (HSS): How can psychology's methodology become tuned in to the reality of the historical nature of cultural psychology? In J. Straub, D. Weidemann, C. Kölbl, & B. Zielke (Eds.), *Pursuit of meaning: Advances in cultural and cross-cultural psychology* (pp. 215–252). transcript Verlag. https://doi.org/10.14361/9783839402344-010 <br>
+  TEM の土台になった、研究に招く人の選び方（HSS。のちに HSI）を提唱した章です。
+- Sato, T., Yasuda, Y., Kido, A., Arakawa, A., Mizoguchi, H., & Valsiner, J. (2007). Sampling reconsidered: Idiographic science and the analyses of personal life trajectories. In J. Valsiner & A. Rosa (Eds.), *The Cambridge handbook of sociocultural psychology* (pp. 82–106). Cambridge University Press. https://doi.org/10.1017/CBO9780511611162.007 <br>
+  TEM と HSS を英語で体系的に紹介した章です。英語で TEM を引くときの標準的な文献です。
+- Sato, T., Hidaka, T., & Fukuda, M. (2009). Depicting the dynamics of living the life: The trajectory equifinality model. In J. Valsiner, P. C. M. Molenaar, M. C. D. P. Lyra, & N. Chaudhary (Eds.), *Dynamic process methodology in the social and developmental sciences* (pp. 217–240). Springer. https://doi.org/10.1007/978-0-387-95922-1_10 <br>
+  TEM の概念と描き方を英語で解説した章です。図の要素の英語名を確かめるのに使えます。
+- Sato, T., Mori, N., & Valsiner, J. (Eds.). (2016). *Making of the future: The trajectory equifinality approach in cultural psychology*. Information Age Publishing. <br>
+  TEA を主題にした英語の論文集です。TEM の総論と、国際的な応用・拡張の章を収めています。
+- Masaki, F. (2025). Self-regulated learning from a cultural psychology perspective: Shifting from strategy to process with the trajectory equifinality approach. *Human Arenas, 8*(1), 131–149. https://doi.org/10.1007/s42087-023-00326-w （無料で読める） <br>
+  自己調整学習を題材に、TEA の考え方と図での描き方を英語で説明しています。
+- Saito, Y., Tomori, K., Sawada, T., & Ohno, K. (2023). Longitudinal process of setting and achieving activity- and participation-level goals in home rehabilitation in Japan: A qualitative study using trajectory equifinality modeling. *International Journal of Environmental Research and Public Health, 20*(9), Article 5746. https://doi.org/10.3390/ijerph20095746 （無料で読める） <br>
+  方法の節で TEM の手順（等至点の設定、分岐点・必須通過点の特定）を説明し、完成した TEM 図を載せた英語の論文です。
+
 ## 引用
 
 このソフトウェアを使った場合は引用してください。機械で読める引用の情報は

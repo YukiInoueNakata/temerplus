@@ -1,7 +1,7 @@
 // ============================================================================
 // gen-changelog.mjs - 更新情報（src/data/changelog.json）から README と別サイト用の文面を作る
 //   cd webApp && npm run changelog
-//   - リポジトリ直下の README.md の「最近の更新」（CHANGELOG:START〜END の間）を差し替える
+//   - リポジトリ直下の README.ja.md の「最近の更新」（CHANGELOG:START〜END の間）を差し替える
 //   - 別サイトに貼る文面を docs/changelog/site.html・site.md に書き出す（docs/ は git 管理外）
 //   - 個人サイト（既定 C:\LocalProjects\YukiInoueNakata.github.io・環境変数 TEMER_SITE_DIR で変更）の
 //     _data/temer_changelog.json に新しい順で写す。日英の詳細ページ（/programs/temer-plus/）がこれを読む。
@@ -24,11 +24,12 @@ if (errors.length) {
   process.exit(1);
 }
 
-const readmePath = resolve(repo, 'README.md');
+// 更新情報の欄は日本語の README.ja.md に置く（英語の README.md は Research Poster Studio に合わせた案内。2026-11-08）
+const readmePath = resolve(repo, 'README.ja.md');
 const before = readFileSync(readmePath, 'utf8');
 const after = replaceReadmeSection(before, entries);
 if (after !== before) writeFileSync(readmePath, after);
-console.log(after !== before ? 'README.md を更新しました' : 'README.md は最新です');
+console.log(after !== before ? 'README.ja.md を更新しました' : 'README.ja.md は最新です');
 
 const siteDir = resolve(repo, 'docs/changelog');
 mkdirSync(siteDir, { recursive: true });

@@ -867,7 +867,12 @@ function HelpTab({ onOpenWizard, onOpenChangelog, unseen }: { onOpenWizard?: () 
     <RibbonGroup title="サポート">
       <RibbonButton label="起動ウィザード" icon="🪄" onClick={onOpenWizard} title="起動時のウィザードを再表示 (新規作成 / プロジェクトを開く / デモを開く)" />
       <RibbonButton label="ツアー" icon="🎓" disabled title="チュートリアルツアー (開発中)" />
-      <RibbonButton label="マニュアル" icon="📘" disabled title="マニュアル (開発中)" />
+      <RibbonButton
+        label="マニュアル"
+        icon="📘"
+        title="はじめてのガイド（画面の写真つき）を新しいタブで開く"
+        onClick={() => window.open('https://github.com/YukiInoueNakata/temerplus/blob/master/docs/getting-started.ja.md', '_blank', 'noopener')}
+      />
       <RibbonButton label="動画" icon="🎬" disabled title="動画リンク (開発中)" />
       <RibbonButton label={unseen ? '更新情報（新）' : '更新情報'} icon="📰" onClick={onOpenChangelog} title="最近の更新（新機能・改善・修正）の一覧" active={unseen} />
       <RibbonButton label="バージョン情報" icon="ℹ" onClick={() => alert('TEMer Plus v0.2.0\n著者: 中田友貴\nライセンス: PolyForm Noncommercial 1.0.0')} />

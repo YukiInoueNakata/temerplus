@@ -17,7 +17,7 @@ describe('更新情報', () => {
   });
 
   it('README の「最近の更新」が changelog.json と一致する（npm run changelog で作り直す）', () => {
-    const readme = readFileSync(resolve(__dirname, '../../../README.md'), 'utf8');
+    const readme = readFileSync(resolve(__dirname, '../../../README.ja.md'), 'utf8');
     expect(readme).toContain(README_START);
     expect(replaceReadmeSection(readme, entries)).toBe(readme);
   });

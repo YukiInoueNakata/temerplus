@@ -1,49 +1,134 @@
-複線径路等至性モデル(TEM)の専用作図ツール
+# TEMer Plus
 
-<!-- CHANGELOG:START -->
-## 最近の更新
+[![Deploy](https://github.com/YukiInoueNakata/temerplus/actions/workflows/deploy.yml/badge.svg)](https://github.com/YukiInoueNakata/temerplus/actions/workflows/deploy.yml)
+[![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/License-PolyForm_Noncommercial_1.0.0-blue.svg)](./LICENSE)
+<!-- DOI badge (add after the first Zenodo release):
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) -->
 
-### 2026年11月8日
+English | [日本語版 README はこちら (Japanese)](README.ja.md)
 
-- **改善** Mac ではショートカットを ⌘ で表示: ボタンやコマンドパレットのショートカットを、Mac では「⌘Z」「⇧⌘S」のように表示します。やり直しは Mac では ⇧⌘Z です。
-- **修正** Shift を使うショートカットが効かないことがある: やり直し（Ctrl+Shift+Z）などが、Shift や Caps Lock の状態によって効きませんでした。
-- **修正** ブラウザによって Box の文字の折り返しが変わる: Chrome・Edge は行の端のかっこ（「」）を詰めて表示し、Safari とは折り返しが変わることがありました。どのブラウザでも詰めない表示にそろえました。
+A **drawing tool for diagrams of the Trajectory Equifinality Model (TEM)**, used in the
+Trajectory Equifinality Approach (TEA) in cultural psychology and qualitative research.
+TEMer Plus runs in the browser: **no installation and no account are needed**.
 
-### 2026年11月7日
+**Open the app: https://yukiinouenakata.github.io/temerplus/**
 
-- **改善** 複数ページの出力を作り直し: 図の始まりを 1 ページ目に合わせ、ページの境目を Box どうしの間の空いた所に置くので、Box が途中で切れません。凡例は各ページに、そのページに出てくる種類だけで付きます。図がページ数に入りきらないときは少し縮めて収め、「この図は約 3.4 ページ分です」のような目安も出ます。
-- **修正** 出力で文字が枠からあふれる: 「両方に収める」などで図を用紙に合わせて縮めたとき、枠だけが縮んで文字が元の大きさのまま残っていました。文字・メモ・曲線も同じ倍率で縮めます。
-- **改善** PNG・PDF・印刷を高い解像度で: 用紙の上で約 300dpi になる大きさで写します（以前の PNG は A4 で横 1170px ほどでした）。
-- **修正** Safari で印刷できない: Safari では印刷用の窓がポップアップとして止められ、印刷できませんでした。用紙の向きは Safari の印刷画面で「横」を選んでください。
-- **修正** 細い二重線が 1 本に見える: モノクロ（既定）・論文向けのテーマで、等至点の二重線が画面と PNG・PDF では 1 本になっていました。
-- **新機能** 出力の前に、含める要素を確認: 出力プレビューで、メモ・記号・コメント・凡例・時期ラベルを図に含めるかを毎回選びます。選び終えるまで保存できません。時期ラベルが無いときや、凡例を含めないときは注意が出ます。
-- **新機能** 論文用レポートの出力前の確認画面: 項目ごとの入力状況を「済・未・一部（Box の説明 37 件中 8 件 など）」で示し、「記入を続ける」か「このまま出力する」かを選べます。図にあるメモ・記号・コメントを載せるか、未入力の項目を出力に含めるかもここで選びます。
-- **改善** 表記方針を 11 項目に: 論文用レポートの表記方針に、矢印の距離・Box の横幅・Box の高さ・Box の形状・フォント装飾・テキスト配置を足しました。
-- **新機能** 記号の簡素化方式（線種は実在性だけ）: 設定の Box スタイルのテーマに「簡素化方式」を足しました。実線＝観察された、点線＝観察されなかった経験とし、EFP・OPP などの種別は種別ラベルで示します。論文用レポートの記号体系の宣言には、今の図の線種がそのまま書き出されます。
-- **修正** Box のテーマの線種が PPTX・SVG に出ない不具合: テーマで指定した枠の線種・太さを、PPTX・SVG でも画面と同じに描くようにしました。
-- **修正** 凡例・時期ラベルの出力が形式によって食い違う不具合: PNG・PDF と PPTX・SVG とで、凡例や時期ラベルが出るかどうかが食い違うことがあったのを揃えました。
+Draw boxes for experiences and the TEM-specific points (bifurcation points, obligatory
+passage points, equifinality points and their polarized counterparts), connect them with
+realized and unrealized paths, add social direction (SD) and social guidance (SG) along
+irreversible time, and export the diagram to **PNG / SVG / PDF / PPTX** or a **Word report
+for a paper**. Diagrams are processed only inside your browser and are never sent to a server.
 
-### 2026年10月15日
+Stack: **React + TypeScript + Vite + React Flow** (a static web app on GitHub Pages).
 
-- **新機能** まとめ枠: Box のプロパティで「まとめ枠」にチェックすると、中に置いた Box をまとめて囲む枠になります（例: いくつかの潜在経験をまとめた P-EFP）。枠を動かすと中の Box とメモも一緒に動きます。
-- **新機能** 接続点の表示の切り替え: 「表示」タブの「接続点」で、Box の左右の丸を隠せます。隠しても矢印はつなげます。出力（PPTX・SVG・PNG・PDF）には常に出ません。
-- **修正** エラーで止まっても作業中の図が消えないように: エラー画面が出た時点で作業中の図を自動保存に退避します。再読み込み後の確認で「OK（復元する）」を選ぶと戻ります。エラー画面から .tem として保存すること、エラーの詳細をコピーすることもできます。
+![TEMer Plus: the ribbon at the top, a TEM diagram in the center, and the properties panel on the right.](docs/images/screenshot.png)
 
-### 2026年10月10日
+## Statement of need
 
-- **改善** 記号のあとに文字を書けるように: メモの記号パレットで記号を選ぶと、「★ 重要な転機」のように記号に続けて文字を書けます。
-- **修正** ページ分割の出力で SD/SG が消える不具合: PPTX・SVG を複数ページに分けて出力したとき、矢印に付けた SD/SG や、両端の Box が別のページにある幅つきの SD/SG が消えていたのを直しました。
+TEM diagrams follow conventions of their own: box types marked by border styles,
+realized and unrealized paths, social direction and social guidance, period labels, and
+irreversible time running in one direction. Researchers usually draw them by hand in
+PowerPoint or Illustrator, where keeping the notation consistent, rearranging boxes as an
+analysis develops, and reporting the notation in a paper all take manual work. TEMer Plus
+treats these elements as structured data (types, levels on the time and item axes, links
+between boxes), so the notation stays consistent, the layout can be edited and
+reorganized, and the same data produce the figure and the text for a paper's method
+section. It succeeds TEMer, an earlier Excel VBA tool by the same author, and its features
+were shaped by a survey of TEM researchers. Target users are researchers and students
+using TEA/TEM, including those who are new to drawing TEM diagrams.
 
-### 2026年10月9日
+## Features
 
-- **新機能** PowerPoint で描いた TEM 図の取り込み: 「ファイル」タブの「表から取り込み」で .pptx を選ぶと、図形の形と位置から Box・矢印・SD/SG・時期ラベルを組み立てます。TEMer で出力した PPTX はそのまま戻せます。
-- **新機能** 強調の記号（★・〇 など）: 「挿入」タブの「記号」で、背景や枠のない「文字だけ」のメモとして置けます。文字色も変えられます。
-- **修正** PowerPoint 出力で枠と文字の大きさがずれる・段落の設定が崩れる: 文字の大きさ・フォント・行送り・余白を画面に合わせました。複雑な図でも画面と同じ見た目になります。
-- **修正** SD/SG の形と向き: SVG・PPTX の SD/SG を画面と同じ五角形にし、縦型の向きを画面に揃えました。種別ラベルとサブラベルが重なっていたのも直しました。
-- **改善** SVG で文字を画面と同じ幅で折り返す: Box・SD/SG・メモの文字が、画面と同じ位置で折り返されるようになりました。
-- **修正** PNG・PDF に接続点の丸が写り込む不具合
-- **改善** 時期ラベルの設定: 入力中に行の順番が入れ替わらないようにし、帯で表示したときの各時期の範囲を表示します。
-- **修正** 逐語録の CSV の文字化け: Shift_JIS で保存された CSV・テキストも読めるようにしました。
+- **TEM elements** — box types (normal experience, latent experience, bifurcation point,
+  equifinality point, polarized equifinality point, obligatory passage point, second
+  equifinality point, others), solid and dashed paths, SD/SG (attached to a box or an
+  arrow, between boxes, or in bands), period labels, the irreversible-time arrow, and an
+  automatic legend; horizontal and vertical layouts; several diagrams (sheets) per file.
+- **Editing** — a data sheet for table-style editing, alignment and spacing tools,
+  undo/redo, notes and symbols on the diagram, and box style themes (including a simplified
+  notation in which line styles show only whether a path was observed).
+- **Import** — CSV / Excel (including MAXQDA coded segments), TEM diagrams drawn in
+  PowerPoint (.pptx), and interview transcripts linked to boxes.
+- **Export** — PNG / SVG / PDF / PPTX / printing, at about 300 dpi for images, with a
+  confirmation of what to include, fitting to the paper, and multi-page output whose page
+  breaks fall between boxes; a Word report for papers with the notation declaration, the
+  notation policy, the diagram, and descriptions of each element; CSV export.
+- **Files** — diagrams are saved as `.tem` (JSON) files; unsaved work is kept automatically
+  in the browser.
 
-それより前の更新は、アプリ（https://yukiinouenakata.github.io/temerplus/）の「ヘルプ」タブの「更新情報」で見られます。
-<!-- CHANGELOG:END -->
+## Getting started
+
+Open https://yukiinouenakata.github.io/temerplus/ in **Chrome** (recommended), Edge, or
+Safari. A step-by-step guide with screenshots, from opening the app to exporting a diagram
+and a paper report, is in [docs/getting-started.en.md](docs/getting-started.en.md)
+(日本語: [docs/getting-started.ja.md](docs/getting-started.ja.md)).
+
+| Browser | Saving |
+|---|---|
+| Chrome, Edge | Choose a file once; later saves overwrite it |
+| Safari, Firefox | Each save downloads a `.tem` file |
+
+Tested on Windows (Chrome, Edge), macOS 26 on Apple Silicon (Safari, Chrome) and macOS 12
+on Intel (Safari, Chrome).
+
+The interface is currently in Japanese. An English demo diagram is available from the
+welcome screen ("Open English demo").
+
+Workshop materials (TEA 2026, in Japanese): https://yukiinouenakata.github.io/tea2026/
+
+## Running from source
+
+Requires Node.js 20 or later.
+
+```bash
+cd webApp
+npm ci
+npm run dev        # development server at http://localhost:5173/
+npm test           # unit tests (Vitest)
+npm run build      # static files in webApp/dist/
+```
+
+## Notes & limitations
+
+- The interface is in Japanese; the English interface is in preparation.
+- PPTX export reproduces positions, text and shapes approximately; PowerPoint wraps text
+  on its own. Use PNG, SVG or PDF when the exact appearance matters.
+- When printing from Safari, choose the paper orientation in the print dialog yourself.
+- In multi-page export, the legend is placed at the same position on every page and may
+  overlap boxes in some diagrams.
+
+## Contributing & support
+
+- **Issues** — report bugs or request features via
+  [GitHub Issues](https://github.com/YukiInoueNakata/temerplus/issues). Please include your
+  computer (Windows or Mac and version), your browser, and what happened.
+- **Release notes** — see the in-app Help tab ("更新情報"), the
+  [project page](https://yukiinouenakata.github.io/en/programs/temer-plus/), or the
+  Japanese README.
+
+## License & attribution
+
+Author: Yuki Inoue Nakata ([ORCID 0009-0000-4934-323X](https://orcid.org/0009-0000-4934-323X)),
+College of Comprehensive Psychology, Ritsumeikan University — design, implementation, documentation.
+
+This repository is licensed under the **PolyForm Noncommercial License 1.0.0** (full text in
+[`LICENSE`](./LICENSE)).
+
+- **Noncommercial use is free** — research, teaching, and personal use.
+- **Commercial use requires a separate license** — see [`COMMERCIAL.md`](./COMMERCIAL.md).
+
+## Citation
+
+If you use this software, please cite it. Machine-readable metadata is in
+[`CITATION.cff`](./CITATION.cff) (also available through GitHub's "Cite this repository").
+A DOI will be added here after the first archived release on Zenodo.
+
+```bibtex
+@software{nakata_temer_plus,
+  author  = {Nakata, Yuki Inoue},
+  title   = {TEMer Plus: A Drawing Tool for the Trajectory Equifinality Model (TEM)},
+  year    = {2026},
+  version = {0.2.0},
+  url     = {https://github.com/YukiInoueNakata/temerplus}
+}
+```

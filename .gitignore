@@ -54,12 +54,20 @@ webApp/*.tsbuildinfo
 # Markdown ドキュメント（非公開: 公開リポジトリには一切含めない）
 *.md
 **/*.md
-# 公開用の最小 README のみ追跡対象に戻す
+# 公開用の README（英語・日本語）だけ追跡対象に戻す（2026-11-08 Research Poster Studio に合わせて日英に）
 !/README.md
+!/README.ja.md
 # LICENSE はテキストファイルなので影響なし
 
 # docs/（調査資料・文献PDF・画像・マニュアルすべてローカル保持・非公開）
 docs/*
+# ただし、はじめてのガイド（日英）とその画像・README の画面の写真は公開する（2026-11-08）
+!docs/getting-started.ja.md
+!docs/getting-started.en.md
+!docs/images/
+docs/images/*
+!docs/images/screenshot.png
+!docs/images/getting-started/
 
 # Web アプリからの出力ファイル（ルート直下 / webApp 直下）
 /*.png

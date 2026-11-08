@@ -21,7 +21,7 @@ for a paper**. Diagrams are processed only inside your browser and are never sen
 
 Stack: **React + TypeScript + Vite + React Flow** (a static web app on GitHub Pages).
 
-![TEMer Plus: the ribbon at the top, a TEM diagram in the center, and the properties panel on the right.](docs/images/screenshot.png)
+![TEMer Plus: the ribbon at the top, a TEM diagram in the center, and the properties panel on the right.](docs/images/screenshot-en.png)
 
 ## Statement of need
 
@@ -76,8 +76,8 @@ and a paper report, is in [docs/getting-started.en.md](docs/getting-started.en.m
 Tested on Windows (Chrome, Edge), macOS 26 on Apple Silicon (Safari, Chrome) and macOS 12
 on Intel (Safari, Chrome).
 
-The interface is currently in Japanese. An English demo diagram is available from the
-welcome screen ("Open English demo").
+The interface is available in Japanese and English ("English / 日本語" at the top right). An English
+demo diagram is available from the welcome screen ("Open English demo").
 
 Workshop materials (TEA 2026, in Japanese): https://yukiinouenakata.github.io/tea2026/
 
@@ -95,7 +95,6 @@ npm run build      # static files in webApp/dist/
 
 ## Notes & limitations
 
-- The interface is in Japanese; the English interface is in preparation.
 - PPTX export reproduces positions, text and shapes approximately; PowerPoint wraps text
   on its own. Use PNG, SVG or PDF when the exact appearance matters.
 - When printing from Safari, choose the paper orientation in the print dialog yourself.

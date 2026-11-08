@@ -71,6 +71,7 @@ docs/*
 !docs/images/
 docs/images/*
 !docs/images/screenshot.png
+!docs/images/screenshot-en.png
 !docs/images/getting-started/
 
 # Web アプリからの出力ファイル（ルート直下 / webApp 直下）

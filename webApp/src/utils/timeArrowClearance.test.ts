@@ -10,6 +10,8 @@ import { computeTimeArrow } from './timeArrow';
 import { computePeriodLabels } from './periodLabels';
 import { nonBandSDSGRect, nonBandSDSGExtent } from './sdsgPlacement';
 import { useTEMStore } from '../store/store';
+import { computeLegendItems, computeLegendColumns } from './legend';
+import { estimateLegendSize } from './fitBounds';
 
 const demoRaw = readFileSync(resolve(__dirname, '../../sample-tem/kanzaki2021_figure1.tem'), 'utf8');
 /** デモを読み込み、縦型はアプリと同じ切り替え（座標を 90 度回す）をしてから返す */
@@ -54,5 +56,34 @@ describe('Line に付けた SD/SG も位置が決まる', () => {
     const sg = { ...sheet.sdsg[0], attachedTo: line.id, itemOffset: 0, timeOffset: 0, anchorMode: undefined };
     const r = nonBandSDSGRect(sg, sheet, 'horizontal');
     expect(r).not.toBeNull();
+  });
+});
+
+describe('横型と縦型を切り替えたときの凡例の位置（2026-11-08）', () => {
+  const legendRect = (doc: TEMDocument, layout: LayoutDirection) => {
+    const sheet = doc.sheets.find((s) => s.id === doc.activeSheetId) ?? doc.sheets[0];
+    const items = computeLegendItems(sheet, doc.settings.legend, doc.settings.locale);
+    const { w, h } = estimateLegendSize(doc.settings.legend, items, computeLegendColumns(doc.settings.legend, layout, items.length));
+    return { x: doc.settings.legend.position.x, y: doc.settings.legend.position.y, w, h, sheet };
+  };
+  it('縦型に切り替えても、凡例は時間の矢印の線と Box に重ならない', () => {
+    const doc = demoIn('vertical');
+    const r = legendRect(doc, 'vertical');
+    const a = computeTimeArrow(r.sheet, 'vertical', doc.settings.timeArrow, doc.settings.sdsgSpace, doc.settings.typeLabelVisibility)!;
+    // 縦型の時間の矢印は縦の線（x = startX）。凡例の横の範囲に入らない
+    expect(a.startX < r.x || a.startX > r.x + r.w).toBe(true);
+    for (const b of r.sheet.boxes) {
+      const overlap = r.x < b.x + b.width && b.x < r.x + r.w && r.y < b.y + b.height && b.y < r.y + r.h;
+      expect(overlap).toBe(false);
+    }
+  });
+  it('横型 → 縦型 → 横型で、凡例は元の位置に戻る', () => {
+    const doc = demoIn('horizontal');
+    const before = { ...doc.settings.legend.position };
+    useTEMStore.getState().setLayout('vertical');
+    useTEMStore.getState().setLayout('horizontal');
+    const after = useTEMStore.getState().doc.settings.legend.position;
+    expect(after.x).toBeCloseTo(before.x, 5);
+    expect(after.y).toBeCloseTo(before.y, 5);
   });
 });

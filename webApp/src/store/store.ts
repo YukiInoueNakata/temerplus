@@ -7,6 +7,7 @@ import { temporal } from 'zundo';
 import { produce } from 'immer';
 import i18n from '../i18n';
 import type {
+  LayoutDirection,
   TEMDocument,
   ViewState,
   Selection,
@@ -46,6 +47,8 @@ import {
 import { computeFitToLabelSize, computeFitFontSize } from '../utils/boxFit';
 import { resolveLineDefaults, lineDefaultsToPatch } from '../utils/lineDefaults';
 import { hydrateDocument } from '../utils/hydrate';
+import { computeLegendItems, computeLegendColumns } from '../utils/legend';
+import { estimateLegendSize } from '../utils/fitBounds';
 
 interface DocumentState {
   doc: TEMDocument;
@@ -2178,13 +2181,33 @@ export const useTEMStore = create<Store>()(
               // 凡例位置も同じ -90° rotation を適用（IL/TL 位置を保存）
               //   h→v: new_x = -old_y, new_y = old_x
               //   v→h: new_x = old_y, new_y = -old_x
+              // 凡例は回さない（文字は横書きのまま）ので、左上の角だけを回すと図の側にはみ出す
+              // （縦型で時間の矢印が凡例を貫いていた。2026-11-08）。図に近い側の端と、時間の始まりの側の端をそろえる:
+              //   h→v: 図の下（低い IL）にある凡例は、上の端の線 y=oy が縦型の右の端 x=-oy になり、左（外側）へ広がる
+              //        図の上にある凡例は、下の端 y=oy+H が縦型の左の端 x=-(oy+H) になり、右へ広がる
+              //   v→h: 逆。時間の方向は、横型の左の端 x と縦型の上の端 y が対応する
               const legend = d.settings.legend;
               if (legend) {
                 const ox = legend.position.x, oy = legend.position.y;
+                const sheet = d.sheets.find((s) => s.id === d.activeSheetId) ?? d.sheets[0];
+                const items = sheet ? computeLegendItems(sheet, legend, d.settings.locale) : [];
+                const sizeIn = (l: LayoutDirection) => (items.length > 0
+                  ? estimateLegendSize(legend, items, computeLegendColumns(legend, l, items.length))
+                  : { w: legend.minWidth ?? 200, h: 100 });
+                const before = sizeIn(currentLayout);
+                const after = sizeIn(layout);
+                // 回した後の Box（d.sheets は回し済み）の IL の中心と比べて、凡例が低い IL 側かを決める
+                const boxes = sheet?.boxes ?? [];
                 if (toVertical) {
-                  legend.position = { x: -oy, y: ox };
+                  // 回す前（横型）: IL が低い = y が大きい
+                  const origBoxCenterY = boxes.length ? -boxes.reduce((n, b) => n + (b.x + b.width / 2), 0) / boxes.length : -Infinity;
+                  const lowIL = oy + before.h / 2 >= origBoxCenterY;
+                  legend.position = { x: lowIL ? -oy - after.w : -(oy + before.h), y: ox };
                 } else {
-                  legend.position = { x: oy, y: -ox };
+                  // 回す前（縦型）: IL が低い = x が小さい。回した後の横型の y から元の x を戻す（x = -(y + h)）
+                  const origBoxCenterX = boxes.length ? -boxes.reduce((n, b) => n + (b.y + b.height / 2), 0) / boxes.length : Infinity;
+                  const lowIL = ox + before.w / 2 <= origBoxCenterX;
+                  legend.position = { x: oy, y: lowIL ? -(ox + before.w) : -ox - after.h };
                 }
               }
             }),

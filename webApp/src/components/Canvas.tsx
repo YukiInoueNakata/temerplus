@@ -940,6 +940,10 @@ function CanvasInner({
             snapGrid={[gridPx, gridPx]}
             fitView
             fitViewOptions={{ padding: 0.2 }}
+            // 倍率の範囲は横幅・縦幅フィット（0.1〜5）と同じにする。既定の下限 0.5 では、縦型など大きな図の「全体フィット」で
+            // 全体が入らなかった（2026-11-08）
+            minZoom={0.1}
+            maxZoom={5}
           >
             {showGrid && <Background gap={Math.max(MINOR_TICK_PX, gridPx)} variant={BackgroundVariant.Dots} />}
             {showPaperGuides && <PaperGuideOverlay />}
@@ -951,6 +955,7 @@ function CanvasInner({
             <SDSGBandOverlay dragInfo={bandDragInfo} bandLayout={sdsgBandComputation?.bandLayout ?? {}} />
             <SmartGuidesOverlay guides={guides} />
             <CustomControls />
+            <ZoomSync />
           </ReactFlow>
           <CustomWheelHandler layout={layout} />
           <HorizontalScrollbar />
@@ -1007,6 +1012,14 @@ function CustomWheelHandler({ layout }: { layout: 'horizontal' | 'vertical' }) {
 
 // 仮想ワールドサイズ（スクロール範囲）
 const WORLD_SIZE = 5000;  // -2500 to +2500
+
+// 画面の倍率をステータスバー（view.zoom）に写す。ボタンやホイールで倍率を変えても、React Flow の onMoveEnd は
+// 呼ばれないことがあるので、React Flow の倍率の値そのものを見張る（以前は写さず、いつも 100% と出ていた。2026-11-08）
+function ZoomSync() {
+  const zoom = useReactFlowStore((s) => s.transform[2]);
+  useEffect(() => { useTEMStore.getState().setZoom(zoom); }, [zoom]);
+  return null;
+}
 
 function HorizontalScrollbar() {
   const { getViewport, setViewport } = useReactFlow();

@@ -294,6 +294,7 @@ export const genParticipantId = () => genId('Part');
 export const genTranscriptId = () => genId('Tr');
 export const genParagraphId = () => genId('Pa');
 export const genSourceRefId = () => genId('Sr');
+export const genSegmentId = () => genId('Seg');
 
 // ----------------------------------------------------------------------------
 // Factories

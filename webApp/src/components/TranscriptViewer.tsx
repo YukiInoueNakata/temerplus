@@ -9,9 +9,10 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SegmentList } from './SegmentList';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import { BOX_TYPE_LABELS } from '../store/defaults';
-import type { BoxType, Paragraph, Participant, SourceRef, Transcript } from '../types';
+import type { TranscriptSegment, BoxType, Paragraph, Participant, SourceRef, Transcript } from '../types';
 import { TranscriptImportDialog } from './TranscriptImportDialog';
 import { TranscriptBulkImportDialog } from './TranscriptBulkImportDialog';
 import { AnonymizeExportDialog } from './AnonymizeExportDialog';
@@ -89,6 +90,10 @@ export function TranscriptViewer({
   // 選択中の段落 ID と選択された文字範囲（charStart..charEnd）
   const [selectedParagraphId, setSelectedParagraphId] = useState<string | null>(null);
   const [selectedRange, setSelectedRange] = useState<{ start: number; end: number } | null>(null);
+  // 中央の欄: 原文を読む／切片の一覧（2026-11-08 ユーザー要望「原文 → 切片化 → Box 化」）
+  const [centerView, setCenterView] = useState<'text' | 'cuts'>('text');
+  const [cutMessage, setCutMessage] = useState<string | null>(null);
+  const addSegment = useTEMStore((s) => s.addSegment);
   // リンク作成ダイアログ
   const [linkDialog, setLinkDialog] = useState<{
     paragraph: Paragraph;
@@ -396,6 +401,40 @@ export function TranscriptViewer({
 
               {/* 中央: 段落本文 */}
               <div style={{ flex: 1, minWidth: 0, overflow: 'auto', padding: 12 }}>
+                {activeTranscript && (
+                  <div role="tablist" style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
+                    {(['text', 'cuts'] as const).map((v) => (
+                      <button
+                        key={v}
+                        role="tab"
+                        aria-selected={centerView === v}
+                        onClick={() => setCenterView(v)}
+                        style={{
+                          padding: '4px 12px', fontSize: 12, borderRadius: 4, cursor: 'pointer',
+                          border: '1px solid ' + (centerView === v ? '#2b5797' : '#ccc'),
+                          background: centerView === v ? '#2b5797' : '#fff',
+                          color: centerView === v ? '#fff' : '#333',
+                        }}
+                      >
+                        {v === 'text' ? t('view.text') : t('view.cuts', { count: activeTranscript.segments?.length ?? 0 })}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {centerView === 'cuts' && activeTranscript ? (
+                  <SegmentList
+                    transcript={activeTranscript}
+                    onJump={(paragraphId) => {
+                      setCenterView('text');
+                      setSelectedParagraphId(paragraphId);
+                      setSelectedRange(null);
+                      setTimeout(() => {
+                        const el = document.querySelector(`[data-paragraph-id="${paragraphId}"]`);
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 100);
+                    }}
+                  />
+                ) : (<>
                 <div style={{ display: 'flex', gap: 8, marginBottom: 10, alignItems: 'center', flexWrap: 'wrap' }}>
                   <input
                     type="text"
@@ -505,6 +544,7 @@ export function TranscriptViewer({
                 ) : (
                   <p>{t('selectTranscript')}</p>
                 )}
+                </>)}
               </div>
 
               {/* 右ペイン リサイザ */}
@@ -531,6 +571,33 @@ export function TranscriptViewer({
                   />
                 ) : (
                   <p style={{ fontSize: 12, color: '#666' }}>{t('refs.selectParagraph')}</p>
+                )}
+                {selectedParagraphId && activeTranscript && (
+                  <div style={{ marginTop: 12, padding: 8, background: '#f3e9f8', borderRadius: 4, fontSize: 12 }}>
+                    <button
+                      className="ribbon-btn-small"
+                      style={{ fontWeight: 600 }}
+                      title={t('cut.make.tip')}
+                      onClick={() => {
+                        const p = activeTranscript.paragraphs.find((x) => x.id === selectedParagraphId);
+                        if (!p) return;
+                        const range = selectedRange;
+                        const quoteText = range ? p.text.slice(range.start, range.end) : p.text;
+                        if (!quoteText.trim()) return;
+                        const id = addSegment(activeTranscript.id, {
+                          paragraphId: p.id,
+                          charStart: range?.start,
+                          charEnd: range?.end,
+                          quoteText,
+                        });
+                        const seg = useTEMStore.getState().doc.transcripts.find((x) => x.id === activeTranscript.id)?.segments?.find((x) => x.id === id);
+                        setCutMessage(t('cut.made', { label: seg?.label ?? '' }));
+                        setSelectedRange(null);
+                        window.getSelection()?.removeAllRanges();
+                      }}
+                    >{selectedRange ? t('cut.make') : t('cut.makeParagraph')}</button>
+                    {cutMessage && <div style={{ marginTop: 6, color: '#6c3483' }}>{cutMessage}</div>}
+                  </div>
                 )}
                 {selectedParagraphId && selectedRange && (
                   <div style={{ marginTop: 12, padding: 8, background: '#fff3cd', borderRadius: 4, fontSize: 12 }}>
@@ -817,6 +884,12 @@ function ParagraphList({
   const visibleParagraphs = onlyUnlinked
     ? transcript.paragraphs.filter((p) => !allSourceRefs.some((x) => x.ref.paragraphId === p.id))
     : transcript.paragraphs;
+  // 段落ごとの切片（毎回作り直すと段落の行の色付けが毎回やり直しになるので、切片が変わったときだけ作る）
+  const cutsByParagraph = useMemo(() => {
+    const m = new Map<string, TranscriptSegment[]>();
+    for (const c of transcript.segments ?? []) m.set(c.paragraphId, [...(m.get(c.paragraphId) ?? []), c]);
+    return m;
+  }, [transcript.segments]);
   return (
     <div>
       {onlyUnlinked && (
@@ -844,6 +917,7 @@ function ParagraphList({
             onOpenLinkDialog={(range) => onOpenLinkDialog(p, range)}
             onSplit={(offset) => onSplit(p.id, offset)}
             onMergeWithNext={() => onMergeWithNext(p.id)}
+            cuts={cutsByParagraph.get(p.id)}
           />
         );
       })}
@@ -868,9 +942,12 @@ function ParagraphRow({
   onOpenLinkDialog,
   onSplit,
   onMergeWithNext,
+  cuts,
 }: {
   paragraph: Paragraph;
   refs: Array<{ ref: SourceRef; target: LinkTarget; label: string; color: string }>;
+  /** この段落の原文の切片 */
+  cuts?: TranscriptSegment[];
   isHit: boolean;
   isSelected: boolean;
   isLast: boolean;
@@ -891,7 +968,7 @@ function ParagraphRow({
   const [tagInput, setTagInput] = useState('');
 
   // 段落本文を文字単位で分割し、各文字に被さる SourceRef を集める
-  const segments = useMemo(() => buildHighlightSegments(paragraph.text, refs), [paragraph.text, refs]);
+  const segments = useMemo(() => buildHighlightSegments(paragraph.text, refs, cuts), [paragraph.text, refs, cuts]);
 
   const handleMouseUp = () => {
     const sel = window.getSelection();
@@ -1151,20 +1228,23 @@ function ParagraphTagsRow({
 interface Segment {
   text: string;
   refs: Array<{ ref: SourceRef; target: LinkTarget; label: string; color: string }>;
+  /** この切れ端を含む原文の切片（紫の破線の下線で示す。2026-11-08） */
+  cuts?: TranscriptSegment[];
 }
 
 function buildHighlightSegments(
   text: string,
   refs: Array<{ ref: SourceRef; target: LinkTarget; label: string; color: string }>,
+  cuts: TranscriptSegment[] = [],
 ): Segment[] {
-  if (refs.length === 0) return [{ text, refs: [] }];
+  if (refs.length === 0 && cuts.length === 0) return [{ text, refs: [] }];
 
   // 各文字位置に重なる ref のセットを構築（O(n*m)、n=文字数、m=ref数）
   // m は実用範囲で大きくない想定
   const breakpoints = new Set<number>([0, text.length]);
-  for (const r of refs) {
-    const s = r.ref.charStart ?? 0;
-    const e = r.ref.charEnd ?? text.length;
+  for (const r of [...refs.map((x) => x.ref), ...cuts]) {
+    const s = r.charStart ?? 0;
+    const e = r.charEnd ?? text.length;
     breakpoints.add(Math.max(0, Math.min(text.length, s)));
     breakpoints.add(Math.max(0, Math.min(text.length, e)));
   }
@@ -1180,12 +1260,27 @@ function buildHighlightSegments(
       const e = r.ref.charEnd ?? text.length;
       return start >= s && end <= e;
     });
-    segs.push({ text: slice, refs: coveringRefs });
+    const coveringCuts = cuts.filter((c) => !c.unresolved && start >= (c.charStart ?? 0) && end <= (c.charEnd ?? text.length));
+    segs.push({ text: slice, refs: coveringRefs, cuts: coveringCuts });
   }
   return segs;
 }
 
 function HighlightSpan({ seg }: { seg: Segment }) {
+  const cuts = seg.cuts ?? [];
+  if (cuts.length === 0) return <RefHighlightSpan seg={seg} />;
+  return (
+    <span
+      className="transcript-cut"
+      title={cuts.map((c) => c.label).join(' / ')}
+      style={{ borderBottom: '2px dashed #8e44ad', paddingBottom: 1 }}
+    >
+      <RefHighlightSpan seg={seg} />
+    </span>
+  );
+}
+
+function RefHighlightSpan({ seg }: { seg: Segment }) {
   const { t } = useTranslation('transcriptViewer');
   if (seg.refs.length === 0) return <span>{seg.text}</span>;
   // 1 重: 単純背景塗り。複数重: 下線で重なりを表現

@@ -122,3 +122,9 @@ reconnect.selection,選択範囲: {{start}}〜{{end}} 文字「{{text}}」,"Sele
 reconnect.delete,リンクを削除,Delete link,リンクの再接続 > ボタン
 reconnect.useWhole,段落全体を参照に切替,Use whole paragraph,リンクの再接続 > ボタン
 reconnect.useSelection,選択範囲で再接続,Reconnect to selection,リンクの再接続 > ボタン
+view.text,原文,Text,逐語録の画面 > 中央の欄の切り替え（原文を読む）
+view.cuts,切片の一覧（{{count}}）,Segments ({{count}}),逐語録の画面 > 中央の欄の切り替え（切片の一覧）
+cut.make,切片にする,Make a segment,逐語録の画面 > 右の欄のボタン（選んだ範囲を切片にする）
+cut.make.tip,選んだ範囲を切片にします。見出し・種別を決めてから、切片の一覧で Box にできます,"Makes the selected range a segment. Set its heading and type, then turn it into a Box from the segment list",逐語録の画面 > 右の欄のボタンの説明
+cut.makeParagraph,段落全体を切片にする,Make the whole paragraph a segment,逐語録の画面 > 右の欄のボタン（範囲を選んでいないとき）
+cut.made,切片にしました（{{label}}）,Segment made ({{label}}),逐語録の画面 > 切片にしたあとの知らせ

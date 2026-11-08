@@ -22,7 +22,7 @@ export interface RetrackResult {
  * - quoteText が新本文中に存在すれば charStart/charEnd を更新し unresolved を解除
  * - 存在しなければ charStart/charEnd は据え置きで unresolved=true をセット
  */
-export function retrackSourceRef(ref: SourceRef, newText: string): RetrackResult {
+export function retrackSourceRef<T extends SourceRef>(ref: T, newText: string): { ref: T; changed: boolean } {
   // 段落全体参照（charStart/charEnd が未指定または quoteText が空）の場合は常に追従成功
   if (!ref.quoteText || ref.quoteText.length === 0) {
     if (ref.unresolved) {
@@ -71,11 +71,11 @@ export function retrackSourceRef(ref: SourceRef, newText: string): RetrackResult
  *
  * @returns 更新後の配列（変更がなくても新しい配列インスタンスを返す）と、変更があった件数
  */
-export function retrackSourceRefsForParagraph(
-  refs: SourceRef[] | undefined,
+export function retrackSourceRefsForParagraph<T extends SourceRef>(
+  refs: T[] | undefined,
   paragraphId: string,
   newText: string,
-): { refs: SourceRef[] | undefined; changedCount: number } {
+): { refs: T[] | undefined; changedCount: number } {
   if (!refs || refs.length === 0) return { refs, changedCount: 0 };
   let changedCount = 0;
   const next = refs.map((r) => {
@@ -91,10 +91,10 @@ export function retrackSourceRefsForParagraph(
  * 段落削除に伴い、その段落を参照する SourceRef を全て unresolved=true にする
  * （ユーザが原文側で段落を消した場合の安全策）。
  */
-export function markRefsUnresolvedForParagraph(
-  refs: SourceRef[] | undefined,
+export function markRefsUnresolvedForParagraph<T extends SourceRef>(
+  refs: T[] | undefined,
   paragraphId: string,
-): SourceRef[] | undefined {
+): T[] | undefined {
   if (!refs || refs.length === 0) return refs;
   let changed = false;
   const next = refs.map((r) => {

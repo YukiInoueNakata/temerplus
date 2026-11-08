@@ -74,6 +74,7 @@ Settings (File > Settings) control the look of the diagram in detail.
 
 - **Import transcripts**: import interview transcripts (text, Word, CSV, Excel) one at a time or in bulk (File > Transcript, Bulk transcripts).
 - **Transcript viewer**: read a transcript while creating Boxes from paragraphs or linking Boxes to paragraphs (source references). It can also search, link many paragraphs at once, and jump from a Box to its paragraph.
+- **From segments to Boxes**: select a range in the transcript and press "Make a segment" to keep it as a segment (shown with a purple dashed underline). The segment list shows segments in text order, where you can set a heading (the Box text), type, Item level, and note. Boxes made from selected segments are placed in text order along the time axis, and changing a heading or type in the list updates the Box. "Arrange Boxes in text order" reorders the Boxes to follow the transcript.
 - **Participants**: keep transcripts and diagrams together for each participant, and refer to them by pseudonyms.
 - **Anonymized export**: export a file in which names are replaced with pseudonyms.
 

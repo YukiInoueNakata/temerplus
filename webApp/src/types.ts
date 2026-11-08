@@ -93,6 +93,9 @@ export interface Box {
   noDescriptionNeeded?: boolean;       // 説明不要フラグ
   zIndex?: number;                     // 重なり順
   sourceRefs?: SourceRef[];            // 原文（Transcript）への参照リンク（多対多、Phase 4）
+  /** この Box を作った原文の切片の ID（TranscriptSegment.id）。切片の一覧で種別などを変えると、この Box にも反映される。
+   *  Box の ID は種別を変えると付け替わるので、結びつきは Box の側に持たせる（2026-11-08） */
+  segmentId?: string;
 
   // サブラベル（協力者ID 等）。box外に表示
   // - 横型: box下部、縦型: box右辺（既定）
@@ -318,6 +321,8 @@ export interface Transcript {
   source: 'txt' | 'csv' | 'xlsx' | 'docx' | 'manual';
   importedAt: string;                // ISO 8601
   paragraphs: Paragraph[];
+  /** 原文の切片（原文 → 切片化 → Box 化。2026-11-08 ユーザー要望）。段落の編集には原文参照と同じく付いていく */
+  segments?: TranscriptSegment[];
   metadata?: TranscriptMetadata;
 }
 
@@ -364,6 +369,14 @@ export interface SourceRef {
   note?: string;                     // この引用に対する個別メモ
   createdAt: string;                 // ISO 8601
   unresolved?: boolean;              // 編集追従に失敗した場合 true
+}
+
+// 原文の切片（2026-11-08）。原文参照（SourceRef）と同じ項目で原文の範囲を指し（段落の編集への追従もそのまま使える）、
+// Box にするときの見出し・種別・Item レベルを持つ。note は切片のメモ
+export interface TranscriptSegment extends SourceRef {
+  label: string;                     // 見出し（要約）。Box にしたときの Box の文字
+  boxType?: BoxType;                 // 種別の候補（省略 = 通常）
+  itemLevel?: number;                // Box にするときの Item レベル（省略 = 0 の一列）
 }
 
 // TEM 図に置ける注釈ノート（吹き出し / メモ）。Box type='annotation'（潜在経験）とは別物

@@ -20,6 +20,7 @@ import type {
   Transcript,
   Paragraph,
   SourceRef,
+  TranscriptSegment,
   LineDefaults,
   Note,
 } from '../types';
@@ -43,10 +44,12 @@ import {
   genSheetId,
   genParagraphId,
   genSourceRefId,
+  genSegmentId,
 } from './defaults';
 import { computeFitToLabelSize, computeFitFontSize } from '../utils/boxFit';
 import { resolveLineDefaults, lineDefaultsToPatch } from '../utils/lineDefaults';
 import { hydrateDocument } from '../utils/hydrate';
+import { transcriptRank, textPosition, compareTextPosition, boxTextPosition, type TextPosition } from '../utils/textOrder';
 import { computeLegendItems, computeLegendColumns } from '../utils/legend';
 import { estimateLegendSize } from '../utils/fitBounds';
 
@@ -330,6 +333,24 @@ interface Actions {
     target: { type: 'box' | 'line' | 'sdsg'; id: string },
     ref: Omit<SourceRef, 'id' | 'createdAt'>,
   ) => string;
+  // --- 原文の切片（原文 → 切片化 → Box 化。2026-11-08） ---
+  /** 原文の範囲を切片にする。見出しの既定は引用の初めの 30 字 */
+  addSegment: (
+    transcriptId: string,
+    input: { paragraphId: string; charStart?: number; charEnd?: number; quoteText: string; label?: string },
+  ) => string;
+  /** 切片の見出し・種別・Item レベル・メモを直す。この切片から作った Box にも反映する */
+  updateSegment: (
+    transcriptId: string,
+    segmentId: string,
+    patch: Partial<Pick<TranscriptSegment, 'label' | 'boxType' | 'itemLevel' | 'note'>>,
+  ) => void;
+  /** 切片を消す（作った Box は残し、結びつきだけを外す） */
+  removeSegment: (transcriptId: string, segmentId: string) => void;
+  /** 選んだ切片から Box を作る（今のシート・原文の順に時間の方向へ並べる・「元に戻す」1 回で全部戻る）。作った Box の ID を返す */
+  createBoxesFromSegments: (transcriptId: string, segmentIds: string[]) => string[];
+  /** 原文に結ばれた Box を、原文の順に並べ直す（今の時間の位置の並びを入れ替える。Item の位置は変えない）。動かした数を返す */
+  arrangeBoxesByTextOrder: (boxIds?: string[]) => number;
   updateSourceRef: (
     target: { type: 'box' | 'line' | 'sdsg'; id: string },
     refId: string,
@@ -2383,6 +2404,11 @@ export const useTEMStore = create<Store>()(
             const p = t.paragraphs.find((x) => x.id === paragraphId);
             if (!p) return;
             p.text = newText;
+            // 切片も原文参照と同じく付いていく（2026-11-08）
+            if (t.segments) {
+              const rs = retrackSourceRefsForParagraph(t.segments, paragraphId, newText);
+              if (rs.changedCount > 0 && rs.refs) t.segments = rs.refs;
+            }
             // SourceRef 追従: 全シートの全要素について該当段落を参照しているものを更新
             for (const sh of d.sheets) {
               for (const b of sh.boxes) {
@@ -2477,6 +2503,15 @@ export const useTEMStore = create<Store>()(
               for (const l of sh.lines) l.sourceRefs = reassign(l.sourceRefs);
               for (const sg of sh.sdsg) sg.sourceRefs = reassign(sg.sourceRefs);
             }
+            // 切片も同じ規則で付け替える（2026-11-08）
+            if (t.segments) {
+              t.segments = t.segments.map((r) => {
+                if (r.paragraphId !== paragraphId || r.charStart === undefined || r.charEnd === undefined) return r;
+                if (r.charStart >= offset) return { ...r, paragraphId: newId, charStart: r.charStart - offset, charEnd: r.charEnd - offset };
+                if (r.charEnd > offset) return { ...r, charEnd: offset, quoteText: before.slice(r.charStart, offset) };
+                return r;
+              });
+            }
             success = true;
           }),
           dirty: true,
@@ -2534,6 +2569,8 @@ export const useTEMStore = create<Store>()(
               for (const l of sh.lines) l.sourceRefs = reassign(l.sourceRefs);
               for (const sg of sh.sdsg) sg.sourceRefs = reassign(sg.sourceRefs);
             }
+            // 切片も同じく前の段落へ（2026-11-08）
+            if (t.segments) t.segments = reassign(t.segments) as TranscriptSegment[];
           }),
           dirty: true,
         }));
@@ -2546,6 +2583,8 @@ export const useTEMStore = create<Store>()(
             if (!t) return;
             t.paragraphs = t.paragraphs.filter((p) => p.id !== paragraphId);
             t.paragraphs.forEach((p, i) => { p.index = i; });
+            // 切片も追えなくなった印を付ける（2026-11-08）
+            t.segments = markRefsUnresolvedForParagraph(t.segments, paragraphId);
             // 該当段落を参照する SourceRef は unresolved=true に
             for (const sh of d.sheets) {
               for (const b of sh.boxes) {
@@ -2561,6 +2600,175 @@ export const useTEMStore = create<Store>()(
           }),
           dirty: true,
         }));
+      },
+
+      addSegment: (transcriptId, input) => {
+        const id = genSegmentId();
+        const quote = input.quoteText.trim();
+        // 見出しの既定は引用の初めの 15 字（長いと横型の Box が縦に大きく伸びる）
+        const label = input.label ?? ([...quote].length > 15 ? [...quote].slice(0, 15).join('') + '…' : quote);
+        set((state) => ({
+          doc: produce(state.doc, (d) => {
+            const t = d.transcripts.find((x) => x.id === transcriptId);
+            if (!t) return;
+            const seg: TranscriptSegment = {
+              id,
+              transcriptId,
+              paragraphId: input.paragraphId,
+              charStart: input.charStart,
+              charEnd: input.charEnd,
+              quoteText: input.quoteText,
+              createdAt: new Date().toISOString(),
+              label,
+            };
+            t.segments = [...(t.segments ?? []), seg];
+          }),
+          dirty: true,
+        }));
+        return id;
+      },
+
+      updateSegment: (transcriptId, segmentId, patch) => {
+        const before = get().doc.transcripts.find((x) => x.id === transcriptId)?.segments?.find((sg) => sg.id === segmentId);
+        if (!before) return;
+        set((state) => ({
+          doc: produce(state.doc, (d) => {
+            const t = d.transcripts.find((x) => x.id === transcriptId);
+            const seg = t?.segments?.find((sg) => sg.id === segmentId);
+            if (!seg) return;
+            if (patch.label !== undefined) seg.label = patch.label;
+            if (patch.boxType !== undefined) seg.boxType = patch.boxType;
+            if (patch.itemLevel !== undefined) seg.itemLevel = Number.isFinite(patch.itemLevel) ? patch.itemLevel : undefined;
+            if (patch.note !== undefined) seg.note = patch.note.trim() || undefined;
+            // この切片から作った Box に見出しと Item レベルを反映する（Box の文字が前の見出しのままのときだけ文字を替える）
+            const layout = d.settings.layout;
+            for (const sh of d.sheets) {
+              for (const b of sh.boxes) {
+                if (b.segmentId !== segmentId) continue;
+                if (patch.label !== undefined && b.label === before.label) b.label = patch.label;
+                if (patch.itemLevel !== undefined && Number.isFinite(patch.itemLevel)) {
+                  if (layout === 'horizontal') b.y = -patch.itemLevel * LEVEL_PX;
+                  else b.x = patch.itemLevel * LEVEL_PX;
+                }
+              }
+            }
+          }),
+          dirty: true,
+        }));
+        // 種別は changeBoxType に任せる（Box の ID と参照の付け替えをするため）。今のシートの Box が対象
+        if (patch.boxType !== undefined && patch.boxType !== before.boxType) {
+          const sheet = getActiveSheet(get().doc);
+          const ids = (sheet?.boxes ?? []).filter((b) => b.segmentId === segmentId && b.type !== patch.boxType).map((b) => b.id);
+          ids.forEach((bid) => get().changeBoxType(bid, patch.boxType!));
+        }
+      },
+
+      removeSegment: (transcriptId, segmentId) => {
+        set((state) => ({
+          doc: produce(state.doc, (d) => {
+            const t = d.transcripts.find((x) => x.id === transcriptId);
+            if (!t?.segments) return;
+            t.segments = t.segments.filter((sg) => sg.id !== segmentId);
+            for (const sh of d.sheets) for (const b of sh.boxes) if (b.segmentId === segmentId) delete b.segmentId;
+          }),
+          dirty: true,
+        }));
+      },
+
+      createBoxesFromSegments: (transcriptId, segmentIds) => {
+        const st = get();
+        const t = st.doc.transcripts.find((x) => x.id === transcriptId);
+        const sheet = getActiveSheet(st.doc);
+        if (!t || !sheet) return [];
+        const rank = transcriptRank(st.doc);
+        // 今のシートに Box がまだ無い切片だけを、原文の順に
+        const already = new Set(sheet.boxes.map((b) => b.segmentId).filter(Boolean));
+        const segs = (t.segments ?? [])
+          .filter((sg) => segmentIds.includes(sg.id) && !already.has(sg.id))
+          .map((sg) => ({ sg, pos: textPosition(st.doc, sg, rank) }))
+          .sort((a, b) => (a.pos && b.pos ? compareTextPosition(a.pos, b.pos) : 0))
+          .map((x) => x.sg);
+        if (segs.length === 0) return [];
+        const layout = st.doc.settings.layout;
+        const isH = layout === 'horizontal';
+        const baseW = st.doc.settings.defaultBoxSize.width;
+        const baseH = st.doc.settings.defaultBoxSize.height;
+        const w = isH ? baseW : baseH;
+        const h = isH ? baseH : baseW;
+        // 時間の方向の始まり: 今ある Box のいちばん後ろの次（無ければ 0）。間隔は Box を足すときと同じ 150px
+        const STEP = 150;
+        const timeEnd = sheet.boxes.length > 0
+          ? Math.max(...sheet.boxes.map((b) => (isH ? b.x + b.width : b.y + b.height)))
+          : -STEP + 50;
+        const start = timeEnd + STEP - 50;
+        const ids: string[] = [];
+        const existing = sheet.boxes.map((b) => b.id);
+        const now = new Date().toISOString();
+        const newBoxes: Box[] = segs.map((sg, i) => {
+          const type = sg.boxType ?? 'normal';
+          const id = genBoxIdByType(type, [...existing, ...ids]);
+          ids.push(id);
+          const time = start + i * STEP;
+          const itemPx = (sg.itemLevel ?? 0) * LEVEL_PX;
+          return {
+            id,
+            type,
+            label: sg.label,
+            description: sg.quoteText,
+            x: isH ? time : itemPx,
+            y: isH ? -itemPx : time,
+            width: w,
+            height: h,
+            textOrientation: isH ? 'vertical' : 'horizontal',
+            segmentId: sg.id,
+            sourceRefs: [{
+              id: genSourceRefId(),
+              transcriptId,
+              paragraphId: sg.paragraphId,
+              charStart: sg.charStart,
+              charEnd: sg.charEnd,
+              quoteText: sg.quoteText,
+              createdAt: now,
+            }],
+          };
+        });
+        set((s) => ({
+          doc: mutateActiveSheet(s.doc, (sh) => { sh.boxes.push(...newBoxes); }),
+          selection: { ...s.selection, boxIds: ids, lineIds: [], sdsgIds: [], noteIds: [] },
+          dirty: true,
+        }));
+        return ids;
+      },
+
+      arrangeBoxesByTextOrder: (boxIds) => {
+        const st = get();
+        const sheet = getActiveSheet(st.doc);
+        if (!sheet) return 0;
+        const isH = st.doc.settings.layout === 'horizontal';
+        const rank = transcriptRank(st.doc);
+        const targets = sheet.boxes
+          .filter((b) => !boxIds || boxIds.includes(b.id))
+          .map((b) => ({ b, pos: boxTextPosition(st.doc, b, rank) }))
+          .filter((x): x is { b: Box; pos: TextPosition } => x.pos != null);
+        if (targets.length < 2) return 0;
+        // 今の時間の位置（左上の角）を小さい順に並べた「席」を、原文の順に割り当て直す（間隔はそのまま残る）
+        const slots = targets.map((x) => (isH ? x.b.x : x.b.y)).sort((a, b) => a - b);
+        const ordered = [...targets].sort((a, b) => compareTextPosition(a.pos, b.pos));
+        const newTime = new Map(ordered.map((x, i) => [x.b.id, slots[i]]));
+        let moved = 0;
+        for (const x of targets) if ((isH ? x.b.x : x.b.y) !== newTime.get(x.b.id)) moved++;
+        if (moved === 0) return 0;
+        set((s) => ({
+          doc: mutateActiveSheet(s.doc, (sh) => {
+            for (const b of sh.boxes) {
+              const tpos = newTime.get(b.id);
+              if (tpos === undefined) continue;
+              if (isH) b.x = tpos; else b.y = tpos;
+            }
+          }),
+          dirty: true,
+        }));
+        return moved;
       },
 
       addSourceRef: (target, refInput) => {

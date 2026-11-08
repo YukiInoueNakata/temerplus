@@ -1,0 +1,23 @@
+﻿key,ja,en,note
+empty,まだ切片がありません。「原文」の画面で範囲を選び、右の欄の「切片にする」を押すと、ここに並びます。,"No segments yet. Select a range in the ""Text"" view and press ""Make a segment"" on the right; segments are listed here.",原文ビューア > 切片の一覧 > 切片が無いとき
+checkAll,すべて選ぶ,Select all,切片の一覧 > ボタン
+uncheckAll,選ぶのをやめる,Clear selection,切片の一覧 > ボタン
+check,{{n}} 番を選ぶ,Select No. {{n}},切片の一覧 > 行の選択欄の読み上げ
+createBoxes,選んだ切片を Box にする（{{count}}）,Make Boxes from selected ({{count}}),切片の一覧 > ボタン（Box がまだ無い選んだ切片の数）
+createBoxes.tip,見出しを文字に、引用を説明に、原文参照つきで Box を作り、原文の順に時間の方向へ並べます。すでに Box がある切片は飛ばします,"Creates Boxes with the heading as the text, the quote as the description, and a source reference, placed in text order along the time axis. Segments that already have a Box are skipped",切片の一覧 > ボタンの説明
+created,Box を {{count}} 個作りました,Created {{count}} Boxes,切片の一覧 > Box を作ったあとの知らせ
+created_one,Box を {{count}} 個作りました,Created {{count}} Box,件数が 1 のときの英語の形（日本語は使われない）
+arrange,Box を原文の順に並べる,Arrange Boxes in text order,切片の一覧 > ボタン
+arrange.tip,この逐語録の切片から作った Box を、原文の順に並べ直します。時間の方向の位置の並びは今のまま使い、上下（Item）の位置は変えません,"Reorders the Boxes made from this transcript's segments into text order. The existing positions along the time axis are reused, and the Item positions are kept",切片の一覧 > ボタンの説明
+arranged,{{count}} 個の Box を並べ直しました,Rearranged {{count}} Boxes,切片の一覧 > 並べ直したあとの知らせ
+arranged_one,{{count}} 個の Box を並べ直しました,Rearranged {{count}} Box,件数が 1 のときの英語の形（日本語は使われない）
+arranged.none,すでに原文の順に並んでいます,Already in text order,切片の一覧 > 並べ直す必要が無かったとき
+col.label,見出し（Box の文字）,Heading (Box text),切片の一覧 > 列の名前
+col.quote,引用,Quote,切片の一覧 > 列の名前（押すと原文の場所へ）
+col.type,種別,Type,切片の一覧 > 列の名前
+col.item,Item,Item,切片の一覧 > 列の名前（Item レベル）
+col.item.tip,Box にしたときの Item レベル（空なら 0 の一列）,Item level of the Box (empty = 0),切片の一覧 > 列の説明
+col.note,メモ,Note,切片の一覧 > 列の名前
+col.box,Box,Box,切片の一覧 > 列の名前（作った Box の ID）
+col.box.tip,図の上でこの Box を選ぶ,Select this Box on the diagram,切片の一覧 > Box の ID のボタンの説明
+remove.tip,切片を消す（作った Box は残ります）,Delete the segment (the Box is kept),切片の一覧 > 消すボタンの説明

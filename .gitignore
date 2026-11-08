@@ -57,6 +57,8 @@ webApp/*.tsbuildinfo
 # 公開用の README（英語・日本語）だけ追跡対象に戻す（2026-11-08 Research Poster Studio に合わせて日英に）
 !/README.md
 !/README.ja.md
+# 商用ライセンスの案内（料金の表を外した版・2026-11-08 公開）
+!/COMMERCIAL.md
 # LICENSE はテキストファイルなので影響なし
 
 # docs/（調査資料・文献PDF・画像・マニュアルすべてローカル保持・非公開）
@@ -76,7 +78,7 @@ docs/images/*
 webApp/*.png
 webApp/*.svg
 webApp/*.tem
-LICENSE
+# LICENSE は 2026-11-08 に公開（名前を直し、DOI の前に公開）
 
 # 研究データ等の非公開サンプル（git 管理外・OneDrive のみ）
 test-assets/private/

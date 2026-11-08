@@ -1,0 +1,7 @@
+﻿key,ja,en,note
+error.unsupported,"対応していない形式です: {{name}}
+対応形式: .txt / .md / .csv / .tsv / .xlsx / .xls / .docx","Unsupported format: {{name}}
+Supported: .txt / .md / .csv / .tsv / .xlsx / .xls / .docx",逐語録の取り込み > ファイルを開いたときのエラー（2 行）
+error.nottabular,Tabular でないファイルです,Not a tabular file,逐語録の取り込み > 表の形の読み込みでのエラー
+error.nosheet,シートが見つかりません,Sheet not found,逐語録の取り込み > 表の形の読み込みでのエラー
+error.notparagraph,Paragraph 型でないファイルです,Not a paragraph-type file,逐語録の取り込み > 段落の形の読み込みでのエラー

@@ -1,0 +1,9 @@
+﻿key,ja,en,note
+"progress.capturingPreview","プレビューをキャプチャ中...","Capturing preview...","印刷の準備中の表示"
+"progress.cropping","ページ {{n}} / {{total}} をクロップ中","Cropping page {{n}} of {{total}}","印刷の準備中の表示（n は何ページ目か）"
+"progress.openWindow","印刷ウィンドウを開きます","Opening the print window","印刷の準備中の表示"
+"window.title","TEMer 印刷プレビュー ({{n}} ページ)","TEMer print preview ({{n}} pages)","印刷のウィンドウ > タブの題（n はページ数）"
+"window.instructions","印刷ダイアログで「用紙サイズ」「向き」がこの用紙に合っているか確認してください。","In the print dialog, check that the paper size and orientation match this paper.","印刷のウィンドウ > 上の案内（縦の用紙）"
+"window.instructionsLandscape","印刷ダイアログで「用紙サイズ」「向き」がこの用紙に合っているか確認してください。Safari は向きを自動で合わせないので「横」を選んでください。","In the print dialog, check that the paper size and orientation match this paper. Safari does not set the orientation automatically, so choose Landscape.","印刷のウィンドウ > 上の案内（横の用紙）"
+"window.closeHint","ダイアログを閉じたらこのウィンドウも閉じて構いません。","You can close this window after closing the dialog.","印刷のウィンドウ > 上の案内の 2 行目"
+"error.popupBlocked","ポップアップがブロックされました。ブラウザのポップアップブロックを解除してください。","The pop-up was blocked. Allow pop-ups for this site in your browser.","印刷 > 印刷のウィンドウを開けなかったときの警告"

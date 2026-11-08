@@ -6,6 +6,7 @@
 // ============================================================================
 
 import type { BoxType, BoxTypePreset } from '../types';
+import i18n from '../i18n';
 
 export type BoxTypePresetMap = Partial<Record<BoxType, BoxTypePreset>>;
 
@@ -18,12 +19,13 @@ export interface BoxStyleTheme {
 }
 
 // 組み込みテーマ ----------------------------------------------------------------
+// 名前と説明は画面の言語（翻訳の表 boxThemes）。読むたびに引くよう getter にしてある
 
 export const BUILTIN_THEMES: BoxStyleTheme[] = [
   {
     id: 'theme-monochrome',
-    name: 'モノクロ（既定）',
-    description: '全 Box を白背景・黒枠で統一。工場出荷時の見た目に近い。',
+    get name() { return i18n.t('boxThemes:monochrome.name'); },
+    get description() { return i18n.t('boxThemes:monochrome.description'); },
     builtin: true,
     presets: {
       normal:    { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.0, borderStyle: 'solid' },
@@ -38,8 +40,8 @@ export const BUILTIN_THEMES: BoxStyleTheme[] = [
   },
   {
     id: 'theme-academic',
-    name: '学会発表向け（淡色）',
-    description: '淡い色調で各 Box タイプを区別。スライドや学会ポスター向け。',
+    get name() { return i18n.t('boxThemes:academic.name'); },
+    get description() { return i18n.t('boxThemes:academic.description'); },
     builtin: true,
     presets: {
       normal:    { backgroundColor: '#ffffff', borderColor: '#555555', color: '#222222' },
@@ -54,8 +56,8 @@ export const BUILTIN_THEMES: BoxStyleTheme[] = [
   },
   {
     id: 'theme-colorful',
-    name: 'カラフル',
-    description: '各 Box タイプを鮮やかな色で塗り分け。発表時の視認性重視。',
+    get name() { return i18n.t('boxThemes:colorful.name'); },
+    get description() { return i18n.t('boxThemes:colorful.description'); },
     builtin: true,
     presets: {
       normal:    { backgroundColor: '#f5f5f5', borderColor: '#424242', color: '#212121' },
@@ -73,8 +75,8 @@ export const BUILTIN_THEMES: BoxStyleTheme[] = [
     // 観察された経験（通常・BFP・EFP・OPP・2nd EFP・その他）は同じ実線、観察されなかった経験（潜在経験）は点線。
     // P-EFP・P-2nd EFP も点線（観察されなかった側。2026-10-30 ユーザー決定）。種別は種別ラベル（自動採番）で示す
     id: 'theme-simplified-reality',
-    name: '簡素化方式（線種は実在性だけ・種別はラベル）',
-    description: '実線＝観察された、点線＝観察されなかった。EFP・OPP などの種別は線種でなく種別ラベルで示す。論文用レポートの記号体系の宣言にそのまま書き出す。',
+    get name() { return i18n.t('boxThemes:simplified.name'); },
+    get description() { return i18n.t('boxThemes:simplified.description'); },
     builtin: true,
     presets: {
       normal:      { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
@@ -90,8 +92,8 @@ export const BUILTIN_THEMES: BoxStyleTheme[] = [
   },
   {
     id: 'theme-paper-bold',
-    name: '論文向け（太枠モノクロ）',
-    description: 'モノクロ + 太枠で印刷時の視認性を確保。',
+    get name() { return i18n.t('boxThemes:paperBold.name'); },
+    get description() { return i18n.t('boxThemes:paperBold.description'); },
     builtin: true,
     presets: {
       normal:    { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
@@ -137,7 +139,7 @@ export function saveUserTheme(name: string, presets: BoxTypePresetMap, descripti
   const id = `theme-user-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
   const theme: BoxStyleTheme = {
     id,
-    name: name.trim() || `テーマ ${themes.length + 1}`,
+    name: name.trim() || i18n.t('boxThemes:user.defaultName', { n: themes.length + 1 }),
     description,
     builtin: false,
     presets: cloneAndSanitizePresets(presets),
@@ -223,7 +225,7 @@ export function sanitizeTheme(input: unknown): BoxStyleTheme | null {
   if (!input || typeof input !== 'object') return null;
   const raw = input as Record<string, unknown>;
   const id = typeof raw.id === 'string' && raw.id ? raw.id : `theme-imported-${Date.now().toString(36)}`;
-  const name = typeof raw.name === 'string' && raw.name.trim() ? raw.name.trim() : '読み込まれたテーマ';
+  const name = typeof raw.name === 'string' && raw.name.trim() ? raw.name.trim() : i18n.t('boxThemes:imported.name');
   const description = typeof raw.description === 'string' ? raw.description : undefined;
   const presets = cloneAndSanitizePresets(raw.presets);
   return { id, name, description, builtin: false, presets };
@@ -290,7 +292,7 @@ export function parseThemesFromJson(text: string): BoxStyleTheme[] {
     if (Object.keys(presets).length > 0) {
       return [{
         id: `theme-imported-${Date.now().toString(36)}`,
-        name: '読み込まれたテーマ',
+        name: i18n.t('boxThemes:imported.name'),
         builtin: false,
         presets,
       }];

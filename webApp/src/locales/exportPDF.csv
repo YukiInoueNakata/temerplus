@@ -1,0 +1,2 @@
+﻿key,ja,en,note
+"progress.page","PDF ページ {{n}} / {{total}}","PDF page {{n}} of {{total}}","出力中の表示（PDF・n は何ページ目か）"

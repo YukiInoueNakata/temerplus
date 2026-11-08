@@ -18,10 +18,10 @@ import type { TEMDocument, Transcript, SourceRef } from '../types';
  */
 export function buildAnonymizationMap(
   namesCsv: string,
-  prefix = '協力者',
+  prefix = '協力者', // i18n-ok 仮名の頭の既定（逐語録・図のデータに入る値）
 ): Record<string, string> {
   const names = namesCsv
-    .split(/[,、，]/)
+    .split(/[,、，]/) // i18n-ok 利用者の入力の区切り（全角の読点）
     .map((s) => s.trim())
     .filter((s) => s.length > 0);
   const map: Record<string, string> = {};

@@ -1,0 +1,13 @@
+﻿key,ja,en,note
+"font.system","システム標準","System default","書式 > フォントの選択肢（ブラウザの標準のフォント）"
+"font.hiraginoYuGothic","ヒラギノ角ゴ / 游ゴシック","Hiragino Sans / Yu Gothic","書式 > フォントの選択肢（ゴシック体）"
+"font.yuMinchoHiraginoMincho","游明朝 / ヒラギノ明朝","Yu Mincho / Hiragino Mincho","書式 > フォントの選択肢（明朝体）"
+"font.meiryo","メイリオ","Meiryo","書式 > フォントの選択肢"
+"sample.sheetName","参加者A","Participant A","作例の図 > シートの名前（図の言語）"
+"sample.author","中田友貴","Yuki Inoue Nakata","作例の図 > ファイルの作者（図の言語）"
+"sample.start","出発点","Starting point","作例の図 > 最初の Box の文字（図の言語）"
+"sample.opp","必須通過点","Obligatory passage point","作例の図 > OPP の Box の文字（図の言語）"
+"sample.bfp","分岐点","Bifurcation point","作例の図 > BFP の Box の文字（図の言語）"
+"sample.efp","等至点","Equifinality point","作例の図 > EFP の Box の文字（図の言語）"
+"sample.pefp","両極化等至点","Polarized equifinality point","作例の図 > P-EFP の Box の文字（図の言語）"
+"sample.period","時期{{n}}","Period {{n}}","作例の図 > 時期ラベル（n は番号・図の言語）"

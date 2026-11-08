@@ -10,6 +10,7 @@ import { getPaperInch, type PaperSizeKey } from './paperSizes';
 import { buildFilter, cropPageToCanvas, type ExportOptions } from './exportImage';
 import type { PageBounds } from './pageSplit';
 import { checkAborted, type ProgressCallback } from './exportProgress';
+import i18n from '../i18n';
 
 export interface PDFExportOptions extends ExportOptions {
   paperSize: PaperSizeKey;
@@ -103,7 +104,7 @@ export async function exportToPDF(
   const total = pages.length;
   for (let i = 0; i < pages.length; i++) {
     checkAborted(opts.signal);
-    opts.onProgress?.({ current: i + 1, total, label: `PDF ページ ${i + 1} / ${total}` });
+    opts.onProgress?.({ current: i + 1, total, label: i18n.t('exportPDF:progress.page', { n: i + 1, total }) });
     const page = pages[i];
     if (i > 0) {
       pdf.addPage([paper.width, paper.height], paper.width >= paper.height ? 'landscape' : 'portrait');

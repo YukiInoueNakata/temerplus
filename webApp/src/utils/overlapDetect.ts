@@ -21,6 +21,7 @@ import {
 import { canvasMeasurer, type TextMeasurer } from './textMeasure';
 import type { Pt } from './linePath';
 import { rectInside } from './groupFrame';
+import i18n from '../i18n';
 
 export type OverlapCheck = 'labelLabel' | 'boxBox' | 'textOverflow' | 'lineLabel';
 
@@ -33,11 +34,12 @@ export const DEFAULT_OVERLAP_CHECKS: OverlapChecks = {
   lineLabel: true,
 };
 
+// 表示名は画面の言語（翻訳の表 overlapDetect）。読むたびに引くよう getter にしてある
 export const OVERLAP_CHECK_LABELS: Record<OverlapCheck, string> = {
-  labelLabel: 'ラベル類の重なり',
-  boxBox: 'Box 同士の重なり',
-  textOverflow: 'テキストのはみ出し',
-  lineLabel: '矢印とラベルの衝突',
+  get labelLabel() { return i18n.t('overlapDetect:check.labelLabel'); },
+  get boxBox() { return i18n.t('overlapDetect:check.boxBox'); },
+  get textOverflow() { return i18n.t('overlapDetect:check.textOverflow'); },
+  get lineLabel() { return i18n.t('overlapDetect:check.lineLabel'); },
 };
 
 export interface OverlapTarget {
@@ -127,24 +129,27 @@ const LABEL_PARTS: ElementPart[] = ['typeLabel', 'subLabel', 'periodLabel', 'tim
 /** 本体として扱う部位 */
 const BODY_PARTS: ElementPart[] = ['box', 'sdsg'];
 
+// 結果の文は画面の言語（翻訳の表 overlapDetect の part.*・describe.*・message.*）。部位の名前は読むたびに引く
 const PART_NAMES: Record<ElementPart | 'line', string> = {
-  box: 'Box',
-  boxLabel: '本文',
-  subLabel: 'サブラベル',
-  typeLabel: '種別ラベル',
-  sdsg: 'SD/SG',
-  periodLabel: '時期ラベル',
-  timeArrowLabel: '時間軸ラベル',
-  legend: '凡例',
-  note: 'メモ',
-  line: '矢印',
+  get box() { return i18n.t('overlapDetect:part.box'); },
+  get boxLabel() { return i18n.t('overlapDetect:part.boxLabel'); },
+  get subLabel() { return i18n.t('overlapDetect:part.subLabel'); },
+  get typeLabel() { return i18n.t('overlapDetect:part.typeLabel'); },
+  get sdsg() { return i18n.t('overlapDetect:part.sdsg'); },
+  get periodLabel() { return i18n.t('overlapDetect:part.periodLabel'); },
+  get timeArrowLabel() { return i18n.t('overlapDetect:part.timeArrowLabel'); },
+  get legend() { return i18n.t('overlapDetect:part.legend'); },
+  get note() { return i18n.t('overlapDetect:part.note'); },
+  get line() { return i18n.t('overlapDetect:part.line'); },
 };
 
 function describe(r: ElementRect): string {
-  const name = PART_NAMES[r.part];
+  const part = PART_NAMES[r.part];
   const text = (r.text ?? '').replace(/\s+/g, ' ').trim();
   const short = text.length > 16 ? `${text.slice(0, 16)}…` : text;
-  return short ? `${r.id} の${name}「${short}」` : `${r.id} の${name}`;
+  return short
+    ? i18n.t('overlapDetect:describe.withText', { id: r.id, part, text: short })
+    : i18n.t('overlapDetect:describe.plain', { id: r.id, part });
 }
 
 export function detectOverlaps(
@@ -173,12 +178,15 @@ export function detectOverlaps(
       if (r.part !== 'boxLabel' || !r.overflow) return;
       const { x, y } = r.overflow;
       if (x <= tolerance && y <= tolerance) return;
-      const dirs: string[] = [];
-      if (x > tolerance) dirs.push(`横に ${Math.round(x)}px`);
-      if (y > tolerance) dirs.push(`縦に ${Math.round(y)}px`);
+      const vars = { id: r.id, x: Math.round(x), y: Math.round(y) };
+      const message = x > tolerance && y > tolerance
+        ? i18n.t('overlapDetect:message.overflow.both', vars)
+        : x > tolerance
+          ? i18n.t('overlapDetect:message.overflow.x', vars)
+          : i18n.t('overlapDetect:message.overflow.y', vars);
       issues.push({
         kind: 'textOverflow',
-        message: `${r.id} の本文が枠から${dirs.join('・')}はみ出しています`,
+        message,
         targets: [{ id: r.id, part: 'boxLabel', text: r.text }],
         amount: Math.max(x, 0) * Math.max(y, 1) + Math.max(y, 0),
         focusRect: r.rect,
@@ -201,7 +209,7 @@ export function detectOverlaps(
       if (!hit) return;
       issues.push({
         kind: 'labelLabel',
-        message: `${describe(a)} と ${describe(b)} が重なっています`,
+        message: i18n.t('overlapDetect:message.overlap', { a: describe(a), b: describe(b) }),
         targets: [
           { id: a.id, part: a.part, text: a.text },
           { id: b.id, part: b.part, text: b.text },
@@ -223,7 +231,7 @@ export function detectOverlaps(
         if (!hit) continue;
         issues.push({
           kind: 'boxBox',
-          message: `${describe(a)} と ${describe(b)} が重なっています`,
+          message: i18n.t('overlapDetect:message.overlap', { a: describe(a), b: describe(b) }),
           targets: [
             { id: a.id, part: a.part, text: a.text },
             { id: b.id, part: b.part, text: b.text },
@@ -257,7 +265,7 @@ export function detectOverlaps(
         if (!hit) return;
         issues.push({
           kind: 'lineLabel',
-          message: `矢印 ${id} が ${describe(target)} の上を通っています`,
+          message: i18n.t('overlapDetect:message.lineCrosses', { id, target: describe(target) }),
           targets: [
             { id, part: 'line' },
             { id: target.id, part: target.part, text: target.text },

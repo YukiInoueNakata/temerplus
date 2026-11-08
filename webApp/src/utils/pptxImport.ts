@@ -16,6 +16,7 @@ import JSZip from 'jszip';
 import type { Box, BoxType, Line, LineType, Note, PeriodLabel, SDSG } from '../types';
 import { genBoxIdByType, genLineIdByType, genPeriodId, genSDSGIdByType } from '../store/defaults';
 import { PPTX_SDSG_NAME_PREFIX } from './sdsgShape';
+import i18n from '../i18n';
 
 const EMU_PER_PT = 12700;
 
@@ -424,7 +425,7 @@ function rectOverlap(a: { x: number; y: number; w: number; h: number }, b: { x: 
 export async function parsePptx(data: ArrayBuffer | Uint8Array, filename = ''): Promise<PptxFile> {
   const zip = await JSZip.loadAsync(data);
   const pres = zip.file('ppt/presentation.xml');
-  if (!pres) throw new Error('PowerPoint のファイルとして読めませんでした（ppt/presentation.xml がありません）');
+  if (!pres) throw new Error(i18n.t('pptxImport:error.notpptx'));
   const presXml = await pres.async('string');
   const sz = presXml.match(/<p:sldSz[^>]*cx="(\d+)"[^>]*cy="(\d+)"/);
   const widthPt = sz ? Number(sz[1]) / EMU_PER_PT : 960;
@@ -456,18 +457,22 @@ export async function parsePptx(data: ArrayBuffer | Uint8Array, filename = ''): 
 
 export type PptxRole = 'ignore' | 'box' | 'sd' | 'sg' | 'sdsgLabel' | 'subLabel' | 'line' | 'period' | 'note' | 'timeArrow';
 
+// 表示名は画面の言語で毎回引く（getter）
 export const PPTX_ROLE_LABELS: Record<PptxRole, string> = {
   box: 'Box',
   sd: 'SD',
   sg: 'SG',
-  sdsgLabel: 'SD/SG のラベル',
-  subLabel: 'サブラベル（Box・SD/SG の下の文字）',
-  line: 'Line（矢印）',
-  period: '時期ラベル',
-  note: 'メモ（付箋）',
-  timeArrow: '時間の矢印（取り込まない）',
-  ignore: '（無視）',
+  get sdsgLabel() { return i18n.t('pptxImport:role.sdsglabel'); },
+  get subLabel() { return i18n.t('pptxImport:role.sublabel'); },
+  get line() { return i18n.t('pptxImport:role.line'); },
+  get period() { return i18n.t('pptxImport:role.period'); },
+  get note() { return i18n.t('pptxImport:role.note'); },
+  get timeArrow() { return i18n.t('pptxImport:role.timearrow'); },
+  get ignore() { return i18n.t('pptxImport:role.ignore'); },
 };
+
+/** 推測の理由を 2 つ以上つなぐ（日本語は「・」） */
+const joinReasons = (parts: string[]): string => parts.filter(Boolean).join(i18n.t('pptxImport:reason.sep'));
 
 export interface ShapePlan {
   key: string;
@@ -510,18 +515,18 @@ const overlapArea = (a: PptxShape, b: PptxShape): number => rectOverlap(visualRe
 const areaOf = (s: PptxShape) => { const r = visualRect(s); return Math.max(1, r.w * r.h); };
 
 /** 「第1期」「Phase 2」などで始まる文字は時期ラベル */
-export const PERIOD_RE = /^\s*(第\s*[0-9０-９一二三四五六七八九十]+\s*期|時期\s*[0-9０-９一二三四五六七八九十]+|(phase|period|stage)\s*[0-9]+)/i;
+export const PERIOD_RE = /^\s*(第\s*[0-9０-９一二三四五六七八九十]+\s*期|時期\s*[0-9０-９一二三四五六七八九十]+|(phase|period|stage)\s*[0-9]+)/i; // i18n-ok 利用者のファイルと照合
 
 /** TEMer の pptx 出力が Box の上に置く種別バッジ（「BFP-1」「2nd EFP」「BFP-2 / OPP-1」など） */
 const TYPE_BADGE_RE = /^\s*(P-2nd\s*EFP|2nd\s*EFP|P-EFP|EFP|BFP|OPP|SD|SG)\s*[-‐]?\s*[0-9]*\s*(\/.*)?$/i;
 const BADGE_TYPES: Record<string, BoxType> = { 'p-2ndefp': 'P-2nd-EFP', '2ndefp': '2nd-EFP', 'p-efp': 'P-EFP', efp: 'EFP', bfp: 'BFP', opp: 'OPP' };
-const TIME_LABEL_RE = /^\s*(非可逆的時間|不可逆的時間|irreversible\s+time)\s*$/i;
+const TIME_LABEL_RE = /^\s*(非可逆的時間|不可逆的時間|irreversible\s+time)\s*$/i; // i18n-ok 利用者のファイルと照合
 
 /**
  * Box 本文の先頭に書かれた種別（「BFP　…」「仮EFP　…」「第2等EFP　…」「必須通過点：…」）。
  * 区切り（空白・コロン・改行）か本文末まで続くものだけを種別とみなす（「BFPとは」は対象外）
  */
-const TYPE_PREFIX_RE = /^\s*(仮)?\s*(P\s*-?|両極化)?\s*(第\s*[2２二]\s*等?(?:至点)?|2nd\s*-?)?\s*(EFP|BFP|OPP|等至点|分岐点|必須通過点)\s*[-‐]?\s*[0-9０-９]*\s*(?:[\s　:：]+|$)/i;
+const TYPE_PREFIX_RE = /^\s*(仮)?\s*(P\s*-?|両極化)?\s*(第\s*[2２二]\s*等?(?:至点)?|2nd\s*-?)?\s*(EFP|BFP|OPP|等至点|分岐点|必須通過点)\s*[-‐]?\s*[0-9０-９]*\s*(?:[\s　:：]+|$)/i; // i18n-ok 利用者のファイルと照合
 
 /**
  * 「仮」は暫定の意味（両極化ではない）なので種別は変えず、ラベルの頭に「（仮）」を残す
@@ -534,11 +539,11 @@ export function detectTypePrefix(text: string): { type: BoxType; rest: string } 
   const isSecond = !!m[3];
   const base = m[4].toUpperCase();
   let type: BoxType;
-  if (base === 'BFP' || base === '分岐点') type = 'BFP';
-  else if (base === 'OPP' || base === '必須通過点') type = 'OPP';
+  if (base === 'BFP' || base === '分岐点') type = 'BFP'; // i18n-ok 利用者の図の文字と照合
+  else if (base === 'OPP' || base === '必須通過点') type = 'OPP'; // i18n-ok 利用者の図の文字と照合
   else type = isSecond ? (isP ? 'P-2nd-EFP' : '2nd-EFP') : (isP ? 'P-EFP' : 'EFP');
   const rest = text.slice(m[0].length);
-  return { type, rest: isTentative && rest.trim() ? `（仮）${rest}` : rest };
+  return { type, rest: isTentative && rest.trim() ? `（仮）${rest}` : rest }; // i18n-ok 図のラベル（元の図の「仮」を残す）
 }
 
 /**
@@ -563,9 +568,9 @@ export function splitBoxText(paragraphs: PptxRun[][], opts: { smallToDescription
 /** 図形 1 つの「見た目」から Box の種別を推測 */
 export function guessBoxType(s: PptxShape): { type: BoxType; reason: string } {
   const prefix = detectTypePrefix(s.text);
-  if (prefix) return { type: prefix.type, reason: '本文の先頭の種別名' };
-  if (s.compound === 'dbl' || s.compound === 'thickThin' || s.compound === 'thinThick') return { type: 'EFP', reason: '二重線' };
-  if (s.dash && s.dash !== 'solid') return { type: 'annotation', reason: '点線（潜在経験として）' };
+  if (prefix) return { type: prefix.type, reason: i18n.t('pptxImport:reason.typeprefix') };
+  if (s.compound === 'dbl' || s.compound === 'thickThin' || s.compound === 'thinThick') return { type: 'EFP', reason: i18n.t('pptxImport:reason.double') };
+  if (s.dash && s.dash !== 'solid') return { type: 'annotation', reason: i18n.t('pptxImport:reason.dotted') };
   return { type: 'normal', reason: '' };
 }
 
@@ -584,13 +589,13 @@ export function classifyShapes(slide: PptxSlide, opts: ClassifyOptions): ShapePl
   const nearBox = (pt: [number, number]) => boxLike.some((b) => distToRect(pt[0], pt[1], visualRect(b)) <= 30);
   slide.shapes
     .filter((s) => s.kind === 'shape' && BIG_ARROW_GEOMS.test(s.geom) && isLong(s))
-    .forEach((s) => set({ key: s.key, role: 'timeArrow', reason: '横に長い矢印' }));
+    .forEach((s) => set({ key: s.key, role: 'timeArrow', reason: i18n.t('pptxImport:reason.longarrow') }));
   slide.shapes
     .filter((s) => (s.kind === 'connector' || LINE_GEOMS.test(s.geom)) && (s.headArrow || s.tailArrow) && isLong(s)
       && visualRect(s).h < visualRect(s).w * 0.1)
     .forEach((s) => {
       const { start, end } = lineEndpoints(s);
-      if (!nearBox(start) && !nearBox(end)) set({ key: s.key, role: 'timeArrow', reason: '横に長い矢印線（両端に Box が無い）' });
+      if (!nearBox(start) && !nearBox(end)) set({ key: s.key, role: 'timeArrow', reason: i18n.t('pptxImport:reason.longarrowline') });
     });
 
   // TEMer 自身の出力の SD/SG は図形名（「TEMer SD」「TEMer SG」）で見分ける。
@@ -598,7 +603,7 @@ export function classifyShapes(slide: PptxSlide, opts: ClassifyOptions): ShapePl
   const sdsgNameType = (name: string): 'sd' | 'sg' | null =>
     name === `${PPTX_SDSG_NAME_PREFIX}SD` ? 'sd' : name === `${PPTX_SDSG_NAME_PREFIX}SG` ? 'sg' : null;
   const namedSdsg = slide.shapes.filter((s) => s.kind === 'shape' && !plans.has(s.key) && sdsgNameType(s.name) !== null);
-  namedSdsg.forEach((s) => set({ key: s.key, role: sdsgNameType(s.name)!, reason: 'TEMer の出力（図形の名前）' }));
+  namedSdsg.forEach((s) => set({ key: s.key, role: sdsgNameType(s.name)!, reason: i18n.t('pptxImport:reason.temername') }));
 
   // SD / SG（向きを持つ吹き出し・矢印・五角形）
   const directedSdsg = slide.shapes.filter((s) => s.kind === 'shape' && !plans.has(s.key) && shapeDirection(s) !== null);
@@ -607,11 +612,11 @@ export function classifyShapes(slide: PptxSlide, opts: ClassifyOptions): ShapePl
     const [dx, dy] = shapeDirection(s)!;
     // 横型の TEM 図: 下向き = SD（上から抑える）、上向き = SG（下から支える）
     // 縦型の TEM 図: 左向き = SD、右向き = SG（TEMer の画面・出力と同じ。Box の方を指す）
-    if (dy > 0.5) set({ key: s.key, role: 'sd', reason: '下向きの矢印' });
-    else if (dy < -0.5) set({ key: s.key, role: 'sg', reason: '上向きの矢印' });
-    else if (dx < -0.5) set({ key: s.key, role: 'sd', reason: '左向きの矢印（縦型の SD）' });
-    else if (dx > 0.5) set({ key: s.key, role: 'sg', reason: '右向きの矢印（縦型の SG）' });
-    else set({ key: s.key, role: 'sd', reason: '向きが斜め（SD と仮定）' });
+    if (dy > 0.5) set({ key: s.key, role: 'sd', reason: i18n.t('pptxImport:reason.arrowdown') });
+    else if (dy < -0.5) set({ key: s.key, role: 'sg', reason: i18n.t('pptxImport:reason.arrowup') });
+    else if (dx < -0.5) set({ key: s.key, role: 'sd', reason: i18n.t('pptxImport:reason.arrowleft') });
+    else if (dx > 0.5) set({ key: s.key, role: 'sg', reason: i18n.t('pptxImport:reason.arrowright') });
+    else set({ key: s.key, role: 'sd', reason: i18n.t('pptxImport:reason.arrowdiagonal') });
   });
 
   // 文字の無い SD/SG の図形には、重なっているテキストをラベルとして結びつける。
@@ -630,33 +635,33 @@ export function classifyShapes(slide: PptxSlide, opts: ClassifyOptions): ShapePl
       const frac = a / area;
       if ((frac >= 0.5 || a >= areaOf(c) * 0.3) && frac > bestFrac) { best = c; bestFrac = frac; }
     });
-    if (best) set({ key: t.key, role: 'sdsgLabel', labelOf: (best as PptxShape).key, reason: 'SD/SG の図形に重なる文字' });
+    if (best) set({ key: t.key, role: 'sdsgLabel', labelOf: (best as PptxShape).key, reason: i18n.t('pptxImport:reason.onsdsg') });
   });
 
   slide.shapes.forEach((s) => {
     if (plans.has(s.key)) return;
-    if (s.kind === 'table' || s.kind === 'picture') { set({ key: s.key, role: 'ignore', reason: s.kind === 'table' ? '表（背景の枠として）' : '画像' }); return; }
+    if (s.kind === 'table' || s.kind === 'picture') { set({ key: s.key, role: 'ignore', reason: s.kind === 'table' ? i18n.t('pptxImport:reason.table') : i18n.t('pptxImport:reason.picture') }); return; }
     const isLineLike = s.kind === 'connector' || LINE_GEOMS.test(s.geom);
     if (isLineLike) {
       if (s.headArrow || s.tailArrow) {
         const dashed = !!s.dash && s.dash !== 'solid';
-        set({ key: s.key, role: 'line', lineType: dashed ? 'XLine' : 'RLine', reason: dashed ? '点線の矢印' : '実線の矢印' });
+        set({ key: s.key, role: 'line', lineType: dashed ? 'XLine' : 'RLine', reason: dashed ? i18n.t('pptxImport:reason.dashedarrow') : i18n.t('pptxImport:reason.solidarrow') });
       } else {
-        set({ key: s.key, role: 'ignore', reason: '矢じりの無い線（区切り線など）' });
+        set({ key: s.key, role: 'ignore', reason: i18n.t('pptxImport:reason.nohead') });
       }
       return;
     }
-    if (!s.text) { set({ key: s.key, role: 'ignore', reason: '文字の無い図形' }); return; }
-    if (PERIOD_RE.test(s.text)) { set({ key: s.key, role: 'period', reason: '「第N期」で始まる' }); return; }
-    if (TIME_LABEL_RE.test(s.text)) { set({ key: s.key, role: 'ignore', reason: '時間の矢印のラベル' }); return; }
+    if (!s.text) { set({ key: s.key, role: 'ignore', reason: i18n.t('pptxImport:reason.notext') }); return; }
+    if (PERIOD_RE.test(s.text)) { set({ key: s.key, role: 'period', reason: i18n.t('pptxImport:reason.period') }); return; }
+    if (TIME_LABEL_RE.test(s.text)) { set({ key: s.key, role: 'ignore', reason: i18n.t('pptxImport:reason.timelabel') }); return; }
     if (!s.isTextBox && (s.hasOutline || s.hasFill) && BOX_GEOMS.test(s.geom)) {
       const g = guessBoxType(s);
       // 枠に重なっていたテキストを合流した図形は、そのことを理由に出す（誤りなら役割を「メモ」にすれば文字は残る）
-      const merged = s.mergedTexts ? `重なっていた文字（${s.mergedTexts} 個）を合流` : '';
-      set({ key: s.key, role: 'box', boxType: g.type, reason: [g.reason, merged].filter(Boolean).join('・') || '枠のある文字' });
+      const merged = s.mergedTexts ? i18n.t('pptxImport:reason.merged', { count: s.mergedTexts }) : '';
+      set({ key: s.key, role: 'box', boxType: g.type, reason: joinReasons([g.reason, merged]) || i18n.t('pptxImport:reason.framedtext') });
       return;
     }
-    set({ key: s.key, role: 'note', reason: '枠の無い文字' });
+    set({ key: s.key, role: 'note', reason: i18n.t('pptxImport:reason.unframedtext') });
   });
 
   // 凡例: 「凡例」「Legend」という見出し（枠の無い文字）を含む最小の空枠の中は、見本の SD/SG・矢印・
@@ -666,7 +671,7 @@ export function classifyShapes(slide: PptxSlide, opts: ClassifyOptions): ShapePl
     return c.cx >= r.x && c.cx <= r.x + r.w && c.cy >= r.y && c.cy <= r.y + r.h;
   };
   slide.shapes
-    .filter((s) => plans.get(s.key)?.role === 'note' && /^\s*(凡例|legend)\s*$/i.test(s.text))
+    .filter((s) => plans.get(s.key)?.role === 'note' && /^\s*(凡例|legend)\s*$/i.test(s.text)) // i18n-ok 利用者の図の見出しと照合
     .forEach((title) => {
       const { cx, cy } = centerOf(visualRect(title));
       const frame = slide.shapes
@@ -677,7 +682,7 @@ export function classifyShapes(slide: PptxSlide, opts: ClassifyOptions): ShapePl
       if (!frame) return;
       const members = slide.shapes.filter((s) => s.key !== frame.f.key && inside(s, frame.r));
       if (members.some((s) => plans.get(s.key)?.role === 'box')) return;
-      [title, ...members].forEach((s) => set({ key: s.key, role: 'ignore', reason: '凡例' }));
+      [title, ...members].forEach((s) => set({ key: s.key, role: 'ignore', reason: i18n.t('pptxImport:reason.legend') }));
     });
 
   // 種別バッジ（TEMer の pptx 出力が Box・SD/SG の外に置く短い文字）。
@@ -693,7 +698,7 @@ export function classifyShapes(slide: PptxSlide, opts: ClassifyOptions): ShapePl
     const { cx, cy } = centerOf(visualRect(s));
     if (kind === 'sd' || kind === 'sg') {
       // SD/SG の図形の近く（40pt）にあるときだけバッジとみなす。離れた「SD」という文字はメモのまま
-      if (sdsgs.some((g) => distToRect(cx, cy, visualRect(g)) <= 40)) set({ key: s.key, role: 'ignore', reason: 'SD/SG の種別バッジ' });
+      if (sdsgs.some((g) => distToRect(cx, cy, visualRect(g)) <= 40)) set({ key: s.key, role: 'ignore', reason: i18n.t('pptxImport:reason.sdsgbadge') });
       return;
     }
     let best: PptxShape | null = null;
@@ -706,10 +711,10 @@ export function classifyShapes(slide: PptxSlide, opts: ClassifyOptions): ShapePl
     const bp = plans.get((best as PptxShape).key)!;
     if ((bp.boxType ?? 'normal') === 'normal' && BADGE_TYPES[kind]) {
       // 理由は上書きせず書き足す（「重なっていた文字を合流」などを消さない）
-      const prev = bp.reason && bp.reason !== '枠のある文字' ? bp.reason : '';
-      set({ ...bp, boxType: BADGE_TYPES[kind], reason: [prev, '隣の種別バッジ'].filter(Boolean).join('・') });
+      const prev = bp.reason && bp.reason !== i18n.t('pptxImport:reason.framedtext') ? bp.reason : '';
+      set({ ...bp, boxType: BADGE_TYPES[kind], reason: joinReasons([prev, i18n.t('pptxImport:reason.badge')]) });
     }
-    set({ key: s.key, role: 'ignore', reason: '種別バッジ（隣の Box の種別に反映）' });
+    set({ key: s.key, role: 'ignore', reason: i18n.t('pptxImport:reason.badgeself') });
   });
 
   // サブラベル: Box・SD/SG のすぐ下（隙間 14pt 以内）にある短く小さな文字（協力者 ID・補足など）。
@@ -728,7 +733,7 @@ export function classifyShapes(slide: PptxSlide, opts: ClassifyOptions): ShapePl
       const gap = r.y - (or.y + or.h);
       if (gap >= -2 && gap < bestGap && cx >= or.x - 4 && cx <= or.x + or.w + 4) { best = o; bestGap = gap; }
     });
-    if (best) set({ key: s.key, role: 'subLabel', labelOf: (best as PptxShape).key, reason: 'すぐ上の要素のサブラベル' });
+    if (best) set({ key: s.key, role: 'subLabel', labelOf: (best as PptxShape).key, reason: i18n.t('pptxImport:reason.sublabel') });
   });
 
   return slide.shapes.map((s) => plans.get(s.key) ?? { key: s.key, role: 'ignore' });
@@ -815,7 +820,7 @@ export function buildFromPptx(slide: PptxSlide, plans: ShapePlan[], opts: PptxBu
   const R = (s: PptxShape) => rects.get(s.key)!;
 
   if (slide.skipped && slide.skipped.length > 0) {
-    warnings.push(`位置を持たない図形（プレースホルダーなど）${slide.skipped.length} 個は取り込めませんでした: ${slide.skipped.map((t) => `「${shortText(t)}」`).join('、')}`);
+    warnings.push(i18n.t('pptxImport:warn.skipped', { count: slide.skipped.length, list: slide.skipped.map((t) => i18n.t('pptxImport:quote', { text: shortText(t) })).join(i18n.t('pptxImport:listsep')) }));
   }
 
   // 原点: Box・SD/SG・メモの最小座標を (startTimePx, 0) に合わせる
@@ -887,18 +892,18 @@ export function buildFromPptx(slide: PptxSlide, plans: ShapePlan[], opts: PptxBu
     };
     const from = pick(start, stId);
     const to = pick(end, enId);
-    const where = `矢印（${Math.round(start[0])},${Math.round(start[1])} → ${Math.round(end[0])},${Math.round(end[1])} pt）`;
+    const where = i18n.t('pptxImport:arrow.where', { x1: Math.round(start[0]), y1: Math.round(start[1]), x2: Math.round(end[0]), y2: Math.round(end[1]) });
     if (!from || !to) {
-      warnings.push(`${where}: ${!from ? '始点' : '終点'}の近くに Box が見つからないため取り込みませんでした`);
+      warnings.push(!from ? i18n.t('pptxImport:warn.arrow.nostart', { where }) : i18n.t('pptxImport:warn.arrow.noend', { where }));
       return;
     }
     if (from.box.id === to.box.id) {
-      warnings.push(`${where}: 両端が同じ Box「${shortText(from.box.label)}」になるため取り込みませんでした`);
+      warnings.push(i18n.t('pptxImport:warn.arrow.samebox', { where, label: shortText(from.box.label) }));
       return;
     }
     const pair = `${from.box.id}>${to.box.id}`;
     if (seenPairs.has(pair)) {
-      warnings.push(`${where}: 「${shortText(from.box.label)}」→「${shortText(to.box.label)}」は既にあるため重複を省きました`);
+      warnings.push(i18n.t('pptxImport:warn.arrow.duplicate', { where, from: shortText(from.box.label), to: shortText(to.box.label) }));
       return;
     }
     seenPairs.add(pair);
@@ -925,7 +930,7 @@ export function buildFromPptx(slide: PptxSlide, plans: ShapePlan[], opts: PptxBu
   });
   plans.forEach((p) => {
     if (p.role === 'sdsgLabel' && (!p.labelOf || !['sd', 'sg'].includes(planBy.get(p.labelOf)?.role ?? ''))) {
-      warnings.push(`「${shortText(shapeBy.get(p.key)?.text ?? '')}」: どの SD/SG のラベルか決まらないため使いませんでした`);
+      warnings.push(i18n.t('pptxImport:warn.sdsglabel.unresolved', { text: shortText(shapeBy.get(p.key)?.text ?? '') }));
     }
   });
   slide.shapes.forEach((s) => {
@@ -934,7 +939,7 @@ export function buildFromPptx(slide: PptxSlide, plans: ShapePlan[], opts: PptxBu
     const type = role === 'sd' ? 'SD' : 'SG';
     const label = (s.text || labelFor.get(s.key) || '').replace(/\s+$/g, '');
     const sr = R(s);
-    if (!label) warnings.push(`${type}（${Math.round(sr.x)},${Math.round(sr.y)} pt）: ラベルになる文字が見つかりませんでした（空のまま取り込みます）`);
+    if (!label) warnings.push(i18n.t('pptxImport:warn.sdsg.nolabel', { type, x: Math.round(sr.x), y: Math.round(sr.y) }));
     // 紐付け先: 時間方向（x）で最も近い Box。x 範囲に入る Box があれば、その中で縦に近いもの
     const { cx, cy } = centerOf(sr);
     let target: { shape: PptxShape; box: Box } | null = null;
@@ -947,7 +952,7 @@ export function buildFromPptx(slide: PptxSlide, plans: ShapePlan[], opts: PptxBu
       if (score < bestScore) { bestScore = score; target = b; }
     });
     if (!target) {
-      warnings.push(`${type}「${shortText(label)}」: 紐付ける Box が無いため取り込みませんでした`);
+      warnings.push(i18n.t('pptxImport:warn.sdsg.nobox', { type, label: shortText(label) }));
       return;
     }
     const t = target as { shape: PptxShape; box: Box };
@@ -972,7 +977,7 @@ export function buildFromPptx(slide: PptxSlide, plans: ShapePlan[], opts: PptxBu
     const ownerId = p.labelOf ? idByKey[p.labelOf] : undefined;
     const target = boxes.find((b) => b.id === ownerId) ?? sdsg.find((g) => g.id === ownerId);
     if (!target) {
-      warnings.push(`「${shortText(text)}」: どの Box・SD/SG のサブラベルか決まらないため使いませんでした`);
+      warnings.push(i18n.t('pptxImport:warn.sublabel.unresolved', { text: shortText(text) }));
       return;
     }
     target.subLabel = target.subLabel ? `${target.subLabel} ${text}` : text;
@@ -1001,10 +1006,10 @@ export function buildFromPptx(slide: PptxSlide, plans: ShapePlan[], opts: PptxBu
     idByKey[s.key] = id;
   });
 
-  if (boxes.length === 0) warnings.push('Box が 1 つもありません。図形の役割を確認してください');
+  if (boxes.length === 0) warnings.push(i18n.t('pptxImport:warn.nobox'));
   const unlinked = boxes.filter((b) => !lines.some((l) => l.from === b.id || l.to === b.id));
   if (boxes.length > 1 && unlinked.length > 0) {
-    warnings.push(`矢印でつながっていない Box が ${unlinked.length} 個あります（元の図に矢印が無い場合は取り込み後に引いてください）`);
+    warnings.push(i18n.t('pptxImport:warn.unlinked', { count: unlinked.length }));
   }
   return { boxes, lines, sdsg, periodLabels, notes, idByKey, warnings };
 }

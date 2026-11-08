@@ -16,11 +16,11 @@
 const SPEAKER_PATTERNS: Array<{ re: RegExp; speakerGroup: number; restGroup: number }> = [
   // "A:", "Q:", "A1:", "山田:", "Aさん:" など（ASCII または 日本語 1〜10文字）
   // [^\s:：)）】\]] で speaker 中にコロン類が来ないよう制限
-  { re: /^\s*([^\s:：)）】\]]{1,10})\s*[:：]\s*(.*)$/, speakerGroup: 1, restGroup: 2 },
+  { re: /^\s*([^\s:：)）】\]]{1,10})\s*[:：]\s*(.*)$/, speakerGroup: 1, restGroup: 2 }, // i18n-ok 話者の書き方（全角の記号）と照合
   // "A) ", "山田) "
-  { re: /^\s*([^\s:：)）】\]]{1,10})\s*[)）]\s+(.*)$/, speakerGroup: 1, restGroup: 2 },
+  { re: /^\s*([^\s:：)）】\]]{1,10})\s*[)）]\s+(.*)$/, speakerGroup: 1, restGroup: 2 }, // i18n-ok 同上
   // "[A] ", "【A】 ", "（A）" など
-  { re: /^\s*[\[【（(]\s*([^\s:：)）】\]]{1,10})\s*[\]】）)]\s*(.*)$/, speakerGroup: 1, restGroup: 2 },
+  { re: /^\s*[\[【（(]\s*([^\s:：)）】\]]{1,10})\s*[\]】）)]\s*(.*)$/, speakerGroup: 1, restGroup: 2 }, // i18n-ok 同上
 ];
 
 export interface SpeakerDetectResult {

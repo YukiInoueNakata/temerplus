@@ -40,10 +40,10 @@ function extractParagraphsFromHtml(html: string): Paragraph[] {
     // 先頭の太字話者検出: <strong>...</strong> または <b>...</b> + コロン
     let speaker: string | undefined;
     let body = inner;
-    const boldRe = /^\s*<(?:strong|b)>([^<]{1,12})<\/(?:strong|b)>\s*[:：]?\s*/;
+    const boldRe = /^\s*<(?:strong|b)>([^<]{1,12})<\/(?:strong|b)>\s*[:：]?\s*/; // i18n-ok 話者名の後の全角コロンと照合
     const m = boldRe.exec(inner);
     if (m) {
-      const candidate = m[1].replace(/[:：]\s*$/, '').trim();
+      const candidate = m[1].replace(/[:：]\s*$/, '').trim(); // i18n-ok 全角コロンと照合
       if (candidate.length > 0 && candidate.length <= 12) {
         speaker = candidate;
         body = inner.slice(m[0].length);

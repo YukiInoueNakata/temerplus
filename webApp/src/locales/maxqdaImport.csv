@@ -1,0 +1,30 @@
+﻿key,ja,en,note
+role.ignore,（無視）,(Ignore),MAXQDA の取り込み > 列の役割の名前（画面の表示は importWizardDialog.csv 側）
+role.docgroup,文書グループ,Document group,MAXQDA の取り込み > 列の役割の名前
+role.docname,文書名（逐語録）,Document name (transcript),MAXQDA の取り込み > 列の役割の名前
+role.code,コード,Code,MAXQDA の取り込み > 列の役割の名前
+role.start,開始,Beginning,MAXQDA の取り込み > 列の役割の名前
+role.end,終了,End,MAXQDA の取り込み > 列の役割の名前
+role.segment,セグメント本文,Segment text,MAXQDA の取り込み > 列の役割の名前
+role.weight,重み,Weight,MAXQDA の取り込み > 列の役割の名前
+role.comment,コメント,Comment,MAXQDA の取り込み > 列の役割の名前
+role.area,領域,Area,MAXQDA の取り込み > 列の役割の名前
+role.coverage,範囲 (%),Coverage (%),MAXQDA の取り込み > 列の役割の名前
+role.codedby,コード付けした人,Coded by,MAXQDA の取り込み > 列の役割の名前
+role.created,作成日,Created,MAXQDA の取り込み > 列の役割の名前
+role.color,色,Color,MAXQDA の取り込み > 列の役割の名前
+role.othercodes,他のコード（同じセグメントの）,Other codes (on the same segment),MAXQDA の取り込み > 列の役割の名前
+action.tag,タグのみ,Tag only,MAXQDA の取り込み > コードの扱いの名前（画面の表示は importWizardDialog.csv 側）
+action.box,Box にする,Make a Box,MAXQDA の取り込み > コードの扱いの名前
+action.sd,SD にする,Make an SD,MAXQDA の取り込み > コードの扱いの名前
+action.sg,SG にする,Make an SG,MAXQDA の取り込み > コードの扱いの名前
+action.period,時期ラベルにする,Make a period label,MAXQDA の取り込み > コードの扱いの名前
+multibox.stack,同じ時期に縦に並べる（1 コード = 1 Box）,Stack in the same period (1 code = 1 Box),MAXQDA の取り込み > 1 つのセグメントに Box のコードが複数あるときの並べ方（画面の表示は importWizardDialog.csv 側）
+multibox.merge,1 つの Box にまとめる（ラベルを連ねる）,Merge into one Box (join the labels),MAXQDA の取り込み > 同上
+multibox.sequence,時期をずらして順に並べる,Place in sequence over time,MAXQDA の取り込み > 同上
+warn.nodoc,「文書名」の列が未指定です。全行を 1 つの逐語録として扱います,No “Document name” column. All rows are treated as one transcript.,MAXQDA の取り込み > 警告
+warn.noseg,「セグメント本文」の列が未指定です。段落の本文が空になります,No “Segment text” column. Paragraph text will be empty.,MAXQDA の取り込み > 警告
+warn.nocode,「コード」の列が未指定です。タグ・Box は作られません,No “Code” column. No tags or Boxes will be created.,MAXQDA の取り込み > 警告
+warn.norange,「開始」「終了」の列が無いため、本文の一致でセグメントを集約します,"No “Beginning”/“End” columns, so segments are grouped by matching text.",MAXQDA の取り込み > 警告
+warn.nosegtext,「{{code}}」（{{doc}}）: セグメント本文が無いため Box / SD・SG にできませんでした,“{{code}}” ({{doc}}): could not make a Box or SD/SG (no segment text),MAXQDA の取り込み > 警告
+warn.noattach,「{{code}}」（{{doc}}）: 紐付ける Box がまだ無いため SD/SG を作れませんでした。先に Box になるコードを選んでください,“{{code}}” ({{doc}}): could not make the SD/SG (no Box to attach to yet). Choose a code that becomes a Box first.,MAXQDA の取り込み > 警告

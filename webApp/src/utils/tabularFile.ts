@@ -6,6 +6,7 @@
 
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
+import i18n from '../i18n';
 
 export interface TabularSheet {
   name: string;
@@ -72,7 +73,7 @@ export function decodeCsvBytes(bytes: Uint8Array): { text: string; encoding: 'ut
 export async function parseTabularFile(file: File): Promise<TabularFile> {
   const format = detectTabularFormat(file.name);
   if (!format) {
-    throw new Error(`対応していない形式です: ${file.name}（対応: .csv / .tsv / .xlsx / .xls）`);
+    throw new Error(i18n.t('tabularFile:error.unsupported', { name: file.name }));
   }
   if (format === 'csv') {
     const { text } = decodeCsvBytes(new Uint8Array(await file.arrayBuffer()));

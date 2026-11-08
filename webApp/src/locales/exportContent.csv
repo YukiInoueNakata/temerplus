@@ -1,0 +1,12 @@
+﻿key,ja,en,note
+"notes.label","メモ（付箋・吹き出し）","Notes (sticky notes and callouts)","出力の画面 > 含めるかを確かめる要素の名前"
+"notes.hint","解釈や作業用のメモが図に残っていないか確かめてください","Make sure no interpretive or working notes are left in the diagram","出力の画面 > 含めるかを確かめる要素の説明"
+"symbols.label","記号（★・〇 など文字だけのメモ）","Symbols (text-only notes such as ★ or ○)","出力の画面 > 含めるかを確かめる要素の名前"
+"symbols.hint","含めるなら、記号の意味を図の説明や本文で示してください","If included, explain the symbols in the figure caption or the text","出力の画面 > 含めるかを確かめる要素の説明"
+"comments.label","コメント","Comments","出力の画面 > 含めるかを確かめる要素の名前"
+"comments.hint","コメントは図には描けません（論文用レポートには載せられます）","Comments cannot be drawn in the diagram (they can go in the paper report)","出力の画面 > 含めるかを確かめる要素の説明"
+"legend.label","凡例","Legend","出力の画面 > 含めるかを確かめる要素の名前"
+"legend.hint","含めないなら、記号の意味を図の説明や本文で示してください","If excluded, explain the symbols in the figure caption or the text","出力の画面 > 含めるかを確かめる要素の説明"
+"periodLabels.label","時期ラベル（時期区分）","Period labels","出力の画面 > 含めるかを確かめる要素の名前"
+"caution.noPeriodLabels","時期ラベル（時期区分）がありません。時期区分を示さないまま出力します。","There are no period labels. The diagram will be exported without periods.","出力の画面 > 図に無いことへの注意"
+"caution.noLegend","凡例を含めずに出力します。記号の意味を図の説明や本文で示してください。","Exporting without a legend. Explain the symbols in the figure caption or the text.","出力の画面 > 凡例を含めないと選んだときの注意"

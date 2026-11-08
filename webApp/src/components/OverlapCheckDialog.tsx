@@ -33,7 +33,7 @@ export function OverlapCheckDialog({
   showInStatusBar: boolean;
   onChangeShowInStatusBar: (next: boolean) => void;
 }) {
-  const { t } = useTranslation('overlapCheckDialog');
+  const { t, i18n } = useTranslation('overlapCheckDialog');
   const doc = useTEMStore((s) => s.doc);
   const sheet = useActiveSheet();
   const setSelection = useTEMStore((s) => s.setSelection);
@@ -41,7 +41,8 @@ export function OverlapCheckDialog({
 
   const issues = useMemo(
     () => (sheet ? detectOverlaps(sheet, doc.settings.layout, doc.settings, { checks }) : []),
-    [sheet, doc.settings, checks],
+    // 結果の文は画面の言語なので、言語を変えたら作り直す
+    [sheet, doc.settings, checks, i18n.language],
   );
   const counts = useMemo(() => countByKind(issues), [issues]);
 

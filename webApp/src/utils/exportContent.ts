@@ -7,6 +7,7 @@
 
 import { produce } from 'immer';
 import type { Sheet, TEMDocument } from '../types';
+import i18n from '../i18n';
 
 export type ExportContentKind = 'notes' | 'symbols' | 'comments' | 'legend' | 'periodLabels';
 
@@ -30,7 +31,7 @@ export interface ExportContentReport {
 
 const isSymbolNote = (style?: string) => style === 'text';
 
-/** 図にある「含めるか確かめる要素」と、無いことへの注意 */
+/** 図にある「含めるか確かめる要素」と、無いことへの注意（表示名・説明・注意は画面の言語） */
 export function detectExportContent(sheet: Sheet | undefined): ExportContentReport {
   const items: ExportContentItem[] = [];
   const cautions: string[] = [];
@@ -38,16 +39,16 @@ export function detectExportContent(sheet: Sheet | undefined): ExportContentRepo
   const notes = sheet.notes ?? [];
   const memo = notes.filter((n) => !isSymbolNote(n.style)).length;
   const symbols = notes.filter((n) => isSymbolNote(n.style)).length;
-  if (memo > 0) items.push({ kind: 'notes', label: 'メモ（付箋・吹き出し）', count: memo, hint: '解釈や作業用のメモが図に残っていないか確かめてください' });
-  if (symbols > 0) items.push({ kind: 'symbols', label: '記号（★・〇 など文字だけのメモ）', count: symbols, hint: '含めるなら、記号の意味を図の説明や本文で示してください' });
+  if (memo > 0) items.push({ kind: 'notes', label: i18n.t('exportContent:notes.label'), count: memo, hint: i18n.t('exportContent:notes.hint') });
+  if (symbols > 0) items.push({ kind: 'symbols', label: i18n.t('exportContent:symbols.label'), count: symbols, hint: i18n.t('exportContent:symbols.hint') });
   const comments = sheet.comments?.length ?? 0;
-  if (comments > 0) items.push({ kind: 'comments', label: 'コメント', count: comments, cannotDraw: true, hint: 'コメントは図には描けません（論文用レポートには載せられます）' });
+  if (comments > 0) items.push({ kind: 'comments', label: i18n.t('exportContent:comments.label'), count: comments, cannotDraw: true, hint: i18n.t('exportContent:comments.hint') });
   // 凡例は自動で作られるので、いつも確かめる
-  items.push({ kind: 'legend', label: '凡例', count: 1, hint: '含めないなら、記号の意味を図の説明や本文で示してください' });
+  items.push({ kind: 'legend', label: i18n.t('exportContent:legend.label'), count: 1, hint: i18n.t('exportContent:legend.hint') });
   if (sheet.periodLabels.length > 0) {
-    items.push({ kind: 'periodLabels', label: '時期ラベル（時期区分）', count: sheet.periodLabels.length });
+    items.push({ kind: 'periodLabels', label: i18n.t('exportContent:periodLabels.label'), count: sheet.periodLabels.length });
   } else {
-    cautions.push('時期ラベル（時期区分）がありません。時期区分を示さないまま出力します。');
+    cautions.push(i18n.t('exportContent:caution.noPeriodLabels'));
   }
   return { items, cautions };
 }
@@ -59,7 +60,7 @@ export function missingChoices(report: ExportContentReport, choices: ExportConte
 
 /** 凡例を含めないと選んだときの注意 */
 export function choiceCautions(choices: ExportContentChoices): string[] {
-  return choices.legend === false ? ['凡例を含めずに出力します。記号の意味を図の説明や本文で示してください。'] : [];
+  return choices.legend === false ? [i18n.t('exportContent:caution.noLegend')] : [];
 }
 
 /**

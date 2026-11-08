@@ -56,6 +56,7 @@ import {
   type Pt as LinePathPt,
 } from './linePath';
 import { checkAborted, type ProgressCallback } from './exportProgress';
+import i18n from '../i18n';
 import { resolveAttachedAnchor, anchorCenter } from './sdsgAttach';
 import { resolveBetweenEndpoint } from './sdsgBetween';
 import { clipPolylineToRect, type Pt as ClipPt } from './lineClip';
@@ -102,7 +103,7 @@ interface Transform {
 
 export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array | void> {
   if (!opts || !opts.sheet || !opts.settings) {
-    throw new Error('exportToPPTX: options.sheet と options.settings が必須です');
+    throw new Error(i18n.t('exportPPT:error.missingOptions'));
   }
   const filename = opts.filename ?? 'TEMer.pptx';
   const scale = opts.scale ?? true;
@@ -152,7 +153,7 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array 
   const total = pages.length;
   for (let i = 0; i < pages.length; i++) {
     checkAborted(opts.signal);
-    opts.onProgress?.({ current: i + 1, total, label: `スライド ${i + 1} / ${total} を生成中` });
+    opts.onProgress?.({ current: i + 1, total, label: i18n.t('exportPPT:progress.slide', { n: i + 1, total }) });
     const page = pages[i];
     const slide = applyPptTextDefaults(pres.addSlide());
     const pageBbox = {
@@ -173,11 +174,11 @@ export async function exportToPPTX(opts: PPTXExportOptions): Promise<Uint8Array 
     const pageSheet = filterSheetForPage(opts.sheet, page2, layout, mode);
     // 時間矢印は図全体（opts.sheet）で計算し、このページの範囲で切る（ページ内の Box から計算し直すと、
     // Box の無いページで矢印が消えた。SVG と同じやり方。2026-11-07 Codex レビュー）
-    drawTimeArrow(pres, slide, opts.sheet, layout, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility, page2, mode, showMarkers);
+    drawTimeArrow(pres, slide, opts.sheet, layout, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility, page2, mode, showMarkers, opts.settings.locale);
     drawPeriodLabels(pres, slide, pageSheet, layout, opts.settings.periodLabels, opts.settings.timeArrow, t, opts.settings.sdsgSpace, opts.settings.typeLabelVisibility);
     drawBoxes(pres, slide, pageSheet, layout, opts.settings, t, 'groups');
     // Line の端点解決と精密クリップのため、常に原シートの全 Box を持つ opts.sheet を渡す
-    drawLines(pres, slide, opts.sheet, layout, t, page2, mode, showMarkers);
+    drawLines(pres, slide, opts.sheet, layout, t, page2, mode, showMarkers, opts.settings.locale);
     // SD/SG は図全体（opts.sheet）で位置・帯の段を計算し、描いた位置がこのページに重なるものだけ出す。
     // 以前は「付いている Box がこのページに見えている」ものだけ残しており、矢印（Line）に付けた SD/SG や
     // 両端の Box が別ページにある幅モードの SD/SG が全ページで消えていた（2026-10-10 利用者の報告）
@@ -338,9 +339,13 @@ function drawContinuationMarker(
   direction: 'forward' | 'backward',
   layout: LayoutDirection,
   t: Transform,
+  locale: Locale = 'ja',
 ) {
   const fsBase = 9;
-  const label = direction === 'forward' ? '→続' : '続→';
+  // 図に入る印なので図の言語
+  const label = direction === 'forward'
+    ? i18n.t('exportPPT:marker.forward', { lng: locale })
+    : i18n.t('exportPPT:marker.backward', { lng: locale });
   const wpx = 42;
   const hpx = 16;
   const isH = layout === 'horizontal';
@@ -875,6 +880,7 @@ function drawLines(
   page?: PageBounds,
   mode?: 'overlap' | 'duplicate',
   showMarkers?: boolean,
+  locale?: Locale,
 ) {
   const byId = new Map(sheet.boxes.map((b) => [b.id, b]));
   const isDup = !!(page && mode === 'duplicate');
@@ -930,8 +936,8 @@ function drawLines(
           const eq = (a: Pt, b: LinePathPt) => Math.abs(a.x - b.x) < 1e-3 && Math.abs(a.y - b.y) < 1e-3;
           const origStart = polyline[0];
           const origEnd = polyline[polyline.length - 1];
-          if (!eq(first, origStart)) drawContinuationMarker(slide, first, 'backward', layout, t);
-          if (!eq(last, origEnd)) drawContinuationMarker(slide, last, 'forward', layout, t);
+          if (!eq(first, origStart)) drawContinuationMarker(slide, first, 'backward', layout, t, locale);
+          if (!eq(last, origEnd)) drawContinuationMarker(slide, last, 'forward', layout, t, locale);
         }
       }
       continue;
@@ -1351,6 +1357,7 @@ function drawTimeArrow(
   page?: PageBounds,
   mode?: 'overlap' | 'duplicate',
   showMarkers?: boolean,
+  locale?: Locale,
 ) {
   if (!settings || !settings.autoInsert) return;
   const arrow = computeTimeArrow(sheet, layout, settings, sdsgSpace, typeLabelVisibility);
@@ -1384,8 +1391,8 @@ function drawTimeArrow(
     emitSeg(p0, p1, piece.endsAtOriginalEnd);
     if (isDup && showMarkers !== false) {
       const eq = (a: ClipPt, b: Pt) => Math.abs(a.x - b.x) < 1e-3 && Math.abs(a.y - b.y) < 1e-3;
-      if (!eq(p0, origStart)) drawContinuationMarker(slide, p0, 'backward', layout, t);
-      if (!eq(p1, origEnd)) drawContinuationMarker(slide, p1, 'forward', layout, t);
+      if (!eq(p0, origStart)) drawContinuationMarker(slide, p0, 'backward', layout, t, locale);
+      if (!eq(p1, origEnd)) drawContinuationMarker(slide, p1, 'forward', layout, t, locale);
     }
   }
 

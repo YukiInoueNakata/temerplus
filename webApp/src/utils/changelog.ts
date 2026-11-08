@@ -10,7 +10,7 @@
 // - scripts/gen-changelog.mjs からも読むので、型注釈を消すだけで動く書き方に限る（enum 等は使わない）
 // ============================================================================
 
-export type ChangeKind = '新機能' | '改善' | '修正';
+export type ChangeKind = '新機能' | '改善' | '修正'; // i18n-ok changelog.json の種類の値（データ）
 
 export interface ChangeItem {
   kind: ChangeKind;
@@ -40,18 +40,18 @@ export function sortEntries(entries: ChangelogEntry[]): ChangelogEntry[] {
 /** データの形を確かめ、問題の一覧を返す（空なら問題なし） */
 export function validateChangelog(entries: ChangelogEntry[]): string[] {
   const errors: string[] = [];
-  const kinds = ['新機能', '改善', '修正'];
+  const kinds = ['新機能', '改善', '修正']; // i18n-ok changelog.json の種類の値（データ）
   const seen = new Set<string>();
   for (const e of entries) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(e.date)) errors.push(`日付の形が違う: ${e.date}`);
-    if (seen.has(e.date)) errors.push(`同じ日付が 2 回ある: ${e.date}`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(e.date)) errors.push(`日付の形が違う: ${e.date}`); // i18n-ok 開発者向けのデータ検査の文（CI・changelog.test.ts）
+    if (seen.has(e.date)) errors.push(`同じ日付が 2 回ある: ${e.date}`); // i18n-ok 開発者向けのデータ検査の文（CI・changelog.test.ts）
     seen.add(e.date);
-    if (!e.items?.length) errors.push(`項目が無い: ${e.date}`);
+    if (!e.items?.length) errors.push(`項目が無い: ${e.date}`); // i18n-ok 開発者向けのデータ検査の文（CI・changelog.test.ts）
     for (const it of e.items ?? []) {
-      if (!kinds.includes(it.kind)) errors.push(`種類が違う（新機能・改善・修正のどれか）: ${e.date} ${it.kind}`);
-      if (!it.title?.trim()) errors.push(`見出しが空: ${e.date}`);
-      if (!it.en?.title?.trim()) errors.push(`英語の見出し（en.title）が無い: ${e.date} ${it.title}`);
-      if (it.detail && !it.en?.detail?.trim()) errors.push(`英語の説明（en.detail）が無い: ${e.date} ${it.title}`);
+      if (!kinds.includes(it.kind)) errors.push(`種類が違う（新機能・改善・修正のどれか）: ${e.date} ${it.kind}`); // i18n-ok 開発者向けのデータ検査の文（CI・changelog.test.ts）
+      if (!it.title?.trim()) errors.push(`見出しが空: ${e.date}`); // i18n-ok 開発者向けのデータ検査の文（CI・changelog.test.ts）
+      if (!it.en?.title?.trim()) errors.push(`英語の見出し（en.title）が無い: ${e.date} ${it.title}`); // i18n-ok 開発者向けのデータ検査の文（CI・changelog.test.ts）
+      if (it.detail && !it.en?.detail?.trim()) errors.push(`英語の説明（en.detail）が無い: ${e.date} ${it.title}`); // i18n-ok 開発者向けのデータ検査の文（CI・changelog.test.ts）
     }
   }
   return errors;
@@ -59,13 +59,13 @@ export function validateChangelog(entries: ChangelogEntry[]): string[] {
 
 const formatDate = (d: string) => {
   const [y, m, day] = d.split('-').map(Number);
-  return `${y}年${m}月${day}日`;
+  return `${y}年${m}月${day}日`; // i18n-ok README・個人サイト向けの日本語の文面（gen-changelog.mjs が使う）
 };
 
 /** README の「最近の更新」の節（マーカーの内側） */
 export function renderReadmeSection(entries: ChangelogEntry[]): string {
   const recent = sortEntries(entries).slice(0, README_RECENT_DATES);
-  const lines = ['## 最近の更新', ''];
+  const lines = ['## 最近の更新', '']; // i18n-ok README・個人サイト向けの日本語の文面（gen-changelog.mjs が使う）
   for (const e of recent) {
     lines.push(`### ${formatDate(e.date)}`, '');
     for (const it of e.items) {
@@ -73,7 +73,7 @@ export function renderReadmeSection(entries: ChangelogEntry[]): string {
     }
     lines.push('');
   }
-  lines.push(`それより前の更新は、アプリ（${APP_URL}）の「ヘルプ」タブの「更新情報」で見られます。`);
+  lines.push(`それより前の更新は、アプリ（${APP_URL}）の「ヘルプ」タブの「更新情報」で見られます。`); // i18n-ok README・個人サイト向けの日本語の文面（gen-changelog.mjs が使う）
   return lines.join('\n');
 }
 
@@ -92,7 +92,7 @@ const escapeHtml = (s: string) =>
 /** 別サイトに貼る HTML の断片（見出しから下だけ。CSS はサイト側に任せる） */
 export function renderSiteHtml(entries: ChangelogEntry[], limit?: number): string {
   const list = sortEntries(entries).slice(0, limit ?? entries.length);
-  const out = ['<section class="temer-changelog">', '  <h2>TEMer の更新情報</h2>'];
+  const out = ['<section class="temer-changelog">', '  <h2>TEMer の更新情報</h2>']; // i18n-ok README・個人サイト向けの日本語の文面（gen-changelog.mjs が使う）
   for (const e of list) {
     out.push(`  <h3>${formatDate(e.date)}</h3>`, '  <ul>');
     for (const it of e.items) {
@@ -101,20 +101,20 @@ export function renderSiteHtml(entries: ChangelogEntry[], limit?: number): strin
     }
     out.push('  </ul>');
   }
-  out.push(`  <p><a href="${APP_URL}">TEMer を開く</a></p>`, '</section>');
+  out.push(`  <p><a href="${APP_URL}">TEMer を開く</a></p>`, '</section>'); // i18n-ok README・個人サイト向けの日本語の文面（gen-changelog.mjs が使う）
   return out.join('\n');
 }
 
 /** 別サイトに貼る Markdown（WordPress・note などの Markdown 入力向け） */
 export function renderSiteMarkdown(entries: ChangelogEntry[], limit?: number): string {
   const list = sortEntries(entries).slice(0, limit ?? entries.length);
-  const lines = ['## TEMer の更新情報', ''];
+  const lines = ['## TEMer の更新情報', '']; // i18n-ok README・個人サイト向けの日本語の文面（gen-changelog.mjs が使う）
   for (const e of list) {
     lines.push(`### ${formatDate(e.date)}`, '');
     for (const it of e.items) lines.push(`- **${it.kind}** ${it.title}${it.detail ? `: ${it.detail}` : ''}`);
     lines.push('');
   }
-  lines.push(`[TEMer を開く](${APP_URL})`);
+  lines.push(`[TEMer を開く](${APP_URL})`); // i18n-ok README・個人サイト向けの日本語の文面（gen-changelog.mjs が使う）
   return lines.join('\n');
 }
 

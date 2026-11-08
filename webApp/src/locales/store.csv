@@ -1,0 +1,3 @@
+﻿key,ja,en,note
+"box.new","新規Box","New box","図 > Box を足したときの最初の文字（図の言語）"
+"box.inserted","挿入{{n}}","Inserted {{n}}","図 > 2 つの Box の間に挿入した Box の最初の文字（n は番号・図の言語）"

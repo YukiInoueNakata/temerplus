@@ -4,6 +4,7 @@
 // - 旧 .tem（hasMeaning: boolean のみ）との相互運用もここに閉じ込める
 // ============================================================================
 
+import i18n from '../i18n';
 import type { VisualConventionEntry, VisualConventionMeaning, VisualConventions } from '../types';
 
 export type VisualConventionKey = Exclude<keyof VisualConventions, 'other'>;
@@ -12,28 +13,40 @@ export type VisualConventionKey = Exclude<keyof VisualConventions, 'other'>;
  * 表記方針の項目（論文 04_report_format.md Block 4 の表の順に並べる）。
  * 入力画面・論文報告の Word 出力・出力前の確認画面がこの一覧を使う。
  * 表の 12 行のうち「影・立体感の付与」は TEMer に影の機能が無いので入れない（2026-10-30 ユーザー決定）
+ * 表示名と書き方の例は翻訳の表 locales/visualConventions.csv から引く（conventionItemLabel / conventionItemHint）。
+ * 画面では画面の言語（lng を渡さない）、論文用レポートでは図の言語（doc.settings.locale）で引く
  */
-export const VISUAL_CONVENTION_ITEMS: { key: VisualConventionKey; label: string; hint?: string }[] = [
-  { key: 'horizontalLength', label: '横軸（時間軸）の間隔' },
-  { key: 'verticalPosition', label: '縦軸（並置軸）の位置' },
-  { key: 'arrowAngle', label: '矢印の角度' },
-  { key: 'arrowLength', label: '矢印の距離（長さ）' },
-  { key: 'boxWidth', label: 'Box の横幅', hint: '時間軸上の位置を Box のどこで読むか（左辺・中心など）も書く' },
-  { key: 'boxHeight', label: 'Box の高さ', hint: '文字量に合わせた（テキスト駆動）か意味を持たせた（意味駆動）か、比べるときの基準（中心など）も書く' },
-  { key: 'lineWeight', label: '線の太さ' },
-  { key: 'colors', label: '色の使用（塗り・枠線・文字）' },
-  { key: 'boxShape', label: 'Box の形状（角丸・直角・楕円）' },
-  { key: 'fontDecoration', label: 'フォント装飾（太字・斜体・サイズ）' },
-  { key: 'textAlignment', label: 'テキスト配置（中央・左寄せなど）' },
+export const VISUAL_CONVENTION_ITEMS: { key: VisualConventionKey; hasHint?: boolean }[] = [
+  { key: 'horizontalLength' },
+  { key: 'verticalPosition' },
+  { key: 'arrowAngle' },
+  { key: 'arrowLength' },
+  { key: 'boxWidth', hasHint: true },
+  { key: 'boxHeight', hasHint: true },
+  { key: 'lineWeight' },
+  { key: 'colors' },
+  { key: 'boxShape' },
+  { key: 'fontDecoration' },
+  { key: 'textAlignment' },
 ];
 
 export const CONVENTION_MEANINGS: VisualConventionMeaning[] = ['yes', 'loose', 'no'];
 
-export const CONVENTION_MEANING_LABELS: Record<VisualConventionMeaning, string> = {
-  yes: '意味あり',
-  loose: '緩やかに意味あり',
-  no: '意味なし',
-};
+/** 表記方針の項目の表示名。lng を省くと画面の言語 */
+export function conventionItemLabel(key: VisualConventionKey, lng?: string): string {
+  return i18n.t(`visualConventions:item.${key}`, { lng });
+}
+
+/** 表記方針の項目の書き方の例（無い項目は undefined）。lng を省くと画面の言語 */
+export function conventionItemHint(key: VisualConventionKey, lng?: string): string | undefined {
+  const it = VISUAL_CONVENTION_ITEMS.find((x) => x.key === key);
+  return it?.hasHint ? i18n.t(`visualConventions:hint.${key}`, { lng }) : undefined;
+}
+
+/** 意味の度合いの表示名（意味あり / 緩やかに意味あり / 意味なし）。lng を省くと画面の言語 */
+export function conventionMeaningLabel(m: VisualConventionMeaning, lng?: string): string {
+  return i18n.t(`visualConventions:meaning.${m}`, { lng });
+}
 
 /**
  * エントリから意味の度合いを解決する。

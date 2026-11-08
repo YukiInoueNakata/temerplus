@@ -54,6 +54,7 @@ import {
   type Pt as LinePathPt,
 } from './linePath';
 import { checkAborted, type ProgressCallback } from './exportProgress';
+import i18n from '../i18n';
 import { resolveAttachedAnchor, anchorCenter } from './sdsgAttach';
 import { resolveBetweenEndpoint } from './sdsgBetween';
 import { clipPolylineToRect } from './lineClip';
@@ -84,7 +85,7 @@ export interface SVGNativeExportOptions {
 
 export async function exportToSVGNative(opts: SVGNativeExportOptions): Promise<void> {
   if (!opts || !opts.sheet || !opts.settings) {
-    throw new Error('exportToSVGNative: options.sheet と options.settings が必須です');
+    throw new Error(i18n.t('exportSVGNative:error.missingOptions'));
   }
   const filename = opts.filename ?? 'TEMer.svg';
   const svgs = buildSVGDocuments(opts);
@@ -134,7 +135,7 @@ export function buildSVGDocuments(opts: SVGNativeExportOptions): string[] {
   const total = pages.length;
   for (let i = 0; i < pages.length; i++) {
     checkAborted(opts.signal);
-    opts.onProgress?.({ current: i + 1, total, label: `SVG ページ ${i + 1} / ${total}` });
+    opts.onProgress?.({ current: i + 1, total, label: i18n.t('exportSVGNative:progress.page', { n: i + 1, total }) });
     const page = pages[i];
     const pageBbox = { x: page.innerX, y: page.innerY, width: page.innerWidth, height: page.innerHeight };
     const t = buildTransform(pageBbox, paperW, paperH, false, 0);

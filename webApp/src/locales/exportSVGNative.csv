@@ -1,0 +1,3 @@
+﻿key,ja,en,note
+"error.missingOptions","exportToSVGNative: options.sheet と options.settings が必須です","exportToSVGNative: options.sheet and options.settings are required","SVG 出力 > 呼び出しの誤り（開発者向け）"
+"progress.page","SVG ページ {{n}} / {{total}}","SVG page {{n}} of {{total}}","出力中の表示（SVG・n は何ページ目か）"

@@ -14,6 +14,7 @@
 import type { Box, BoxType, Paragraph, SDSG, SourceRef, Transcript, PeriodLabel } from '../types';
 import { genParagraphId, genPeriodId, genTranscriptId } from '../store/defaults';
 import { mapBoxType, TYPE_DICT } from './csvImport';
+import i18n from '../i18n';
 
 // ----------------------------------------------------------------------------
 // 列の役割
@@ -36,42 +37,43 @@ export type MaxqdaRole =
   | 'color'      // 色
   | 'otherCodes'; // セグメントに割り当てられた他のコード（改行区切り、"(ウェイト: N)" 付き）
 
+// 表示名は画面の言語で毎回引く（getter）。呼び出し側はキーの順だけを使う
 export const MAXQDA_ROLE_LABELS: Record<MaxqdaRole, string> = {
-  ignore: '（無視）',
-  docGroup: '文書グループ',
-  docName: '文書名（逐語録）',
-  code: 'コード',
-  start: '開始',
-  end: '終了',
-  segment: 'セグメント本文',
-  weight: '重み',
-  comment: 'コメント',
-  area: '領域',
-  coverage: '範囲 (%)',
-  codedBy: 'コード付けした人',
-  created: '作成日',
-  color: '色',
-  otherCodes: '他のコード（同じセグメントの）',
+  get ignore() { return i18n.t('maxqdaImport:role.ignore'); },
+  get docGroup() { return i18n.t('maxqdaImport:role.docgroup'); },
+  get docName() { return i18n.t('maxqdaImport:role.docname'); },
+  get code() { return i18n.t('maxqdaImport:role.code'); },
+  get start() { return i18n.t('maxqdaImport:role.start'); },
+  get end() { return i18n.t('maxqdaImport:role.end'); },
+  get segment() { return i18n.t('maxqdaImport:role.segment'); },
+  get weight() { return i18n.t('maxqdaImport:role.weight'); },
+  get comment() { return i18n.t('maxqdaImport:role.comment'); },
+  get area() { return i18n.t('maxqdaImport:role.area'); },
+  get coverage() { return i18n.t('maxqdaImport:role.coverage'); },
+  get codedBy() { return i18n.t('maxqdaImport:role.codedby'); },
+  get created() { return i18n.t('maxqdaImport:role.created'); },
+  get color() { return i18n.t('maxqdaImport:role.color'); },
+  get otherCodes() { return i18n.t('maxqdaImport:role.othercodes'); },
 };
 
 /** MAXQDA の日英の標準列名からの推測 */
 export function guessMaxqdaRole(header: string): MaxqdaRole {
   const h = header.trim().toLowerCase();
   if (!h) return 'ignore';
-  if (/^(文書グループ|document group|dokumentgruppe)$/.test(h)) return 'docGroup';
-  if (/^(文書名|document name|document|dokumentname|文書)$/.test(h)) return 'docName';
-  if (/^(コード|code|kode)$/.test(h)) return 'code';
-  if (/^(開始|beginning|begin|start|anfang)$/.test(h)) return 'start';
-  if (/^(終了|end|ende)$/.test(h)) return 'end';
-  if (/^(セグメント|segment|text|本文|preview|プレビュー)$/.test(h)) return 'segment';
-  if (/^(重み|weight|weight score|gewicht)$/.test(h)) return 'weight';
-  if (/^(コメント|comment|kommentar|メモ|memo)$/.test(h)) return 'comment';
-  if (/他のコード|other codes|all codes|weitere codes/.test(h)) return 'otherCodes';
-  if (/^(領域|area|fläche)$/.test(h)) return 'area';
-  if (/^(範囲|範囲 ?\(%\)|coverage|coverage ?%|abdeckungsgrad)$/.test(h)) return 'coverage';
-  if (/^(コード付けした人|created by|coded by|erstellt von|作成者)$/.test(h)) return 'codedBy';
-  if (/^(作成日|created|erstellt|作成日時)$/.test(h)) return 'created';
-  if (/^(色|color|colour|farbe)$/.test(h)) return 'color';
+  if (/^(文書グループ|document group|dokumentgruppe)$/.test(h)) return 'docGroup'; // i18n-ok MAXQDA の見出しと照合
+  if (/^(文書名|document name|document|dokumentname|文書)$/.test(h)) return 'docName'; // i18n-ok MAXQDA の見出しと照合
+  if (/^(コード|code|kode)$/.test(h)) return 'code'; // i18n-ok MAXQDA の見出しと照合
+  if (/^(開始|beginning|begin|start|anfang)$/.test(h)) return 'start'; // i18n-ok MAXQDA の見出しと照合
+  if (/^(終了|end|ende)$/.test(h)) return 'end'; // i18n-ok MAXQDA の見出しと照合
+  if (/^(セグメント|segment|text|本文|preview|プレビュー)$/.test(h)) return 'segment'; // i18n-ok MAXQDA の見出しと照合
+  if (/^(重み|weight|weight score|gewicht)$/.test(h)) return 'weight'; // i18n-ok MAXQDA の見出しと照合
+  if (/^(コメント|comment|kommentar|メモ|memo)$/.test(h)) return 'comment'; // i18n-ok MAXQDA の見出しと照合
+  if (/他のコード|other codes|all codes|weitere codes/.test(h)) return 'otherCodes'; // i18n-ok MAXQDA の見出しと照合
+  if (/^(領域|area|fläche)$/.test(h)) return 'area'; // i18n-ok MAXQDA の見出しと照合
+  if (/^(範囲|範囲 ?\(%\)|coverage|coverage ?%|abdeckungsgrad)$/.test(h)) return 'coverage'; // i18n-ok MAXQDA の見出しと照合
+  if (/^(コード付けした人|created by|coded by|erstellt von|作成者)$/.test(h)) return 'codedBy'; // i18n-ok MAXQDA の見出しと照合
+  if (/^(作成日|created|erstellt|作成日時)$/.test(h)) return 'created'; // i18n-ok MAXQDA の見出しと照合
+  if (/^(色|color|colour|farbe)$/.test(h)) return 'color'; // i18n-ok MAXQDA の見出しと照合
   return 'ignore';
 }
 
@@ -121,7 +123,7 @@ export function parseOtherCodesCell(cellText: string): Array<{ code: string; wei
     .map((t) => t.trim())
     .filter((t) => t.length > 0)
     .map((t) => {
-      const m = t.match(/^(.*?)\s*[（(]\s*(?:ウェイト|weight|gewicht)\s*[:：]\s*(-?\d+(?:\.\d+)?)\s*[)）]\s*$/i);
+      const m = t.match(/^(.*?)\s*[（(]\s*(?:ウェイト|weight|gewicht)\s*[:：]\s*(-?\d+(?:\.\d+)?)\s*[)）]\s*$/i); // i18n-ok MAXQDA の書き出しの値と照合
       return m ? { code: m[1].trim(), weight: m[2] } : { code: t };
     })
     .filter((e) => e.code.length > 0);
@@ -148,11 +150,11 @@ export function dedupeSegments(rows: string[][], opts: DedupeOptions): DedupeRes
   const keyMode: DedupeKeyMode = opts.keyMode ?? 'range';
   const warnings: string[] = [];
 
-  if (iDoc < 0) warnings.push('「文書名」の列が未指定です。全行を 1 つの逐語録として扱います');
-  if (iSeg < 0) warnings.push('「セグメント本文」の列が未指定です。段落の本文が空になります');
-  if (iCode < 0) warnings.push('「コード」の列が未指定です。タグ・Box は作られません');
+  if (iDoc < 0) warnings.push(i18n.t('maxqdaImport:warn.nodoc'));
+  if (iSeg < 0) warnings.push(i18n.t('maxqdaImport:warn.noseg'));
+  if (iCode < 0) warnings.push(i18n.t('maxqdaImport:warn.nocode'));
   if (keyMode === 'range' && (iStart < 0 || iEnd < 0)) {
-    warnings.push('「開始」「終了」の列が無いため、本文の一致でセグメントを集約します');
+    warnings.push(i18n.t('maxqdaImport:warn.norange'));
   }
 
   const data = opts.hasHeader ? rows.slice(1) : rows;
@@ -161,7 +163,7 @@ export function dedupeSegments(rows: string[][], opts: DedupeOptions): DedupeRes
 
   data.forEach((row, i) => {
     const docGroup = cell(row, iGroup);
-    const docName = cell(row, iDoc) || '（文書名なし）';
+    const docName = cell(row, iDoc) || '（文書名なし）'; // i18n-ok 逐語録の名前（データ）
     const start = cell(row, iStart);
     const end = cell(row, iEnd);
     const text = cell(row, iSeg);
@@ -219,7 +221,7 @@ export function dedupeSegments(rows: string[][], opts: DedupeOptions): DedupeRes
 // コードの集計と階層
 // ----------------------------------------------------------------------------
 
-const HIERARCHY_SEPARATORS = ['\\', '>', '/', '＞'];
+const HIERARCHY_SEPARATORS = ['\\', '>', '/', '＞']; // i18n-ok コードの階層の区切り（データと照合）
 
 /** "親\子\孫" → { parents: ['親','子'], leaf: '孫' } */
 export function splitCodePath(code: string): { parents: string[]; leaf: string } {
@@ -246,11 +248,11 @@ export interface CodeSummary {
 export type CodeAction = 'tag' | 'box' | 'sd' | 'sg' | 'period';
 
 export const CODE_ACTION_LABELS: Record<CodeAction, string> = {
-  tag: 'タグのみ',
-  box: 'Box にする',
-  sd: 'SD にする',
-  sg: 'SG にする',
-  period: '時期ラベルにする',
+  get tag() { return i18n.t('maxqdaImport:action.tag'); },
+  get box() { return i18n.t('maxqdaImport:action.box'); },
+  get sd() { return i18n.t('maxqdaImport:action.sd'); },
+  get sg() { return i18n.t('maxqdaImport:action.sg'); },
+  get period() { return i18n.t('maxqdaImport:action.period'); },
 };
 
 /** 語から種別を推測する。TYPE_DICT（CSV 取り込みの辞書）を再利用 */
@@ -275,9 +277,9 @@ function guessTypeFromWords(words: string[]): BoxType | undefined {
 function guessActionFromWords(parents: string[], leaf: string): CodeAction | undefined {
   const test = (w: string): CodeAction | undefined => {
     const t = w.trim().toLowerCase();
-    if (/(^|[^a-z])sd([^a-z]|$)|社会的方向づけ|社会的方向付け/.test(t)) return 'sd';
-    if (/(^|[^a-z])sg([^a-z]|$)|社会的ガイド|社会的助勢/.test(t)) return 'sg';
-    if (/時期|期間|period|phase|フェーズ|第[0-9一二三四五六七八九十]+期/.test(t)) return 'period';
+    if (/(^|[^a-z])sd([^a-z]|$)|社会的方向づけ|社会的方向付け|social direction/.test(t)) return 'sd'; // i18n-ok コード名と照合
+    if (/(^|[^a-z])sg([^a-z]|$)|社会的ガイド|社会的助勢|social guidance/.test(t)) return 'sg'; // i18n-ok コード名と照合
+    if (/時期|期間|period|phase|フェーズ|第[0-9一二三四五六七八九十]+期/.test(t)) return 'period'; // i18n-ok コード名と照合
     return undefined;
   };
   for (const w of [...parents, leaf]) {
@@ -286,7 +288,7 @@ function guessActionFromWords(parents: string[], leaf: string): CodeAction | und
   }
   // 親コードの名前が「TEM 図の要素になる候補」を指していれば Box
   const top = (parents[0] ?? '').trim().toLowerCase();
-  if (top && /候補|二次コード|tem[_\s-]?(box|item|経験|出来事)|(^|[^a-z])box([^a-z]|$)|経験|出来事|イベント|event|episode/.test(top)) return 'box';
+  if (top && /候補|二次コード|tem[_\s-]?(box|item|経験|出来事)|(^|[^a-z])box([^a-z]|$)|経験|出来事|イベント|event|episode/.test(top)) return 'box'; // i18n-ok コード名と照合
   return undefined;
 }
 
@@ -347,9 +349,9 @@ export interface BuildOptions {
 export type MultiBoxMode = 'stack' | 'merge' | 'sequence';
 
 export const MULTI_BOX_MODE_LABELS: Record<MultiBoxMode, string> = {
-  stack: '同じ時期に縦に並べる（1 コード = 1 Box）',
-  merge: '1 つの Box にまとめる（ラベルを連ねる）',
-  sequence: '時期をずらして順に並べる',
+  get stack() { return i18n.t('maxqdaImport:multibox.stack'); },
+  get merge() { return i18n.t('maxqdaImport:multibox.merge'); },
+  get sequence() { return i18n.t('maxqdaImport:multibox.sequence'); },
 };
 
 /** 段落番号や時刻の並びで、セグメントに Box になるコードが何個付いているか */
@@ -488,7 +490,7 @@ export function buildFromSegments(dedupe: DedupeResult, opts: BuildOptions): Bui
         if (!plan || plan.action === 'tag') return;
         const { leaf } = splitCodePath(code);
         if (plan.action !== 'period' && !para) {
-          warnings.push(`「${code}」（${docName}）: セグメント本文が無いため Box / SD・SG にできませんでした`);
+          warnings.push(i18n.t('maxqdaImport:warn.nosegtext', { code, doc: docName }));
           return;
         }
         if (plan.action === 'box') {
@@ -518,7 +520,7 @@ export function buildFromSegments(dedupe: DedupeResult, opts: BuildOptions): Bui
           // 直前の Box（このセグメントに Box があればそれ）に紐付ける。SD は上の Box、SG は下の Box
           const attachedTo = type === 'SD' ? lastBoxIdInDoc : (lastBottomBoxInDoc ?? lastBoxIdInDoc);
           if (!attachedTo) {
-            warnings.push(`「${code}」（${docName}）: 紐付ける Box がまだ無いため SD/SG を作れませんでした。先に Box になるコードを選んでください`);
+            warnings.push(i18n.t('maxqdaImport:warn.noattach', { code, doc: docName }));
             return;
           }
           const nth = attachedCount.get(`${attachedTo}:${type}`) ?? 0;

@@ -1,0 +1,5 @@
+﻿key,ja,en,note
+"error.missingOptions","exportToPPTX: options.sheet と options.settings が必須です","exportToPPTX: options.sheet and options.settings are required","PowerPoint 出力 > 呼び出しの誤り（開発者向け）"
+"progress.slide","スライド {{n}} / {{total}} を生成中","Generating slide {{n}} of {{total}}","出力中の表示（PowerPoint・n は何枚目か）"
+"marker.forward","→続","→ cont.","PowerPoint 出力の図 > ページをまたぐ矢印の、次のページへ続く側の印（図の言語）"
+"marker.backward","続→","cont. →","PowerPoint 出力の図 > ページをまたぐ矢印の、前のページから続く側の印（図の言語）"

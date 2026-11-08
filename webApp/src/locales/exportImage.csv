@@ -1,0 +1,5 @@
+﻿key,ja,en,note
+"progress.capturing","キャプチャ中...","Capturing...","出力中の表示（PNG・SVG 画像）"
+"progress.capturingPreview","プレビューをキャプチャ中...","Capturing preview...","出力中の表示（PNG・SVG 画像）"
+"progress.cropping","ページ {{n}} / {{total}} をクロップ中","Cropping page {{n}} of {{total}}","出力中の表示（PNG・SVG 画像・n は何ページ目か）"
+"progress.done","完了","Done","出力中の表示（PNG・SVG 画像）"

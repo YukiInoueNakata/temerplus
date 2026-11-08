@@ -5,9 +5,10 @@
 // 強制はしない。「記入しない」まま出力することもできる
 // ============================================================================
 
+import i18n from '../i18n';
 import type { Note, TEMDocument } from '../types';
 import { NOTE_SYMBOLS } from './noteStyle';
-import { VISUAL_CONVENTION_ITEMS, resolveConventionMeaning } from './visualConventions';
+import { VISUAL_CONVENTION_ITEMS, conventionItemLabel, resolveConventionMeaning } from './visualConventions';
 
 export type ReportItemState = 'done' | 'partial' | 'missing';
 /** 「記入を続ける」で開くタブ */
@@ -61,7 +62,7 @@ export function usedSymbols(doc: TEMDocument): string[] {
 function countState(label: string, total: number, done: number, key: string): ReportStatusItem | null {
   if (total === 0) return null;
   const state: ReportItemState = done === total ? 'done' : done === 0 ? 'missing' : 'partial';
-  return { key, label, state, detail: state === 'partial' ? `${total} 件中 ${done} 件` : `${total} 件` };
+  return { key, label, state, detail: state === 'partial' ? i18n.t('reportStatus:count.partial', { total, done }) : i18n.t('reportStatus:count.all', { total }) };
 }
 
 /** 図にあるメモ・記号・コメントの件数 */
@@ -83,17 +84,17 @@ export function reportContentCounts(doc: TEMDocument) {
   return { notes, flaggedNotes, symbols, comments };
 }
 
-/** 選ばないと出力できない項目（図にあるものだけ）の表示名 */
+/** 選ばないと出力できない項目（図にあるものだけ）の表示名（画面の言語） */
 export function missingReportChoices(doc: TEMDocument, choices: ReportContentChoices): string[] {
   const c = reportContentCounts(doc);
   const out: string[] = [];
-  if (c.notes > 0 && !choices.notes) out.push('メモ');
-  if (c.symbols > 0 && choices.symbols === undefined) out.push('記号');
-  if (c.comments > 0 && choices.comments === undefined) out.push('コメント');
+  if (c.notes > 0 && !choices.notes) out.push(i18n.t('reportStatus:choice.notes'));
+  if (c.symbols > 0 && choices.symbols === undefined) out.push(i18n.t('reportStatus:choice.symbols'));
+  if (c.comments > 0 && choices.comments === undefined) out.push(i18n.t('reportStatus:choice.comments'));
   return out;
 }
 
-/** 項目ごとの入力状況 */
+/** 項目ごとの入力状況（label・detail は画面の言語） */
 export function computeReportStatus(doc: TEMDocument, choices: ReportContentChoices = {}): ReportStatusItem[] {
   const m = doc.metadata;
   const items: ReportStatusItem[] = [];
@@ -101,15 +102,15 @@ export function computeReportStatus(doc: TEMDocument, choices: ReportContentChoi
   // Block 1 記号体系
   const ns = m.notationSystem;
   items.push({
-    key: 'notation', label: '記号体系の宣言', tab: 'notation',
+    key: 'notation', label: i18n.t('reportStatus:item.notation'), tab: 'notation',
     state: !ns ? 'missing' : ns.base !== 'Arakawa2012' && !filled(ns.customDescription) ? 'partial' : 'done',
-    detail: ns && ns.base !== 'Arakawa2012' && !filled(ns.customDescription) ? '独自・その他の説明が空' : undefined,
+    detail: ns && ns.base !== 'Arakawa2012' && !filled(ns.customDescription) ? i18n.t('reportStatus:detail.notation.customEmpty') : undefined,
   });
   // 記号の意味（記号を載せると選んだときだけ）
   if (choices.symbols) {
     const syms = usedSymbols(doc);
     const meant = syms.filter((s) => filled(m.symbolMeanings?.[s])).length;
-    const it = countState('記号の意味', syms.length, meant, 'symbolMeanings');
+    const it = countState(i18n.t('reportStatus:item.symbolMeanings'), syms.length, meant, 'symbolMeanings');
     if (it) items.push({ ...it, tab: 'notation' });
   }
 
@@ -117,18 +118,18 @@ export function computeReportStatus(doc: TEMDocument, choices: ReportContentChoi
   const pi = m.participantsInfo;
   const piParts = [!!pi && pi.count > 0, filled(pi?.description)];
   items.push({
-    key: 'participants', label: '協力者情報', tab: 'participants',
+    key: 'participants', label: i18n.t('reportStatus:item.participants'), tab: 'participants',
     state: piParts.every(Boolean) ? 'done' : piParts.some(Boolean) ? 'partial' : 'missing',
-    detail: piParts.some(Boolean) && !piParts.every(Boolean) ? (piParts[0] ? '属性などの記述が空' : '協力者数が 0') : undefined,
+    detail: piParts.some(Boolean) && !piParts.every(Boolean) ? (piParts[0] ? i18n.t('reportStatus:detail.participants.descriptionEmpty') : i18n.t('reportStatus:detail.participants.countZero')) : undefined,
   });
 
   // Block 3 インタビュー
   const iv = m.interview;
   const ivAny = filled(iv?.method) || filled(iv?.durationDescription) || (iv?.timesCount ?? 0) > 0;
   items.push({
-    key: 'interview', label: 'インタビュー方法', tab: 'interview',
+    key: 'interview', label: i18n.t('reportStatus:item.interview'), tab: 'interview',
     state: filled(iv?.method) ? 'done' : ivAny ? 'partial' : 'missing',
-    detail: !filled(iv?.method) && ivAny ? '方法が空' : undefined,
+    detail: !filled(iv?.method) && ivAny ? i18n.t('reportStatus:detail.interview.methodEmpty') : undefined,
   });
 
   // Block 4 表記方針（項目ごと）
@@ -137,9 +138,9 @@ export function computeReportStatus(doc: TEMDocument, choices: ReportContentChoi
     const meaning = ent ? resolveConventionMeaning(ent) : undefined;
     const needsDesc = meaning === 'yes' || meaning === 'loose';
     items.push({
-      key: `visual.${it.key}`, label: `表記方針: ${it.label}`, tab: 'visual',
+      key: `visual.${it.key}`, label: i18n.t('reportStatus:item.visual', { label: conventionItemLabel(it.key) }), tab: 'visual',
       state: !ent ? 'missing' : needsDesc && !filled(ent.description) ? 'partial' : 'done',
-      detail: ent && needsDesc && !filled(ent.description) ? '説明が空' : undefined,
+      detail: ent && needsDesc && !filled(ent.description) ? i18n.t('reportStatus:detail.visual.descriptionEmpty') : undefined,
     });
   }
 
@@ -149,12 +150,15 @@ export function computeReportStatus(doc: TEMDocument, choices: ReportContentChoi
   const lines = doc.sheets.flatMap((s) => s.lines);
   const sdsg = doc.sheets.flatMap((s) => s.sdsg);
   for (const it of [
-    countState('Box の説明', boxes.length, boxes.filter(described).length, 'desc.box'),
-    countState('径路の説明', lines.length, lines.filter(described).length, 'desc.line'),
-    countState('SD/SG の説明', sdsg.length, sdsg.filter(described).length, 'desc.sdsg'),
+    countState(i18n.t('reportStatus:item.descBox'), boxes.length, boxes.filter(described).length, 'desc.box'),
+    countState(i18n.t('reportStatus:item.descLine'), lines.length, lines.filter(described).length, 'desc.line'),
+    countState(i18n.t('reportStatus:item.descSdsg'), sdsg.length, sdsg.filter(described).length, 'desc.sdsg'),
   ]) if (it) items.push(it);
 
   return items;
 }
 
-export const REPORT_STATE_LABEL: Record<ReportItemState, string> = { done: '済', partial: '一部', missing: '未' };
+/** 入力状況の表示名（済／一部／未。画面の言語） */
+export function reportStateLabel(state: ReportItemState): string {
+  return i18n.t(`reportStatus:state.${state}`);
+}

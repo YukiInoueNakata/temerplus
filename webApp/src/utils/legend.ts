@@ -42,15 +42,15 @@ export interface LegendItem {
 }
 
 const BOX_DESCRIPTIONS: Record<BoxType, string> = {
-  'normal':     '経験・出来事',
-  'BFP':        '分岐点 (Bifurcation Point)',
-  'EFP':        '等至点 (Equifinality Point)',
-  'P-EFP':      '両極化等至点 (Polarized EFP)',
-  'OPP':        '必須通過点 (Obligatory Passage Point)',
-  'annotation': '潜在経験 / 想定された未実現経験',
-  '2nd-EFP':    '第二等至点',
-  'P-2nd-EFP':  '両極化第二等至点',
-  'other':      'その他',
+  'normal':     '経験・出来事', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  'BFP':        '分岐点 (Bifurcation Point)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  'EFP':        '等至点 (Equifinality Point)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  'P-EFP':      '両極化等至点 (Polarized EFP)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  'OPP':        '必須通過点 (Obligatory Passage Point)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  'annotation': '潜在経験 / 想定された未実現経験', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  '2nd-EFP':    '第二等至点', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  'P-2nd-EFP':  '両極化第二等至点', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  'other':      'その他', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
 };
 
 // 英語ロケール時の説明文（ラベル自体は BOX_TYPE_LABELS.en を使う）
@@ -69,11 +69,11 @@ const BOX_DESCRIPTIONS_EN: Record<BoxType, string> = {
 // Box 以外の凡例項目（径路 / SD・SG / 非可逆的時間）のラベルと説明
 const NON_BOX_TEXT = {
   ja: {
-    RLine:     { label: '実線径路',     description: '実現した径路' },
-    XLine:     { label: '点線径路',     description: '想定された（未実現）径路' },
-    SD:        { label: 'SD',           description: '社会的方向づけ（径路を妨害する力）' },
-    SG:        { label: 'SG',           description: '社会的ガイド（径路を支援する力）' },
-    timeArrow: { label: '非可逆的時間', description: '時間軸の方向' },
+    RLine:     { label: '実線径路',     description: '実現した径路' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+    XLine:     { label: '点線径路',     description: '想定された（未実現）径路' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+    SD:        { label: 'SD',           description: '社会的方向づけ（径路を妨害する力）' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+    SG:        { label: 'SG',           description: '社会的ガイド（径路を支援する力）' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+    timeArrow: { label: '非可逆的時間', description: '時間軸の方向' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   },
   en: {
     RLine:     { label: 'Solid path',        description: 'Realized path' },
@@ -125,7 +125,7 @@ export function computeLegendItems(
         category: 'box',
         key: `other:${label}`,
         label,
-        description: isEn ? 'Other (user-defined)' : 'その他（利用者定義の種別）',
+        description: isEn ? 'Other (user-defined)' : 'その他（利用者定義の種別）', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
       });
     });
   }

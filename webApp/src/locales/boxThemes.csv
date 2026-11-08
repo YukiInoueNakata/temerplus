@@ -1,0 +1,13 @@
+﻿key,ja,en,note
+"monochrome.name","モノクロ（既定）","Monochrome (default)","設定 > Box のテーマ > 組み込みテーマの名前"
+"monochrome.description","全 Box を白背景・黒枠で統一。工場出荷時の見た目に近い。","White fill and black border for every box. Close to the original look.","設定 > Box のテーマ > 組み込みテーマの説明"
+"academic.name","学会発表向け（淡色）","Presentations (pale colors)","設定 > Box のテーマ > 組み込みテーマの名前"
+"academic.description","淡い色調で各 Box タイプを区別。スライドや学会ポスター向け。","Pale colors tell the box types apart. For slides and conference posters.","設定 > Box のテーマ > 組み込みテーマの説明"
+"colorful.name","カラフル","Colorful","設定 > Box のテーマ > 組み込みテーマの名前"
+"colorful.description","各 Box タイプを鮮やかな色で塗り分け。発表時の視認性重視。","Vivid colors for each box type. Easy to see in presentations.","設定 > Box のテーマ > 組み込みテーマの説明"
+"simplified.name","簡素化方式（線種は実在性だけ・種別はラベル）","Simplified (line style shows observation only, type shown by label)","設定 > Box のテーマ > 組み込みテーマの名前（記号の簡素化方式）"
+"simplified.description","実線＝観察された、点線＝観察されなかった。EFP・OPP などの種別は線種でなく種別ラベルで示す。論文用レポートの記号体系の宣言にそのまま書き出す。","Solid = observed, dashed = not observed. Types such as EFP and OPP are shown by type labels, not by line style. Written as is into the notation declaration of the paper report.","設定 > Box のテーマ > 組み込みテーマの説明"
+"paperBold.name","論文向け（太枠モノクロ）","Papers (bold monochrome)","設定 > Box のテーマ > 組み込みテーマの名前"
+"paperBold.description","モノクロ + 太枠で印刷時の視認性を確保。","Monochrome with bold borders for legibility in print.","設定 > Box のテーマ > 組み込みテーマの説明"
+"user.defaultName","テーマ {{n}}","Theme {{n}}","設定 > Box のテーマ > 名前を空にして保存したときの名前（n は番号）"
+"imported.name","読み込まれたテーマ","Imported theme","設定 > Box のテーマ > 名前の無いテーマを読み込んだときの名前"

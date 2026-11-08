@@ -10,8 +10,10 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useTEMStore } from '../store/store';
 import {
   CONVENTION_MEANINGS,
-  CONVENTION_MEANING_LABELS,
   VISUAL_CONVENTION_ITEMS,
+  conventionItemHint,
+  conventionItemLabel,
+  conventionMeaningLabel,
   resolveConventionMeaning,
   setConventionMeaning,
   type VisualConventionKey,
@@ -22,7 +24,7 @@ import {
   missingReportChoices,
   reportContentCounts,
   usedSymbols,
-  REPORT_STATE_LABEL,
+  reportStateLabel,
   type ReportContentChoices,
   type ReportItemState,
   type ReportTab,
@@ -498,7 +500,7 @@ function VisualSection({ updateMeta }: { updateMeta: UpdateMeta }) {
                   checked={meaning === m}
                   onChange={() => update(props.keyName, setConventionMeaning(cur, m))}
                 />
-                {CONVENTION_MEANING_LABELS[m]}
+                {conventionMeaningLabel(m)}
               </label>
             ))}
           </div>
@@ -529,7 +531,7 @@ function VisualSection({ updateMeta }: { updateMeta: UpdateMeta }) {
       <h4>{t('visual.title')}</h4>
       <p className="hint">{t('visual.hint')}</p>
       {VISUAL_CONVENTION_ITEMS.map((it) => (
-        <Entry key={it.key} name={it.label} keyName={it.key} hint={it.hint} />
+        <Entry key={it.key} name={conventionItemLabel(it.key)} keyName={it.key} hint={conventionItemHint(it.key)} />
       ))}
     </section>
   );
@@ -587,7 +589,7 @@ function ReportConfirm({
         <tbody>
           {status.map((it) => (
             <tr key={it.key} style={{ borderBottom: '1px solid #eee' }}>
-              <td style={{ width: 44, color: STATE_COLOR[it.state], fontWeight: 700 }}>{REPORT_STATE_LABEL[it.state]}</td>
+              <td style={{ width: 44, color: STATE_COLOR[it.state], fontWeight: 700 }}>{reportStateLabel(it.state)}</td>
               <td>{it.label}{it.detail ? t('confirm.status.detail', { detail: it.detail }) : ''}</td>
               <td style={{ textAlign: 'right' }}>
                 {it.state !== 'done' && (it.tab

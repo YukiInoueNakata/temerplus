@@ -14,6 +14,7 @@ import { parseDocx } from './docx';
 import { genTranscriptId } from '../../store/defaults';
 import type { Paragraph, Transcript } from '../../types';
 import { decodeCsvBytes } from '../tabularFile';
+import i18n from '../../i18n';
 
 export type TranscriptSourceFormat = 'txt' | 'csv' | 'xlsx' | 'docx';
 
@@ -63,9 +64,7 @@ async function readTextFileAutoEncoding(file: File): Promise<string> {
 export async function importTranscriptFile(file: File): Promise<ImportInitialResult> {
   const format = detectFormatFromFilename(file.name);
   if (!format) {
-    throw new Error(
-      `対応していない形式です: ${file.name}\n対応形式: .txt / .md / .csv / .tsv / .xlsx / .xls / .docx`
-    );
+    throw new Error(i18n.t('transcriptImport:error.unsupported', { name: file.name }));
   }
 
   switch (format) {
@@ -140,9 +139,9 @@ export function buildTranscriptFromTabular(opts: {
   sessionNumber?: number;
 }): Transcript {
   const { initialResult, sheetIndex, hasHeader, mapping, title, participantId, sessionNumber } = opts;
-  if (!initialResult.tabular) throw new Error('Tabular でないファイルです');
+  if (!initialResult.tabular) throw new Error(i18n.t('transcriptImport:error.nottabular'));
   const sheet = initialResult.tabular.sheets[sheetIndex];
-  if (!sheet) throw new Error('シートが見つかりません');
+  if (!sheet) throw new Error(i18n.t('transcriptImport:error.nosheet'));
   const dataRows = hasHeader ? sheet.rows.slice(1) : sheet.rows;
   const paragraphs = buildParagraphsFromRows(dataRows, mapping);
   return {
@@ -167,7 +166,7 @@ export function buildTranscriptFromParagraphs(opts: {
   sessionNumber?: number;
 }): Transcript {
   const { initialResult, title, participantId, sessionNumber } = opts;
-  if (!initialResult.paragraphs) throw new Error('Paragraph 型でないファイルです');
+  if (!initialResult.paragraphs) throw new Error(i18n.t('transcriptImport:error.notparagraph'));
   return {
     id: genTranscriptId(),
     participantId,

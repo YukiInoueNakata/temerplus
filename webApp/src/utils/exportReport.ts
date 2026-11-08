@@ -4,6 +4,7 @@
 // - TEM 図（キャンバスを PNG 化して埋込）
 // - 結果: シートごとに 時期区分 / Box (種別ごと) / 径路 / SD / SG を漏れなくリスト
 // - 用語凡例
+// - 本文は図の言語（doc.settings.locale。凡例と同じ）で書く。文言は翻訳の表 locales/exportReport.csv
 // ============================================================================
 
 import {
@@ -16,7 +17,8 @@ import {
   ImageRun,
 } from 'docx';
 import { toPng } from 'html-to-image';
-import { resolveConventionMeaning, VISUAL_CONVENTION_ITEMS } from './visualConventions';
+import i18n from '../i18n';
+import { conventionItemLabel, resolveConventionMeaning, VISUAL_CONVENTION_ITEMS } from './visualConventions';
 import { boxHasType } from './typeDisplay';
 import { buildFilter } from './exportImage';
 import { NOTE_MEMO_CLASS, NOTE_SYMBOL_CLASS, NOTE_UNFLAGGED_CLASS } from './noteStyle';
@@ -43,14 +45,14 @@ export interface PaperReportOptions {
   includeSourceRefs?: boolean;     // 原文引用を結果セクションに含める (既定 true)
   /**
    * 引用の表記スタイル:
-   *   'bracket' (既定): [原文 T1 §4]「指導教員と...」
-   *   'apa':           （A, 第1回, §4）「指導教員と...」
+   *   'bracket' (既定): [原文 T1 §4]「指導教員と...」 / 英語 [Source T1 §4] "..."
+   *   'apa':           （A, 第1回, §4）「指導教員と...」 / 英語 (A, session 1, §4) "..."
    *                     APA 風の括弧引用。協力者 + 回 + 段落番号
    */
   sourceRefStyle?: 'bracket' | 'apa';
   /**
    * 未入力の項目を出力に含めないか（既定 true＝論文 04_report_format.md 4 節のとおり含めない）。
-   * false なら「（未入力）」「（説明未記入）」と書いて含める（Word で清書するときに抜けが分かる）
+   * false なら「（未入力）」「（説明未記入）」（英語は (not entered) など）と書いて含める（Word で清書するときに抜けが分かる）
    */
   omitMissing?: boolean;
   /** 図にあるメモ・記号・コメントをどう載せるか（出力前の確認画面で選ぶ）。未指定はメモ＝「載せる」にしたものだけ */
@@ -60,6 +62,18 @@ export interface PaperReportOptions {
 // ----------------------------------------------------------------------------
 // 小さなヘルパ
 // ----------------------------------------------------------------------------
+
+/** 図の言語で引く翻訳（buildPaperReportParagraphs で作って各ヘルパに渡す）。キーは 'exportReport:<key>' */
+type Tr = (key: string, opts?: Record<string, unknown>) => string;
+
+function makeTr(lng: string): Tr {
+  return (key, opts) => i18n.t(key, { ...opts, lng });
+}
+
+/** 事象・経験のラベルを括る（日本語は〈…〉） */
+function wrapLabel(t: Tr, label: string): string {
+  return t('exportReport:label.wrap', { label });
+}
 
 function heading(text: string, level: typeof HeadingLevel[keyof typeof HeadingLevel]): Paragraph {
   return new Paragraph({
@@ -76,10 +90,10 @@ function para(text: string, opts?: { bold?: boolean; italic?: boolean }): Paragr
 
 // 中黒つきの bullet 段落（docx 標準の bullet を使わず素朴に "・" でリスト化）
 // Word 側で箇条書きスタイルに変換しやすく、表記が確定的になる
-function bullet(text: string, indent = 0): Paragraph {
+function bullet(t: Tr, text: string, indent = 0): Paragraph {
   const prefix = indent > 0 ? '    '.repeat(indent) : '';
   return new Paragraph({
-    children: [new TextRun({ text: `${prefix}・${text}` })],
+    children: [new TextRun({ text: `${prefix}${t('exportReport:bullet')}${text}` })],
   });
 }
 
@@ -93,17 +107,10 @@ async function fetchPngBytes(dataUrl: string): Promise<Uint8Array> {
 // 種別ラベル
 // ----------------------------------------------------------------------------
 
-const BOX_TYPE_LABEL_JA: Record<BoxType, string> = {
-  'normal': '事象・経験（通常 Box）',
-  'OPP': '必須通過点 (OPP)',
-  'BFP': '分岐点 (BFP)',
-  'EFP': '等至点 (EFP)',
-  'P-EFP': '両極化した等至点 (P-EFP)',
-  '2nd-EFP': '第2等至点 (2nd EFP)',
-  'P-2nd-EFP': '両極化した第2等至点 (P-2nd EFP)',
-  'annotation': '注釈・潜在経験 (annotation)',
-  'other': 'その他（利用者定義の種別）',
-};
+/** 結果の節の Box の種別の見出し（図の言語） */
+function boxTypeHeading(t: Tr, type: BoxType): string {
+  return t(`exportReport:boxType.${type}`);
+}
 
 // 列挙順（読み手に望ましい順番: EFP 系を先に、normal/annotation を最後に）
 const BOX_TYPE_ORDER: BoxType[] = [
@@ -123,10 +130,10 @@ const BOX_TYPE_ORDER: BoxType[] = [
 // ----------------------------------------------------------------------------
 
 // omit: 未入力を書かない。以前はモジュール変数で持ち、2 つのレポートを同時に作ると混ざった（レビュー #8）
-function descSuffix(omit: boolean, description?: string, noDescriptionNeeded?: boolean): string {
-  if (description && description.trim()) return ` — 説明: ${description.trim()}`;
-  if (noDescriptionNeeded) return omit ? '' : ' — （説明不要）';
-  return omit ? '' : ' — （説明未記入）';
+function descSuffix(t: Tr, omit: boolean, description?: string, noDescriptionNeeded?: boolean): string {
+  if (description && description.trim()) return t('exportReport:desc.text', { text: description.trim() });
+  if (noDescriptionNeeded) return omit ? '' : t('exportReport:desc.notNeeded');
+  return omit ? '' : t('exportReport:desc.missing');
 }
 
 /**
@@ -153,6 +160,7 @@ export function reportFigureFilter(
 
 // 原文引用を 1 行で要約。スタイルは bracket / apa を切替可能
 function sourceRefSuffix(
+  t: Tr,
   refs: SourceRef[] | undefined,
   transcripts: Transcript[],
   participantsLookup: Map<string, string>,
@@ -160,45 +168,48 @@ function sourceRefSuffix(
 ): string {
   if (!refs || refs.length === 0) return '';
   const parts = refs.map((r, i) => {
-    const t = transcripts.find((x) => x.id === r.transcriptId);
-    const para = t?.paragraphs.find((p) => p.id === r.paragraphId);
+    const tr = transcripts.find((x) => x.id === r.transcriptId);
+    const para = tr?.paragraphs.find((p) => p.id === r.paragraphId);
     const paraIdx = para ? `§${para.index + 1}` : '';
     const quote = (r.quoteText ?? '').trim();
     const quoteShort = quote.length > 60 ? quote.slice(0, 60) + '...' : quote;
-    const unres = r.unresolved ? ' [追従不能]' : '';
+    const unres = r.unresolved ? t('exportReport:ref.unresolved') : '';
 
     if (style === 'apa') {
       // 協力者 (pseudonym) + 第N回 + §段落
-      const pseudo = t?.participantId ? (participantsLookup.get(t.participantId) ?? '不明') : '不明';
-      const session = t?.sessionNumber !== undefined ? `第${t.sessionNumber}回` : '';
+      const unknown = t('exportReport:ref.unknownParticipant');
+      const pseudo = tr?.participantId ? (participantsLookup.get(tr.participantId) ?? unknown) : unknown;
+      const session = tr?.sessionNumber !== undefined ? t('exportReport:ref.session', { n: tr.sessionNumber }) : '';
       const cite = [pseudo, session, paraIdx].filter(Boolean).join(', ');
-      return `（${cite}）「${quoteShort}」${unres}`;
+      return t('exportReport:ref.apa', { cite, quote: quoteShort, unresolved: unres });
     } else {
-      const tLabel = t ? (t.title.length > 20 ? `T${i + 1}` : t.title) : `T?`;
-      return `[原文 ${tLabel} ${paraIdx}]「${quoteShort}」${unres}`;
+      const tLabel = tr ? (tr.title.length > 20 ? `T${i + 1}` : tr.title) : `T?`;
+      return t('exportReport:ref.bracket', { transcript: tLabel, paragraph: paraIdx, quote: quoteShort, unresolved: unres });
     }
   });
   return '  ' + parts.join(' ');
 }
 
 function formatPeriodLabels(
+  t: Tr,
   labels: PeriodLabel[],
   layout: LayoutDirection,
 ): Paragraph[] {
   if (labels.length === 0) return [];
   const out: Paragraph[] = [];
-  out.push(heading('時期区分', HeadingLevel.HEADING_3));
+  out.push(heading(t('exportReport:heading.periods'), HeadingLevel.HEADING_3));
   const sorted = [...labels].sort((a, b) => a.position - b.position);
   const axisLabel = layout === 'horizontal' ? 'Time level' : 'Time level';
   sorted.forEach((p, i) => {
-    const lab = (p.label && p.label.trim()) ? p.label.trim() : '（ラベル未設定）';
-    out.push(bullet(`期${i + 1}: 〈${lab}〉  (${axisLabel} ${p.position})`));
+    const lab = (p.label && p.label.trim()) ? p.label.trim() : t('exportReport:noLabel');
+    out.push(bullet(t, t('exportReport:period.item', { n: i + 1, label: wrapLabel(t, lab), axis: axisLabel, position: p.position })));
   });
   out.push(para(''));
   return out;
 }
 
 function formatBoxesByType(
+  t: Tr,
   boxes: Box[],
   type: BoxType,
   transcripts: Transcript[],
@@ -211,30 +222,31 @@ function formatBoxesByType(
   const subset = boxes.filter((b) => boxHasType(b, type));
   if (subset.length === 0) return [];
   const out: Paragraph[] = [];
-  out.push(heading(BOX_TYPE_LABEL_JA[type], HeadingLevel.HEADING_3));
+  out.push(heading(boxTypeHeading(t, type), HeadingLevel.HEADING_3));
   subset.forEach((b) => {
-    const lab = (b.label && b.label.trim()) ? b.label.trim() : '（ラベル未設定）';
+    const lab = (b.label && b.label.trim()) ? b.label.trim() : t('exportReport:noLabel');
     const sub = b.subLabel && b.subLabel.trim() ? ` [${b.subLabel.trim()}]` : '';
-    const refSfx = includeRefs ? sourceRefSuffix(b.sourceRefs, transcripts, participantsLookup, style) : '';
+    const refSfx = includeRefs ? sourceRefSuffix(t, b.sourceRefs, transcripts, participantsLookup, style) : '';
     // 種別「その他」は利用者が付けた種別ラベルを添える
     const custom = type === 'other' && (b.customTypeLabel ?? '').trim()
-      ? `（種別: ${(b.customTypeLabel ?? '').trim()}）` : '';
+      ? t('exportReport:box.customType', { type: (b.customTypeLabel ?? '').trim() }) : '';
     // この見出しが併記種別側なら、主種別を添える
     const asSecondary = b.type !== type
-      ? `（主種別: ${BOX_TYPE_LABEL_JA[b.type]} との併記）` : '';
-    out.push(bullet(`${b.id}${sub} 〈${lab}〉${custom}${asSecondary}${descSuffix(omit, b.description, b.noDescriptionNeeded)}${refSfx}`));
+      ? t('exportReport:box.asSecondary', { type: boxTypeHeading(t, b.type) }) : '';
+    out.push(bullet(t, `${b.id}${sub} ${wrapLabel(t, lab)}${custom}${asSecondary}${descSuffix(t, omit, b.description, b.noDescriptionNeeded)}${refSfx}`));
   });
   out.push(para(''));
   return out;
 }
 
-function lineTypeLabel(t: Line['type']): string {
-  if (t === 'RLine') return '実線（実現された径路）';
-  if (t === 'XLine') return '点線（未実現／潜在的径路）';
-  return String(t);
+function lineTypeLabel(t: Tr, type: Line['type']): string {
+  if (type === 'RLine') return t('exportReport:lineType.RLine');
+  if (type === 'XLine') return t('exportReport:lineType.XLine');
+  return String(type);
 }
 
 function formatLines(
+  t: Tr,
   lines: Line[],
   boxes: Box[],
   transcripts: Transcript[],
@@ -245,13 +257,13 @@ function formatLines(
 ): Paragraph[] {
   if (lines.length === 0) return [];
   const out: Paragraph[] = [];
-  out.push(heading('径路 (Line)', HeadingLevel.HEADING_3));
+  out.push(heading(t('exportReport:heading.lines'), HeadingLevel.HEADING_3));
 
   const labelOf = (id: string): string => {
     const b = boxes.find((x) => x.id === id);
     if (!b) return id;
-    const txt = (b.label && b.label.trim()) ? b.label.trim() : '（ラベル未設定）';
-    return `${b.id}〈${txt}〉`;
+    const txt = (b.label && b.label.trim()) ? b.label.trim() : t('exportReport:noLabel');
+    return `${b.id}${wrapLabel(t, txt)}`;
   };
 
   const groups: Array<{ type: Line['type']; items: Line[] }> = [
@@ -261,24 +273,25 @@ function formatLines(
 
   for (const g of groups) {
     if (g.items.length === 0) continue;
-    out.push(bullet(lineTypeLabel(g.type)));
+    out.push(bullet(t, lineTypeLabel(t, g.type)));
     g.items.forEach((l) => {
-      const labelPart = l.label && l.label.trim() ? ` 〈${l.label.trim()}〉` : '';
-      const refSfx = includeRefs ? sourceRefSuffix(l.sourceRefs, transcripts, participantsLookup, style) : '';
-      out.push(bullet(`${l.id}${labelPart}: ${labelOf(l.from)} → ${labelOf(l.to)}${descSuffix(omit, l.description, l.noDescriptionNeeded)}${refSfx}`, 1));
+      const labelPart = l.label && l.label.trim() ? ` ${wrapLabel(t, l.label.trim())}` : '';
+      const refSfx = includeRefs ? sourceRefSuffix(t, l.sourceRefs, transcripts, participantsLookup, style) : '';
+      out.push(bullet(t, `${l.id}${labelPart}: ${labelOf(l.from)} → ${labelOf(l.to)}${descSuffix(t, omit, l.description, l.noDescriptionNeeded)}${refSfx}`, 1));
     });
   }
   out.push(para(''));
   return out;
 }
 
-function sdsgTypeLabel(t: SDSG['type']): string {
-  return t === 'SD'
-    ? '社会的方向づけ (SD)'
-    : '社会的支援 (SG)';
+function sdsgTypeLabel(t: Tr, type: SDSG['type']): string {
+  return type === 'SD'
+    ? t('exportReport:sdsg.SD')
+    : t('exportReport:sdsg.SG');
 }
 
 function formatSdsg(
+  t: Tr,
   sdsgs: SDSG[],
   boxes: Box[],
   lines: Line[],
@@ -296,8 +309,8 @@ function formatSdsg(
       if (kind === 'box') {
         const b = boxes.find((x) => x.id === id);
         if (!b) return id;
-        const t = (b.label && b.label.trim()) ? b.label.trim() : '（ラベル未設定）';
-        return `${b.id}〈${t}〉`;
+        const txt = (b.label && b.label.trim()) ? b.label.trim() : t('exportReport:noLabel');
+        return `${b.id}${wrapLabel(t, txt)}`;
       } else {
         const l = lines.find((x) => x.id === id);
         if (!l) return id;
@@ -307,7 +320,7 @@ function formatSdsg(
     const a1 = refOf(s.attachedTo, s.attachedType);
     if (s.anchorMode === 'between' && s.attachedTo2 && s.attachedType2) {
       const a2 = refOf(s.attachedTo2, s.attachedType2);
-      return `${a1} と ${a2} の間`;
+      return t('exportReport:sdsg.between', { a: a1, b: a2 });
     }
     return a1;
   };
@@ -315,12 +328,12 @@ function formatSdsg(
   for (const type of ['SD', 'SG'] as const) {
     const subset = sdsgs.filter((s) => s.type === type);
     if (subset.length === 0) continue;
-    out.push(heading(sdsgTypeLabel(type), HeadingLevel.HEADING_3));
+    out.push(heading(sdsgTypeLabel(t, type), HeadingLevel.HEADING_3));
     subset.forEach((s) => {
-      const lab = (s.label && s.label.trim()) ? s.label.trim() : '（ラベル未設定）';
+      const lab = (s.label && s.label.trim()) ? s.label.trim() : t('exportReport:noLabel');
       const sub = s.subLabel && s.subLabel.trim() ? ` [${s.subLabel.trim()}]` : '';
-      const refSfx = includeRefs ? sourceRefSuffix(s.sourceRefs, transcripts, participantsLookup, style) : '';
-      out.push(bullet(`${s.id}${sub} 〈${lab}〉  対象: ${attachedLabel(s)}${descSuffix(omit, s.description, s.noDescriptionNeeded)}${refSfx}`));
+      const refSfx = includeRefs ? sourceRefSuffix(t, s.sourceRefs, transcripts, participantsLookup, style) : '';
+      out.push(bullet(t, `${s.id}${sub} ${wrapLabel(t, lab)}${t('exportReport:sdsg.target', { target: attachedLabel(s) })}${descSuffix(t, omit, s.description, s.noDescriptionNeeded)}${refSfx}`));
     });
     out.push(para(''));
   }
@@ -332,6 +345,7 @@ function formatSdsg(
 // ----------------------------------------------------------------------------
 
 function buildSheetResults(
+  t: Tr,
   sheet: Sheet,
   layout: LayoutDirection,
   multiSheet: boolean,
@@ -344,58 +358,55 @@ function buildSheetResults(
 ): Paragraph[] {
   const out: Paragraph[] = [];
   if (multiSheet) {
-    out.push(heading(`シート: ${sheet.name}`, HeadingLevel.HEADING_2));
+    out.push(heading(t('exportReport:sheet.heading', { name: sheet.name }), HeadingLevel.HEADING_2));
   }
 
   // カウンタ
-  const summary: string[] = [];
-  summary.push(`Box ${sheet.boxes.length} 件`);
-  summary.push(`径路 ${sheet.lines.length} 件`);
-  summary.push(`SD/SG ${sheet.sdsg.length} 件`);
-  summary.push(`時期区分 ${sheet.periodLabels.length} 件`);
-  out.push(para(`本シートの図要素: ${summary.join(' / ')}`));
+  out.push(para(t('exportReport:sheet.summary', {
+    boxes: sheet.boxes.length, lines: sheet.lines.length, sdsg: sheet.sdsg.length, periods: sheet.periodLabels.length,
+  })));
   out.push(para(''));
 
   // 時期区分（先頭）
-  out.push(...formatPeriodLabels(sheet.periodLabels, layout));
+  out.push(...formatPeriodLabels(t, sheet.periodLabels, layout));
 
   // Box 種別ごと
-  for (const t of BOX_TYPE_ORDER) {
-    out.push(...formatBoxesByType(sheet.boxes, t, transcripts, participantsLookup, includeRefs, style, omit));
+  for (const type of BOX_TYPE_ORDER) {
+    out.push(...formatBoxesByType(t, sheet.boxes, type, transcripts, participantsLookup, includeRefs, style, omit));
   }
 
   // 径路
-  out.push(...formatLines(sheet.lines, sheet.boxes, transcripts, participantsLookup, includeRefs, style, omit));
+  out.push(...formatLines(t, sheet.lines, sheet.boxes, transcripts, participantsLookup, includeRefs, style, omit));
 
   // SD / SG
-  out.push(...formatSdsg(sheet.sdsg, sheet.boxes, sheet.lines, transcripts, participantsLookup, includeRefs, style, omit));
+  out.push(...formatSdsg(t, sheet.sdsg, sheet.boxes, sheet.lines, transcripts, participantsLookup, includeRefs, style, omit));
 
   // 図上のメモ（記号＝文字だけのメモは除く）。確認画面の選択: すべて／「載せる」にしたものだけ／載せない
   const notesChoice = content.notes ?? 'flagged';
   const reportNotes = notesChoice === 'none' ? [] : (sheet.notes ?? []).filter((n) =>
     n.style !== 'text' && (n.text ?? '').trim() && (notesChoice === 'all' || n.includeInReport));
   if (reportNotes.length > 0) {
-    out.push(heading('注記（図上のメモ）', HeadingLevel.HEADING_3));
+    out.push(heading(t('exportReport:heading.notes'), HeadingLevel.HEADING_3));
     reportNotes.forEach((n) => {
-      const target = n.showLeader && n.leaderTo ? `（→ ${n.leaderTo}）` : '';
-      out.push(bullet(`${n.id}${target} ${n.text.trim().replace(/\s*\n\s*/g, ' ')}`));
+      const target = n.showLeader && n.leaderTo ? t('exportReport:note.target', { target: n.leaderTo }) : '';
+      out.push(bullet(t, `${n.id}${target} ${n.text.trim().replace(/\s*\n\s*/g, ' ')}`));
     });
     out.push(para(''));
   }
 
   // コメント（確認画面で「載せる」を選んだときだけ）
   if (content.comments && (sheet.comments?.length ?? 0) > 0) {
-    out.push(heading('コメント', HeadingLevel.HEADING_3));
+    out.push(heading(t('exportReport:heading.comments'), HeadingLevel.HEADING_3));
     const nameOf = (id: string) => {
       const b = sheet.boxes.find((x) => x.id === id);
-      if (b) return `${b.id}〈${(b.label ?? '').trim() || '（ラベル未設定）'}〉`;
+      if (b) return `${b.id}${wrapLabel(t, (b.label ?? '').trim() || t('exportReport:noLabel'))}`;
       return id;
     };
-    const oneLine = (t: string) => t.trim().replace(/\s*\n\s*/g, ' ');
+    const oneLine = (s: string) => s.trim().replace(/\s*\n\s*/g, ' ');
     sheet.comments.forEach((c) => {
-      const st = c.resolved ? '（解決済み）' : '';
-      out.push(bullet(`${nameOf(c.targetId)}: ${oneLine(c.text)}${st}`));
-      (c.replies ?? []).forEach((r) => out.push(bullet(`返信: ${oneLine(r.text)}`, 1)));
+      const st = c.resolved ? t('exportReport:comment.resolved') : '';
+      out.push(bullet(t, `${nameOf(c.targetId)}: ${oneLine(c.text)}${st}`));
+      (c.replies ?? []).forEach((r) => out.push(bullet(t, t('exportReport:comment.reply', { text: oneLine(r.text) }), 1)));
     });
     out.push(para(''));
   }
@@ -407,25 +418,15 @@ function buildSheetResults(
 // 用語凡例
 // ----------------------------------------------------------------------------
 
-function buildGlossary(sectionTitle: string): Paragraph[] {
+/** 用語凡例の行（並び順） */
+const GLOSSARY_KEYS = ['OPP', 'BFP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'SD', 'SG', 'RLine', 'XLine', 'timeArrow'] as const;
+
+function buildGlossary(t: Tr, sectionTitle: string): Paragraph[] {
   const out: Paragraph[] = [];
   out.push(heading(sectionTitle, HeadingLevel.HEADING_1));
-  out.push(para('図中で用いた略語は以下のとおりである。'));
-  const items: Array<[string, string]> = [
-    ['OPP', '必須通過点 (Obligatory Passage Point)'],
-    ['BFP', '分岐点 (Bifurcation Point)'],
-    ['EFP', '等至点 (Equifinality Point)'],
-    ['P-EFP', '両極化した等至点 (Polarized Equifinality Point)'],
-    ['2nd EFP', '第2等至点 (Second Equifinality Point)'],
-    ['P-2nd EFP', '両極化した第2等至点 (Polarized Second Equifinality Point)'],
-    ['SD', '社会的方向づけ (Social Direction)'],
-    ['SG', '社会的支援 (Social Guidance)'],
-    ['実線矢印', '実現された径路（実際に辿られた経路）'],
-    ['点線矢印', '未実現／潜在的径路'],
-    ['非可逆的時間', '左から右（または上から下）へ向かう時間軸'],
-  ];
-  for (const [abbr, full] of items) {
-    out.push(bullet(`${abbr}: ${full}`));
+  out.push(para(t('exportReport:glossary.intro')));
+  for (const k of GLOSSARY_KEYS) {
+    out.push(bullet(t, t(`exportReport:glossary.${k}`)));
   }
   out.push(para(''));
   return out;
@@ -436,6 +437,7 @@ function buildGlossary(sectionTitle: string): Paragraph[] {
 // ----------------------------------------------------------------------------
 
 function buildResultsSection(
+  t: Tr,
   doc: TEMDocument,
   includeRefs: boolean,
   style: 'bracket' | 'apa',
@@ -453,20 +455,20 @@ function buildResultsSection(
   }
 
   // テンプレート文（編集前提のドラフト）
-  out.push(para('本研究では，TEM（複線径路等至性モデル）を用いて分析を行い，その結果を上記の TEM 図に示した。'));
-  out.push(para('以下では，図中に描かれた要素（時期区分・各種事象・径路・社会的影響）を漏れなく列挙する。事象や経験のラベルは慣例に従い〈…〉で括って示す。'));
+  out.push(para(t('exportReport:results.intro')));
+  out.push(para(t('exportReport:results.listing')));
   if (includeRefs && doc.transcripts.length > 0) {
     if (style === 'apa') {
-      out.push(para('各要素の末尾には，紐付くインタビュー原文の引用を APA 風の括弧表記「（協力者, 第N回, §段落）「…」」 で示す。'));
+      out.push(para(t('exportReport:results.refs.apa')));
     } else {
-      out.push(para('各要素の末尾には，紐付くインタビュー原文の引用を [原文 T<番号> §<段落>]「…」 の形式で示す。'));
+      out.push(para(t('exportReport:results.refs.bracket')));
     }
   }
   out.push(para(''));
 
   const multiSheet = doc.sheets.length > 1;
   for (const sheet of doc.sheets) {
-    out.push(...buildSheetResults(sheet, doc.settings.layout, multiSheet, doc.transcripts, participantsLookup, includeRefs, style, content, omit));
+    out.push(...buildSheetResults(t, sheet, doc.settings.layout, multiSheet, doc.transcripts, participantsLookup, includeRefs, style, content, omit));
   }
   return out;
 }
@@ -481,12 +483,15 @@ export async function buildPaperReportParagraphs(
   opts: PaperReportOptions,
 ): Promise<Paragraph[]> {
   const children: Paragraph[] = [];
+  // 本文は図の言語（凡例と同じ doc.settings.locale）。画面の言語ではない
+  const lng = doc.settings.locale ?? 'ja';
+  const t = makeTr(lng);
 
   // タイトル
   children.push(new Paragraph({
     heading: HeadingLevel.TITLE,
     alignment: AlignmentType.CENTER,
-    children: [new TextRun({ text: doc.metadata.title || 'TEM 図報告', bold: true })],
+    children: [new TextRun({ text: doc.metadata.title || t('exportReport:title.default'), bold: true })],
   }));
   if (doc.metadata.author) {
     children.push(new Paragraph({
@@ -501,7 +506,7 @@ export async function buildPaperReportParagraphs(
   // 節の番号は出力する節だけで振る（未入力の節を省いても番号が飛ばないように）
   let secNo = 0;
   const section = (title: string) => children.push(heading(`${++secNo}. ${title}`, HeadingLevel.HEADING_1));
-  const missingPara = () => children.push(para('（未入力）', { italic: true }));
+  const missingPara = () => children.push(para(t('exportReport:notEntered'), { italic: true }));
 
   // 1. 記号体系（Block 1）
   const ns = doc.metadata.notationSystem;
@@ -513,15 +518,15 @@ export async function buildPaperReportParagraphs(
   // 各要素の線種と線種が表す意味は、今の図の実際の線種から書く（設定画面のテーマで選んだ表記がそのまま出る）
   const notation = describeNotation(doc);
   if (ns || notation || symbolLines.length > 0 || !omit) {
-    section('記号体系の宣言');
+    section(t('exportReport:section.notation'));
     if (ns) {
       // 「準拠」ではなく「参照」と書く（荒川ら 2012 は自らの手順を標準ではないとしている。論文 Block 1）
       children.push(para(
         ns.base === 'Arakawa2012'
-          ? '本図の記号は，荒川・安田・サトウ（2012）を参照した TEMerPlus の既定の表記による。'
+          ? t('exportReport:notation.arakawa')
           : ns.base === 'custom'
-            ? '本図は独自の記号体系を用いる（下記参照）。'
-            : 'その他の記号体系を用いる（下記参照）。'
+            ? t('exportReport:notation.custom')
+            : t('exportReport:notation.other')
       ));
       if (ns.customDescription) children.push(para(ns.customDescription));
     } else if (!omit) {
@@ -529,12 +534,12 @@ export async function buildPaperReportParagraphs(
     }
     if (notation) {
       children.push(para(notation.meaning));
-      children.push(para('各要素の枠の線種は次のとおりである。'));
-      notation.lines.forEach((l) => children.push(bullet(l)));
+      children.push(para(t('exportReport:notation.lines')));
+      notation.lines.forEach((l) => children.push(bullet(t, l)));
     }
     if (symbolLines.length > 0) {
-      children.push(para('図中の記号の意味は次のとおりである。'));
-      symbolLines.forEach((x) => children.push(bullet(`${x.sym}: ${x.meaning || '（意味未記入）'}`)));
+      children.push(para(t('exportReport:notation.symbols')));
+      symbolLines.forEach((x) => children.push(bullet(t, `${x.sym}: ${x.meaning || t('exportReport:notation.symbolNoMeaning')}`)));
     }
     children.push(para(''));
   }
@@ -543,14 +548,14 @@ export async function buildPaperReportParagraphs(
   const pi = doc.metadata.participantsInfo;
   const piLines: string[] = [];
   if (pi) {
-    if (pi.count > 0) piLines.push(`協力者数: ${pi.count} 名`);
-    if (pi.description) piLines.push(`記述: ${pi.description}`);
-    if (pi.hsiDescription) piLines.push(`HSI 水準: ${pi.hsiDescription}`);
-    if (pi.pseudonyms && pi.pseudonyms.length) piLines.push(`仮名: ${pi.pseudonyms.join(', ')}`);
+    if (pi.count > 0) piLines.push(t('exportReport:participants.count', { count: pi.count }));
+    if (pi.description) piLines.push(t('exportReport:participants.description', { text: pi.description }));
+    if (pi.hsiDescription) piLines.push(t('exportReport:participants.hsi', { text: pi.hsiDescription }));
+    if (pi.pseudonyms && pi.pseudonyms.length) piLines.push(t('exportReport:participants.pseudonyms', { names: pi.pseudonyms.join(', ') }));
   }
   if (piLines.length > 0 || !omit) {
-    section('協力者情報');
-    if (piLines.length > 0) piLines.forEach((t) => children.push(para(t)));
+    section(t('exportReport:section.participants'));
+    if (piLines.length > 0) piLines.forEach((line) => children.push(para(line)));
     else missingPara();
     children.push(para(''));
   }
@@ -559,15 +564,15 @@ export async function buildPaperReportParagraphs(
   const iv = doc.metadata.interview;
   const ivLines: string[] = [];
   if (iv) {
-    if (iv.method) ivLines.push(`方法: ${iv.method}`);
-    if (iv.durationDescription) ivLines.push(`所要時間/期間: ${iv.durationDescription}`);
-    if (iv.timesCount > 0) ivLines.push(`回数: ${iv.timesCount} 回`);
-    if (iv.analysisCombination) ivLines.push(`分析の組合せ: ${iv.analysisCombination}`);
-    if (iv.notes) ivLines.push(`備考: ${iv.notes}`);
+    if (iv.method) ivLines.push(t('exportReport:interview.method', { text: iv.method }));
+    if (iv.durationDescription) ivLines.push(t('exportReport:interview.duration', { text: iv.durationDescription }));
+    if (iv.timesCount > 0) ivLines.push(t('exportReport:interview.times', { count: iv.timesCount }));
+    if (iv.analysisCombination) ivLines.push(t('exportReport:interview.analysis', { text: iv.analysisCombination }));
+    if (iv.notes) ivLines.push(t('exportReport:interview.notes', { text: iv.notes }));
   }
   if (ivLines.length > 0 || !omit) {
-    section('インタビュー方法');
-    if (ivLines.length > 0) ivLines.forEach((t) => children.push(para(t)));
+    section(t('exportReport:section.interview'));
+    if (ivLines.length > 0) ivLines.forEach((line) => children.push(para(line)));
     else missingPara();
     children.push(para(''));
   }
@@ -577,26 +582,28 @@ export async function buildPaperReportParagraphs(
   const convLines: string[] = [];
   for (const it of VISUAL_CONVENTION_ITEMS) {
     const ent: VisualConventionEntry | undefined = vc?.[it.key];
+    const label = conventionItemLabel(it.key, lng);
     if (!ent) {
-      if (!omit) convLines.push(`${it.label}: （未入力）`);
+      if (!omit) convLines.push(t('exportReport:convention.notEntered', { label }));
       continue;
     }
     const meaning = resolveConventionMeaning(ent);
     const desc = (ent.description ?? '').trim();
-    const descOrMissing = desc || (omit ? '' : '（説明未記入）');
-    convLines.push(
-      meaning === 'yes'   ? `${it.label}: 意味あり。${descOrMissing}` :
-      meaning === 'loose' ? `${it.label}: 緩やかに意味あり。${descOrMissing}` :
-                            `${it.label}: 意味なし（見栄えのみ）`
-    );
+    const descOrMissing = desc || (omit ? '' : t('exportReport:convention.noDescription'));
+    // 説明が無いとき英語の文末に空白が残るので落とす（日本語は元から空白で終わらない）
+    convLines.push((
+      meaning === 'yes'   ? t('exportReport:convention.yes', { label, description: descOrMissing }) :
+      meaning === 'loose' ? t('exportReport:convention.loose', { label, description: descOrMissing }) :
+                            t('exportReport:convention.no', { label })
+    ).trimEnd());
   }
   vc?.other?.forEach((o) => convLines.push(`${o.aspect}: ${o.description}`));
   if (convLines.length > 0 || doc.metadata.reportNotes || !omit) {
-    section('表記方針');
-    convLines.forEach((t) => children.push(para(t)));
+    section(t('exportReport:section.visual'));
+    convLines.forEach((line) => children.push(para(line)));
     if (doc.metadata.reportNotes) {
       children.push(para(''));
-      children.push(heading('補足', HeadingLevel.HEADING_2));
+      children.push(heading(t('exportReport:heading.reportNotes'), HeadingLevel.HEADING_2));
       children.push(para(doc.metadata.reportNotes));
     }
     children.push(para(''));
@@ -604,7 +611,7 @@ export async function buildPaperReportParagraphs(
 
   // 5. 図（埋込）
   if (opts.includeDiagram && opts.diagramElementId) {
-    section('TEM 図');
+    section(t('exportReport:section.diagram'));
     try {
       const el = document.getElementById(opts.diagramElementId);
       if (el) {
@@ -632,8 +639,8 @@ export async function buildPaperReportParagraphs(
         }));
       }
     } catch (e) {
-      console.warn('図の埋め込みに失敗:', e);
-      children.push(para('（図の埋め込みに失敗しました）', { italic: true }));
+      console.warn('図の埋め込みに失敗:', e); // i18n-ok（開発者向けのログ）
+      children.push(para(t('exportReport:diagram.failed'), { italic: true }));
     }
     children.push(para(''));
   }
@@ -641,10 +648,10 @@ export async function buildPaperReportParagraphs(
   // 6. 結果（漏れなく図要素を列挙）
   const includeRefs = opts.includeSourceRefs !== false;   // 既定 true
   const style = opts.sourceRefStyle ?? 'bracket';
-  children.push(...buildResultsSection(doc, includeRefs, style, content, `${++secNo}. 結果`, omit));
+  children.push(...buildResultsSection(t, doc, includeRefs, style, content, `${++secNo}. ${t('exportReport:section.results')}`, omit));
 
   // 7. 用語凡例
-  children.push(...buildGlossary(`${++secNo}. 用語凡例（図中略語の説明）`));
+  children.push(...buildGlossary(t, `${++secNo}. ${t('exportReport:section.glossary')}`));
 
   return children;
 }

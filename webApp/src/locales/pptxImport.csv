@@ -1,0 +1,52 @@
+﻿key,ja,en,note
+error.notpptx,PowerPoint のファイルとして読めませんでした（ppt/presentation.xml がありません）,Could not read the file as PowerPoint (ppt/presentation.xml is missing),PowerPoint の取り込み > ファイルを開いたときのエラー
+role.sdsglabel,SD/SG のラベル,SD/SG label,PowerPoint の取り込み > 図形の役割の名前（画面の表示は pptxImportDialog.csv 側）
+role.sublabel,サブラベル（Box・SD/SG の下の文字）,Sublabel (text below a Box or SD/SG),PowerPoint の取り込み > 図形の役割の名前
+role.line,Line（矢印）,Line (arrow),PowerPoint の取り込み > 図形の役割の名前
+role.period,時期ラベル,Period label,PowerPoint の取り込み > 図形の役割の名前
+role.note,メモ（付箋）,Note (sticky),PowerPoint の取り込み > 図形の役割の名前
+role.timearrow,時間の矢印（取り込まない）,Time arrow (not imported),PowerPoint の取り込み > 図形の役割の名前
+role.ignore,（無視）,(Ignore),PowerPoint の取り込み > 図形の役割の名前
+reason.sep,・,"; ",PowerPoint の取り込み > 推測の理由を 2 つ以上つなぐ区切り
+reason.typeprefix,本文の先頭の種別名,Type name at the start of the text,PowerPoint の取り込み > 図形の役割を推測した理由（Box の種別）
+reason.double,二重線,Double outline,PowerPoint の取り込み > 推測の理由（Box の種別を等至点に）
+reason.dotted,点線（潜在経験として）,Dotted outline (as latent experience),PowerPoint の取り込み > 推測の理由（Box の種別）
+reason.longarrow,横に長い矢印,Long horizontal arrow,PowerPoint の取り込み > 推測の理由（時間の矢印）
+reason.longarrowline,横に長い矢印線（両端に Box が無い）,Long horizontal arrow line (no Box at either end),PowerPoint の取り込み > 推測の理由（時間の矢印）
+reason.temername,TEMer の出力（図形の名前）,TEMer output (shape name),PowerPoint の取り込み > 推測の理由（SD/SG）
+reason.arrowdown,下向きの矢印,Downward arrow,PowerPoint の取り込み > 推測の理由（SD）
+reason.arrowup,上向きの矢印,Upward arrow,PowerPoint の取り込み > 推測の理由（SG）
+reason.arrowleft,左向きの矢印（縦型の SD）,Leftward arrow (SD in a vertical diagram),PowerPoint の取り込み > 推測の理由（SD）
+reason.arrowright,右向きの矢印（縦型の SG）,Rightward arrow (SG in a vertical diagram),PowerPoint の取り込み > 推測の理由（SG）
+reason.arrowdiagonal,向きが斜め（SD と仮定）,Diagonal direction (assumed SD),PowerPoint の取り込み > 推測の理由（SD）
+reason.onsdsg,SD/SG の図形に重なる文字,Text over an SD/SG shape,PowerPoint の取り込み > 推測の理由（SD/SG のラベル）
+reason.table,表（背景の枠として）,Table (as a background frame),PowerPoint の取り込み > 推測の理由（無視）
+reason.picture,画像,Image,PowerPoint の取り込み > 推測の理由（無視）
+reason.dashedarrow,点線の矢印,Dashed arrow,PowerPoint の取り込み > 推測の理由（Line）
+reason.solidarrow,実線の矢印,Solid arrow,PowerPoint の取り込み > 推測の理由（Line）
+reason.nohead,矢じりの無い線（区切り線など）,Line without an arrowhead (e.g. a divider),PowerPoint の取り込み > 推測の理由（無視）
+reason.notext,文字の無い図形,Shape without text,PowerPoint の取り込み > 推測の理由（無視）
+reason.period,「第N期」で始まる,Starts with a period name (e.g. Phase N),PowerPoint の取り込み > 推測の理由（時期ラベル）
+reason.timelabel,時間の矢印のラベル,Label of the time arrow,PowerPoint の取り込み > 推測の理由（無視）
+reason.merged,重なっていた文字（{{count}} 個）を合流,Merged {{count}} overlapping text(s),PowerPoint の取り込み > 推測の理由（Box）
+reason.framedtext,枠のある文字,Text in a frame,PowerPoint の取り込み > 推測の理由（Box）
+reason.unframedtext,枠の無い文字,Text without a frame,PowerPoint の取り込み > 推測の理由（メモ）
+reason.legend,凡例,Legend,PowerPoint の取り込み > 推測の理由（無視）
+reason.sdsgbadge,SD/SG の種別バッジ,SD/SG type badge,PowerPoint の取り込み > 推測の理由（無視）
+reason.badge,隣の種別バッジ,Adjacent type badge,PowerPoint の取り込み > 推測の理由（Box の種別）
+reason.badgeself,種別バッジ（隣の Box の種別に反映）,Type badge (applied to the adjacent Box),PowerPoint の取り込み > 推測の理由（無視）
+reason.sublabel,すぐ上の要素のサブラベル,Sublabel of the element just above,PowerPoint の取り込み > 推測の理由（サブラベル）
+quote,「{{text}}」,“{{text}}”,PowerPoint の取り込み > 警告の中で図形の文字を囲むかぎ括弧
+listsep,、,", ",PowerPoint の取り込み > 警告の中で図形の文字を並べる区切り
+arrow.where,"矢印（{{x1}},{{y1}} → {{x2}},{{y2}} pt）","Arrow ({{x1}},{{y1}} → {{x2}},{{y2}} pt)",PowerPoint の取り込み > 警告の頭に付く矢印の位置
+warn.skipped,位置を持たない図形（プレースホルダーなど）{{count}} 個は取り込めませんでした: {{list}},Could not import {{count}} shape(s) without a position (e.g. placeholders): {{list}},PowerPoint の取り込み > 警告
+warn.arrow.nostart,{{where}}: 始点の近くに Box が見つからないため取り込みませんでした,{{where}}: not imported (no Box near the start point),PowerPoint の取り込み > 警告（矢印）
+warn.arrow.noend,{{where}}: 終点の近くに Box が見つからないため取り込みませんでした,{{where}}: not imported (no Box near the end point),PowerPoint の取り込み > 警告（矢印）
+warn.arrow.samebox,{{where}}: 両端が同じ Box「{{label}}」になるため取り込みませんでした,{{where}}: not imported (both ends attach to the same Box “{{label}}”),PowerPoint の取り込み > 警告（矢印）
+warn.arrow.duplicate,{{where}}: 「{{from}}」→「{{to}}」は既にあるため重複を省きました,{{where}}: duplicate skipped (“{{from}}” → “{{to}}” already exists),PowerPoint の取り込み > 警告（矢印）
+warn.sdsglabel.unresolved,「{{text}}」: どの SD/SG のラベルか決まらないため使いませんでした,“{{text}}”: not used (could not tell which SD/SG it labels),PowerPoint の取り込み > 警告
+warn.sdsg.nolabel,"{{type}}（{{x}},{{y}} pt）: ラベルになる文字が見つかりませんでした（空のまま取り込みます）","{{type}} ({{x}},{{y}} pt): no text found for the label (imported with an empty label)",PowerPoint の取り込み > 警告（SD/SG）
+warn.sdsg.nobox,{{type}}「{{label}}」: 紐付ける Box が無いため取り込みませんでした,{{type}} “{{label}}”: not imported (no Box to attach to),PowerPoint の取り込み > 警告（SD/SG）
+warn.sublabel.unresolved,「{{text}}」: どの Box・SD/SG のサブラベルか決まらないため使いませんでした,“{{text}}”: not used (could not tell which Box or SD/SG it belongs to),PowerPoint の取り込み > 警告
+warn.nobox,Box が 1 つもありません。図形の役割を確認してください,No Boxes. Check the roles of the shapes.,PowerPoint の取り込み > 警告
+warn.unlinked,矢印でつながっていない Box が {{count}} 個あります（元の図に矢印が無い場合は取り込み後に引いてください）,"{{count}} Box(es) are not connected by arrows (if the original diagram has none, draw them after importing)",PowerPoint の取り込み > 警告

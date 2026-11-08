@@ -1,0 +1,25 @@
+﻿key,ja,en,note
+field.ignore,（無視）,(Ignore),CSV・表の取り込み > 列の割り当ての選択肢（取り込まない列）
+field.label,ラベル,Label,CSV・表の取り込み > 列の割り当ての選択肢
+field.type,種別,Type,CSV・表の取り込み > Box の列の割り当ての選択肢
+field.sublabel,サブラベル,Sublabel,CSV・表の取り込み > 列の割り当ての選択肢
+field.description,説明,Description,CSV・表の取り込み > 列の割り当ての選択肢
+field.width,幅,Width,CSV・表の取り込み > Box の列の割り当ての選択肢
+field.height,高さ,Height,CSV・表の取り込み > Box の列の割り当ての選択肢
+line.type,種別 (RLine/XLine),Type (RLine/XLine),CSV・表の取り込み > Line の列の割り当ての選択肢
+line.shape,形状 (straight/elbow/curve),Shape (straight/elbow/curve),CSV・表の取り込み > Line の列の割り当ての選択肢
+sdsg.type,種別 (SD/SG),Type (SD/SG),CSV・表の取り込み > SD/SG の列の割り当ての選択肢
+sdsg.attachedto,紐付け対象 (attachedTo),Attached to (attachedTo),CSV・表の取り込み > SD/SG の列の割り当ての選択肢
+sdsg.attachedto2,2 つ目の対象 (attachedTo2),Second target (attachedTo2),CSV・表の取り込み > SD/SG の列の割り当ての選択肢
+sdsg.anchormode,アンカー方式 (single/between),Anchor mode (single/between),CSV・表の取り込み > SD/SG の列の割り当ての選択肢
+sdsg.spacemode,配置モード (attached/band-top/band-bottom),Placement (attached/band-top/band-bottom),CSV・表の取り込み > SD/SG の列の割り当ての選択肢
+period.position,位置 (Time Level),Position (Time Level),CSV・表の取り込み > 時期ラベルの列の割り当ての選択肢
+error.nolabel,行 {{row}}: ラベルが空のためスキップ,Row {{row}}: skipped (empty label),CSV・表の取り込み > 取り込めなかった行の一覧（Box・時期ラベル）
+error.levelnan,行 {{row}}: Level が数値でないためスキップ,Row {{row}}: skipped (Level is not a number),CSV・表の取り込み > 取り込めなかった行の一覧（Box）
+error.line.noends,行 {{row}}: from/to が空のためスキップ,Row {{row}}: skipped (from/to is empty),CSV・表の取り込み > 取り込めなかった行の一覧（Line）
+error.line.nofrom,行 {{row}}: from={{id}} に該当する Box がないためスキップ,Row {{row}}: skipped (no Box with from={{id}}),CSV・表の取り込み > 取り込めなかった行の一覧（Line）
+error.line.noto,行 {{row}}: to={{id}} に該当する Box がないためスキップ,Row {{row}}: skipped (no Box with to={{id}}),CSV・表の取り込み > 取り込めなかった行の一覧（Line）
+error.sdsg.noattached,行 {{row}}: attachedTo が空のためスキップ,Row {{row}}: skipped (attachedTo is empty),CSV・表の取り込み > 取り込めなかった行の一覧（SD/SG）
+error.sdsg.attachednotfound,行 {{row}}: attachedTo={{id}} に該当する Box/Line がないためスキップ,Row {{row}}: skipped (no Box/Line with attachedTo={{id}}),CSV・表の取り込み > 取り込めなかった行の一覧（SD/SG）
+error.sdsg.attached2notfound,行 {{row}}: attachedTo2={{id}} に該当する Box/Line がないため undefined 扱い,Row {{row}}: no Box/Line with attachedTo2={{id}} (left unset),CSV・表の取り込み > 取り込めなかった行の一覧（SD/SG。行は取り込む）
+error.period.positionnan,行 {{row}}: 位置 (position) が数値でないためスキップ,Row {{row}}: skipped (position is not a number),CSV・表の取り込み > 取り込めなかった行の一覧（時期ラベル）

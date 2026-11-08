@@ -7,6 +7,7 @@
 import Papa from 'papaparse';
 import type { Box, BoxType, Line, LineType, LineShape, SDSG, SDSGType, PeriodLabel, TextOrientation } from '../types';
 import { decodeCsvBytes } from './tabularFile';
+import i18n from '../i18n';
 
 export type CsvFieldKind =
   | 'ignore'
@@ -20,17 +21,18 @@ export type CsvFieldKind =
   | 'width'
   | 'height';
 
+// 表示名は画面の言語で毎回引く（getter）。呼び出し側はキーの順だけを使う
 export const FIELD_LABELS: Record<CsvFieldKind, string> = {
-  ignore: '（無視）',
-  label: 'ラベル',
-  type: '種別',
+  get ignore() { return i18n.t('csvImport:field.ignore'); },
+  get label() { return i18n.t('csvImport:field.label'); },
+  get type() { return i18n.t('csvImport:field.type'); },
   timeLevel: 'Time Level',
   itemLevel: 'Item Level',
   id: 'ID',
-  subLabel: 'サブラベル',
-  description: '説明',
-  width: '幅',
-  height: '高さ',
+  get subLabel() { return i18n.t('csvImport:field.sublabel'); },
+  get description() { return i18n.t('csvImport:field.description'); },
+  get width() { return i18n.t('csvImport:field.width'); },
+  get height() { return i18n.t('csvImport:field.height'); },
 };
 
 /** 種別キーワード辞書（日英両対応。小文字で比較） */
@@ -48,21 +50,29 @@ export const TYPE_DICT: Record<string, BoxType> = {
   '2ndefp': '2nd-EFP',
   'p-2nd-efp': 'P-2nd-EFP',
   // 日本語
-  '通常': 'normal',
-  'その他': 'other',
+  '通常': 'normal', // i18n-ok 利用者のファイルの値と照合
+  'その他': 'other', // i18n-ok 利用者のファイルの値と照合
   'other': 'other',
-  '経験': 'normal',
-  'イベント': 'normal',
-  '出来事': 'normal',
-  '分岐点': 'BFP',
-  '等至点': 'EFP',
-  '両極化等至点': 'P-EFP',
-  '両極化': 'P-EFP',
-  '必須通過点': 'OPP',
-  '潜在経験': 'annotation',
-  '想定': 'annotation',
-  '第二等至点': '2nd-EFP',
-  '両極化第二等至点': 'P-2nd-EFP',
+  '経験': 'normal', // i18n-ok 利用者のファイルの値と照合
+  'イベント': 'normal', // i18n-ok 利用者のファイルの値と照合
+  '出来事': 'normal', // i18n-ok 利用者のファイルの値と照合
+  '分岐点': 'BFP', // i18n-ok 利用者のファイルの値と照合
+  '等至点': 'EFP', // i18n-ok 利用者のファイルの値と照合
+  '両極化等至点': 'P-EFP', // i18n-ok 利用者のファイルの値と照合
+  '両極化': 'P-EFP', // i18n-ok 利用者のファイルの値と照合
+  '必須通過点': 'OPP', // i18n-ok 利用者のファイルの値と照合
+  '潜在経験': 'annotation', // i18n-ok 利用者のファイルの値と照合
+  '想定': 'annotation', // i18n-ok 利用者のファイルの値と照合
+  '第二等至点': '2nd-EFP', // i18n-ok 利用者のファイルの値と照合
+  '両極化第二等至点': 'P-2nd-EFP', // i18n-ok 利用者のファイルの値と照合する
+  // 英語の用語名（terms.csv の英語）。MAXQDA の取り込みが部分一致で引くので、長い語（それを含む語）を先に置く
+  'polarized second equifinality point': 'P-2nd-EFP',
+  'second equifinality point': '2nd-EFP',
+  'polarized equifinality point': 'P-EFP',
+  'equifinality point': 'EFP',
+  'bifurcation point': 'BFP',
+  'obligatory passage point': 'OPP',
+  'latent experience': 'annotation',
 };
 
 export function mapBoxType(raw: string): BoxType {
@@ -96,7 +106,7 @@ export function parseCsvText(text: string): ParsedCsv {
   if (rows.length > 0) {
     const first = rows[0];
     const allNonNumeric = first.every((c) => c !== '' && !/^-?\d+(?:\.\d+)?$/.test(c.trim()));
-    const hasHeaderKeyword = first.some((c) => /^(label|type|id|time|item|sub|description|種別|ラベル|時間|位置|説明|サブ)/i.test(c.trim()));
+    const hasHeaderKeyword = first.some((c) => /^(label|type|id|time|item|sub|description|種別|ラベル|時間|位置|説明|サブ)/i.test(c.trim())); // i18n-ok 利用者の見出しと照合
     probableHeader = allNonNumeric || hasHeaderKeyword;
   }
   return { rows, probableHeader, delimiter: delim };
@@ -117,15 +127,15 @@ export async function parseCsvFile(file: File): Promise<ParsedCsv> {
 export function guessFieldKind(header: string): CsvFieldKind {
   const h = header.trim().toLowerCase();
   if (!h) return 'ignore';
-  if (/^(label|ラベル|名前|name)$/.test(h)) return 'label';
-  if (/^(type|種別|種類|kind)$/.test(h)) return 'type';
-  if (/^(time|time[_ ]?level|時間|時間レベル|timelevel)$/i.test(h)) return 'timeLevel';
-  if (/^(item|item[_ ]?level|項目|項目レベル|itemlevel)$/i.test(h)) return 'itemLevel';
-  if (/^(id|識別)$/i.test(h)) return 'id';
-  if (/^(sub|sub[_ ]?label|subtitle|サブ|サブラベル)$/i.test(h)) return 'subLabel';
-  if (/^(desc|description|説明)$/i.test(h)) return 'description';
-  if (/^(width|w|幅)$/i.test(h)) return 'width';
-  if (/^(height|h|高さ)$/i.test(h)) return 'height';
+  if (/^(label|ラベル|名前|name)$/.test(h)) return 'label'; // i18n-ok 利用者の見出しと照合
+  if (/^(type|種別|種類|kind)$/.test(h)) return 'type'; // i18n-ok 利用者の見出しと照合
+  if (/^(time|time[_ ]?level|時間|時間レベル|timelevel)$/i.test(h)) return 'timeLevel'; // i18n-ok 利用者の見出しと照合
+  if (/^(item|item[_ ]?level|項目|項目レベル|itemlevel)$/i.test(h)) return 'itemLevel'; // i18n-ok 利用者の見出しと照合
+  if (/^(id|識別)$/i.test(h)) return 'id'; // i18n-ok 利用者の見出しと照合
+  if (/^(sub|sub[_ ]?label|subtitle|サブ|サブラベル)$/i.test(h)) return 'subLabel'; // i18n-ok 利用者の見出しと照合
+  if (/^(desc|description|説明)$/i.test(h)) return 'description'; // i18n-ok 利用者の見出しと照合
+  if (/^(width|w|幅)$/i.test(h)) return 'width'; // i18n-ok 利用者の見出しと照合
+  if (/^(height|h|高さ)$/i.test(h)) return 'height'; // i18n-ok 利用者の見出しと照合
   return 'ignore';
 }
 
@@ -211,7 +221,7 @@ export function buildBoxesFromRows(rows: string[][], opts: ImportOptions): Impor
     const labelRaw = cell(row, 'label');
     const label = (labelRaw ?? '').trim();
     if (!label) {
-      errors.push(`行 ${rowIdx + 1 + (opts.hasHeader ? 1 : 0)}: ラベルが空のためスキップ`);
+      errors.push(i18n.t('csvImport:error.nolabel', { row: rowIdx + 1 + (opts.hasHeader ? 1 : 0) }));
       return;
     }
 
@@ -233,7 +243,7 @@ export function buildBoxesFromRows(rows: string[][], opts: ImportOptions): Impor
       ? Number(ilRaw)
       : opts.baseItemLevel;
     if (!isFinite(timeLevel) || !isFinite(itemLevel)) {
-      errors.push(`行 ${rowIdx + 1}: Level が数値でないためスキップ`);
+      errors.push(i18n.t('csvImport:error.levelnan', { row: rowIdx + 1 }));
       return;
     }
 
@@ -292,37 +302,38 @@ export function buildBoxesFromRows(rows: string[][], opts: ImportOptions): Impor
 export type LineCsvFieldKind = 'ignore' | 'id' | 'from' | 'to' | 'type' | 'shape' | 'label' | 'description';
 
 export const LINE_FIELD_LABELS: Record<LineCsvFieldKind, string> = {
-  ignore: '（無視）',
+  get ignore() { return i18n.t('csvImport:field.ignore'); },
   id: 'ID',
   from: 'From',
   to: 'To',
-  type: '種別 (RLine/XLine)',
-  shape: '形状 (straight/elbow/curve)',
-  label: 'ラベル',
-  description: '説明',
+  get type() { return i18n.t('csvImport:line.type'); },
+  get shape() { return i18n.t('csvImport:line.shape'); },
+  get label() { return i18n.t('csvImport:field.label'); },
+  get description() { return i18n.t('csvImport:field.description'); },
 };
 
 export function guessLineFieldKind(header: string): LineCsvFieldKind {
   const h = header.trim().toLowerCase();
   if (!h) return 'ignore';
-  if (/^(id|識別)$/i.test(h)) return 'id';
-  if (/^(from|始点|起点)$/i.test(h)) return 'from';
-  if (/^(to|終点)$/i.test(h)) return 'to';
-  if (/^(type|種別|種類|kind)$/i.test(h)) return 'type';
-  if (/^(shape|形状)$/i.test(h)) return 'shape';
-  if (/^(label|ラベル|名前|name)$/i.test(h)) return 'label';
-  if (/^(desc|description|説明)$/i.test(h)) return 'description';
+  if (/^(id|識別)$/i.test(h)) return 'id'; // i18n-ok 利用者の見出しと照合
+  if (/^(from|始点|起点)$/i.test(h)) return 'from'; // i18n-ok 利用者の見出しと照合
+  if (/^(to|終点)$/i.test(h)) return 'to'; // i18n-ok 利用者の見出しと照合
+  if (/^(type|種別|種類|kind)$/i.test(h)) return 'type'; // i18n-ok 利用者の見出しと照合
+  if (/^(shape|形状)$/i.test(h)) return 'shape'; // i18n-ok 利用者の見出しと照合
+  if (/^(label|ラベル|名前|name)$/i.test(h)) return 'label'; // i18n-ok 利用者の見出しと照合
+  if (/^(desc|description|説明)$/i.test(h)) return 'description'; // i18n-ok 利用者の見出しと照合
   return 'ignore';
 }
 
 const LINE_TYPE_DICT: Record<string, LineType> = {
-  rline: 'RLine', solid: 'RLine', '実線': 'RLine', '実線矢印': 'RLine',
-  xline: 'XLine', dashed: 'XLine', dotted: 'XLine', '点線': 'XLine', '点線矢印': 'XLine', '破線': 'XLine',
+  rline: 'RLine', solid: 'RLine', '実線': 'RLine', '実線矢印': 'RLine', // i18n-ok 利用者のファイルの値と照合
+  xline: 'XLine', dashed: 'XLine', dotted: 'XLine', '点線': 'XLine', '点線矢印': 'XLine', '破線': 'XLine', // i18n-ok 同上
+  'solid arrow': 'RLine', 'dashed arrow': 'XLine', 'dotted arrow': 'XLine', // 英語の用語名（terms.csv の line.*）
 };
 const LINE_SHAPE_DICT: Record<string, LineShape> = {
-  straight: 'straight', '直線': 'straight',
-  elbow: 'elbow', l: 'elbow', 'l字': 'elbow', '折れ線': 'elbow',
-  curve: 'curve', '曲線': 'curve', bezier: 'curve',
+  straight: 'straight', '直線': 'straight', // i18n-ok 利用者のファイルの値と照合
+  elbow: 'elbow', l: 'elbow', 'l字': 'elbow', '折れ線': 'elbow', // i18n-ok 同上
+  curve: 'curve', '曲線': 'curve', bezier: 'curve', // i18n-ok 同上
 };
 
 export function mapLineType(raw: string): LineType {
@@ -379,15 +390,15 @@ export function buildLinesFromRows(rows: string[][], opts: LineImportOptions): L
     const from = (cell(row, 'from') ?? '').trim();
     const to = (cell(row, 'to') ?? '').trim();
     if (!from || !to) {
-      errors.push(`行 ${rowNum}: from/to が空のためスキップ`);
+      errors.push(i18n.t('csvImport:error.line.noends', { row: rowNum }));
       return;
     }
     if (!opts.validBoxIds.has(from)) {
-      errors.push(`行 ${rowNum}: from=${from} に該当する Box がないためスキップ`);
+      errors.push(i18n.t('csvImport:error.line.nofrom', { row: rowNum, id: from }));
       return;
     }
     if (!opts.validBoxIds.has(to)) {
-      errors.push(`行 ${rowNum}: to=${to} に該当する Box がないためスキップ`);
+      errors.push(i18n.t('csvImport:error.line.noto', { row: rowNum, id: to }));
       return;
     }
     const typeRaw = cell(row, 'type');
@@ -420,36 +431,37 @@ export type SDSGCsvFieldKind =
   | 'spaceMode' | 'subLabel' | 'description';
 
 export const SDSG_FIELD_LABELS: Record<SDSGCsvFieldKind, string> = {
-  ignore: '（無視）',
+  get ignore() { return i18n.t('csvImport:field.ignore'); },
   id: 'ID',
-  type: '種別 (SD/SG)',
-  label: 'ラベル',
-  attachedTo: '紐付け対象 (attachedTo)',
-  attachedTo2: '2 つ目の対象 (attachedTo2)',
-  anchorMode: 'アンカー方式 (single/between)',
-  spaceMode: '配置モード (attached/band-top/band-bottom)',
-  subLabel: 'サブラベル',
-  description: '説明',
+  get type() { return i18n.t('csvImport:sdsg.type'); },
+  get label() { return i18n.t('csvImport:field.label'); },
+  get attachedTo() { return i18n.t('csvImport:sdsg.attachedto'); },
+  get attachedTo2() { return i18n.t('csvImport:sdsg.attachedto2'); },
+  get anchorMode() { return i18n.t('csvImport:sdsg.anchormode'); },
+  get spaceMode() { return i18n.t('csvImport:sdsg.spacemode'); },
+  get subLabel() { return i18n.t('csvImport:field.sublabel'); },
+  get description() { return i18n.t('csvImport:field.description'); },
 };
 
 export function guessSDSGFieldKind(header: string): SDSGCsvFieldKind {
   const h = header.trim().toLowerCase();
   if (!h) return 'ignore';
-  if (/^(id|識別)$/i.test(h)) return 'id';
-  if (/^(type|種別|種類|kind)$/i.test(h)) return 'type';
-  if (/^(label|ラベル|名前|name)$/i.test(h)) return 'label';
-  if (/^(attached.?to2|attachedto2|対象2|対象 ?2)$/i.test(h)) return 'attachedTo2';
-  if (/^(attached.?to|attachedto|対象|紐付け|紐付け対象)$/i.test(h)) return 'attachedTo';
-  if (/^(anchor|anchormode|アンカー|アンカー方式)$/i.test(h)) return 'anchorMode';
-  if (/^(space|spacemode|配置|配置モード|モード)$/i.test(h)) return 'spaceMode';
-  if (/^(sub|sub[_ ]?label|サブ|サブラベル)$/i.test(h)) return 'subLabel';
-  if (/^(desc|description|説明)$/i.test(h)) return 'description';
+  if (/^(id|識別)$/i.test(h)) return 'id'; // i18n-ok 利用者の見出しと照合
+  if (/^(type|種別|種類|kind)$/i.test(h)) return 'type'; // i18n-ok 利用者の見出しと照合
+  if (/^(label|ラベル|名前|name)$/i.test(h)) return 'label'; // i18n-ok 利用者の見出しと照合
+  if (/^(attached.?to2|attachedto2|対象2|対象 ?2)$/i.test(h)) return 'attachedTo2'; // i18n-ok 利用者の見出しと照合
+  if (/^(attached.?to|attachedto|対象|紐付け|紐付け対象)$/i.test(h)) return 'attachedTo'; // i18n-ok 利用者の見出しと照合
+  if (/^(anchor|anchormode|アンカー|アンカー方式)$/i.test(h)) return 'anchorMode'; // i18n-ok 利用者の見出しと照合
+  if (/^(space|spacemode|配置|配置モード|モード)$/i.test(h)) return 'spaceMode'; // i18n-ok 利用者の見出しと照合
+  if (/^(sub|sub[_ ]?label|サブ|サブラベル)$/i.test(h)) return 'subLabel'; // i18n-ok 利用者の見出しと照合
+  if (/^(desc|description|説明)$/i.test(h)) return 'description'; // i18n-ok 利用者の見出しと照合
   return 'ignore';
 }
 
 const SDSG_TYPE_DICT: Record<string, SDSGType> = {
-  sd: 'SD', '社会的方向': 'SD', '社会的方向づけ': 'SD',
-  sg: 'SG', '社会的ガイド': 'SG',
+  sd: 'SD', '社会的方向': 'SD', '社会的方向づけ': 'SD', // i18n-ok 利用者のファイルの値と照合
+  sg: 'SG', '社会的ガイド': 'SG', // i18n-ok 同上
+  'social direction': 'SD', 'social guidance': 'SG', // 英語の用語名（terms.csv の SD・SG）
 };
 
 export function mapSDSGType(raw: string): SDSGType {
@@ -505,12 +517,12 @@ export function buildSDSGsFromRows(rows: string[][], opts: SDSGImportOptions): S
     const rowNum = idx + 1 + (opts.hasHeader ? 1 : 0);
     const attachedTo = (cell(row, 'attachedTo') ?? '').trim();
     if (!attachedTo) {
-      errors.push(`行 ${rowNum}: attachedTo が空のためスキップ`);
+      errors.push(i18n.t('csvImport:error.sdsg.noattached', { row: rowNum }));
       return;
     }
     const attachedType = resolveAttachedType(attachedTo);
     if (!attachedType) {
-      errors.push(`行 ${rowNum}: attachedTo=${attachedTo} に該当する Box/Line がないためスキップ`);
+      errors.push(i18n.t('csvImport:error.sdsg.attachednotfound', { row: rowNum, id: attachedTo }));
       return;
     }
     const typeRaw = cell(row, 'type');
@@ -527,7 +539,7 @@ export function buildSDSGsFromRows(rows: string[][], opts: SDSGImportOptions): S
     const at2Raw = (cell(row, 'attachedTo2') ?? '').trim();
     const attachedTo2 = at2Raw || undefined;
     if (attachedTo2 && !resolveAttachedType(attachedTo2)) {
-      errors.push(`行 ${rowNum}: attachedTo2=${attachedTo2} に該当する Box/Line がないため undefined 扱い`);
+      errors.push(i18n.t('csvImport:error.sdsg.attached2notfound', { row: rowNum, id: attachedTo2 }));
     }
     const anchorRaw = (cell(row, 'anchorMode') ?? '').trim().toLowerCase();
     const anchorMode: 'single' | 'between' | undefined = anchorRaw === 'between'
@@ -565,18 +577,18 @@ export function buildSDSGsFromRows(rows: string[][], opts: SDSGImportOptions): S
 export type PeriodLabelCsvFieldKind = 'ignore' | 'id' | 'position' | 'label';
 
 export const PERIOD_LABEL_FIELD_LABELS: Record<PeriodLabelCsvFieldKind, string> = {
-  ignore: '（無視）',
+  get ignore() { return i18n.t('csvImport:field.ignore'); },
   id: 'ID',
-  position: '位置 (Time Level)',
-  label: 'ラベル',
+  get position() { return i18n.t('csvImport:period.position'); },
+  get label() { return i18n.t('csvImport:field.label'); },
 };
 
 export function guessPeriodLabelFieldKind(header: string): PeriodLabelCsvFieldKind {
   const h = header.trim().toLowerCase();
   if (!h) return 'ignore';
-  if (/^(id|識別)$/i.test(h)) return 'id';
-  if (/^(position|pos|time|時間|位置)$/i.test(h)) return 'position';
-  if (/^(label|ラベル|名前|name|時期)$/i.test(h)) return 'label';
+  if (/^(id|識別)$/i.test(h)) return 'id'; // i18n-ok 利用者の見出しと照合
+  if (/^(position|pos|time|時間|位置)$/i.test(h)) return 'position'; // i18n-ok 利用者の見出しと照合
+  if (/^(label|ラベル|名前|name|時期)$/i.test(h)) return 'label'; // i18n-ok 利用者の見出しと照合
   return 'ignore';
 }
 
@@ -623,13 +635,13 @@ export function buildPeriodLabelsFromRows(
     const rowNum = idx + 1 + (opts.hasHeader ? 1 : 0);
     const label = (cell(row, 'label') ?? '').trim();
     if (!label) {
-      errors.push(`行 ${rowNum}: ラベルが空のためスキップ`);
+      errors.push(i18n.t('csvImport:error.nolabel', { row: rowNum }));
       return;
     }
     const posRaw = (cell(row, 'position') ?? '').trim();
     const position = posRaw === '' ? NaN : Number(posRaw);
     if (!isFinite(position)) {
-      errors.push(`行 ${rowNum}: 位置 (position) が数値でないためスキップ`);
+      errors.push(i18n.t('csvImport:error.period.positionnan', { row: rowNum }));
       return;
     }
     const idRaw = cell(row, 'id');

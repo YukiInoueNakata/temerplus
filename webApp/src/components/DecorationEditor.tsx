@@ -9,7 +9,7 @@
 
 import { useTranslation } from 'react-i18next';
 import type { TextAlign, VerticalAlign } from '../types';
-import { FONT_OPTIONS } from '../store/defaults';
+import { FONT_OPTIONS, fontOptionLabel } from '../store/defaults';
 import { ColorPicker } from './ColorPicker';
 
 // ----------------------------------------------------------------------------
@@ -42,7 +42,7 @@ export function FontFamilyRow({
         {value === undefined && <option value="">{t('mixed')}</option>}
         {emptyOptionLabel && <option value="">{emptyOptionLabel}</option>}
         {FONT_OPTIONS.map((f) => (
-          <option key={f.value} value={f.value}>{f.label}</option>
+          <option key={f.value} value={f.value}>{fontOptionLabel(f)}</option>
         ))}
       </select>
     </div>

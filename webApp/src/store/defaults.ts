@@ -11,7 +11,10 @@ import type {
   Line,
   SDSG,
   PeriodLabel,
+  Locale,
 } from '../types';
+import i18n from '../i18n';
+import { initialUILanguage } from '../utils/uiLanguage';
 
 export const DEFAULT_SETTINGS: ProjectSettings = {
   layout: 'horizontal',
@@ -26,7 +29,7 @@ export const DEFAULT_SETTINGS: ProjectSettings = {
   },
   showLegend: true,
   legendPosition: 'right',
-  timelineLabel: { ja: '非可逆的時間', en: 'Irreversible time' },
+  timelineLabel: { ja: '非可逆的時間', en: 'Irreversible time' }, // i18n-ok 日英の対そのもの
   timelineAutoInsert: true,
   defaultFont: 'system-ui',
   defaultFontSize: 13,
@@ -48,7 +51,7 @@ export const DEFAULT_SETTINGS: ProjectSettings = {
     // 既定: 下部（min Item_Level 基準、offset=0 でちょうどその位置）
     itemReference: 'min',
     itemOffset: 0,
-    label: '非可逆的時間',
+    label: '非可逆的時間', // i18n-ok 日本語の図の既定値（新しい図は createDefaultSettings が図の言語で入れる）
     strokeWidth: 2.5,
     fontSize: 14,
     labelSideHorizontal: 'bottom',
@@ -70,7 +73,7 @@ export const DEFAULT_SETTINGS: ProjectSettings = {
     includeLines: true,
     includeSDSG: true,
     includeTimeArrow: false,
-    title: '凡例',
+    title: '凡例', // i18n-ok 日本語の図の既定値（新しい図は createDefaultSettings が図の言語で入れる）
     fontSize: 11,
     minWidth: 200,
     showDescriptions: false,
@@ -195,11 +198,13 @@ export const LEVEL_PX = 100;
 export const MINOR_TICK_PX = 10;
 
 // Available fonts (bundled system fonts)
-export const FONT_OPTIONS: { value: string; label: string }[] = [
-  { value: 'system-ui', label: 'システム標準' },
-  { value: '"Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif', label: 'ヒラギノ角ゴ / 游ゴシック' },
-  { value: '"Yu Mincho", "Hiragino Mincho Pro", "Yu Mincho Light", serif', label: '游明朝 / ヒラギノ明朝' },
-  { value: '"Meiryo", "メイリオ", sans-serif', label: 'メイリオ' },
+// - 表示名は画面の言語。訳す名前は labelKey（defaults の翻訳の表）で持ち、使う時に fontOptionLabel で引く
+export interface FontOption { value: string; label?: string; labelKey?: string }
+export const FONT_OPTIONS: FontOption[] = [
+  { value: 'system-ui', labelKey: 'defaults:font.system' },
+  { value: '"Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif', labelKey: 'defaults:font.hiraginoYuGothic' },
+  { value: '"Yu Mincho", "Hiragino Mincho Pro", "Yu Mincho Light", serif', labelKey: 'defaults:font.yuMinchoHiraginoMincho' },
+  { value: '"Meiryo", "メイリオ", sans-serif', labelKey: 'defaults:font.meiryo' }, // i18n-ok フォントの CSS の値
   { value: '"Noto Sans JP", sans-serif', label: 'Noto Sans JP' },
   { value: '"Noto Serif JP", serif', label: 'Noto Serif JP' },
   { value: 'Arial, sans-serif', label: 'Arial' },
@@ -207,6 +212,12 @@ export const FONT_OPTIONS: { value: string; label: string }[] = [
   { value: 'Georgia, serif', label: 'Georgia' },
   { value: '"Courier New", monospace', label: 'Courier New' },
 ];
+
+/** フォントの選択肢の表示名（画面の言語） */
+export function fontOptionLabel(f: FontOption): string {
+  if (f.labelKey) return i18n.t(f.labelKey);
+  return f.label ?? f.value;
+}
 
 // ----------------------------------------------------------------------------
 // ID generators
@@ -303,18 +314,38 @@ export function createEmptySheet(name: string, order: number): Sheet {
   };
 }
 
-export function createSampleSheet(name: string, order: number): Sheet {
+/** 画面の言語（新しい図の言語の既定。i18n の初期化前は利用者の好み・ブラウザの言語） */
+export function currentUILocale(): Locale {
+  const lng = i18n.resolvedLanguage ?? i18n.language ?? initialUILanguage();
+  return lng.startsWith('en') ? 'en' : 'ja';
+}
+
+/**
+ * 新しい図の設定（図の言語 locale と、図に入る既定の文字＝非可逆的時間の矢印のラベル・凡例の題を図の言語で入れる）。
+ * 既存のファイルを開いたときは使わない（そのファイルの locale と文字を使う）
+ */
+export function createDefaultSettings(locale: Locale = currentUILocale()): ProjectSettings {
+  return {
+    ...DEFAULT_SETTINGS,
+    locale,
+    timeArrow: { ...DEFAULT_SETTINGS.timeArrow, label: i18n.t('terms:timeArrow', { lng: locale }) },
+    legend: { ...DEFAULT_SETTINGS.legend, title: i18n.t('terms:legend', { lng: locale }) },
+  };
+}
+
+export function createSampleSheet(name: string, order: number, locale: Locale = currentUILocale()): Sheet {
   const sheet = createEmptySheet(name, order);
+  const tl = (key: string, opts: Record<string, unknown> = {}) => i18n.t(key, { ...opts, lng: locale });
   // 標準構成:
   //   Item1(出発点) → OPP1(必須通過点) → BFP1(分岐点) → EFP1(等至点) / P_EFP1(両極化等至点)
   //   SD / SG は BFP1 に紐づけ
   //   時期1 = 出発点〜等至点、時期2 = 等至点以降
   const boxes: Box[] = [
-    { id: 'Item1',  type: 'normal', label: '出発点',       x: 100, y: 200, width: 60, height: 100, textOrientation: 'vertical' },
-    { id: 'OPP1',   type: 'OPP',    label: '必須通過点',   x: 300, y: 200, width: 60, height: 120, textOrientation: 'vertical' },
-    { id: 'BFP1',   type: 'BFP',    label: '分岐点',       x: 500, y: 200, width: 60, height: 100, textOrientation: 'vertical' },
-    { id: 'EFP1',   type: 'EFP',    label: '等至点',       x: 700, y: 100, width: 70, height: 120, textOrientation: 'vertical' },
-    { id: 'P_EFP1', type: 'P-EFP',  label: '両極化等至点', x: 700, y: 300, width: 70, height: 120, textOrientation: 'vertical' },
+    { id: 'Item1',  type: 'normal', label: tl('defaults:sample.start'), x: 100, y: 200, width: 60, height: 100, textOrientation: 'vertical' },
+    { id: 'OPP1',   type: 'OPP',    label: tl('defaults:sample.opp'), x: 300, y: 200, width: 60, height: 120, textOrientation: 'vertical' },
+    { id: 'BFP1',   type: 'BFP',    label: tl('defaults:sample.bfp'), x: 500, y: 200, width: 60, height: 100, textOrientation: 'vertical' },
+    { id: 'EFP1',   type: 'EFP',    label: tl('defaults:sample.efp'), x: 700, y: 100, width: 70, height: 120, textOrientation: 'vertical' },
+    { id: 'P_EFP1', type: 'P-EFP',  label: tl('defaults:sample.pefp'), x: 700, y: 300, width: 70, height: 120, textOrientation: 'vertical' },
   ];
   const lines: Line[] = [
     { id: 'RL_1', type: 'RLine', from: 'Item1', to: 'OPP1',   connectionMode: 'center-to-center', shape: 'straight' },
@@ -331,8 +362,8 @@ export function createSampleSheet(name: string, order: number): Sheet {
   // Item 左端 x=100 → timeLevel=1, EFP x=700 → timeLevel=7
   // 中央 ≒ timeLevel=4（時期1）、timeLevel=7.5（時期2）
   const periodLabels: PeriodLabel[] = [
-    { id: genPeriodId(), position: 4,   label: '時期1' },
-    { id: genPeriodId(), position: 7.5, label: '時期2' },
+    { id: genPeriodId(), position: 4,   label: tl('defaults:sample.period', { n: 1 }) },
+    { id: genPeriodId(), position: 7.5, label: tl('defaults:sample.period', { n: 2 }) },
   ];
   sheet.boxes = boxes;
   sheet.lines = lines;
@@ -341,14 +372,15 @@ export function createSampleSheet(name: string, order: number): Sheet {
   return sheet;
 }
 
-export function createEmptyDocument(): TEMDocument {
+/** 新しい空の図。図の言語は画面の言語（locale を渡せばそれ） */
+export function createEmptyDocument(locale: Locale = currentUILocale()): TEMDocument {
   const sheet = createEmptySheet('Sheet 1', 0);
   return {
     version: '0.4',
     sheets: [sheet],
     activeSheetId: sheet.id,
     participants: [],
-    settings: DEFAULT_SETTINGS,
+    settings: createDefaultSettings(locale),
     metadata: {
       title: 'Untitled TEM',
       createdAt: new Date().toISOString(),
@@ -359,8 +391,8 @@ export function createEmptyDocument(): TEMDocument {
   };
 }
 
-export function createSampleDocument(): TEMDocument {
-  const sheet = createSampleSheet('参加者A', 0);
+export function createSampleDocument(locale: Locale = currentUILocale()): TEMDocument {
+  const sheet = createSampleSheet(i18n.t('defaults:sample.sheetName', { lng: locale }), 0, locale);
   return {
     version: '0.4',
     sheets: [sheet],
@@ -368,10 +400,10 @@ export function createSampleDocument(): TEMDocument {
     participants: [
       { id: genParticipantId(), pseudonym: 'A' },
     ],
-    settings: DEFAULT_SETTINGS,
+    settings: createDefaultSettings(locale),
     metadata: {
       title: 'Sample TEM',
-      author: '中田友貴',
+      author: i18n.t('defaults:sample.author', { lng: locale }),
       createdAt: new Date().toISOString(),
       modifiedAt: new Date().toISOString(),
     },
@@ -405,15 +437,15 @@ export const BOX_RENDER_SPECS: Record<string, BoxRenderSpec> = {
 };
 
 export const BOX_TYPE_LABELS: Record<string, { ja: string; en: string; shortJa?: string }> = {
-  normal:      { ja: '通常',               en: 'Normal', shortJa: '通常' },
-  other:       { ja: 'その他',             en: 'Other',  shortJa: 'その他' },
-  BFP:         { ja: '分岐点',             en: 'BFP',    shortJa: 'BFP' },
-  EFP:         { ja: '等至点',             en: 'EFP',    shortJa: 'EFP' },
-  'P-EFP':     { ja: '両極化等至点',       en: 'P-EFP',  shortJa: 'P-EFP' },
-  OPP:         { ja: '必須通過点',         en: 'OPP',    shortJa: 'OPP' },
-  annotation:  { ja: '潜在経験',           en: 'Latent', shortJa: '潜在' },
-  '2nd-EFP':   { ja: '第二等至点',         en: '2nd EFP', shortJa: '2nd EFP' },
-  'P-2nd-EFP': { ja: '両極化第二等至点',   en: 'P-2nd EFP', shortJa: 'P-2nd' },
+  normal:      { ja: '通常',               en: 'Normal', shortJa: '通常' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  other:       { ja: 'その他',             en: 'Other',  shortJa: 'その他' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  BFP:         { ja: '分岐点',             en: 'BFP',    shortJa: 'BFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  EFP:         { ja: '等至点',             en: 'EFP',    shortJa: 'EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  'P-EFP':     { ja: '両極化等至点',       en: 'P-EFP',  shortJa: 'P-EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  OPP:         { ja: '必須通過点',         en: 'OPP',    shortJa: 'OPP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  annotation:  { ja: '潜在経験',           en: 'Latent', shortJa: '潜在' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  '2nd-EFP':   { ja: '第二等至点',         en: '2nd EFP', shortJa: '2nd EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  'P-2nd-EFP': { ja: '両極化第二等至点',   en: 'P-2nd EFP', shortJa: 'P-2nd' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
 };
 
 // Exported for testing / other consumers

@@ -4,6 +4,8 @@
 // - 96 DPI 換算の px と、inch ベースの 2 系統を提供
 // ============================================================================
 
+import i18n from '../i18n';
+
 export type PaperSizeKey =
   | 'A4-landscape'
   | 'A4-portrait'
@@ -64,13 +66,14 @@ export function getPaperInch(size: PaperSizeKey, customW?: number, customH?: num
   return PAPER_SIZES_INCH[size];
 }
 
+// 表示名は画面の言語（翻訳の表 paperSizes）。読むたびに引くよう getter にしてある
 export const PAPER_SIZE_OPTIONS: { value: Exclude<PaperSizeKey, 'custom'>; label: string }[] = [
-  { value: 'A4-landscape', label: 'A4 横' },
-  { value: 'A4-portrait',  label: 'A4 縦' },
-  { value: 'A3-landscape', label: 'A3 横' },
-  { value: 'A3-portrait',  label: 'A3 縦' },
-  { value: '16:9',         label: '16:9 スライド（13.33×7.5 in）' },
-  { value: '4:3',          label: '4:3 スライド（10.67×8.0 in）' },
+  { value: 'A4-landscape', get label() { return i18n.t('paperSizes:A4-landscape'); } },
+  { value: 'A4-portrait',  get label() { return i18n.t('paperSizes:A4-portrait'); } },
+  { value: 'A3-landscape', get label() { return i18n.t('paperSizes:A3-landscape'); } },
+  { value: 'A3-portrait',  get label() { return i18n.t('paperSizes:A3-portrait'); } },
+  { value: '16:9',         get label() { return i18n.t('paperSizes:slide16x9'); } },
+  { value: '4:3',          get label() { return i18n.t('paperSizes:slide4x3'); } },
 ];
 
 /**

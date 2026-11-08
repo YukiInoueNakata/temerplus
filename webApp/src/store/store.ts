@@ -5,6 +5,7 @@
 import { create } from 'zustand';
 import { temporal } from 'zundo';
 import { produce } from 'immer';
+import i18n from '../i18n';
 import type {
   TEMDocument,
   ViewState,
@@ -532,7 +533,7 @@ export const useTEMStore = create<Store>()(
               const defaults: Box = {
                 id,
                 type: 'normal',
-                label: '新規Box',
+                label: i18n.t('store:box.new', { lng: s.doc.settings.locale }),
                 x: refBox ? refBox.x + (layout === 'horizontal' ? 150 : 0) : 200,
                 y: refBox ? refBox.y + (layout === 'horizontal' ? 0 : 150) : 200,
                 width: defaultWidth,
@@ -1870,6 +1871,8 @@ export const useTEMStore = create<Store>()(
         if (count < 1) return;
         const insertedRef: { ids: string[] } = { ids: [] };
         set((state) => {
+          // 挿入した Box の最初の文字は図の言語
+          const insertedLabel = (n: number) => i18n.t('store:box.inserted', { n, lng: state.doc.settings.locale });
           return {
             doc: mutateActiveSheet(state.doc, (sheet) => {
               const start = sheet.boxes.find((b) => b.id === startId);
@@ -1896,7 +1899,7 @@ export const useTEMStore = create<Store>()(
                   const newItem = startItem + (endItem - startItem) * t;
                   const newId = genBoxIdByType('normal', sheet.boxes.map((b) => b.id));
                   const newBox: Box = {
-                    id: newId, type: 'normal', label: `挿入${i}`,
+                    id: newId, type: 'normal', label: insertedLabel(i),
                     x: 0, y: 0, width: start.width, height: start.height,
                     textOrientation: start.textOrientation,
                   };
@@ -1939,7 +1942,7 @@ export const useTEMStore = create<Store>()(
                   const newItem = startItem + (endItem - startItem) * t;
                   const newId = genBoxIdByType('normal', sheet.boxes.map((b) => b.id));
                   const newBox: Box = {
-                    id: newId, type: 'normal', label: `挿入${i + 1}`,
+                    id: newId, type: 'normal', label: insertedLabel(i + 1),
                     x: 0, y: 0, width: start.width, height: start.height,
                     textOrientation: start.textOrientation,
                   };

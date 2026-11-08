@@ -1,0 +1,2 @@
+﻿key,ja,en,note
+error.unsupported,対応していない形式です: {{name}}（対応: .csv / .tsv / .xlsx / .xls）,Unsupported format: {{name}} (supported: .csv / .tsv / .xlsx / .xls),表のファイル（CSV・Excel）を開いたときのエラー

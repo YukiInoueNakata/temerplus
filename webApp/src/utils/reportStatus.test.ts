@@ -6,7 +6,7 @@ import { Document, Packer } from 'docx';
 import { hydrateDocument } from './hydrate';
 import { computeReportStatus, missingReportChoices, usedSymbols, symbolKeyOf } from './reportStatus';
 import { buildPaperReportParagraphs } from './exportReport';
-import { VISUAL_CONVENTION_ITEMS } from './visualConventions';
+import { VISUAL_CONVENTION_ITEMS, conventionItemLabel } from './visualConventions';
 import type { Note, TEMDocument } from '../types';
 import kanzakiRaw from '../../sample-tem/kanzaki2021_figure1.tem?raw';
 
@@ -112,7 +112,7 @@ describe('論文用レポートの Word', () => {
   it('「（未入力）」と書いて含める: 9 項目すべてと要素の説明の抜けが分かる', async () => {
     const t = await reportText(fresh(), { omitMissing: false });
     expect(t).toContain('1. 記号体系の宣言');
-    for (const it of VISUAL_CONVENTION_ITEMS) expect(t).toContain(`${it.label}: （未入力）`);
+    for (const it of VISUAL_CONVENTION_ITEMS) expect(t).toContain(`${conventionItemLabel(it.key)}: （未入力）`);
     expect(t.some((p) => p.includes('（説明未記入）'))).toBe(true);
   });
 

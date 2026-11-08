@@ -59,7 +59,7 @@ export function isFontAvailable(name: string): boolean {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) return true;
-  const sample = 'mmmmmmmmmmlliI 永あア123';
+  const sample = 'mmmmmmmmmmlliI 永あア123'; // i18n-ok フォントの有無を測る見本の文字
   const ok = ['monospace', 'serif', 'sans-serif'].some((base) => {
     ctx.font = `72px ${base}`;
     const w0 = ctx.measureText(sample).width;
@@ -93,7 +93,7 @@ export function measureNormalLineRatio(fontFace: string): number {
   const hit = lineRatioCache.get(fontFace);
   if (hit) return hit;
   const el = document.createElement('div');
-  el.textContent = '永あ\n永あ';
+  el.textContent = '永あ\n永あ'; // i18n-ok 行の高さを測る見本の文字
   el.style.cssText = [
     'position:absolute', 'visibility:hidden', 'left:-9999px', 'top:0',
     'white-space:pre', 'line-height:normal', 'font-size:100px',

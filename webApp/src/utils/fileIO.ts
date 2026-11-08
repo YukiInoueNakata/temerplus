@@ -4,6 +4,7 @@
 
 import { get, set, del } from 'idb-keyval';
 import type { TEMDocument } from '../types';
+import i18n from '../i18n';
 
 const AUTO_BACKUP_KEY = 'temer-autosave';
 const AUTO_BACKUP_META_KEY = 'temer-autosave-meta';
@@ -105,7 +106,7 @@ export async function loadFromFile(): Promise<{ doc: TEMDocument; handle: FileHa
         const doc = validateAndParse(text);
         resolve({ doc, handle: null });
       } catch (e) {
-        alert('ファイルの読み込みに失敗しました: ' + (e as Error).message);
+        alert(i18n.t('fileIO:error.loadfailed', { message: (e as Error).message }));
         resolve(null);
       }
     };
@@ -115,16 +116,16 @@ export async function loadFromFile(): Promise<{ doc: TEMDocument; handle: FileHa
 
 function validateAndParse(text: string): TEMDocument {
   const data = JSON.parse(text);
-  if (!data || typeof data !== 'object') throw new Error('無効なJSONです');
-  if (!Array.isArray(data.sheets)) throw new Error('sheets フィールドがありません');
-  if (!data.settings) throw new Error('settings フィールドがありません');
-  if (!data.metadata) throw new Error('metadata フィールドがありません');
+  if (!data || typeof data !== 'object') throw new Error(i18n.t('fileIO:error.invalidjson'));
+  if (!Array.isArray(data.sheets)) throw new Error(i18n.t('fileIO:error.nosheets'));
+  if (!data.settings) throw new Error(i18n.t('fileIO:error.nosettings'));
+  if (!data.metadata) throw new Error(i18n.t('fileIO:error.nometadata'));
   // version 互換性チェック（簡易）
   // - 0.3 ファイルは transcripts=[] を補完して 0.4 として扱う
   // - 0.4 はそのまま
   // - それ以外は警告
   if (data.version && data.version !== '0.3' && data.version !== '0.4') {
-    console.warn(`Version mismatch: file=${data.version}, app=0.4. 可能な範囲で読み込みます。`);
+    console.warn(i18n.t('fileIO:warn.version', { version: data.version }));
   }
   if (data.version === '0.3') {
     data.version = '0.4';

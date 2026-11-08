@@ -7,6 +7,7 @@ import { toPng, toSvg } from 'html-to-image';
 import JSZip from 'jszip';
 import type { PageBounds } from './pageSplit';
 import { checkAborted, type ProgressCallback } from './exportProgress';
+import i18n from '../i18n';
 
 export interface ExportOptions {
   includeRulers?: boolean;       // 既定 false
@@ -219,16 +220,16 @@ export async function exportToPNGPages(
   signal?: AbortSignal,
 ): Promise<void> {
   if (!pages || pages.length <= 1) {
-    onProgress?.({ current: 0, total: 1, label: 'キャプチャ中...' });
+    onProgress?.({ current: 0, total: 1, label: i18n.t('exportImage:progress.capturing') });
     await exportToPNG(elementId, `${baseName}.png`, pixelRatio === 'auto' ? 2 : pixelRatio, opts);
-    onProgress?.({ current: 1, total: 1, label: '完了' });
+    onProgress?.({ current: 1, total: 1, label: i18n.t('exportImage:progress.done') });
     return;
   }
   const node = document.getElementById(elementId);
   if (!node) throw new Error(`Element not found: #${elementId}`);
 
   const total = pages.length + 1; // 1=キャプチャ + N=ページクロップ
-  onProgress?.({ current: 0, total, label: 'プレビューをキャプチャ中...' });
+  onProgress?.({ current: 0, total, label: i18n.t('exportImage:progress.capturingPreview') });
   checkAborted(signal);
 
   const strip = computeStripFromPages(pages);
@@ -246,7 +247,7 @@ export async function exportToPNGPages(
   const zip = new JSZip();
   for (let i = 0; i < pages.length; i++) {
     checkAborted(signal);
-    onProgress?.({ current: i + 1, total, label: `ページ ${i + 1} / ${pages.length} をクロップ中` });
+    onProgress?.({ current: i + 1, total, label: i18n.t('exportImage:progress.cropping', { n: i + 1, total: pages.length }) });
     const canvas = await cropPageToCanvas(img, strip, pages[i], ratioX, ratioY, opts.background);
     const blob = await canvasToBlob(canvas, 'image/png');
     const pageNum = String(i + 1).padStart(String(pages.length).length, '0');
@@ -254,7 +255,7 @@ export async function exportToPNGPages(
   }
   const zipBlob = await zip.generateAsync({ type: 'blob' });
   downloadBlob(zipBlob, `${baseName}_pages.zip`);
-  onProgress?.({ current: total, total, label: '完了' });
+  onProgress?.({ current: total, total, label: i18n.t('exportImage:progress.done') });
 }
 
 /**
@@ -271,16 +272,16 @@ export async function exportToSVGPages(
   signal?: AbortSignal,
 ): Promise<void> {
   if (!pages || pages.length <= 1) {
-    onProgress?.({ current: 0, total: 1, label: 'キャプチャ中...' });
+    onProgress?.({ current: 0, total: 1, label: i18n.t('exportImage:progress.capturing') });
     await exportToSVG(elementId, `${baseName}.svg`, opts);
-    onProgress?.({ current: 1, total: 1, label: '完了' });
+    onProgress?.({ current: 1, total: 1, label: i18n.t('exportImage:progress.done') });
     return;
   }
   const node = document.getElementById(elementId);
   if (!node) throw new Error(`Element not found: #${elementId}`);
 
   const total = pages.length + 1;
-  onProgress?.({ current: 0, total, label: 'プレビューをキャプチャ中...' });
+  onProgress?.({ current: 0, total, label: i18n.t('exportImage:progress.capturingPreview') });
   checkAborted(signal);
 
   // ベース画像は PNG（高 DPI）で 1 回キャプチャし、各ページをクロップ → PNG を <image> 埋め込みした SVG として保存
@@ -299,7 +300,7 @@ export async function exportToSVGPages(
   const zip = new JSZip();
   for (let i = 0; i < pages.length; i++) {
     checkAborted(signal);
-    onProgress?.({ current: i + 1, total, label: `ページ ${i + 1} / ${pages.length} をクロップ中` });
+    onProgress?.({ current: i + 1, total, label: i18n.t('exportImage:progress.cropping', { n: i + 1, total: pages.length }) });
     const page = pages[i];
     const sx = Math.round((page.innerX - strip.x) * ratioX);
     const sy = Math.round((page.innerY - strip.y) * ratioY);
@@ -325,5 +326,5 @@ export async function exportToSVGPages(
   }
   const zipBlob = await zip.generateAsync({ type: 'blob' });
   downloadBlob(zipBlob, `${baseName}_pages.zip`);
-  onProgress?.({ current: total, total, label: '完了' });
+  onProgress?.({ current: total, total, label: i18n.t('exportImage:progress.done') });
 }

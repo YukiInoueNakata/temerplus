@@ -1,0 +1,7 @@
+﻿key,ja,en,note
+error.loadfailed,ファイルの読み込みに失敗しました: {{message}},Failed to load the file: {{message}},.tem を開くとき（ファイル選択の代替経路）の警告ダイアログ
+error.invalidjson,無効なJSONです,Invalid JSON,.tem を開くときのエラー（上の警告の中に出る）
+error.nosheets,sheets フィールドがありません,The sheets field is missing,.tem を開くときのエラー
+error.nosettings,settings フィールドがありません,The settings field is missing,.tem を開くときのエラー
+error.nometadata,metadata フィールドがありません,The metadata field is missing,.tem を開くときのエラー
+warn.version,"Version mismatch: file={{version}}, app=0.4. 可能な範囲で読み込みます。","Version mismatch: file={{version}}, app=0.4. Loading as much as possible.",.tem を開くとき（版が違う）の開発者コンソールの警告

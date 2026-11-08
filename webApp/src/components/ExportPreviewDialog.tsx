@@ -60,7 +60,7 @@ export function ExportPreviewDialog({
   open: boolean;
   onClose: () => void;
 }) {
-  const { t } = useTranslation('exportPreviewDialog');
+  const { t, i18n } = useTranslation('exportPreviewDialog');
   const doc = useTEMStore((s) => s.doc);
   const [xf, setXf] = useState<ExportTransform>(DEFAULT_EXPORT_TRANSFORM);
   const [method, setMethod] = useState<OutputMethod>('png');
@@ -240,7 +240,8 @@ export function ExportPreviewDialog({
   }, [open]);
   const contentReport = useMemo(
     () => detectExportContent(doc.sheets.find((s) => s.id === doc.activeSheetId)),
-    [doc],
+    // 表示名は画面の言語なので、言語を変えたら作り直す
+    [doc, i18n.language],
   );
   const contentMissing = missingChoices(contentReport, contentChoices);
 

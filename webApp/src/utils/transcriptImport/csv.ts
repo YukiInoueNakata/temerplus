@@ -23,9 +23,9 @@ export interface CsvParseResult {
 }
 
 // ヘッダ名のパターン（部分一致、大文字小文字無視）
-const SPEAKER_HEADERS = ['speaker', 'name', 'speaker_name', '話者', '発言者', '人物'];
-const TIMESTAMP_HEADERS = ['timestamp', 'time', 'time_code', 'タイムスタンプ', '時刻', '時間'];
-const TEXT_HEADERS = ['text', 'utterance', 'transcript', 'body', '発言', '本文', 'テキスト', '内容'];
+const SPEAKER_HEADERS = ['speaker', 'name', 'speaker_name', '話者', '発言者', '人物']; // i18n-ok 利用者の見出しと照合
+const TIMESTAMP_HEADERS = ['timestamp', 'time', 'time_code', 'タイムスタンプ', '時刻', '時間']; // i18n-ok 利用者の見出しと照合
+const TEXT_HEADERS = ['text', 'utterance', 'transcript', 'body', '発言', '本文', 'テキスト', '内容']; // i18n-ok 利用者の見出しと照合
 
 function matchHeader(name: string, candidates: string[]): boolean {
   const lower = name.trim().toLowerCase();

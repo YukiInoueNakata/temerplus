@@ -9,6 +9,7 @@ import { toPng } from 'html-to-image';
 import type { PageBounds } from './pageSplit';
 import { getPaperInch, type PaperSizeKey } from './paperSizes';
 import { checkAborted, type ProgressCallback } from './exportProgress';
+import i18n from '../i18n';
 import { captureRatio, cropPageToCanvas, buildFilter as imageFilter } from './exportImage';
 
 export interface PrintOptions {
@@ -73,7 +74,7 @@ export async function printDiagram(
   const paper = getPaperInch(opts.paperSize, opts.customPaperWidthPx, opts.customPaperHeightPx);
   const pagesLen = opts.pages && opts.pages.length > 1 ? opts.pages.length : 1;
   const totalSteps = 1 + pagesLen + 1; // capture + crops + print window
-  opts.onProgress?.({ current: 0, total: totalSteps, label: 'プレビューをキャプチャ中...' });
+  opts.onProgress?.({ current: 0, total: totalSteps, label: i18n.t('printing:progress.capturingPreview') });
   checkAborted(opts.signal);
 
   // 全体を 1 回キャプチャ。用紙の上で 300dpi になる倍率（以前は 2 倍に固定で、解像度がプレビューの枠で決まった）
@@ -99,7 +100,7 @@ export async function printDiagram(
     for (const page of opts.pages) {
       idx++;
       checkAborted(opts.signal);
-      opts.onProgress?.({ current: 1 + idx, total: totalSteps, label: `ページ ${idx} / ${opts.pages.length} をクロップ中` });
+      opts.onProgress?.({ current: 1 + idx, total: totalSteps, label: i18n.t('printing:progress.cropping', { n: idx, total: opts.pages.length }) });
       // 描く範囲の外を消し、そのページの凡例を重ねる（PNG・PDF と共用）
       const canvas = await cropPageToCanvas(img, strip, page, ratioX, ratioY, opts.background);
       pageDataUrls.push(canvas.toDataURL('image/png'));
@@ -112,11 +113,12 @@ export async function printDiagram(
   const pageSizeCSS = `${paper.width}in ${paper.height}in`;
   const bodyBg = opts.background === 'transparent' ? 'transparent' : '#ffffff';
 
+  // 印刷のウィンドウの案内は画面の言語
   const html = `<!doctype html>
-<html lang="ja">
+<html lang="${i18n.language}">
 <head>
 <meta charset="utf-8"/>
-<title>TEMer 印刷プレビュー (${pageDataUrls.length} ページ)</title>
+<title>${i18n.t('printing:window.title', { n: pageDataUrls.length })}</title>
 <style>
   @page { size: ${pageSizeCSS}; margin: 0; }
   html, body { margin: 0; padding: 0; background: ${bodyBg}; }
@@ -160,19 +162,19 @@ export async function printDiagram(
 </head>
 <body>
   <div class="instructions">
-    印刷ダイアログで「用紙サイズ」「向き」がこの用紙に合っているか確認してください。${paper.width > paper.height ? 'Safari は向きを自動で合わせないので「横」を選んでください。' : ''}
-    ダイアログを閉じたらこのウィンドウも閉じて構いません。
+    ${i18n.t(paper.width > paper.height ? 'printing:window.instructionsLandscape' : 'printing:window.instructions')}
+    ${i18n.t('printing:window.closeHint')}
   </div>
 ${pageDataUrls.map((u, i) => `  <div class="page"><img src="${u}" alt="page ${i + 1}"/></div>`).join('\n')}
 </body>
 </html>`;
 
-  opts.onProgress?.({ current: totalSteps, total: totalSteps, label: '印刷ウィンドウを開きます' });
+  opts.onProgress?.({ current: totalSteps, total: totalSteps, label: i18n.t('printing:progress.openWindow') });
   const win = opts.targetWindow && !opts.targetWindow.closed
     ? opts.targetWindow
     : window.open('', '_blank', 'width=960,height=720');
   if (!win) {
-    throw new Error('ポップアップがブロックされました。ブラウザのポップアップブロックを解除してください。');
+    throw new Error(i18n.t('printing:error.popupBlocked'));
   }
   win.document.open();
   win.document.write(html);

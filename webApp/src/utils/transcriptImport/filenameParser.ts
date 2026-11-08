@@ -23,7 +23,7 @@ export interface FilenameHints {
 // アンダースコアは regex の \w に含まれるため \b が効かないので、
 // 前後境界を (?:^|[\s_\-]) / (?=$|[\s_\-]) で明示。
 const SESSION_PATTERNS: RegExp[] = [
-  /第\s*(\d{1,3})\s*回/,                                       // 第N回
+  /第\s*(\d{1,3})\s*回/,                                       // 第N回 // i18n-ok ファイル名と照合
   /(?:^|[\s_\-])session[\s_\-]?(\d{1,3})(?=$|[\s_\-])/i,        // session N
   /(?:^|[\s_\-])sess[\s_\-]?(\d{1,3})(?=$|[\s_\-])/i,           // sess N
   /(?:^|[\s_\-])v(\d{1,3})(?=$|[\s_\-])/i,                      // vN
@@ -33,7 +33,7 @@ const SESSION_PATTERNS: RegExp[] = [
 
 // 協力者 prefix として削除する語
 const PARTICIPANT_PREFIX_PATTERNS: RegExp[] = [
-  /^協力者\s*/,
+  /^協力者\s*/, // i18n-ok ファイル名と照合
   /^participant[\s_-]*/i,
   /^interviewee[\s_-]*/i,
   /^subject[\s_-]*/i,
@@ -42,7 +42,7 @@ const PARTICIPANT_PREFIX_PATTERNS: RegExp[] = [
 
 // セッション関連表記を一括除去するパターン
 const SESSION_STRIP_PATTERNS: RegExp[] = [
-  /第\s*\d{1,3}\s*回/g,
+  /第\s*\d{1,3}\s*回/g, // i18n-ok ファイル名と照合
   /(?:^|[\s_\-])session[\s_\-]?\d{1,3}(?=$|[\s_\-])/gi,
   /(?:^|[\s_\-])sess[\s_\-]?\d{1,3}(?=$|[\s_\-])/gi,
   /(?:^|[\s_\-])v\d{1,3}(?=$|[\s_\-])/gi,
@@ -79,11 +79,11 @@ export function parseFilenameHints(filenameNoExt: string): FilenameHints {
   // 日付っぽいプレフィクス (8 桁数字 or 6 桁) を除去
   rest = rest.replace(/^\d{6,8}[_\-\s]+/, '');
   // 拡張子裏装飾 (xxxファイル名 (xxx)) → カッコ内除去
-  rest = rest.replace(/[（(][^）)]*[）)]/g, ' ');
+  rest = rest.replace(/[（(][^）)]*[）)]/g, ' '); // i18n-ok ファイル名の全角括弧と照合
 
   // 3. セパレータで分割し、有意な語を participant 候補に
   const tokens = rest
-    .split(/[\s_\-、，,/\\.]+/)
+    .split(/[\s_\-、，,/\\.]+/) // i18n-ok ファイル名の区切り（全角の読点）
     .map((t) => t.trim())
     .filter((t) => t.length > 0);
 
@@ -99,7 +99,7 @@ export function parseFilenameHints(filenameNoExt: string): FilenameHints {
     if (token.length === 0) continue;
     if (/^\d+$/.test(token)) continue;
     // 「interview」「transcript」「逐語録」「原文」など意味のない単語は除外
-    if (/^(interview|transcript|逐語録|原文|raw|data|notes?)$/i.test(token)) continue;
+    if (/^(interview|transcript|逐語録|原文|raw|data|notes?)$/i.test(token)) continue; // i18n-ok ファイル名と照合
     participantHint = token;
     break;
   }
@@ -108,7 +108,7 @@ export function parseFilenameHints(filenameNoExt: string): FilenameHints {
 }
 
 function toHalfWidthDigits(s: string): string {
-  return s.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+  return s.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)); // i18n-ok 全角数字を半角に
 }
 
 /**

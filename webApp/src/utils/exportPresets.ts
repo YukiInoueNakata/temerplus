@@ -6,6 +6,7 @@
 // ============================================================================
 
 import { DEFAULT_EXPORT_TRANSFORM, type ExportTransform } from './exportTransform';
+import i18n from '../i18n';
 
 export interface ExportOutputOptions {
   background: 'white' | 'transparent';
@@ -56,11 +57,12 @@ function makeOptions(
   };
 }
 
+// 名前と説明は画面の言語（翻訳の表 exportPresets）。読むたびに引くよう getter にしてある
 export const BUILTIN_PRESETS: ExportPreset[] = [
   {
     id: 'builtin-default',
-    name: '既定（A4 横）',
-    description: '初期値。微調整なし、A4 横、両方フィット',
+    get name() { return i18n.t('exportPresets:default.name'); },
+    get description() { return i18n.t('exportPresets:default.description'); },
     builtin: true,
     options: makeOptions({
       paperSize: 'A4-landscape',
@@ -69,8 +71,8 @@ export const BUILTIN_PRESETS: ExportPreset[] = [
   },
   {
     id: 'builtin-conf-16-9',
-    name: '学会発表（16:9 スライド）',
-    description: '16:9 スライド向け。文字 +2pt、線 +0.5、両方フィット',
+    get name() { return i18n.t('exportPresets:conf169.name'); },
+    get description() { return i18n.t('exportPresets:conf169.description'); },
     builtin: true,
     options: makeOptions({
       paperSize: '16:9',
@@ -83,8 +85,8 @@ export const BUILTIN_PRESETS: ExportPreset[] = [
   },
   {
     id: 'builtin-conf-4-3',
-    name: '学会発表（4:3 スライド）',
-    description: '4:3 スライド向け。文字 +2pt、線 +0.5',
+    get name() { return i18n.t('exportPresets:conf43.name'); },
+    get description() { return i18n.t('exportPresets:conf43.description'); },
     builtin: true,
     options: makeOptions({
       paperSize: '4:3',
@@ -97,8 +99,8 @@ export const BUILTIN_PRESETS: ExportPreset[] = [
   },
   {
     id: 'builtin-paper-a4-landscape',
-    name: '論文向け（A4 横）',
-    description: '論文掲載向け。A4 横、文字サイズ等倍、白背景',
+    get name() { return i18n.t('exportPresets:paperA4Landscape.name'); },
+    get description() { return i18n.t('exportPresets:paperA4Landscape.description'); },
     builtin: true,
     options: makeOptions({
       paperSize: 'A4-landscape',
@@ -107,8 +109,8 @@ export const BUILTIN_PRESETS: ExportPreset[] = [
   },
   {
     id: 'builtin-paper-a4-portrait',
-    name: '論文向け（A4 縦）',
-    description: '論文掲載向け。A4 縦、文字サイズ等倍、白背景',
+    get name() { return i18n.t('exportPresets:paperA4Portrait.name'); },
+    get description() { return i18n.t('exportPresets:paperA4Portrait.description'); },
     builtin: true,
     options: makeOptions({
       paperSize: 'A4-portrait',
@@ -117,8 +119,8 @@ export const BUILTIN_PRESETS: ExportPreset[] = [
   },
   {
     id: 'builtin-slide-large',
-    name: 'スライド向け（大文字）',
-    description: '会場後方からも読めるよう文字 +4pt、線太め',
+    get name() { return i18n.t('exportPresets:slideLarge.name'); },
+    get description() { return i18n.t('exportPresets:slideLarge.description'); },
     builtin: true,
     options: makeOptions({
       paperSize: '16:9',
@@ -133,8 +135,8 @@ export const BUILTIN_PRESETS: ExportPreset[] = [
   },
   {
     id: 'builtin-print-check',
-    name: '印刷品質確認用（ID 表示）',
-    description: 'ID バッジ ON、用紙枠 ON、グリッド ON で検証用に',
+    get name() { return i18n.t('exportPresets:printCheck.name'); },
+    get description() { return i18n.t('exportPresets:printCheck.description'); },
     builtin: true,
     options: makeOptions(
       {
@@ -252,7 +254,7 @@ export function saveUserPreset(
   description?: string,
 ): ExportPreset[] {
   const trimmed = name.trim();
-  if (!trimmed) throw new Error('プリセット名を入力してください');
+  if (!trimmed) throw new Error(i18n.t('exportPresets:error.emptyName'));
   const presets = loadUserPresets();
   const preset: ExportPreset = {
     id: genUserId(),

@@ -2,8 +2,7 @@
 
 [![Deploy](https://github.com/YukiInoueNakata/temerplus/actions/workflows/deploy.yml/badge.svg)](https://github.com/YukiInoueNakata/temerplus/actions/workflows/deploy.yml)
 [![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/License-PolyForm_Noncommercial_1.0.0-blue.svg)](./LICENSE)
-<!-- DOI badge (add after the first Zenodo release):
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24051875.svg)](https://doi.org/10.5281/zenodo.24051875)
 
 English | [日本語版 README はこちら (Japanese)](README.ja.md)
 
@@ -164,7 +163,7 @@ Bibliographic details were checked against CiNii, J-STAGE, Crossref, and the pub
 
 If you use this software, please cite it. Machine-readable metadata is in
 [`CITATION.cff`](./CITATION.cff) (also available through GitHub's "Cite this repository").
-A DOI will be added here after the first archived release on Zenodo.
+The software is archived on Zenodo: https://doi.org/10.5281/zenodo.24051875 (all versions; v0.2.0 is https://doi.org/10.5281/zenodo.24051876 ).
 
 ```bibtex
 @software{nakata_temer_plus,
@@ -172,6 +171,7 @@ A DOI will be added here after the first archived release on Zenodo.
   title   = {TEMer Plus: A Drawing Tool for Trajectory Equifinality Modeling (TEM)},
   year    = {2026},
   version = {0.2.0},
+  doi     = {10.5281/zenodo.24051875},
   url     = {https://github.com/YukiInoueNakata/temerplus}
 }
 ```

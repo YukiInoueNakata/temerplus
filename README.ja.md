@@ -2,8 +2,7 @@
 
 [![Deploy](https://github.com/YukiInoueNakata/temerplus/actions/workflows/deploy.yml/badge.svg)](https://github.com/YukiInoueNakata/temerplus/actions/workflows/deploy.yml)
 [![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/License-PolyForm_Noncommercial_1.0.0-blue.svg)](./LICENSE)
-<!-- DOI のバッジ（Zenodo で最初のリリースが保存されたら足す）:
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24051875.svg)](https://doi.org/10.5281/zenodo.24051875)
 
 [English](README.md) | 日本語
 
@@ -147,7 +146,7 @@ npm run build      # webApp/dist/ に静的なファイルを書き出す
 
 このソフトウェアを使った場合は引用してください。機械で読める引用の情報は
 [`CITATION.cff`](./CITATION.cff) にあります（GitHub の「Cite this repository」からも使えます）。
-DOI は、Zenodo で最初のリリースが保存されたあとにここに書きます。
+Zenodo に保存しています: https://doi.org/10.5281/zenodo.24051875 （すべての版。v0.2.0 は https://doi.org/10.5281/zenodo.24051876 ）
 
 ```bibtex
 @software{nakata_temer_plus,
@@ -155,6 +154,7 @@ DOI は、Zenodo で最初のリリースが保存されたあとにここに書
   title   = {TEMer Plus: A Drawing Tool for Trajectory Equifinality Modeling (TEM)},
   year    = {2026},
   version = {0.2.0},
+  doi     = {10.5281/zenodo.24051875},
   url     = {https://github.com/YukiInoueNakata/temerplus}
 }
 ```

@@ -7,6 +7,7 @@
 import type { Sheet, PeriodLabelSettings, TimeArrowSettings, LayoutDirection, SDSGSpaceSettings, TypeLabelVisibilityMap } from '../types';
 import { LEVEL_PX } from '../store/defaults';
 import { computeBandOuterCoord, resolveBandOuterBounds } from './sdsgSpaceLayout';
+import { pushNonBandSDSGExtents } from './sdsgPlacement';
 
 export interface PeriodLabelGeometry {
   startX: number;
@@ -42,19 +43,9 @@ export function computePeriodLabels(
     xs.push(b.x, b.x + b.width);
     ys.push(b.y, b.y + b.height);
   });
-  sheet.sdsg.forEach((sg) => {
-    // band-mode SDSG は下の sdsgSpace ブロックで近似拡張する
-    if (sg.spaceMode === 'band-top' || sg.spaceMode === 'band-bottom') return;
-    const attached = sheet.boxes.find((b) => b.id === sg.attachedTo);
-    if (!attached) return;
-    const isH = layout === 'horizontal';
-    const sgX = attached.x + (isH ? (sg.timeOffset ?? 0) : (sg.itemOffset ?? 0));
-    const sgY = attached.y + (isH ? (sg.itemOffset ?? 0) : (sg.timeOffset ?? 0));
-    const sgW = sg.width ?? 70;
-    const sgH = sg.height ?? 40;
-    xs.push(sgX, sgX + sgW);
-    ys.push(sgY, sgY + sgH);
-  });
+  // 帯に置かない SD/SG（Box・Line に付ける／間に置く）を、画面と同じ位置の計算で、種別ラベル・サブラベルまで含めて足す
+  // （以前は Box の左上の角を基準にし、Line に付けたもの・ラベルを数えず、下の SG に時間の矢印が重なっていた。2026-11-08）
+  pushNonBandSDSGExtents(sheet, layout, xs, ys, typeLabelVisibility, { bandEnabled: sdsgSpace ? !!sdsgSpace.enabled : undefined });
 
   // 時期ラベルは最高 IL 側を基準にするため、最高 IL 方向のみ bbox を拡張する。
   //   横型: 最高 IL = 最小 y 方向（画面上）

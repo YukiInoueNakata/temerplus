@@ -5,6 +5,7 @@
 import type { Sheet, TimeArrowSettings, LayoutDirection, SDSGSpaceSettings, TypeLabelVisibilityMap } from '../types';
 import { LEVEL_PX } from '../store/defaults';
 import { computeBandOuterCoord, resolveBandOuterBounds } from './sdsgSpaceLayout';
+import { pushNonBandSDSGExtents } from './sdsgPlacement';
 
 export interface TimeArrowGeometry {
   startX: number;
@@ -47,18 +48,9 @@ export function computeTimeArrow(
   // SDSG座標も含める（位置は attachedTo + offset）
   // band モード SDSG は band 配置に依存し循環のリスクがあるため、band 範囲を
   // 「boxes 基準の最外エッジ」として近似的に xs/ys に追加する（下の sdsgSpace ブロック）。
-  sheet.sdsg.forEach((sg) => {
-    if (sg.spaceMode === 'band-top' || sg.spaceMode === 'band-bottom') return;
-    const attached = sheet.boxes.find((b) => b.id === sg.attachedTo);
-    if (!attached) return;
-    const isH = layout === 'horizontal';
-    const sgX = attached.x + (isH ? (sg.timeOffset ?? 0) : (sg.itemOffset ?? 0));
-    const sgY = attached.y + (isH ? (sg.itemOffset ?? 0) : (sg.timeOffset ?? 0));
-    const sgW = sg.width ?? 70;
-    const sgH = sg.height ?? 40;
-    xs.push(sgX, sgX + sgW);
-    ys.push(sgY, sgY + sgH);
-  });
+  // 帯に置かない SD/SG（Box・Line に付ける／間に置く）を、画面と同じ位置の計算で、種別ラベル・サブラベルまで含めて足す
+  // （以前は Box の左上の角を基準にし、Line に付けたもの・ラベルを数えず、下の SG に時間の矢印が重なっていた。2026-11-08）
+  pushNonBandSDSGExtents(sheet, layout, xs, ys, typeLabelVisibility, { bandEnabled: sdsgSpace ? !!sdsgSpace.enabled : undefined });
 
   // 非可逆的時間は最低 IL 側を基準にするため、最低 IL 方向のみ bbox を拡張する。
   //   横型: 最低 IL = 最大 y 方向（画面下）

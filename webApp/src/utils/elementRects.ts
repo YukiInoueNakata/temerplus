@@ -9,6 +9,7 @@
 import type { Sheet, ProjectSettings, LayoutDirection, Box, SDSG } from '../types';
 import { computeSDSGBandLayout, sdsgBandKey, computeBandRowAssignments, computeSDSGBandPosition } from './sdsgSpaceLayout';
 import { resolveBetweenEndpoint } from './sdsgBetween';
+import { nonBandSDSGRect } from './sdsgPlacement';
 import { computeTimeArrow } from './timeArrow';
 import { computePeriodLabels } from './periodLabels';
 import { computeLegendItems, computeLegendColumns } from './legend';
@@ -135,60 +136,9 @@ export function collectSDSGRects(
       }
     }
 
-    // --- between モード ---
-    if (sg.anchorMode === 'between' && sg.attachedTo2) {
-      const ep1 = resolveBetweenEndpoint(sg.attachedTo, boxById, lineById, isH);
-      const ep2 = resolveBetweenEndpoint(sg.attachedTo2, boxById, lineById, isH);
-      if (ep1 && ep2) {
-        const mode = sg.betweenMode ?? 'edge-to-edge';
-        const left = ep1.timeStart <= ep2.timeStart ? ep1 : ep2;
-        const right = ep1.timeStart <= ep2.timeStart ? ep2 : ep1;
-        let startPos: number, endPos: number;
-        if (mode === 'edge-to-edge') {
-          startPos = left.timeStart;
-          endPos = right.timeStart + right.timeSize;
-        } else {
-          startPos = left.timeStart + left.timeSize / 2;
-          endPos = right.timeStart + right.timeSize / 2;
-        }
-        const timeCenter = (startPos + endPos) / 2;
-        const timeSpan = Math.max(10, Math.abs(endPos - startPos));
-        const itemCenter = (ep1.itemCenter + ep2.itemCenter) / 2;
-        const w = isH ? timeSpan : (sg.width ?? 70);
-        const h = isH ? (sg.height ?? 40) : timeSpan;
-        const anchorX = isH ? timeCenter : itemCenter;
-        const anchorY = isH ? itemCenter : timeCenter;
-        const x = anchorX - w / 2 + (isH ? (sg.timeOffset ?? 0) : (sg.itemOffset ?? 0));
-        const y = anchorY - h / 2 + (isH ? (sg.itemOffset ?? 0) : (sg.timeOffset ?? 0));
-        out.push({ sdsg: sg, rect: rectOf(x, y, w, h) });
-        return;
-      }
-    }
-
-    // --- attached モード ---
-    const attachedBox = sheet.boxes.find((b) => b.id === sg.attachedTo);
-    let ax = 0, ay = 0;
-    if (attachedBox) {
-      ax = attachedBox.x + attachedBox.width / 2;
-      ay = attachedBox.y + attachedBox.height / 2;
-    } else {
-      const attachedLine = sheet.lines.find((l) => l.id === sg.attachedTo);
-      if (attachedLine) {
-        const fromBox = sheet.boxes.find((b) => b.id === attachedLine.from);
-        const toBox = sheet.boxes.find((b) => b.id === attachedLine.to);
-        if (fromBox && toBox) {
-          ax = (fromBox.x + fromBox.width / 2 + toBox.x + toBox.width / 2) / 2;
-          ay = (fromBox.y + fromBox.height / 2 + toBox.y + toBox.height / 2) / 2;
-        }
-      }
-    }
-    const timeOff = sg.timeOffset ?? 0;
-    const itemOff = sg.itemOffset ?? 0;
-    const w = sg.width ?? 70;
-    const h = sg.height ?? 40;
-    const x = ax - w / 2 + (isH ? timeOff : itemOff);
-    const y = ay - h / 2 + (isH ? itemOff : timeOff);
-    out.push({ sdsg: sg, rect: rectOf(x, y, w, h) });
+    // --- 間に置く／Box・Line に付ける（時間の矢印・時期ラベルと同じ計算。utils/sdsgPlacement.ts） ---
+    const rect = nonBandSDSGRect(sg, sheet, layout, { boxById, lineById });
+    if (rect) out.push({ sdsg: sg, rect: rectOf(rect.x, rect.y, rect.width, rect.height) });
   });
 
   return out;

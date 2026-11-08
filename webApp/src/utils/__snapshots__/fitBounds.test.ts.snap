@@ -3,16 +3,16 @@
 exports[`computeContentBounds（ゴールデン） > 日本語デモの各シートの bbox が変わらない 1`] = `
 [
   {
-    "height": 757,
+    "height": 752,
     "width": 820,
     "x": 0,
-    "y": 27,
+    "y": 31,
   },
   {
-    "height": 1245,
+    "height": 1230,
     "width": 2111,
     "x": 0,
-    "y": -513,
+    "y": -499,
   },
 ]
 `;
@@ -20,16 +20,16 @@ exports[`computeContentBounds（ゴールデン） > 日本語デモの各シー
 exports[`computeContentBounds（ゴールデン） > 英語デモの各シートの bbox が変わらない 1`] = `
 [
   {
-    "height": 757,
+    "height": 752,
     "width": 850,
     "x": 0,
-    "y": 27,
+    "y": 31,
   },
   {
-    "height": 1245,
+    "height": 1230,
     "width": 2193,
     "x": 0,
-    "y": -513,
+    "y": -499,
   },
 ]
 `;

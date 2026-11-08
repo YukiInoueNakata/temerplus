@@ -393,7 +393,7 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
             onChange={(e) => {
               const newType = e.target.value as BoxType;
               if (!isMulti) changeBoxType(first.id, newType);
-              else ids.forEach((id) => changeBoxType(id, newType));
+              else useTEMStore.getState().changeBoxTypes(ids, newType);
             }}
           >
             {commonType === undefined && <option value=""></option>}

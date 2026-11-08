@@ -20,7 +20,7 @@ import ReactFlow, {
   type NodeChange,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { useTEMStore, useActiveSheet, beginHistoryGesture, endHistoryGesture } from '../store/store';
+import { useTEMStore, useActiveSheet, beginHistoryGesture, endHistoryGesture, isHistoryGestureActive } from '../store/store';
 import { BoxContextMenu } from './BoxQuickEdit';
 import { BoxNode, type BoxNodeData } from './nodes/BoxNode';
 import { SDSGNode, type SDSGNodeData } from './nodes/SDSGNode';
@@ -122,7 +122,6 @@ function CanvasInner({
   const fitMode = useTEMStore((s) => s.fitMode);
 
   const dragging = useRef(false);
-  const noteDragging = useRef(false);
   // 整列ガイド（world 座標）
   const [guides, setGuides] = useState<{ v: number[]; h: number[] }>({ v: [], h: [] });
   // band モード SDSG をドラッグ中のプレビュー情報 (row 境界表示用)
@@ -563,23 +562,23 @@ function CanvasInner({
         // 位置が一度も書き込まれず、手を離すと元に戻っていた（メモ・記号が動かせなかった。2026-11-08 ユーザー指摘）
         if (ch.type === 'position' && sheet.notes?.some((n) => n.id === ch.id)) {
           if (ch.dragging === true && ch.position) {
-            if (!noteDragging.current) { noteDragging.current = true; beginHistoryGesture(); }
+            if (!isHistoryGestureActive()) beginHistoryGesture();
             updateNote(ch.id, { x: ch.position.x, y: ch.position.y });
           } else if (ch.dragging === false) {
             if (ch.position) updateNote(ch.id, { x: ch.position.x, y: ch.position.y });
-            if (noteDragging.current) { noteDragging.current = false; endHistoryGesture(); }
+            endHistoryGesture();
           }
           continue;
         }
         // ドラッグの終わり（React Flow 11 は位置を入れずに知らせる）。以前は位置がある知らせだけを見ていたので
         // 記録の再開が呼ばれず、以後の操作が「元に戻す」に残らなくなっていた（2026-11-08 レビュー）
-        if (ch.type === 'position' && ch.dragging === false && dragging.current) {
+        if (ch.type === 'position' && ch.dragging === false) {
           dragging.current = false;
           endHistoryGesture();
           setGuides({ v: [], h: [] });
         }
         if (ch.type === 'position' && ch.position) {
-          if (ch.dragging === true && !dragging.current) {
+          if (ch.dragging === true && !isHistoryGestureActive()) {
             dragging.current = true;
             beginHistoryGesture();
           }

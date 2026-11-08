@@ -124,3 +124,37 @@ describe('匿名化と逐語録の削除', () => {
     expect(active().boxes[0].segmentId).toBeUndefined();
   });
 });
+
+describe('再レビュー（2026-11-08）', () => {
+  it('ドラッグが取り消されて終わりの知らせが来なくても、指を離した（取り消した）ときに記録を再開する', async () => {
+    const id = st().addBox({ type: 'normal', x: 0, y: 0 });
+    beginHistoryGesture();
+    st().updateBox(id, { x: 80 });
+    window.dispatchEvent(new Event('pointercancel'));
+    await new Promise((r) => setTimeout(r, 5));
+    // 再開されているので、この後の操作は記録に残る
+    st().updateBox(id, { label: '後の操作' });
+    undo();
+    const b = active().boxes.find((x) => x.id === id)!;
+    expect(b.label).not.toBe('後の操作');
+    expect(b.x).toBe(80);
+    undo();
+    expect(active().boxes.find((x) => x.id === id)!.x).toBe(0);
+  });
+  it('段落全体の切片から作った Box の原文参照も、段落の書き換えに付いていく', () => {
+    const seg = st().addSegment('T1', { paragraphId: 'P2', quoteText: 'それから変わった。' });
+    st().createBoxesFromSegments('T1', [seg]);
+    st().updateParagraphText('T1', 'P2', 'まったく別の文。');
+    const ref = active().boxes[0].sourceRefs![0];
+    expect(ref.unresolved).toBeFalsy();
+    expect(ref.quoteText).toBe('まったく別の文。');
+  });
+  it('匿名化で文字数が変わっても、切片の範囲は同じ文字を指す', () => {
+    useTEMStore.setState((s) => ({ doc: { ...s.doc, transcripts: [{ ...s.doc.transcripts[0], paragraphs: [{ id: 'P1', index: 0, text: '山田太郎に会う' }] }] } }));
+    const seg = st().addSegment('T1', { paragraphId: 'P1', charStart: 5, charEnd: 7, quoteText: '会う' });
+    const out = anonymizeDocument(st().doc, { 山田太郎: 'A' });
+    const t = out.transcripts[0];
+    const sg = t.segments!.find((x) => x.id === seg)!;
+    expect(t.paragraphs[0].text.slice(sg.charStart, sg.charEnd)).toBe('会う');
+  });
+});

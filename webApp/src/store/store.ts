@@ -2405,6 +2405,7 @@ export const useTEMStore = create<Store>()(
             if (!t) return;
             const p = t.paragraphs.find((x) => x.id === paragraphId);
             if (!p) return;
+            const oldText = p.text;
             p.text = newText;
             // 切片も原文参照と同じく付いていく（2026-11-08）
             if (t.segments) {
@@ -2421,15 +2422,15 @@ export const useTEMStore = create<Store>()(
             // SourceRef 追従: 全シートの全要素について該当段落を参照しているものを更新
             for (const sh of d.sheets) {
               for (const b of sh.boxes) {
-                const r = retrackSourceRefsForParagraph(b.sourceRefs, paragraphId, newText);
+                const r = retrackSourceRefsForParagraph(b.sourceRefs, paragraphId, newText, oldText);
                 if (r.changedCount > 0) b.sourceRefs = r.refs;
               }
               for (const l of sh.lines) {
-                const r = retrackSourceRefsForParagraph(l.sourceRefs, paragraphId, newText);
+                const r = retrackSourceRefsForParagraph(l.sourceRefs, paragraphId, newText, oldText);
                 if (r.changedCount > 0) l.sourceRefs = r.refs;
               }
               for (const sg of sh.sdsg) {
-                const r = retrackSourceRefsForParagraph(sg.sourceRefs, paragraphId, newText);
+                const r = retrackSourceRefsForParagraph(sg.sourceRefs, paragraphId, newText, oldText);
                 if (r.changedCount > 0) sg.sourceRefs = r.refs;
               }
             }
@@ -2746,8 +2747,9 @@ export const useTEMStore = create<Store>()(
               id: genSourceRefId(),
               transcriptId,
               paragraphId: sg.paragraphId,
-              charStart: sg.charStart,
-              charEnd: sg.charEnd,
+              // 段落全体の切片から作った Box は、段落全体を指す参照（範囲なし）にする（書き換えに付いていく）
+              charStart: sg.wholeParagraph ? undefined : sg.charStart,
+              charEnd: sg.wholeParagraph ? undefined : sg.charEnd,
               quoteText: sg.quoteText,
               createdAt: now,
             }],
@@ -2871,15 +2873,26 @@ export const useTEMStore = create<Store>()(
 // 以前は止めて再開するだけで、操作の前の状態が記録に残らず（zundo は止めている間の変更を記録しない）、
 // 「元に戻す」で 1 つ前の操作まで一緒に戻っていた。終わりの知らせが届かず、記録が止まったままになることもあった
 let gestureBefore: TEMDocument | null = null;
+// React Flow はドラッグが途中で取り消されると（2 本の指で触れたときなど）終わりを知らせないので、
+// 指・マウスを離したとき・取り消されたとき・窓から外れたときにも必ず終える（2026-11-08 再レビュー）
+const gestureEndEvents = ['pointerup', 'pointercancel', 'blur'] as const;
+const endGestureSoon = () => { window.setTimeout(endHistoryGesture, 0); };
+export function isHistoryGestureActive(): boolean { return gestureBefore != null; }
 export function beginHistoryGesture(): void {
   if (gestureBefore) return;
   gestureBefore = useTEMStore.getState().doc;
   useTEMStore.temporal.getState().pause();
+  if (typeof window !== 'undefined') {
+    for (const ev of gestureEndEvents) window.addEventListener(ev, endGestureSoon, { capture: true, once: true });
+  }
 }
 export function endHistoryGesture(): void {
   const before = gestureBefore;
   if (!before) return;
   gestureBefore = null;
+  if (typeof window !== 'undefined') {
+    for (const ev of gestureEndEvents) window.removeEventListener(ev, endGestureSoon, { capture: true });
+  }
   const temporal = useTEMStore.temporal.getState();
   temporal.resume();
   const now = useTEMStore.getState().doc;

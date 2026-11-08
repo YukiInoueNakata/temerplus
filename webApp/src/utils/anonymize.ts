@@ -61,6 +61,40 @@ export function applyReplacements(text: string, replacements: Record<string, str
   return text.replace(re, (m) => replacements[m] ?? m);
 }
 
+/**
+ * 置き換えと一緒に、置き換える前の文字の位置を置き換えた後の位置に直す関数を返す（2026-11-08 再レビュー）。
+ * 範囲の始まりは置き換えた語の頭へ、終わりは語の後ろへ寄せる
+ */
+export function applyReplacementsWithMap(
+  text: string,
+  replacements: Record<string, string>,
+): { text: string; mapStart: (i: number) => number; mapEnd: (i: number) => number } {
+  const keys = Object.keys(replacements).sort((a, b) => b.length - a.length);
+  if (keys.length === 0) return { text, mapStart: (i) => i, mapEnd: (i) => i };
+  const re = new RegExp(keys.map(escapeRegex).join('|'), 'g');
+  const spans: Array<{ o0: number; o1: number; n0: number; n1: number }> = [];
+  let out = '';
+  let last = 0;
+  for (let m = re.exec(text); m; m = re.exec(text)) {
+    out += text.slice(last, m.index);
+    const rep = replacements[m[0]] ?? m[0];
+    spans.push({ o0: m.index, o1: m.index + m[0].length, n0: out.length, n1: out.length + rep.length });
+    out += rep;
+    last = m.index + m[0].length;
+  }
+  out += text.slice(last);
+  const map = (i: number, end: boolean) => {
+    let shift = 0;
+    for (const sp of spans) {
+      if (i >= sp.o1) { shift = sp.n1 - sp.o1; continue; }
+      if (i > sp.o0) return end ? sp.n1 : sp.n0;   // 語の途中
+      break;
+    }
+    return i + shift;
+  };
+  return { text: out, mapStart: (i) => map(i, false), mapEnd: (i) => map(i, true) };
+}
+
 function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -69,19 +103,30 @@ function escapeRegex(s: string): string {
  * Transcript 全段落のテキスト + speaker + SourceRef.quoteText に置換を適用した
  * 新しい Transcript を返す。anonymizationMap には適用辞書を記録。
  */
+/** 範囲（charStart・charEnd）を置き換えた後の位置に直す。範囲が無ければそのまま */
+function remapRange(
+  r: { charStart?: number; charEnd?: number },
+  m: { mapStart: (i: number) => number; mapEnd: (i: number) => number } | undefined,
+): { charStart?: number; charEnd?: number } {
+  if (!m || r.charStart === undefined || r.charEnd === undefined) return {};
+  return { charStart: m.mapStart(r.charStart), charEnd: m.mapEnd(r.charEnd) };
+}
+
 export function anonymizeTranscript(
   tr: Transcript,
   replacements: Record<string, string>,
 ): Transcript {
+  const mappers = new Map(tr.paragraphs.map((p) => [p.id, applyReplacementsWithMap(p.text, replacements)]));
   const paragraphs = tr.paragraphs.map((p) => ({
     ...p,
     speaker: p.speaker ? applyReplacements(p.speaker, replacements) : p.speaker,
-    text: applyReplacements(p.text, replacements),
+    text: mappers.get(p.id)!.text,
   }));
   const prevMap = tr.metadata?.anonymizationMap ?? {};
   // 切片の引用・見出し・メモも置き換える（見出しの既定は引用の初めなので名前が入りうる。2026-11-08 レビュー）
   const segments = tr.segments?.map((sg) => ({
     ...sg,
+    ...remapRange(sg, mappers.get(sg.paragraphId)),
     quoteText: applyReplacements(sg.quoteText, replacements),
     label: applyReplacements(sg.label, replacements),
     note: sg.note ? applyReplacements(sg.note, replacements) : sg.note,
@@ -109,8 +154,10 @@ export function anonymizeDocument(
   doc: TEMDocument,
   replacements: Record<string, string>,
 ): TEMDocument {
+  const mappers = new Map(doc.transcripts.flatMap((t) => t.paragraphs.map((p) => [p.id, applyReplacementsWithMap(p.text, replacements)] as const)));
   const replaceRef = (r: SourceRef): SourceRef => ({
     ...r,
+    ...remapRange(r, mappers.get(r.paragraphId)),
     quoteText: applyReplacements(r.quoteText, replacements),
   });
   return {

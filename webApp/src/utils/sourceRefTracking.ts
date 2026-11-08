@@ -22,7 +22,13 @@ export interface RetrackResult {
  * - quoteText が新本文中に存在すれば charStart/charEnd を更新し unresolved を解除
  * - 存在しなければ charStart/charEnd は据え置きで unresolved=true をセット
  */
-export function retrackSourceRef<T extends SourceRef>(ref: T, newText: string): { ref: T; changed: boolean } {
+export function retrackSourceRef<T extends SourceRef>(ref: T, newText: string, oldText?: string): { ref: T; changed: boolean } {
+  // 範囲を持たず、引用が書き換える前の段落の全文と同じ参照は「段落全体」を指す。書き換えた後の段落全体を引用にする
+  // （以前は旧文を探して見つからず追えなくなっていた。段落全体の切片から作った Box も同じ。2026-11-08 再レビュー）
+  if (oldText !== undefined && ref.charStart === undefined && ref.charEnd === undefined && ref.quoteText === oldText) {
+    if (ref.quoteText === newText && !ref.unresolved) return { ref, changed: false };
+    return { ref: { ...ref, quoteText: newText, unresolved: false }, changed: true };
+  }
   // 段落全体参照（charStart/charEnd が未指定または quoteText が空）の場合は常に追従成功
   if (!ref.quoteText || ref.quoteText.length === 0) {
     if (ref.unresolved) {
@@ -75,12 +81,13 @@ export function retrackSourceRefsForParagraph<T extends SourceRef>(
   refs: T[] | undefined,
   paragraphId: string,
   newText: string,
+  oldText?: string,
 ): { refs: T[] | undefined; changedCount: number } {
   if (!refs || refs.length === 0) return { refs, changedCount: 0 };
   let changedCount = 0;
   const next = refs.map((r) => {
     if (r.paragraphId !== paragraphId) return r;
-    const result = retrackSourceRef(r, newText);
+    const result = retrackSourceRef(r, newText, oldText);
     if (result.changed) changedCount++;
     return result.ref;
   });

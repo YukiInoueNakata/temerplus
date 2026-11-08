@@ -102,7 +102,7 @@
 "sdsg.band.bottom.v","左側 (SG) に配置","Place at left (SG)","SD/SG の帯位置の選択肢（縦型の図）"
 "sdsg.spaceMode.confirm","配置モードを変更すると、時間/項目オフセットと帯内 Inset がリセットされます。よろしいですか?","Changing the placement mode resets the time/item offsets and the in-band inset. Continue?","SD/SG の配置方式を変えるときの確認の文"
 "sdsg.type.SD","SD (社会的方向づけ)","SD (Social direction)","プロパティ > SD/SG の種別の選択肢"
-"sdsg.type.SG","SG (社会的ガイド)","SG (Social guidance)","プロパティ > SD/SG の種別の選択肢"
+"sdsg.type.SG","SG (社会的助勢)","SG (Social guidance)","プロパティ > SD/SG の種別の選択肢"
 "sdsg.attachedTo","紐付け対象 (attachedTo)","Attached to (attachedTo)","プロパティ > SD/SG の基本タブの欄の名前"
 "sdsg.attachedTo2","2 つ目の対象 (attachedTo2)","Second target (attachedTo2)","プロパティ > SD/SG の基本タブの欄の名前"
 "sdsg.attachedTo2.tooltip","値を選ぶと between モードになります。空（未指定）に戻すと single モードに戻ります","Selecting a value switches to between mode. Clearing it returns to single mode","「2 つ目の対象」の説明"

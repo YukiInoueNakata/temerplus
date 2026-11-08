@@ -72,7 +72,7 @@ const NON_BOX_TEXT = {
     RLine:     { label: '実線径路',     description: '実現した径路' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
     XLine:     { label: '点線径路',     description: '想定された（未実現）径路' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
     SD:        { label: 'SD',           description: '社会的方向づけ（径路を妨害する力）' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
-    SG:        { label: 'SG',           description: '社会的ガイド（径路を支援する力）' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+    SG:        { label: 'SG',           description: '社会的助勢（径路を支援する力）' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
     timeArrow: { label: '非可逆的時間', description: '時間軸の方向' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   },
   en: {

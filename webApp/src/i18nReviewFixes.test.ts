@@ -4,7 +4,7 @@ import i18n from './i18n';
 import { initialUILanguage, hasPriorUse } from './utils/uiLanguage';
 import { useTEMStore } from './store/store';
 import { summarizeCodes, type MaxqdaSegment } from './utils/maxqdaImport';
-import { mapBoxType } from './utils/csvImport';
+import { mapBoxType, mapSDSGType } from './utils/csvImport';
 import { BOX_TYPE_LABELS } from './store/defaults';
 
 afterEach(async () => {
@@ -78,5 +78,16 @@ describe('種類名の表記（両極化した等至点・第 2 等至点）', (
       summarizeCodes([seg('両極化等至点の選択'), seg('P-EFPの選択'), seg('潜在経験の想定')]).map((c) => [c.code, c.suggestedType]),
     );
     expect(byCode).toEqual({ '両極化等至点の選択': 'P-EFP', 'P-EFPの選択': 'P-EFP', '潜在経験の想定': 'annotation' });
+  });
+});
+
+describe('SG の呼び名（社会的助勢）と TEM の英語名（Modeling）', () => {
+  it('表示は社会的助勢、英語名は Modeling', () => {
+    expect(i18n.t('terms:SG', { lng: 'ja' })).toBe('社会的助勢（SG）');
+    expect(i18n.t('terms:tem', { lng: 'en' })).toBe('Trajectory Equifinality Modeling (TEM)');
+    expect(i18n.t('exportReport:sdsg.SG', { lng: 'ja' })).toBe('社会的助勢 (SG)');
+  });
+  it('取り込みは旧称も SG として読む', () => {
+    for (const w of ['社会的助勢', '社会的ガイド', '社会的ガイダンス', '社会的支援']) expect(mapSDSGType(w)).toBe('SG');
   });
 });

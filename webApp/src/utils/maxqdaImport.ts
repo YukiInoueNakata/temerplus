@@ -273,7 +273,7 @@ function guessTypeFromWords(words: string[]): BoxType | undefined {
 
 /**
  * 語から扱いを推測する。親コード（最上位）を優先し、次に葉を見る。
- * - "TEM_SD"/"SD"/"社会的方向づけ" → SD、"TEM_SG"/"SG"/"社会的ガイド" → SG
+ * - "TEM_SD"/"SD"/"社会的方向づけ" → SD、"TEM_SG"/"SG"/"社会的助勢"/"社会的ガイド" → SG
  * - "時期"/"period"/"第1期" → 時期ラベル
  * - "二次コード候補"/"TEM_Box"/"Box"/"経験"/"出来事"/"event" などを親に持つ → Box（通常）
  */
@@ -281,7 +281,7 @@ function guessActionFromWords(parents: string[], leaf: string): CodeAction | und
   const test = (w: string): CodeAction | undefined => {
     const t = w.trim().toLowerCase();
     if (/(^|[^a-z])sd([^a-z]|$)|社会的方向づけ|社会的方向付け|social direction/.test(t)) return 'sd'; // i18n-ok コード名と照合
-    if (/(^|[^a-z])sg([^a-z]|$)|社会的ガイド|社会的助勢|social guidance/.test(t)) return 'sg'; // i18n-ok コード名と照合
+    if (/(^|[^a-z])sg([^a-z]|$)|社会的助勢|社会的ガイド|社会的ガイダンス|social guidance/.test(t)) return 'sg'; // i18n-ok コード名と照合
     if (/時期|期間|period|phase|フェーズ|第[0-9一二三四五六七八九十]+期/.test(t)) return 'period'; // i18n-ok コード名と照合
     return undefined;
   };

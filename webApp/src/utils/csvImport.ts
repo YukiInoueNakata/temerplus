@@ -466,7 +466,7 @@ export function guessSDSGFieldKind(header: string): SDSGCsvFieldKind {
 
 const SDSG_TYPE_DICT: Record<string, SDSGType> = {
   sd: 'SD', '社会的方向': 'SD', '社会的方向づけ': 'SD', // i18n-ok 利用者のファイルの値と照合
-  sg: 'SG', '社会的ガイド': 'SG', // i18n-ok 同上
+  sg: 'SG', '社会的助勢': 'SG', '社会的ガイド': 'SG', '社会的ガイダンス': 'SG', '社会的支援': 'SG', // i18n-ok 同上（正式は社会的助勢。旧称も読む）
   'social direction': 'SD', 'social guidance': 'SG', // 英語の用語名（terms.csv の SD・SG）
 };
 

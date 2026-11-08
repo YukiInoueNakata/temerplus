@@ -1,6 +1,6 @@
 ﻿key,ja,en,note
 app.name,TEMer Plus,TEMer Plus,アプリの名前（訳さない）
-tem,複線径路等至性モデル（TEM）,Trajectory Equifinality Model (TEM),方法の名前
+tem,複線径路等至性モデル（TEM）,Trajectory Equifinality Modeling (TEM),方法の名前（英語名は Model から Modeling に変更。同書 表1-2）
 tea,複線径路等至アプローチ（TEA）,Trajectory Equifinality Approach (TEA),方法の名前
 boxType.normal,通常,Normal,Box の種類（通常の経験・出来事）
 boxType.normal.long,通常の経験,Experience,Box の種類の説明
@@ -17,7 +17,7 @@ line.XLine,点線矢印,Dashed arrow,実現しなかった（想定された）�
 path.realized,実現した径路,Realized path,径路の種類
 path.unrealized,実現しなかった径路,Unrealized path,径路の種類
 SD,社会的方向づけ（SD）,Social direction (SD),径路を妨げる力。略号 SD
-SG,社会的ガイド（SG）,Social guidance (SG),径路を後押しする力。略号 SG
+SG,社会的助勢（SG）,Social guidance (SG),径路を後押しする力。略号 SG。旧称 社会的ガイド・社会的ガイダンス（安田・サトウ編著『TEAによる対人援助プロセスと分岐の記述』表1-2）
 timeArrow,非可逆的時間,Irreversible time,時間軸の矢印
 period,時期区分,Period,時期の区切り
 periodLabel,時期ラベル,Period label,時期区分の名前

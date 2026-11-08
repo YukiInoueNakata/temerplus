@@ -121,7 +121,7 @@ boxTypeLabel.2nd-EFP,2nd-EFP（第 2 等至点）,2nd-EFP (Second equifinality p
 boxTypeLabel.P-2nd-EFP,P-2nd-EFP（両極化した第 2 等至点）,P-2nd-EFP (Polarized second equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.annotation,annotation（潜在経験）,annotation (Latent experience),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.SD,SD（社会的方向づけ）,SD (Social direction),設定 > タイプラベル と Box スタイル の種類の名前
-boxTypeLabel.SG,SG（社会的ガイド）,SG (Social guidance),設定 > タイプラベル と Box スタイル の種類の名前
+boxTypeLabel.SG,SG（社会的助勢）,SG (Social guidance),設定 > タイプラベル と Box スタイル の種類の名前
 typeLabel.title,タイプラベル（種別バッジ）表示,Type label (type badge) visibility,設定 > タイプラベル の見出し
 typeLabel.hint,各種別について、キャンバス上のタイプラベルを個別に表示／非表示できます。,Show or hide the type label on the canvas for each type.,設定 > タイプラベル の説明文
 typeLabel.bulk,一括:,All:,設定 > タイプラベル の一括のボタンの前の字

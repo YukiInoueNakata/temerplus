@@ -45,11 +45,11 @@ const BOX_DESCRIPTIONS: Record<BoxType, string> = {
   'normal':     '経験・出来事', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'BFP':        '分岐点 (Bifurcation Point)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'EFP':        '等至点 (Equifinality Point)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
-  'P-EFP':      '両極化等至点 (Polarized EFP)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  'P-EFP':      '両極化した等至点 (Polarized EFP)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'OPP':        '必須通過点 (Obligatory Passage Point)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'annotation': '潜在経験 / 想定された未実現経験', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
-  '2nd-EFP':    '第二等至点', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
-  'P-2nd-EFP':  '両極化第二等至点', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  '2nd-EFP':    '第 2 等至点', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  'P-2nd-EFP':  '両極化した第 2 等至点', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'other':      'その他', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
 };
 

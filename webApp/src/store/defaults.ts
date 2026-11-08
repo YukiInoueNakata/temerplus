@@ -337,7 +337,7 @@ export function createSampleSheet(name: string, order: number, locale: Locale = 
   const sheet = createEmptySheet(name, order);
   const tl = (key: string, opts: Record<string, unknown> = {}) => i18n.t(key, { ...opts, lng: locale });
   // 標準構成:
-  //   Item1(出発点) → OPP1(必須通過点) → BFP1(分岐点) → EFP1(等至点) / P_EFP1(両極化等至点)
+  //   Item1(出発点) → OPP1(必須通過点) → BFP1(分岐点) → EFP1(等至点) / P_EFP1(両極化した等至点)
   //   SD / SG は BFP1 に紐づけ
   //   時期1 = 出発点〜等至点、時期2 = 等至点以降
   const boxes: Box[] = [
@@ -441,11 +441,11 @@ export const BOX_TYPE_LABELS: Record<string, { ja: string; en: string; shortJa?:
   other:       { ja: 'その他',             en: 'Other',  shortJa: 'その他' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   BFP:         { ja: '分岐点',             en: 'BFP',    shortJa: 'BFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   EFP:         { ja: '等至点',             en: 'EFP',    shortJa: 'EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
-  'P-EFP':     { ja: '両極化等至点',       en: 'P-EFP',  shortJa: 'P-EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  'P-EFP':     { ja: '両極化した等至点',       en: 'P-EFP',  shortJa: 'P-EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   OPP:         { ja: '必須通過点',         en: 'OPP',    shortJa: 'OPP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   annotation:  { ja: '潜在経験',           en: 'Latent', shortJa: '潜在' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
-  '2nd-EFP':   { ja: '第二等至点',         en: '2nd EFP', shortJa: '2nd EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
-  'P-2nd-EFP': { ja: '両極化第二等至点',   en: 'P-2nd EFP', shortJa: 'P-2nd' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  '2nd-EFP':   { ja: '第 2 等至点',         en: '2nd EFP', shortJa: '2nd EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  'P-2nd-EFP': { ja: '両極化した第 2 等至点',   en: 'P-2nd EFP', shortJa: 'P-2nd' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
 };
 
 // Exported for testing / other consumers

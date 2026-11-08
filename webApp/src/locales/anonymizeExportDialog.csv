@@ -7,9 +7,11 @@ No names were anonymized when the transcripts were imported. Enter additional ta
 "hint.replaced","置換対象: 段落本文・段落の話者欄・SourceRef.quoteText・Box / Line / SDSG の description。","Replaced: paragraph text, paragraph speaker fields, SourceRef.quoteText, and the description of Boxes, Lines and SD/SG.","匿名化して書き出す画面 > 説明の 2 段目（置き換える所。プロパティ名は訳さない）"
 "hint.notReplaced","置換しないもの: Box.label / Line.label / SDSG.label (解析者の概念名なので個別確認が必要)。","Not replaced: Box.label / Line.label / SDSG.label (these are the analyst's concept names; check them one by one).","匿名化して書き出す画面 > 説明の 3 段目"
 "existing.title","既存の匿名化マップ ({{count}} 件)","Existing anonymization maps ({{count}} entries)","匿名化して書き出す画面 > 取り込み時に作った置き換え表の見出し"
+existing.title_one,既存の匿名化マップ ({{count}} 件),Existing anonymization maps ({{count}} entry),件数が 1 のときの英語の形（日本語は使われない）
 "existing.none","原文が登録されていません。","No transcripts registered.","匿名化して書き出す画面 > 逐語録が無いとき"
 "existing.session","第{{n}}回","Session {{n}}","匿名化して書き出す画面 > 逐語録のインタビューの回"
 "existing.count","{{title}}: {{count}} 件","{{title}}: {{count}} entries","匿名化して書き出す画面 > 逐語録ごとの置き換えの数（title は逐語録の題）"
+existing.count_one,{{title}}: {{count}} 件,{{title}}: {{count}} entry,件数が 1 のときの英語の形（日本語は使われない）
 "additional.title","追加の匿名化対象 (任意)","Additional targets (optional)","匿名化して書き出す画面 > 追加で置き換える名前の節の見出し"
 "additional.names","氏名・組織名","Names and organizations","匿名化して書き出す画面 > 入力欄の名前"
 "additional.placeholder","コンマ区切り (例: 山田太郎, X 大学, 田中先生)","Comma-separated (e.g. Taro Yamada, X University, Ms. Tanaka)","匿名化して書き出す画面 > 入力欄の例"

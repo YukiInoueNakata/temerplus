@@ -49,7 +49,8 @@ export function TranscriptImportDialog({
   const [participantId, setParticipantId] = useState<string>('');
   const [sessionNumber, setSessionNumber] = useState<string>('');   // 文字列で保持、確定時に number へ
   const [anonymizeNames, setAnonymizeNames] = useState<string>(''); // コンマ区切りの匿名化対象
-  const [anonymizePrefix, setAnonymizePrefix] = useState<string>(defaultPrefix);
+  // 空なら使うときに図の言語の既定（defaultPrefix）で埋める（初期値に入れると、窓を作ったときの言語のまま残る。2026-11-08 レビューの指摘）
+  const [anonymizePrefix, setAnonymizePrefix] = useState<string>('');
 
   const reset = () => {
     setInitial(null);

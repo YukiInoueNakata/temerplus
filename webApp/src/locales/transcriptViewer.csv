@@ -15,6 +15,7 @@ list.confirmDelete,"「{{title}}」を削除しますか？
 この原文を参照している全ての SourceRef も削除されます。","Delete ""{{title}}""?
 All source references to this transcript will also be deleted.",逐語録の画面 > 削除の確認（2 行）
 list.paragraphs,{{count}} 段落 / {{source}},{{count}} paragraphs / {{source}},逐語録の画面 > 左の一覧の小さな説明（段落の数と形式）
+list.paragraphs_one,{{count}} 段落 / {{source}},{{count}} paragraph / {{source}},件数が 1 のときの英語の形（日本語は使われない）
 session,第{{n}}回,Session {{n}},逐語録の画面 > 何回目のインタビューか
 sessionNone,(回数未指定),(no session),逐語録の画面 > 回数が無いとき
 unassigned,(未割当),(Unassigned),逐語録の画面 > 協力者が決まっていない逐語録のまとまり
@@ -30,7 +31,9 @@ search.scope.current,現在の原文,Current transcript,逐語録の画面 > 検
 search.scope.participant,同じ協力者の全回,All sessions of this participant,逐語録の画面 > 検索範囲の選択肢
 search.scope.all,全原文を横断,All transcripts,逐語録の画面 > 検索範囲の選択肢
 search.hits,ヒット {{count}} 段落,{{count}} paragraphs found,逐語録の画面 > 検索の結果の数
+search.hits_one,ヒット {{count}} 段落,{{count}} paragraph found,件数が 1 のときの英語の形（日本語は使われない）
 search.crossHits,ヒット {{count}} 段落（{{transcripts}} 原文）,{{count}} paragraphs found ({{transcripts}} transcripts),逐語録の画面 > 横断検索の結果の数
+search.crossHits_one,ヒット {{count}} 段落（{{transcripts}} 原文）,{{count}} paragraph found ({{transcripts}} transcripts),件数が 1 のときの英語の形（日本語は使われない）
 search.bulkLink,一括リンク...,Link all...,逐語録の画面 > ボタン
 search.bulkLink.tip,ヒットした段落を Box に一括リンク,Link all found paragraphs to a Box,逐語録の画面 > ボタンの吹き出し
 search.crossLink.all,横断一括リンク...,Link all across transcripts...,逐語録の画面 > ボタン
@@ -47,6 +50,7 @@ onlyUnlinkedShown,未リンク段落のみ表示中: {{shown}} / {{total}} 段�
 paragraph.speaker,話者,Speaker,逐語録の画面 > 段落の編集の入力欄（薄字）
 paragraph.time,時刻,Time,逐語録の画面 > 段落の編集の入力欄（薄字）
 paragraph.links,{{count}} リンク,{{count}} links,逐語録の画面 > 段落に付いた原文参照の数
+paragraph.links_one,{{count}} リンク,{{count}} link,件数が 1 のときの英語の形（日本語は使われない）
 paragraph.note,メモ,Note,逐語録の画面 > 段落のメモ（印とボタン）
 paragraph.noteClose,メモ閉,Close note,逐語録の画面 > 段落のボタン
 paragraph.linkWhole,段落全体をリンク,Link whole paragraph,逐語録の画面 > 段落のボタン
@@ -89,17 +93,22 @@ cancel,キャンセル,Cancel,リンクの画面 > ボタン
 bulk.title,検索ヒットを一括リンク,Link all search hits,一括リンクの画面の題
 bulk.titleCross,横断検索ヒットを一括リンク,Link all cross-search hits,一括リンクの画面の題
 bulk.count,{{count}} 件,{{count}} hits,一括リンク > 題の中の件数
+bulk.count_one,{{count}} 件,{{count}} hit,件数が 1 のときの英語の形（日本語は使われない）
 bulk.transcripts,{{count}} 原文,{{count}} transcripts,一括リンク > 題の中の逐語録の数
+bulk.transcripts_one,{{count}} 原文,{{count}} transcript,件数が 1 のときの英語の形（日本語は使われない）
 bulk.boxLabelPlaceholder,例: 指導教員との出会い,e.g. Meeting the supervisor,一括リンク > 入力欄（薄字）
 bulk.hint,description には選択した全段落の本文を連結して貼付します（§番号付き）。,The text of all selected paragraphs is joined and pasted into the description (with § numbers).,一括リンク > 説明
 bulk.selectAll,全選択,Select all,一括リンク > チェックボックス
 bulk.selected,{{selected}} / {{total}} 段落を選択中,{{selected}} / {{total}} paragraphs selected,一括リンク > 選んだ数
 bulk.confirmNew,Box 作成 + {{count}} 段落をリンク,Create Box + link {{count}} paragraphs,一括リンク > ボタン
+bulk.confirmNew_one,Box 作成 + {{count}} 段落をリンク,Create Box + link {{count}} paragraph,件数が 1 のときの英語の形（日本語は使われない）
 bulk.confirmExisting,{{count}} 段落をリンク追加,Link {{count}} paragraphs,一括リンク > ボタン
+bulk.confirmExisting_one,{{count}} 段落をリンク追加,Link {{count}} paragraph,件数が 1 のときの英語の形（日本語は使われない）
 cross.noMatch,「{{keyword}}」にマッチする段落が見つかりませんでした。,"No paragraphs match ""{{keyword}}"".",逐語録の画面 > 横断検索で何も無いとき
 cross.summary,{{participants}} 協力者 / {{transcripts}} 原文に渡って {{hits}} 件のヒット。各行クリックで該当段落へジャンプします。,{{hits}} hits across {{participants}} participants / {{transcripts}} transcripts. Click a row to jump to the paragraph.,逐語録の画面 > 横断検索の結果の説明
 cross.groupCount,{{hits}} 件 / {{sessions}} 回,{{hits}} hits / {{sessions}} sessions,逐語録の画面 > 横断検索の協力者ごとの件数
 cross.hits,{{count}} 件,{{count}} hits,逐語録の画面 > 横断検索の回ごとの件数
+cross.hits_one,{{count}} 件,{{count}} hit,件数が 1 のときの英語の形（日本語は使われない）
 cross.jump,クリックで該当段落へジャンプ,Click to jump to the paragraph,逐語録の画面 > 横断検索の行の吹き出し
 reconnect.confirmDelete,このリンクを完全に削除しますか？,Delete this link permanently?,リンクの再接続 > 削除の確認
 reconnect.title,リンク再接続 ({{type}} / {{id}}),Reconnect link ({{type}} / {{id}}),リンクの再接続の画面の題

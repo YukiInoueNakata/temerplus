@@ -580,6 +580,8 @@ function AlignButton({ type }: { type: 'left' | 'center-h' | 'right' | 'top' | '
 
 function InsertTab({ onOpenInsertBetween, onOpenPeriodLabels }: { onOpenInsertBetween: () => void; onOpenPeriodLabels: () => void }) {
   const addBox = useTEMStore((s) => s.addBox);
+  // Box に入れる文字は図の言語で引く（ボタンの表示は画面の言語。2026-11-08 レビューの指摘）
+  const docLocale = useTEMStore((s) => s.doc.settings.locale) ?? 'ja';
   const selection = useTEMStore((s) => s.selection);
   const addSequentialLines = useTEMStore((s) => s.addSequentialLines);
   const addSDSG = useTEMStore((s) => s.addSDSG);
@@ -649,7 +651,7 @@ function InsertTab({ onOpenInsertBetween, onOpenPeriodLabels }: { onOpenInsertBe
             key={type}
             label={t(`terms:boxType.${type}`)}
             icon={getIconForBoxType(type)}
-            onClick={() => addBox({ type, label: t(`terms:boxType.${type}`) })}
+            onClick={() => addBox({ type, label: t(`terms:boxType.${type}`, { lng: docLocale }) })}
           />
         ))}
       </RibbonGroup>

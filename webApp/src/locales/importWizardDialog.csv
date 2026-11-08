@@ -79,11 +79,15 @@ error.noPeriods,時期ラベルを作れませんでした。位置とラベル�
 error.noTextColumn,「本文」の列を割り当ててください,Assign a column to Text,表から取り込み > 取り込めなかったときの注意
 error.noParagraphs,段落を作れませんでした（本文が空）,No paragraphs could be created (the text is empty),表から取り込み > 取り込めなかったときの注意
 done.warnings,警告 {{count}} 件:,{{count}} warnings:,表から取り込み > 取り込んだ後の知らせ（警告の一覧の見出し）
+done.warnings_one,警告 {{count}} 件:,{{count}} warning:,件数が 1 のときの英語の形（日本語は使われない）
 done.boxes,{{boxes}} 件の Box、{{lines}} 件の Line を取り込みました,Imported {{boxes}} Boxes and {{lines}} Lines,表から取り込み > 取り込んだ後の知らせ
 done.lines,{{count}} 件の Line を取り込みました,Imported {{count}} Lines,表から取り込み > 取り込んだ後の知らせ
+done.lines_one,{{count}} 件の Line を取り込みました,Imported {{count}} Line,件数が 1 のときの英語の形（日本語は使われない）
 done.sdsg,{{count}} 件の SD/SG を取り込みました,Imported {{count}} SD/SG,表から取り込み > 取り込んだ後の知らせ
 done.periods,{{count}} 件の時期ラベルを取り込みました,Imported {{count}} period labels,表から取り込み > 取り込んだ後の知らせ
+done.periods_one,{{count}} 件の時期ラベルを取り込みました,Imported {{count}} period label,件数が 1 のときの英語の形（日本語は使われない）
 done.transcript,逐語録「{{title}}」（{{count}} 段落）を取り込みました,"Imported the transcript ""{{title}}"" ({{count}} paragraphs)",表から取り込み > 取り込んだ後の知らせ
+done.transcript_one,逐語録「{{title}}」（{{count}} 段落）を取り込みました,"Imported the transcript ""{{title}}"" ({{count}} paragraph)",件数が 1 のときの英語の形（日本語は使われない）
 done.maxqda,"逐語録 {{transcripts}} 本（{{paragraphs}} 段落）、Box {{boxes}}、SD/SG {{sdsg}}、時期ラベル {{periods}} を取り込みました","Imported {{transcripts}} transcripts ({{paragraphs}} paragraphs), {{boxes}} Boxes, {{sdsg}} SD/SG and {{periods}} period labels",表から取り込み > 取り込んだ後の知らせ（MAXQDA）
 step1.heading,1. ファイルを選ぶ,1. Choose a file,表から取り込み > 手順 1 の見出し
 step1.hint,CSV / TSV / Excel（.xlsx / .xls）。Excel は最初の非空シートを読み、あとで切り替えられます。PowerPoint（.pptx）で描いた TEM 図も取り込めます（図形の役割を確かめる画面に進みます）。,"CSV / TSV / Excel (.xlsx / .xls). For Excel, the first non-empty sheet is read; you can switch later. TEM diagrams drawn in PowerPoint (.pptx) can also be imported (you will go on to a screen for checking the role of each shape).",表から取り込み > 手順 1 の説明（ここでのシートは Excel のシート）
@@ -94,6 +98,7 @@ step2.sheet,シート,Sheet,表から取り込み > Excel のシートの選択�
 step2.sheetOption,{{name}}（{{rows}} 行）,{{name}} ({{rows}} rows),表から取り込み > Excel のシートの選択肢
 step2.hasHeader,1 行目は見出し,First row is a header,表から取り込み > チェックボックスのラベル
 step2.preview,プレビュー（先頭 {{count}} 行）,Preview (first {{count}} rows),表から取り込み > 見出し
+step2.preview_one,プレビュー（先頭 {{count}} 行）,Preview (first {{count}} row),件数が 1 のときの英語の形（日本語は使われない）
 step3.heading,3. 列の役割を決める,3. Set the role of each column,表から取り込み > 手順 3 の見出し
 step3.hint,{{required}}。見出しから推測した値が入っています。,{{required}}. Values guessed from the headers are filled in.,表から取り込み > 手順 3 の説明（{{required}} は required.* の文）
 step3.col.header,列（見出し）,Column (header),表から取り込み > 列の役割の表の列名

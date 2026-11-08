@@ -497,7 +497,7 @@ function CanvasInner({
     if (!sheet) return [];
     const selLineIds = new Set(storeLineIds);
     return sheet.lines.map((l) => {
-      // 端点が潜在経験(annotation)や両極化等至点(P-EFP/P-2nd-EFP)に
+      // 端点が潜在経験(annotation)や両極化した等至点(P-EFP/P-2nd-EFP)に
       // 接続している場合、XLineでなくても点線化
       const fromBox = sheet.boxes.find((b) => b.id === l.from);
       const toBox = sheet.boxes.find((b) => b.id === l.to);

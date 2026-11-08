@@ -115,10 +115,10 @@ snap.distancePx,距離スナップ（px）,Distance snap (px),設定 > スナッ
 boxTypeLabel.normal,normal（通常）,normal (Normal),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.BFP,BFP（分岐点）,BFP (Bifurcation point),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.EFP,EFP（等至点）,EFP (Equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
-boxTypeLabel.P-EFP,P-EFP（両極化等至点）,P-EFP (Polarized equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.P-EFP,P-EFP（両極化した等至点）,P-EFP (Polarized equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.OPP,OPP（必須通過点）,OPP (Obligatory passage point),設定 > タイプラベル と Box スタイル のBox の種類の名前
-boxTypeLabel.2nd-EFP,2nd-EFP（第二等至点）,2nd-EFP (Second equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
-boxTypeLabel.P-2nd-EFP,P-2nd-EFP（両極化第二等至点）,P-2nd-EFP (Polarized second equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.2nd-EFP,2nd-EFP（第 2 等至点）,2nd-EFP (Second equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.P-2nd-EFP,P-2nd-EFP（両極化した第 2 等至点）,P-2nd-EFP (Polarized second equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.annotation,annotation（潜在経験）,annotation (Latent experience),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.SD,SD（社会的方向づけ）,SD (Social direction),設定 > タイプラベル と Box スタイル の種類の名前
 boxTypeLabel.SG,SG（社会的ガイド）,SG (Social guidance),設定 > タイプラベル と Box スタイル の種類の名前

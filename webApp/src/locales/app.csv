@@ -39,6 +39,15 @@ Click Cancel to stop saving.","確認の窓（逐語録を含むファイルを�
 
 If you add them, sheet names will be duplicated (sheet IDs are made unique automatically).
 Continue?","確認の窓（ファイル > 別シートとして開く で名前が重なるとき）。{{names}} はシート名の一覧"
+confirm.duplicateSheetNames_one,"現在と同じシート名が {{count}} 件あります:
+{{names}}
+
+このまま追加するとシート名が重複します（シート ID は自動でユニーク化されます）。
+続行しますか？","{{count}} sheet has the same name as a current sheet:
+{{names}}
+
+If you add it, sheet names will be duplicated (sheet IDs are made unique automatically).
+Continue?",件数が 1 のときの英語の形（日本語は使われない）
 "sheetNameBullet","・{{name}}","- {{name}}","上の確認の窓のシート名の一覧の 1 行"
 "alert.noActiveSheet","アクティブシートが見つかりません","The active sheet was not found.","警告の窓（CSV エクスポートで今のシートが見つからないとき）"
 "error.exportPreview.title","出力プレビューでエラー","Error in export preview","出力の画面が壊れたときの代わりの窓の見出し"

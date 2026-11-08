@@ -15,6 +15,7 @@ reason.manual,手で変更,Changed by hand,PowerPoint から取り込み > 図�
 error.importFailed,取り込みの途中で失敗しました: {{message}},Import failed partway: {{message}},PowerPoint から取り込み > 取り込めなかったときの注意
 done.summary,"Box {{boxes}}、Line {{lines}}、SD/SG {{sdsg}}、時期ラベル {{periods}}、メモ {{notes}} を取り込みました","Imported {{boxes}} Boxes, {{lines}} Lines, {{sdsg}} SD/SG, {{periods}} period labels and {{notes}} notes",PowerPoint から取り込み > 取り込んだ後の知らせ
 done.warnings,確認してほしいこと {{count}} 件:,{{count}} things to check:,PowerPoint から取り込み > 取り込んだ後の知らせ（警告の一覧の見出し）
+done.warnings_one,確認してほしいこと {{count}} 件:,{{count}} thing to check:,件数が 1 のときの英語の形（日本語は使われない）
 step1.heading,1. ファイルを選ぶ,1. Choose a file,PowerPoint から取り込み > 手順 1 の見出し
 step1.hint,PowerPoint（.pptx）で描いた TEM 図。図形の見た目（枠・吹き出しの向き・矢印・文字）から Box や SD/SG を推測します。,"A TEM diagram drawn in PowerPoint (.pptx). Boxes and SD/SG are guessed from how the shapes look (outline, callout direction, arrows, text).",PowerPoint から取り込み > 手順 1 の説明
 step1.drop,ここに .pptx をドロップ、またはクリックして選択,"Drop a .pptx here, or click to choose one",PowerPoint から取り込み > ファイルを落とす枠

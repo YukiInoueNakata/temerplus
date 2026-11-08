@@ -28,7 +28,8 @@ reason.nohead,矢じりの無い線（区切り線など）,Line without an arro
 reason.notext,文字の無い図形,Shape without text,PowerPoint の取り込み > 推測の理由（無視）
 reason.period,「第N期」で始まる,Starts with a period name (e.g. Phase N),PowerPoint の取り込み > 推測の理由（時期ラベル）
 reason.timelabel,時間の矢印のラベル,Label of the time arrow,PowerPoint の取り込み > 推測の理由（無視）
-reason.merged,重なっていた文字（{{count}} 個）を合流,Merged {{count}} overlapping text(s),PowerPoint の取り込み > 推測の理由（Box）
+reason.merged,重なっていた文字（{{count}} 個）を合流,Merged {{count}} overlapping texts,PowerPoint の取り込み > 推測の理由（Box）
+reason.merged_one,重なっていた文字（{{count}} 個）を合流,Merged {{count}} overlapping text,件数が 1 のときの英語の形（日本語は使われない）
 reason.framedtext,枠のある文字,Text in a frame,PowerPoint の取り込み > 推測の理由（Box）
 reason.unframedtext,枠の無い文字,Text without a frame,PowerPoint の取り込み > 推測の理由（メモ）
 reason.legend,凡例,Legend,PowerPoint の取り込み > 推測の理由（無視）
@@ -39,7 +40,8 @@ reason.sublabel,すぐ上の要素のサブラベル,Sublabel of the element jus
 quote,「{{text}}」,“{{text}}”,PowerPoint の取り込み > 警告の中で図形の文字を囲むかぎ括弧
 listsep,、,", ",PowerPoint の取り込み > 警告の中で図形の文字を並べる区切り
 arrow.where,"矢印（{{x1}},{{y1}} → {{x2}},{{y2}} pt）","Arrow ({{x1}},{{y1}} → {{x2}},{{y2}} pt)",PowerPoint の取り込み > 警告の頭に付く矢印の位置
-warn.skipped,位置を持たない図形（プレースホルダーなど）{{count}} 個は取り込めませんでした: {{list}},Could not import {{count}} shape(s) without a position (e.g. placeholders): {{list}},PowerPoint の取り込み > 警告
+warn.skipped,位置を持たない図形（プレースホルダーなど）{{count}} 個は取り込めませんでした: {{list}},Could not import {{count}} shapes without a position (e.g. placeholders): {{list}},PowerPoint の取り込み > 警告
+warn.skipped_one,位置を持たない図形（プレースホルダーなど）{{count}} 個は取り込めませんでした: {{list}},Could not import {{count}} shape without a position (e.g. a placeholder): {{list}},件数が 1 のときの英語の形（日本語は使われない）
 warn.arrow.nostart,{{where}}: 始点の近くに Box が見つからないため取り込みませんでした,{{where}}: not imported (no Box near the start point),PowerPoint の取り込み > 警告（矢印）
 warn.arrow.noend,{{where}}: 終点の近くに Box が見つからないため取り込みませんでした,{{where}}: not imported (no Box near the end point),PowerPoint の取り込み > 警告（矢印）
 warn.arrow.samebox,{{where}}: 両端が同じ Box「{{label}}」になるため取り込みませんでした,{{where}}: not imported (both ends attach to the same Box “{{label}}”),PowerPoint の取り込み > 警告（矢印）
@@ -49,4 +51,5 @@ warn.sdsg.nolabel,"{{type}}（{{x}},{{y}} pt）: ラベルになる文字が見�
 warn.sdsg.nobox,{{type}}「{{label}}」: 紐付ける Box が無いため取り込みませんでした,{{type}} “{{label}}”: not imported (no Box to attach to),PowerPoint の取り込み > 警告（SD/SG）
 warn.sublabel.unresolved,「{{text}}」: どの Box・SD/SG のサブラベルか決まらないため使いませんでした,“{{text}}”: not used (could not tell which Box or SD/SG it belongs to),PowerPoint の取り込み > 警告
 warn.nobox,Box が 1 つもありません。図形の役割を確認してください,No Boxes. Check the roles of the shapes.,PowerPoint の取り込み > 警告
-warn.unlinked,矢印でつながっていない Box が {{count}} 個あります（元の図に矢印が無い場合は取り込み後に引いてください）,"{{count}} Box(es) are not connected by arrows (if the original diagram has none, draw them after importing)",PowerPoint の取り込み > 警告
+warn.unlinked,矢印でつながっていない Box が {{count}} 個あります（元の図に矢印が無い場合は取り込み後に引いてください）,"{{count}} Boxes are not connected by arrows (if the original diagram has none, draw them after importing)",PowerPoint の取り込み > 警告
+warn.unlinked_one,矢印でつながっていない Box が {{count}} 個あります（元の図に矢印が無い場合は取り込み後に引いてください）,"{{count}} Box is not connected by arrows (if the original diagram has none, draw them after importing)",件数が 1 のときの英語の形（日本語は使われない）

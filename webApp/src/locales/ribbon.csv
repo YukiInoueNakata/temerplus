@@ -51,16 +51,20 @@
 "home.redo","進む ({{key}})","Redo ({{key}})","リボン > 編集 のボタン。{{key}} はショートカット"
 "home.copy","コピー","Copy","リボン > 編集 のボタン"
 "home.copy.title","選択中の {{count}} 要素をコピー","Copy {{count}} selected items","ボタンの説明（マウスを重ねたとき）"
+home.copy.title_one,選択中の {{count}} 要素をコピー,Copy {{count}} selected item,件数が 1 のときの英語の形（日本語は使われない）
 "home.paste","貼付","Paste","リボン > 編集 のボタン"
 "home.paste.title","クリップボードの {{count}} 要素を貼り付け","Paste {{count}} items from the clipboard","ボタンの説明（マウスを重ねたとき）"
+home.paste.title_one,クリップボードの {{count}} 要素を貼り付け,Paste {{count}} item from the clipboard,件数が 1 のときの英語の形（日本語は使われない）
 "home.paste.empty","クリップボードが空です","The clipboard is empty","貼付ボタンの説明（貼り付けるものが無いとき）"
 "home.delete","削除","Delete","リボン > 編集 のボタン"
 "home.delete.title","選択中の {{count}} 要素を削除","Delete {{count}} selected items","ボタンの説明（マウスを重ねたとき）"
+home.delete.title_one,選択中の {{count}} 要素を削除,Delete {{count}} selected item,件数が 1 のときの英語の形（日本語は使われない）
 "home.noSelection","図形を選択してください","Select shapes first","コピー・削除・複製ボタンの説明（何も選んでいないとき）"
 "home.group.edit","編集","Edit","リボン > 編集 のまとまりの名前"
 "home.selectAll","全選択","Select all","リボン > 編集 のボタン"
 "home.duplicate","複製","Duplicate","リボン > 編集 のボタン"
 "home.duplicate.title","選択中の {{count}} 要素を複製","Duplicate {{count}} selected items","ボタンの説明（マウスを重ねたとき）"
+home.duplicate.title_one,選択中の {{count}} 要素を複製,Duplicate {{count}} selected item,件数が 1 のときの英語の形（日本語は使われない）
 "home.fitBoth","文字に合わせる","Fit to text","リボン > 編集 のボタン（Box の大きさを文字に合わせる）"
 "home.fitBoth.title","選択 Box のサイズ（幅・高さとも）をラベルに合わせて最小化","Shrink the selected Boxes (width and height) to fit their labels","ボタンの説明（マウスを重ねたとき）"
 "home.fitWidth","幅を文字に","Fit width","リボン > 編集 のボタン"

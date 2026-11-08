@@ -23,7 +23,8 @@ export function AnonymizeExportDialog({
   const defaultPrefix = t('terms:participant', { lng: docLocale });
   const doc = useTEMStore((s) => s.doc);
   const [additionalNames, setAdditionalNames] = useState('');
-  const [prefix, setPrefix] = useState(defaultPrefix);
+  // 空なら使うときに図の言語の既定（defaultPrefix）で埋める（初期値に入れると、窓を作ったときの言語のまま残る。2026-11-08 レビューの指摘）
+  const [prefix, setPrefix] = useState('');
 
   // 既存の anonymizationMap を集約 (Transcript ごと)
   const existingMaps = useMemo(() => {
@@ -133,6 +134,7 @@ export function AnonymizeExportDialog({
                 type="text"
                 value={prefix}
                 onChange={(e) => setPrefix(e.target.value)}
+                placeholder={defaultPrefix}
                 style={{ width: 120 }}
               />
               <span style={{ fontSize: 11, color: '#666', marginLeft: 8 }}>

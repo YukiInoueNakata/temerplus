@@ -9,5 +9,5 @@
 "sample.opp","必須通過点","Obligatory passage point","作例の図 > OPP の Box の文字（図の言語）"
 "sample.bfp","分岐点","Bifurcation point","作例の図 > BFP の Box の文字（図の言語）"
 "sample.efp","等至点","Equifinality point","作例の図 > EFP の Box の文字（図の言語）"
-"sample.pefp","両極化等至点","Polarized equifinality point","作例の図 > P-EFP の Box の文字（図の言語）"
+"sample.pefp","両極化した等至点","Polarized equifinality point","作例の図 > P-EFP の Box の文字（図の言語）"
 "sample.period","時期{{n}}","Period {{n}}","作例の図 > 時期ラベル（n は番号・図の言語）"

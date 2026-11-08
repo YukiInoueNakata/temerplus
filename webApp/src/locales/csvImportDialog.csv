@@ -44,15 +44,18 @@ error.noSdsg,インポート可能な SDSG がありませんでした。type �
 error.noPeriods,インポート可能な時期ラベルがありませんでした。position と label 列を割り当ててください。,There were no period labels to import. Assign the position and label columns.,CSV 取り込み > 取り込めなかったときの注意
 done.boxes,{{boxes}} 件の Box、{{lines}} 件の Line をインポートしました,Imported {{boxes}} Boxes and {{lines}} Lines,CSV 取り込み > 取り込んだ後の知らせ
 done.lines,{{count}} 件の Line をインポートしました,Imported {{count}} Lines,CSV 取り込み > 取り込んだ後の知らせ
+done.lines_one,{{count}} 件の Line をインポートしました,Imported {{count}} Line,件数が 1 のときの英語の形（日本語は使われない）
 done.sdsg,{{count}} 件の SDSG をインポートしました,Imported {{count}} SD/SG,CSV 取り込み > 取り込んだ後の知らせ
 done.periods,{{count}} 件の時期ラベルをインポートしました,Imported {{count}} period labels,CSV 取り込み > 取り込んだ後の知らせ
+done.periods_one,{{count}} 件の時期ラベルをインポートしました,Imported {{count}} period label,件数が 1 のときの英語の形（日本語は使われない）
 done.withWarnings,インポート完了（警告 {{count}} 件）,Import finished ({{count}} warnings),CSV 取り込み > 警告があったときの知らせの見出し
+done.withWarnings_one,インポート完了（警告 {{count}} 件）,Import finished ({{count}} warning),件数が 1 のときの英語の形（日本語は使われない）
 target,インポート対象,Import as,CSV 取り込み > 取り込む対象の選択のラベル
 chooseFile,CSV ファイルを選択してください。1 行目にヘッダがある場合は自動判定します。,Choose a CSV file. A header in the first row is detected automatically.,CSV 取り込み > ファイル選択の説明
 spec.heading,仕様メモ ({{target}}):,Format notes ({{target}}):,CSV 取り込み > 列の決まりの見出し
 spec.box.required,必須列: ラベル（label）,Required column: label,CSV 取り込み > Box の列の決まり
 spec.box.optional,オプション列: 種別 / Time Level / Item Level / ID / サブラベル / 説明 / 幅 / 高さ,Optional columns: type / time level / item level / ID / sublabel / description / width / height,CSV 取り込み > Box の列の決まり
-spec.box.types,種別は英名（BFP / EFP / P-EFP / OPP / annotation / 2nd-EFP）または日本語（分岐点・等至点・両極化等至点・必須通過点・潜在経験・第二等至点）,Type is an English code (BFP / EFP / P-EFP / OPP / annotation / 2nd-EFP) or a Japanese name (分岐点・等至点・両極化等至点・必須通過点・潜在経験・第二等至点),CSV 取り込み > Box の列の決まり（日本語の種別名はファイルの中で使える語なので英語版でも日本語のまま）
+spec.box.types,種別は英名（BFP / EFP / P-EFP / OPP / annotation / 2nd-EFP）または日本語（分岐点・等至点・両極化した等至点・必須通過点・潜在経験・第 2 等至点）,Type is an English code (BFP / EFP / P-EFP / OPP / annotation / 2nd-EFP) or a Japanese name (分岐点・等至点・両極化した等至点・必須通過点・潜在経験・第 2 等至点),CSV 取り込み > Box の列の決まり（日本語の種別名はファイルの中で使える語なので英語版でも日本語のまま）
 spec.line.required,必須列: from（始点 Box ID）/ to（終点 Box ID）,Required columns: from (start Box ID) / to (end Box ID),CSV 取り込み > Line の列の決まり
 spec.line.optional,オプション列: ID / type (RLine/XLine) / shape (straight/elbow/curve) / label / 説明,Optional columns: ID / type (RLine/XLine) / shape (straight/elbow/curve) / label / description,CSV 取り込み > Line の列の決まり
 spec.line.before,from / to は,from / to must match a Box ID that exists on the ,CSV 取り込み > Line の列の決まり（太字の「現在のシート」の前）

@@ -255,13 +255,16 @@ export const CODE_ACTION_LABELS: Record<CodeAction, string> = {
   get period() { return i18n.t('maxqdaImport:action.period'); },
 };
 
+const TYPE_DICT_BY_LENGTH = Object.entries(TYPE_DICT).sort((a, b) => b[0].length - a[0].length);
+
 /** 語から種別を推測する。TYPE_DICT（CSV 取り込みの辞書）を再利用 */
 function guessTypeFromWords(words: string[]): BoxType | undefined {
   for (const w of words) {
     const lower = w.trim().toLowerCase();
     if (TYPE_DICT[lower]) return TYPE_DICT[lower];
     // 部分一致（「第1分岐点」「BFP: 進学」のような書き方）
-    for (const [k, v] of Object.entries(TYPE_DICT)) {
+    // 長い語から試す（「両極化等至点」が「等至点」に、「p-efp」が「efp」に先に当たらないように。2026-11-08）
+    for (const [k, v] of TYPE_DICT_BY_LENGTH) {
       if (k.length >= 2 && lower.includes(k)) return v;
     }
   }

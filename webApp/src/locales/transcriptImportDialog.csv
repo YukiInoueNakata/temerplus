@@ -14,6 +14,7 @@ col.time,時刻,Time,逐語録の取り込み > プレビューの列名
 col.text,本文,Text,逐語録の取り込み > プレビューの列名
 step2.previewParagraphs,2. プレビュー (先頭 5 段落),2. Preview (first 5 paragraphs),逐語録の取り込み > 手順 2 の見出し（文章のファイル）
 step2.totalParagraphs,合計 {{count}} 段落,{{count}} paragraphs in total,逐語録の取り込み > 段落の数
+step2.totalParagraphs_one,合計 {{count}} 段落,{{count}} paragraph in total,件数が 1 のときの英語の形（日本語は使われない）
 step3.heading,3. メタデータ,3. Metadata,逐語録の取り込み > 手順 3 の見出し
 step3.title,タイトル,Title,逐語録の取り込み > 入力欄のラベル
 step3.titlePlaceholder,例: 協力者 A 第1回 (2026-04-15),"e.g. Participant A, session 1 (2026-04-15)",逐語録の取り込み > 題の入力欄（薄字）

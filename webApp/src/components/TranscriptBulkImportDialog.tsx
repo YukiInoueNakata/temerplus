@@ -61,7 +61,8 @@ export function TranscriptBulkImportDialog({
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [globalAnonymize, setGlobalAnonymize] = useState('');
-  const [anonymizePrefix, setAnonymizePrefix] = useState(defaultPrefix);
+  // 空なら使うときに図の言語の既定（defaultPrefix）で埋める（初期値に入れると、窓を作ったときの言語のまま残る。2026-11-08 レビューの指摘）
+  const [anonymizePrefix, setAnonymizePrefix] = useState('');
 
   const reset = () => {
     setRows([]);
@@ -99,7 +100,7 @@ export function TranscriptBulkImportDialog({
       }
       const titleParts: string[] = [];
       if (hints.participantHint) titleParts.push(hints.participantHint);
-      if (hints.sessionHint !== undefined) titleParts.push(`第${hints.sessionHint}回`); // i18n-ok 逐語録の題の既定値（データ）
+      if (hints.sessionHint !== undefined) titleParts.push(t('title.session', { n: hints.sessionHint, lng: docLocale })); // 逐語録の題の既定値（データなので図の言語）
       const title = titleParts.length > 0 ? titleParts.join(' ') : filenameNoExt;
 
       let initial: ImportInitialResult | undefined;
@@ -418,6 +419,7 @@ export function TranscriptBulkImportDialog({
                     type="text"
                     value={anonymizePrefix}
                     onChange={(e) => setAnonymizePrefix(e.target.value)}
+                    placeholder={defaultPrefix}
                     style={{ width: 100 }}
                   />
                 </div>

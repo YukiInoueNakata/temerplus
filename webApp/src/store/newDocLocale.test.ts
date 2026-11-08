@@ -36,7 +36,7 @@ describe('新しい図の言語＝画面の言語', () => {
     expect(doc.settings.legend.title).toBe(DEFAULT_SETTINGS.legend.title);
     const sample = createSampleDocument();
     expect(sample.sheets[0].name).toBe('参加者A');
-    expect(sample.sheets[0].boxes.map((b) => b.label)).toEqual(['出発点', '必須通過点', '分岐点', '等至点', '両極化等至点']);
+    expect(sample.sheets[0].boxes.map((b) => b.label)).toEqual(['出発点', '必須通過点', '分岐点', '等至点', '両極化した等至点']);
     expect(sample.sheets[0].periodLabels.map((p) => p.label)).toEqual(['時期1', '時期2']);
     expect(sample.metadata.author).toBe('中田友貴');
   });

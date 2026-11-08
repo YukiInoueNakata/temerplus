@@ -3,6 +3,7 @@ title,原文参照 ({{count}}),Source references ({{count}}),プロパティ > �
 title.unresolved,⚠{{count}} 追従不能,⚠{{count}} not tracked,原文参照の節の見出しの後ろに付く注意（原文の編集で位置が分からなくなった件数）
 title.unreferenced,⚠ 未引用,⚠ Not cited,原文参照の節の見出しの後ろに付く注意（逐語録があるのに引用が 0 件）
 title.coverage,協力者 {{count}},{{count}} participants,原文参照の節の見出しの後ろに付く協力者の人数
+title.coverage_one,協力者 {{count}},{{count}} participant,件数が 1 のときの英語の形（日本語は使われない）
 unassigned,(未割当),(unassigned),協力者が割り当てられていない逐語録（協力者の名前の並びの中）
 warn.noRefs,原文への引用がありません,No citations from the transcript,原文参照の節の赤い注意の太字
 warn.noRefs.hint,この要素は原文ビューアで段落をリンクすると根拠を保証できます。,Link a paragraph in the transcript viewer to ground this element in the data.,原文参照の節の赤い注意の説明

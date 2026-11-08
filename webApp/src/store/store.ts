@@ -2195,7 +2195,17 @@ export const useTEMStore = create<Store>()(
       // 図の表記の言語（凡例など）。画面の言語は uiLanguage.ts（利用者の好み）で、ここでは変えない（2026-11-08）
       setLocale: (locale) => {
         set((state) => ({
-          doc: produce(state.doc, (d) => { d.settings.locale = locale; }),
+          doc: produce(state.doc, (d) => {
+            const prev = d.settings.locale ?? 'ja';
+            d.settings.locale = locale;
+            // 時間の矢印の文字と凡例の題が前の言語の既定のままなら、新しい言語の既定に替える
+            // （利用者が書き換えた文字は残す。替えないと「凡例」「非可逆的時間」だけ前の言語で残る。2026-11-08）
+            if (prev === locale) return;
+            const swap = (cur: string | undefined, key: string) =>
+              cur === i18n.t(key, { lng: prev }) ? i18n.t(key, { lng: locale }) : cur;
+            if (d.settings.timeArrow) d.settings.timeArrow.label = swap(d.settings.timeArrow.label, 'terms:timeArrow') ?? d.settings.timeArrow.label;
+            if (d.settings.legend) d.settings.legend.title = swap(d.settings.legend.title, 'terms:legend') ?? d.settings.legend.title;
+          }),
         }));
       },
       setUIFontSize: (size) => {

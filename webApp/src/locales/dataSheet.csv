@@ -13,8 +13,10 @@ box.clipboardEmpty,クリップボードにテキストがありません。Exce
 box.selected,選択 {{count}}個,{{count}} selected,データシート > 選んだ Box の数
 box.copy,コピー,Copy,データシート > ボタン
 box.copy.tip,選択中の {{count}} 行をコピー（下の「挿入」ボタンで貼り付け）,"Copy the {{count}} selected rows (paste with the ""Insert"" buttons below)",データシート > コピーボタンの吹き出し
+box.copy.tip_one,選択中の {{count}} 行をコピー（下の「挿入」ボタンで貼り付け）,"Copy the {{count}} selected row (paste with the ""Insert"" buttons below)",件数が 1 のときの英語の形（日本語は使われない）
 box.copy.tipNone,行のチェックボックスで出来事を選択してください,Select events with the row checkboxes,データシート > コピーボタンの吹き出し（何も選んでいないとき）
 box.clipboardCount,クリップボード {{count}}行,Clipboard: {{count}} rows,データシート > アプリ内のクリップボードの行数
+box.clipboardCount_one,クリップボード {{count}}行,Clipboard: {{count}} row,件数が 1 のときの英語の形（日本語は使われない）
 box.pasteMode,貼付モード:,Paste mode:,データシート > 貼り付けの方式のラベル
 box.pasteMode.tip,クリップボード挿入時の座標決定方式,How positions are set when inserting from the clipboard,データシート > 貼り付けの方式の吹き出し
 box.pasteMode.offset,+20 オフセット,+20 offset,データシート > 貼り付けの方式の選択肢
@@ -27,6 +29,7 @@ box.id.tip,ダブルクリックで変更,Double-click to change,データシー
 box.type.tip,変更するとIDも自動更新,Changing it also updates the ID,データシート > 種別の欄の吹き出し
 box.label.tip,Excelから複数行コピペ可,You can paste multiple rows from Excel,データシート > ラベルの欄の吹き出し
 box.insertBelow.tip,この下にコピーした行を挿入（{{count}} 行、モード: {{mode}}）,"Insert the copied rows below ({{count}} rows, mode: {{mode}})",データシート > 行の挿入ボタンの吹き出し
+box.insertBelow.tip_one,この下にコピーした行を挿入（{{count}} 行、モード: {{mode}}）,"Insert the copied row below ({{count}} row, mode: {{mode}})",件数が 1 のときの英語の形（日本語は使われない）
 box.insertBelowText.tip,この下に Excel / テキストの行を挿入（OS のクリップボードを 1 行 = 1 Box として読み込みます）,Insert rows from Excel / text below (each line of the system clipboard becomes one Box),データシート > 行の挿入ボタンの吹き出し（アプリ内のクリップボードが空のとき）
 box.insertHere.tip,ここに{{count}}個挿入,Insert {{count}} here,データシート > 行の間の挿入ボタンの吹き出し
 box.insertHere,＋ここに挿入,+ Insert here,データシート > 行の間の挿入ボタン
@@ -57,8 +60,11 @@ sdsg.empty,SD/SG はまだありません。上のボタンから追加できま
 slot.disabled.tip,クリップボードに貼り付け可能な要素がありません,Nothing on the clipboard to paste,データシート > 挿入の帯の吹き出し
 slot.text.tip,OS のクリップボードのテキストを 1 行 = 1 Box として末尾に挿入します（Excel の複数行コピーに対応）,Inserts the system clipboard text at the end with one line = one Box (works with rows copied from Excel),データシート > 挿入の帯の吹き出し
 slot.paste.tip,ここにコピーした行を挿入（{{count}} 行）,Insert the copied rows here ({{count}} rows),データシート > 挿入の帯の吹き出し
+slot.paste.tip_one,ここにコピーした行を挿入（{{count}} 行）,Insert the copied row here ({{count}} row),件数が 1 のときの英語の形（日本語は使われない）
 slot.text,＋ Excel / テキストの行をここに挿入,+ Insert rows from Excel / text here,データシート > 挿入の帯
 slot.paste,＋ コピーした行をここに挿入,+ Insert copied rows here,データシート > 挿入の帯
 slot.pasteN,＋ コピーした行をここに挿入 ({{count}} 行),+ Insert copied rows here ({{count}} rows),データシート > 挿入の帯（行数つき）
+slot.pasteN_one,＋ コピーした行をここに挿入 ({{count}} 行),+ Insert copied row here ({{count}} row),件数が 1 のときの英語の形（日本語は使われない）
 row.paste.tip,この下にクリップボードを挿入（{{count}} 行）,Insert the clipboard below ({{count}} rows),データシート > 行の挿入ボタンの吹き出し（SD/SG）
+row.paste.tip_one,この下にクリップボードを挿入（{{count}} 行）,Insert the clipboard below ({{count}} row),件数が 1 のときの英語の形（日本語は使われない）
 row.clipboardEmpty,クリップボード空,Clipboard is empty,データシート > 行の挿入ボタンの吹き出し（SD/SG）

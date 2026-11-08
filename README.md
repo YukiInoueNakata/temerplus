@@ -55,6 +55,11 @@ using TEA/TEM, including those who are new to drawing TEM diagrams.
   notation policy, the diagram, and descriptions of each element; CSV export.
 - **Files** — diagrams are saved as `.tem` (JSON) files; unsaved work is kept automatically
   in the browser.
+- **Interface** — Japanese and English, switchable at any time; the diagram text (legend,
+  report) follows a separate per-diagram language setting.
+
+The full list of features is in [docs/features.en.md](docs/features.en.md)
+(日本語: [docs/features.ja.md](docs/features.ja.md)).
 
 ## Getting started
 

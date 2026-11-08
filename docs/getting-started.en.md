@@ -96,6 +96,14 @@ Saving works a little differently depending on the browser (see [4. Save](#4-sav
 Social direction (SD), social guidance (SG) and periods can be added with "SD追加", "SG追加" and "時期ラベル" on the Insert tab.
 To undo a mistake, use "元に戻す" (Undo) on the "編集" (Edit) tab (Ctrl+Z, or ⌘Z on a Mac).
 
+### Switch between horizontal and vertical layouts
+
+Time can flow to the right (Horizontal) or downward (Vertical). Switch with the "Horizontal" / "Vertical" buttons at the top right.
+Boxes, arrows, SD/SG, and the legend are repositioned for the new direction.
+After switching, press "Fit all" (⛶) at the bottom right of the diagram to see the whole diagram.
+
+For everything else the app can do, see the [list of features](features.en.md).
+
 ## 4. Save
 
 Click "保存" (Save) in the top-right corner (Ctrl+S, or ⌘S on a Mac). The diagram is saved as a `.tem` file.

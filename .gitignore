@@ -66,6 +66,8 @@ docs/*
 # ただし、はじめてのガイド（日英）とその画像・README の画面の写真は公開する（2026-11-08）
 !docs/getting-started.ja.md
 !docs/getting-started.en.md
+!docs/features.ja.md
+!docs/features.en.md
 !docs/images/
 docs/images/*
 !docs/images/screenshot.png

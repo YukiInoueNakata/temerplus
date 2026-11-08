@@ -19,7 +19,7 @@ import { renderVerticalAwareText } from '../../utils/verticalText';
 import { renderRichText } from '../../utils/richText';
 import { computeAutoFitSize, computeFitFontSize } from '../../utils/boxFit';
 import { useTEMView } from '../../context/TEMViewContext';
-import { useTEMStore } from '../../store/store';
+import { useTEMStore, beginHistoryGesture, endHistoryGesture } from '../../store/store';
 
 export interface BoxNodeData extends Pick<
   Box,
@@ -435,7 +435,7 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
   const onResizeStart = () => {
     if (resizing.current) return;
     resizing.current = true;
-    useTEMStore.temporal.getState().pause();
+    beginHistoryGesture();
   };
   const onResize = (
     _e: unknown,
@@ -449,7 +449,7 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
   const onResizeEnd = () => {
     if (!resizing.current) return;
     resizing.current = false;
-    useTEMStore.temporal.getState().resume();
+    endHistoryGesture();
   };
 
   return (

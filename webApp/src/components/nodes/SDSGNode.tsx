@@ -12,7 +12,7 @@ import type { SDSG } from '../../types';
 import { renderVerticalAwareText } from '../../utils/verticalText';
 import { sdsgPentagonPoints, sdsgSubLabelShift, SDSG_TYPE_TAG_LINE_HEIGHT } from '../../utils/sdsgShape';
 import { useTEMView } from '../../context/TEMViewContext';
-import { useTEMStore } from '../../store/store';
+import { useTEMStore, beginHistoryGesture, endHistoryGesture } from '../../store/store';
 
 export interface SDSGNodeData extends Pick<
   SDSG,
@@ -54,7 +54,7 @@ export function SDSGNode({ data, selected, id: nodeId }: NodeProps<SDSGNodeData>
   const onResizeStart = () => {
     if (resizing.current) return;
     resizing.current = true;
-    useTEMStore.temporal.getState().pause();
+    beginHistoryGesture();
   };
   const onResize = (_e: unknown, params: { width: number; height: number }) => {
     const w = Math.max(10, Math.round(params.width));
@@ -68,7 +68,7 @@ export function SDSGNode({ data, selected, id: nodeId }: NodeProps<SDSGNodeData>
   const onResizeEnd = () => {
     if (!resizing.current) return;
     resizing.current = false;
-    useTEMStore.temporal.getState().resume();
+    endHistoryGesture();
   };
   // flipDirection=true の場合は種別と逆向きに点を描画（band 配置時の方向点自動反転用）
   const isSD = data.flipDirection ? data.type === 'SG' : data.type === 'SD';

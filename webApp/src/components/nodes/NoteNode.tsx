@@ -9,7 +9,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NodeResizer, useStore as useReactFlowStore, type NodeProps } from 'reactflow';
-import { useTEMStore } from '../../store/store';
+import { useTEMStore, beginHistoryGesture, endHistoryGesture } from '../../store/store';
 import { useTEMView } from '../../context/TEMViewContext';
 import type { Note } from '../../types';
 import { collectSDSGRects } from '../../utils/elementRects';
@@ -96,9 +96,9 @@ export function NoteNode({ data, selected }: NodeProps<NoteNodeData>) {
           minHeight={30}
           handleStyle={{ width: 8, height: 8, borderRadius: 2, background: '#2684ff', border: '1px solid #fff' }}
           lineStyle={{ borderColor: '#2684ff' }}
-          onResizeStart={() => { if (!resizing.current) { resizing.current = true; useTEMStore.temporal.getState().pause(); } }}
+          onResizeStart={() => { if (!resizing.current) { resizing.current = true; beginHistoryGesture(); } }}
           onResize={(_e, p) => updateNote(data.id, { width: p.width, height: p.height })}
-          onResizeEnd={() => { if (resizing.current) { resizing.current = false; useTEMStore.temporal.getState().resume(); } }}
+          onResizeEnd={() => { if (resizing.current) { resizing.current = false; endHistoryGesture(); } }}
         />
       )}
       <div

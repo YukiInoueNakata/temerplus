@@ -13,9 +13,8 @@ import { SELECTABLE_BOX_TYPES } from '../utils/typeDisplay';
 import type { BoxType } from '../types';
 
 export function changeSelectedBoxesType(type: BoxType): void {
-  const ids = [...useTEMStore.getState().selection.boxIds];
-  // changeBoxType は ID も種別の接頭辞に付け替え、選択の状態も付け替える
-  ids.forEach((id) => useTEMStore.getState().changeBoxType(id, type));
+  // まとめて 1 回で変える（「元に戻す」1 回で戻る）。ID の付け替えと選択の付け替えもする
+  useTEMStore.getState().changeBoxTypes([...useTEMStore.getState().selection.boxIds], type);
 }
 
 /** delta=+1 で Item レベルを 1 上げる（横型は画面の上へ、縦型は画面の右へ） */

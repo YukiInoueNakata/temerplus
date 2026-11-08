@@ -21,6 +21,7 @@ import type {
   Paragraph,
   SourceRef,
   TranscriptSegment,
+  BoxType,
   LineDefaults,
   Note,
 } from '../types';
@@ -221,6 +222,8 @@ interface Actions {
 
   // 型変更 + ID自動更新（新しい型の接頭辞で自動採番、参照も追従）
   changeBoxType: (boxId: string, newType: string) => void;
+  /** 今のシートの Box の種別をまとめて変える（「元に戻す」1 回で戻る） */
+  changeBoxTypes: (boxIds: string[], newType: BoxType) => void;
 
   // Sequential line creation
   addSequentialLines: (boxIds: string[], type?: 'RLine' | 'XLine') => void;
@@ -383,6 +386,23 @@ const mutateSheet = (doc: TEMDocument, sheetId: string, mutator: (sheet: Sheet) 
     if (sheet) mutator(sheet);
     draft.metadata.modifiedAt = new Date().toISOString();
   });
+
+// Box の種別を変える（下書きのシートの中だけ）。ID を新しい種別の接頭辞で振り直し、そのシートの中の参照
+// （矢印・SD/SG・コメント・メモの引き出し線）を付け替える。文字が前の種別の既定の名前のままなら新しい名前に替える
+function applyBoxTypeChange(sh: Sheet, boxId: string, newType: BoxType, lng: string): string | null {
+  const box = sh.boxes.find((b) => b.id === boxId);
+  if (!box || box.type === newType) return null;
+  const oldType = box.type;
+  const newId = genBoxIdByType(newType, sh.boxes.filter((b) => b.id !== boxId).map((b) => b.id));
+  box.type = newType;
+  box.id = newId;
+  if (box.label === i18n.t(`terms:boxType.${oldType}`, { lng })) box.label = i18n.t(`terms:boxType.${newType}`, { lng });
+  sh.lines.forEach((l) => { if (l.from === boxId) l.from = newId; if (l.to === boxId) l.to = newId; });
+  sh.sdsg.forEach((sg) => { if (sg.attachedTo === boxId) sg.attachedTo = newId; if (sg.attachedTo2 === boxId) sg.attachedTo2 = newId; });
+  sh.comments.forEach((c) => { if (c.targetId === boxId) c.targetId = newId; });
+  (sh.notes ?? []).forEach((n) => { if (n.leaderTo === boxId) n.leaderTo = newId; });
+  return newId;
+}
 
 // 貼付時に sourceRefs（原文リンク）の ID を振り直すためのヘルパー。
 // 同じ SourceRef.id が複数エンティティに存在すると編集追従・論文レポートの
@@ -2054,47 +2074,26 @@ export const useTEMStore = create<Store>()(
       },
 
       // --- 型変更 + ID自動更新 ---
-      changeBoxType: (boxId, newType) => {
+      // 今のシートの中だけで種別・ID・参照を付け替える。以前は全シートの同じ ID の Box を書き換えていて、
+      // シートを複製した後に片方を変えるともう片方も変わり、ID が重なることもあった（2026-11-08 レビュー）
+      changeBoxType: (boxId, newType) => { get().changeBoxTypes([boxId], newType as BoxType); },
+      changeBoxTypes: (boxIds, newType) => {
         const state = get();
-        const sheet = state.doc.sheets.find((s) => s.id === state.doc.activeSheetId);
-        if (!sheet) return;
-        const box = sheet.boxes.find((b) => b.id === boxId);
-        if (!box) return;
-        const oldType = box.type;
-        if (oldType === newType) return;
-
-        // 新しい型の接頭辞で新ID生成（自分自身を除く他のIDとの衝突を回避）
-        const otherIds = sheet.boxes.filter((b) => b.id !== boxId).map((b) => b.id);
-        const newId = genBoxIdByType(newType, otherIds);
-
-        // 1. 型変更 + 2. ID変更 + 3. 参照の一括更新
+        const sheet = getActiveSheet(state.doc);
+        if (!sheet || !sheet.boxes.some((b) => boxIds.includes(b.id) && b.type !== newType)) return;
+        const idMap = new Map<string, string>();
         set((s) => ({
           doc: produce(s.doc, (d) => {
-            d.sheets.forEach((sh) => {
-              sh.boxes.forEach((b) => {
-                if (b.id === boxId) {
-                  b.type = newType as Box['type'];
-                  b.id = newId;
-                  // 文字が前の種別の既定の名前のまま（リボンから足した Box など）なら、新しい種別の名前に替える。
-                  // 書き換えた文字は残す（2026-11-08。種別を変えても「通常」と残っていた）
-                  const lng = d.settings.locale ?? 'ja';
-                  if (b.label === i18n.t(`terms:boxType.${oldType}`, { lng })) {
-                    b.label = i18n.t(`terms:boxType.${newType}`, { lng });
-                  }
-                }
-              });
-              sh.lines.forEach((l) => {
-                if (l.from === boxId) l.from = newId;
-                if (l.to === boxId) l.to = newId;
-              });
-              sh.sdsg.forEach((sg) => { if (sg.attachedTo === boxId) sg.attachedTo = newId; });
-              sh.comments.forEach((c) => { if (c.targetId === boxId) c.targetId = newId; });
-            });
+            const sh = getActiveSheet(d);
+            if (!sh) return;
+            const lng = d.settings.locale ?? 'ja';
+            for (const id of boxIds) {
+              const newId = applyBoxTypeChange(sh, id, newType, lng);
+              if (newId) idMap.set(id, newId);
+            }
             d.metadata.modifiedAt = new Date().toISOString();
           }),
-          selection: s.selection.boxIds.includes(boxId)
-            ? { ...s.selection, boxIds: s.selection.boxIds.map((id) => (id === boxId ? newId : id)) }
-            : s.selection,
+          selection: { ...s.selection, boxIds: s.selection.boxIds.map((id) => idMap.get(id) ?? id) },
           dirty: true,
         }));
       },
@@ -2360,7 +2359,10 @@ export const useTEMStore = create<Store>()(
       removeTranscript: (id) => {
         set((state) => ({
           doc: produce(state.doc, (d) => {
+            const removedSegIds = new Set((d.transcripts.find((t) => t.id === id)?.segments ?? []).map((sg) => sg.id));
             d.transcripts = d.transcripts.filter((t) => t.id !== id);
+            // その逐語録の切片から作った Box の結びつきを外す（2026-11-08 レビュー）
+            for (const sh of d.sheets) for (const b of sh.boxes) if (b.segmentId && removedSegIds.has(b.segmentId)) delete b.segmentId;
             // 関連 SourceRef を全シートの全要素から削除
             for (const sh of d.sheets) {
               for (const b of sh.boxes) {
@@ -2406,8 +2408,15 @@ export const useTEMStore = create<Store>()(
             p.text = newText;
             // 切片も原文参照と同じく付いていく（2026-11-08）
             if (t.segments) {
-              const rs = retrackSourceRefsForParagraph(t.segments, paragraphId, newText);
-              if (rs.changedCount > 0 && rs.refs) t.segments = rs.refs;
+              // 段落全体の切片は、書き換えた後の段落全体を指し続ける（引用も書き換える）
+              t.segments = t.segments.map((sg) => (sg.paragraphId === paragraphId && sg.wholeParagraph
+                ? { ...sg, quoteText: newText, charStart: 0, charEnd: newText.length, unresolved: false }
+                : sg));
+              const rs = retrackSourceRefsForParagraph(t.segments.filter((sg) => !sg.wholeParagraph), paragraphId, newText);
+              if (rs.changedCount > 0 && rs.refs) {
+                const byId = new Map(rs.refs.map((r) => [r.id, r]));
+                t.segments = t.segments.map((sg) => byId.get(sg.id) ?? sg);
+              }
             }
             // SourceRef 追従: 全シートの全要素について該当段落を参照しているものを更新
             for (const sh of d.sheets) {
@@ -2569,8 +2578,11 @@ export const useTEMStore = create<Store>()(
               for (const l of sh.lines) l.sourceRefs = reassign(l.sourceRefs);
               for (const sg of sh.sdsg) sg.sourceRefs = reassign(sg.sourceRefs);
             }
-            // 切片も同じく前の段落へ（2026-11-08）
-            if (t.segments) t.segments = reassign(t.segments) as TranscriptSegment[];
+            // 切片も同じく前の段落へ（2026-11-08）。結合した後は、前後どちらの段落全体の切片も段落の一部になる
+            if (t.segments) {
+              t.segments = (reassign(t.segments) as TranscriptSegment[]).map((sg) =>
+                sg.paragraphId === p.id && sg.wholeParagraph ? { ...sg, wholeParagraph: undefined } : sg);
+            }
           }),
           dirty: true,
         }));
@@ -2611,15 +2623,19 @@ export const useTEMStore = create<Store>()(
           doc: produce(state.doc, (d) => {
             const t = d.transcripts.find((x) => x.id === transcriptId);
             if (!t) return;
+            const para = t.paragraphs.find((p) => p.id === input.paragraphId);
+            const whole = input.charStart === undefined || input.charEnd === undefined;
             const seg: TranscriptSegment = {
               id,
               transcriptId,
               paragraphId: input.paragraphId,
-              charStart: input.charStart,
-              charEnd: input.charEnd,
+              // 段落全体の切片も範囲（段落の初めから終わり）で持つ（範囲が無いと分割・結合で引用と食い違った。2026-11-08 レビュー）
+              charStart: whole ? 0 : input.charStart,
+              charEnd: whole ? (para?.text.length ?? input.quoteText.length) : input.charEnd,
               quoteText: input.quoteText,
               createdAt: new Date().toISOString(),
               label,
+              ...(whole ? { wholeParagraph: true } : {}),
             };
             t.segments = [...(t.segments ?? []), seg];
           }),
@@ -2631,6 +2647,7 @@ export const useTEMStore = create<Store>()(
       updateSegment: (transcriptId, segmentId, patch) => {
         const before = get().doc.transcripts.find((x) => x.id === transcriptId)?.segments?.find((sg) => sg.id === segmentId);
         if (!before) return;
+        const idMap = new Map<string, string>();
         set((state) => ({
           doc: produce(state.doc, (d) => {
             const t = d.transcripts.find((x) => x.id === transcriptId);
@@ -2640,27 +2657,31 @@ export const useTEMStore = create<Store>()(
             if (patch.boxType !== undefined) seg.boxType = patch.boxType;
             if (patch.itemLevel !== undefined) seg.itemLevel = Number.isFinite(patch.itemLevel) ? patch.itemLevel : undefined;
             if (patch.note !== undefined) seg.note = patch.note.trim() || undefined;
-            // この切片から作った Box に見出しと Item レベルを反映する（Box の文字が前の見出しのままのときだけ文字を替える）
+            // この切片から作った Box（全シート）に反映する。種別・見出し・Item を同じ 1 回の書き込みで
+            // （以前は種別だけ今のシート・別の記録になり、1 回戻すと切片と Box が食い違った。2026-11-08 レビュー）
             const layout = d.settings.layout;
+            const lng = d.settings.locale ?? 'ja';
             for (const sh of d.sheets) {
-              for (const b of sh.boxes) {
-                if (b.segmentId !== segmentId) continue;
+              const linked = sh.boxes.filter((b) => b.segmentId === segmentId).map((b) => b.id);
+              for (const id of linked) {
+                const b = sh.boxes.find((x) => x.id === id)!;
                 if (patch.label !== undefined && b.label === before.label) b.label = patch.label;
                 if (patch.itemLevel !== undefined && Number.isFinite(patch.itemLevel)) {
                   if (layout === 'horizontal') b.y = -patch.itemLevel * LEVEL_PX;
                   else b.x = patch.itemLevel * LEVEL_PX;
                 }
+                if (patch.boxType !== undefined) {
+                  const newId = applyBoxTypeChange(sh, id, patch.boxType, lng);
+                  if (newId && sh.id === d.activeSheetId) idMap.set(id, newId);
+                }
               }
             }
           }),
+          selection: idMap.size > 0
+            ? { ...state.selection, boxIds: state.selection.boxIds.map((id) => idMap.get(id) ?? id) }
+            : state.selection,
           dirty: true,
         }));
-        // 種別は changeBoxType に任せる（Box の ID と参照の付け替えをするため）。今のシートの Box が対象
-        if (patch.boxType !== undefined && patch.boxType !== before.boxType) {
-          const sheet = getActiveSheet(get().doc);
-          const ids = (sheet?.boxes ?? []).filter((b) => b.segmentId === segmentId && b.type !== patch.boxType).map((b) => b.id);
-          ids.forEach((bid) => get().changeBoxType(bid, patch.boxType!));
-        }
       },
 
       removeSegment: (transcriptId, segmentId) => {
@@ -2839,10 +2860,35 @@ export const useTEMStore = create<Store>()(
       // zundo options: only track doc, not view/selection
       partialize: (state) => ({ doc: state.doc } as Pick<Store, 'doc'>),
       limit: 100,
-      equality: (a, b) => JSON.stringify(a.doc) === JSON.stringify(b.doc),
+      // doc が同じもの（倍率・選択など view だけの変更）なら文字列にしない（大きな逐語録で重かった。2026-11-08 レビュー）
+      equality: (a, b) => a.doc === b.doc || JSON.stringify(a.doc) === JSON.stringify(b.doc),
     }
   )
 );
+
+// ドラッグ・大きさの変更など、続けて何度も書き込む操作を「元に戻す」1 回にまとめる（2026-11-08 レビュー）。
+// 始めに図のデータを控えて記録を止め、終わりに記録を再開して、控えた状態を 1 件だけ記録に足す。
+// 以前は止めて再開するだけで、操作の前の状態が記録に残らず（zundo は止めている間の変更を記録しない）、
+// 「元に戻す」で 1 つ前の操作まで一緒に戻っていた。終わりの知らせが届かず、記録が止まったままになることもあった
+let gestureBefore: TEMDocument | null = null;
+export function beginHistoryGesture(): void {
+  if (gestureBefore) return;
+  gestureBefore = useTEMStore.getState().doc;
+  useTEMStore.temporal.getState().pause();
+}
+export function endHistoryGesture(): void {
+  const before = gestureBefore;
+  if (!before) return;
+  gestureBefore = null;
+  const temporal = useTEMStore.temporal.getState();
+  temporal.resume();
+  const now = useTEMStore.getState().doc;
+  if (now === before || JSON.stringify(now) === JSON.stringify(before)) return;
+  useTEMStore.temporal.setState((ts) => ({
+    pastStates: [...ts.pastStates, { doc: before }].slice(-100),
+    futureStates: [],
+  }));
+}
 
 // Convenience hook to get active sheet
 export const useActiveSheet = (): Sheet | undefined => {

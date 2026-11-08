@@ -79,9 +79,17 @@ export function anonymizeTranscript(
     text: applyReplacements(p.text, replacements),
   }));
   const prevMap = tr.metadata?.anonymizationMap ?? {};
+  // 切片の引用・見出し・メモも置き換える（見出しの既定は引用の初めなので名前が入りうる。2026-11-08 レビュー）
+  const segments = tr.segments?.map((sg) => ({
+    ...sg,
+    quoteText: applyReplacements(sg.quoteText, replacements),
+    label: applyReplacements(sg.label, replacements),
+    note: sg.note ? applyReplacements(sg.note, replacements) : sg.note,
+  }));
   return {
     ...tr,
     paragraphs,
+    ...(segments ? { segments } : {}),
     metadata: {
       ...tr.metadata,
       anonymizationMap: { ...prevMap, ...replacements },
@@ -112,6 +120,8 @@ export function anonymizeDocument(
       ...sh,
       boxes: sh.boxes.map((b) => ({
         ...b,
+        // 切片から作った Box の文字は切片の見出し（引用の初め）由来なので置き換える。ほかの Box の文字は解析者の概念名なので置き換えない
+        ...(b.segmentId ? { label: applyReplacements(b.label, replacements) } : {}),
         description: b.description ? applyReplacements(b.description, replacements) : b.description,
         sourceRefs: b.sourceRefs?.map(replaceRef),
       })),

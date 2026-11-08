@@ -3,7 +3,7 @@
 // - 原文の順に並べ、見出し・種別・Item レベル・メモをその場で直せる。直すと、この切片から作った Box にも反映される
 // - 選んだ切片から Box を作る（原文の順に時間の方向へ並ぶ）。Box を原文の順に並べ直す
 // ============================================================================
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTEMStore } from '../store/store';
 import { BOX_TYPE_LABELS } from '../store/defaults';
@@ -138,6 +138,10 @@ function SegmentRow({
   const [label, setLabel] = useState(sg.label);
   const [note, setNote] = useState(sg.note ?? '');
   const [item, setItem] = useState(sg.itemLevel != null ? String(sg.itemLevel) : '');
+  // 「元に戻す」などでストアの値が変わったら入力欄に取り込み直す（古い値を書き戻さないように。2026-11-08 レビュー）
+  useEffect(() => { setLabel(sg.label); }, [sg.label]);
+  useEffect(() => { setNote(sg.note ?? ''); }, [sg.note]);
+  useEffect(() => { setItem(sg.itemLevel != null ? String(sg.itemLevel) : ''); }, [sg.itemLevel]);
   const commitOnEnter = (e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); };
   const quote = sg.quoteText.length > 40 ? sg.quoteText.slice(0, 40) + '…' : sg.quoteText;
   return (

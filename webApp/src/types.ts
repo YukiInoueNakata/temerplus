@@ -377,6 +377,8 @@ export interface TranscriptSegment extends SourceRef {
   label: string;                     // 見出し（要約）。Box にしたときの Box の文字
   boxType?: BoxType;                 // 種別の候補（省略 = 通常）
   itemLevel?: number;                // Box にするときの Item レベル（省略 = 0 の一列）
+  /** 段落全体を切片にしたもの。段落を書き換えても段落全体を指し続ける（結合すると外れる） */
+  wholeParagraph?: boolean;
 }
 
 // TEM 図に置ける注釈ノート（吹き出し / メモ）。Box type='annotation'（潜在経験）とは別物

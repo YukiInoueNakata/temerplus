@@ -20,7 +20,7 @@ import ReactFlow, {
   type NodeChange,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { useTEMStore, useActiveSheet } from '../store/store';
+import { useTEMStore, useActiveSheet, beginHistoryGesture, endHistoryGesture } from '../store/store';
 import { BoxContextMenu } from './BoxQuickEdit';
 import { BoxNode, type BoxNodeData } from './nodes/BoxNode';
 import { SDSGNode, type SDSGNodeData } from './nodes/SDSGNode';
@@ -557,29 +557,31 @@ function CanvasInner({
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
       if (!sheet) return;
-      const temporal = useTEMStore.temporal.getState();
       for (const ch of changes) {
         // Note（メモ・記号）はスナップも帯も無関係。Box と同じく、ドラッグの途中で位置を書き込む。
         // React Flow 11 はドラッグを終えた知らせ（dragging=false）に位置を入れないので、以前の「ドロップ時に確定」では
         // 位置が一度も書き込まれず、手を離すと元に戻っていた（メモ・記号が動かせなかった。2026-11-08 ユーザー指摘）
         if (ch.type === 'position' && sheet.notes?.some((n) => n.id === ch.id)) {
           if (ch.dragging === true && ch.position) {
-            if (!noteDragging.current) { noteDragging.current = true; temporal.pause(); }
+            if (!noteDragging.current) { noteDragging.current = true; beginHistoryGesture(); }
             updateNote(ch.id, { x: ch.position.x, y: ch.position.y });
           } else if (ch.dragging === false) {
             if (ch.position) updateNote(ch.id, { x: ch.position.x, y: ch.position.y });
-            if (noteDragging.current) { noteDragging.current = false; temporal.resume(); }
+            if (noteDragging.current) { noteDragging.current = false; endHistoryGesture(); }
           }
           continue;
+        }
+        // ドラッグの終わり（React Flow 11 は位置を入れずに知らせる）。以前は位置がある知らせだけを見ていたので
+        // 記録の再開が呼ばれず、以後の操作が「元に戻す」に残らなくなっていた（2026-11-08 レビュー）
+        if (ch.type === 'position' && ch.dragging === false && dragging.current) {
+          dragging.current = false;
+          endHistoryGesture();
+          setGuides({ v: [], h: [] });
         }
         if (ch.type === 'position' && ch.position) {
           if (ch.dragging === true && !dragging.current) {
             dragging.current = true;
-            temporal.pause();
-          } else if (ch.dragging === false && dragging.current) {
-            dragging.current = false;
-            temporal.resume();
-            setGuides({ v: [], h: [] });
+            beginHistoryGesture();
           }
           // スマートガイド: Box / SDSG ドラッグ中（現在 SDSG は size を w/h or pos.width/height 経由で取得）
           if (ch.dragging === true) {

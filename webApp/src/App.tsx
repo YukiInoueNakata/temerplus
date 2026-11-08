@@ -335,6 +335,17 @@ export default function App() {
     clearAutoBackup();
   };
 
+  // 最後にクリックしたのが図の画面か（図の画面だけのキーを効かせるかの判定に使う。2026-11-08 レビュー）
+  const lastPointerOnCanvas = useRef(false);
+  useEffect(() => {
+    const onDown = (e: PointerEvent) => {
+      const el = e.target as Element | null;
+      lastPointerOnCanvas.current = !!el?.closest?.('.react-flow') && !el?.closest?.('.modal, [role=dialog]');
+    };
+    window.addEventListener('pointerdown', onDown, true);
+    return () => window.removeEventListener('pointerdown', onDown, true);
+  }, []);
+
   // キーボードショートカット
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -369,8 +380,10 @@ export default function App() {
         handleNew();
         return;
       }
-      if (ctrl && !e.shiftKey && k === 'z') { e.preventDefault(); temporal.undo(); return; }
-      if ((ctrl && e.shiftKey && k === 'z') || (ctrl && k === 'y')) { e.preventDefault(); temporal.redo(); return; }
+      // 文字の入力中の Ctrl+Z / Ctrl+Y は入力の取り消し（ブラウザ）に任せる。以前は図全体の「元に戻す」になり、
+      // 見出しを打っている途中で押すと Box を作った操作などが戻った（2026-11-08 レビュー）
+      if (ctrl && !e.shiftKey && k === 'z') { if (isEditing) return; e.preventDefault(); temporal.undo(); return; }
+      if ((ctrl && e.shiftKey && k === 'z') || (ctrl && k === 'y')) { if (isEditing) return; e.preventDefault(); temporal.redo(); return; }
       if (ctrl && k === 'a' && !isEditing) { e.preventDefault(); store.selectAll(); return; }
       if (ctrl && k === 'c' && !isEditing) { e.preventDefault(); store.copyToClipboard(); return; }
       if (ctrl && k === 'v' && !isEditing) { e.preventDefault(); store.pasteFromClipboard(); return; }
@@ -400,10 +413,14 @@ export default function App() {
         }
       }
       if (e.key === 'Escape' && !isEditing) { store.clearSelection(); return; }
+      // 図の画面だけのキー（矢印・数字・V/H/M）は、最後にクリックしたのが図の画面で、選択肢やダイアログの中に
+      // フォーカスが無いときだけ効かせる。以前は原文ビューアや選択肢の中でも効き、裏の Box が動いた（2026-11-08 レビュー）
+      const inWidget = !!target.closest?.('select, [role=radio], [role=menu], [role=dialog], .modal, .box-context-menu');
+      const canvasKeys = lastPointerOnCanvas.current && !inWidget && !isEditing;
       // 矢印のキーで選んだ Box・メモを動かす（2026-11-08 ユーザー要望「位置の調整が面倒」）。
       // 図形を動かせるのは「選択」「範囲選択」のモードだけ（「移動」のモードは画面を動かすモードなので動かさない）。
       // 1 回でスナップの間隔、Shift と一緒なら 1 レベル（LEVEL_PX）。向きは画面のとおり（横型・縦型で同じ）
-      if (!isEditing && !ctrl && !e.altKey && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+      if (canvasKeys && !ctrl && !e.altKey && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
         const sel = store.selection;
         if ((sel.boxIds.length > 0 || sel.noteIds.length > 0) && store.view.canvasMode !== 'move') {
           e.preventDefault();
@@ -416,13 +433,13 @@ export default function App() {
       }
       // 数字のキー 1〜7 で選んだ Box の種別を変える（順は SELECTABLE_BOX_TYPES: 通常・分岐点・等至点・両極化した等至点・
       // 必須通過点・潜在経験・その他）。2026-11-08 ユーザー要望
-      if (!isEditing && !ctrl && !e.altKey && !e.shiftKey && /^[1-7]$/.test(k) && store.selection.boxIds.length > 0) {
+      if (canvasKeys && !ctrl && !e.altKey && !e.shiftKey && /^[1-7]$/.test(k) && store.selection.boxIds.length > 0) {
         e.preventDefault();
         changeSelectedBoxesType(SELECTABLE_BOX_TYPES[Number(k) - 1]);
         return;
       }
       // 操作のモードの切り替え（2026-11-08 ユーザー要望）。作図ソフトでよく使う割り当て: V=選択・H=移動（手）・M=範囲選択
-      if (!isEditing && !ctrl && !e.altKey && !e.shiftKey) {
+      if (canvasKeys && !ctrl && !e.altKey && !e.shiftKey) {
         const mode = k === 'v' ? 'pointer' : k === 'h' ? 'move' : k === 'm' ? 'select' : null;
         if (mode) { e.preventDefault(); store.setCanvasMode(mode); return; }
       }

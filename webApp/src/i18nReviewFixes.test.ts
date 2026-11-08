@@ -1,7 +1,8 @@
 // 英語化のレビュー（2026-11-08・Codex と独立レビュー）で直した点の検査
 import { describe, it, expect, afterEach } from 'vitest';
 import i18n from './i18n';
-import { initialUILanguage, hasPriorUse } from './utils/uiLanguage';
+import { initialUILanguage, hasPriorUse, settleUILanguage } from './utils/uiLanguage';
+import { detectTypePrefix } from './utils/pptxImport';
 import { useTEMStore } from './store/store';
 import { summarizeCodes, type MaxqdaSegment } from './utils/maxqdaImport';
 import { mapBoxType, mapSDSGType, mapLineType } from './utils/csvImport';
@@ -108,5 +109,27 @@ describe('凡例と用語の表の英語（Irreversible Time・Solid path）', (
     expect(mapLineType('Solid path')).toBe('RLine');
     expect(mapLineType('Dashed path')).toBe('XLine');
     expect(mapLineType('Solid arrow')).toBe('RLine');
+  });
+});
+
+describe('2 回目のレビューの指摘', () => {
+  it('図の言語を変えたら「変更あり」になる（同じ言語なら変えない）', () => {
+    useTEMStore.setState({ dirty: false });
+    useTEMStore.getState().setLocale('ja');
+    expect(useTEMStore.getState().dirty).toBe(false);
+    useTEMStore.getState().setLocale('en');
+    expect(useTEMStore.getState().dirty).toBe(true);
+  });
+  it('PPTX の種類の照合は「両極化した」の新しい表記も読む', () => {
+    expect(detectTypePrefix('両極化した等至点 進学しない')?.type).toBe('P-EFP');
+    expect(detectTypePrefix('両極化した第 2 等至点 転職しない')?.type).toBe('P-2nd-EFP');
+    expect(detectTypePrefix('第 2 等至点 転職')?.type).toBe('2nd-EFP');
+    expect(detectTypePrefix('両極化等至点 進学しない')?.type).toBe('P-EFP');
+  });
+  it('言語の好みが無くても、自動保存の図が残っていれば日本語にする', async () => {
+    expect(await settleUILanguage('en', async () => true, null)).toBe('ja');
+    expect(await settleUILanguage('en', async () => false, null)).toBe('en');
+    expect(await settleUILanguage('en', async () => { throw new Error('x'); }, null)).toBe('en');
+    expect(await settleUILanguage('ja', async () => false, 'en')).toBe('en');
   });
 });

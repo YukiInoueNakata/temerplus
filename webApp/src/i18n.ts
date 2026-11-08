@@ -14,7 +14,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import Papa from 'papaparse';
-import { initialUILanguage, saveUILanguage } from './utils/uiLanguage';
+import { initialUILanguage } from './utils/uiLanguage';
 
 export const SUPPORTED_LOCALES = ['ja', 'en'] as const;
 export type SupportedLocale = typeof SUPPORTED_LOCALES[number];
@@ -55,11 +55,9 @@ const csvFiles = import.meta.glob<string>('./locales/*.csv', { eager: true, quer
 export const resources = buildResources(csvFiles);
 export const NAMESPACES = Object.keys(resources.ja ?? {});
 
-// 最初に決めた言語はその場で保存する（保存しないと、次に開いたときにアプリの他の値が残っていることから
-// 「今までの利用者」とみなされ、英語で始めた人が日本語に変わる。2026-11-08）
+// ここでは localStorage だけで仮に決める。自動保存（IndexedDB）も見た確定と保存は main.tsx の settleUILanguage（2026-11-08）
 const IS_TEST = import.meta.env?.MODE === 'test';
 const startLanguage = IS_TEST ? 'ja' : initialUILanguage();
-if (!IS_TEST) saveUILanguage(startLanguage);
 
 void i18n
   .use(initReactI18next)

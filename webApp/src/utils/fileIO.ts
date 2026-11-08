@@ -194,6 +194,11 @@ export async function saveAutoBackup(doc: TEMDocument): Promise<void> {
   await set(AUTO_BACKUP_META_KEY, meta);
 }
 
+/** 自動保存の図が残っているか（今までの利用者かの判定に使う。図の本体は読まない） */
+export async function hasAutoBackup(): Promise<boolean> {
+  return (await get<AutoBackupMeta>(AUTO_BACKUP_META_KEY)) != null;
+}
+
 export async function loadAutoBackup(): Promise<{ doc: TEMDocument; meta: AutoBackupMeta } | null> {
   const [doc, meta] = await Promise.all([
     get<TEMDocument>(AUTO_BACKUP_KEY),

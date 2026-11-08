@@ -17,6 +17,26 @@ export function initialUILanguage(
   return browserLang.toLowerCase().startsWith('ja') || browserLang === '' ? 'ja' : 'en';
 }
 
+/**
+ * 起動の最初に一度だけ呼ぶ。言語の好みがまだ無ければ、自動保存（IndexedDB）にこのアプリの図が残っているかも見て
+ * （localStorage に印が無くても今までの利用者のことがある）、今までの利用者なら日本語にする。決めた言語は保存する
+ * （保存しないと、次に開いたときにアプリの他の値が残っていることから「今までの利用者」とみなされ、
+ *   英語で始めた新しい利用者が日本語に変わる）。2026-11-08 レビューの指摘
+ */
+export async function settleUILanguage(
+  current: UILanguage,
+  hasBackup: () => Promise<boolean>,
+  stored: string | null = safeGet(),
+): Promise<UILanguage> {
+  if (stored === 'ja' || stored === 'en') return stored;
+  let lang = current;
+  if (lang !== 'ja') {
+    try { if (await hasBackup()) lang = 'ja'; } catch { /* 読めなければブラウザの言語のまま */ }
+  }
+  saveUILanguage(lang);
+  return lang;
+}
+
 export function saveUILanguage(lang: UILanguage): void {
   try { localStorage.setItem(UI_LANGUAGE_KEY, lang); } catch { /* 保存できない環境では今回だけ切り替える */ }
 }

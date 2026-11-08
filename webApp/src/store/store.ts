@@ -2210,6 +2210,8 @@ export const useTEMStore = create<Store>()(
             if (d.settings.timeArrow) d.settings.timeArrow.label = swap(d.settings.timeArrow.label, 'terms:timeArrow') ?? d.settings.timeArrow.label;
             if (d.settings.legend) d.settings.legend.title = swap(d.settings.legend.title, 'terms:legend') ?? d.settings.legend.title;
           }),
+          // 図の言語は図のファイルに保存される値なので、変えたら「変更あり」にする（保存の確認・自動保存のため。2026-11-08 レビューの指摘）
+          dirty: state.dirty || (state.doc.settings.locale ?? 'ja') !== locale,
         }));
       },
       setUIFontSize: (size) => {

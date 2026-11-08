@@ -14,6 +14,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { shortcutLabel } from '../utils/platform';
+import { LanguageSwitch } from './LanguageSwitch';
 
 export type StartupWizardChoice =
   | { kind: 'open-tem' }                  // 既存 .tem を開く
@@ -59,6 +60,8 @@ export function StartupWizardDialog({
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 820, maxWidth: '94vw' }}>
         <div className="modal-header">
           <h3>{t('title')}</h3>
+          {/* 言語の切り替え（2026-11-08 ユーザー要望）。手を付けていない空の図は新しい言語で作り直す */}
+          <LanguageSwitch variant="segmented" recreatePristineDoc className="startup-language-switch" />
           <button onClick={dismiss} className="modal-close" title={t('close.title')}>×</button>
         </div>
         <div className="modal-body" style={{ minHeight: 360 }}>

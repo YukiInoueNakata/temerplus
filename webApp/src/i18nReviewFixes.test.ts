@@ -3,6 +3,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import i18n from './i18n';
 import { initialUILanguage, hasPriorUse, settleUILanguage } from './utils/uiLanguage';
 import { detectTypePrefix } from './utils/pptxImport';
+import { isPristineEmptyDoc } from './components/LanguageSwitch';
 import { useTEMStore } from './store/store';
 import { summarizeCodes, type MaxqdaSegment } from './utils/maxqdaImport';
 import { mapBoxType, mapSDSGType, mapLineType } from './utils/csvImport';
@@ -131,5 +132,16 @@ describe('2 回目のレビューの指摘', () => {
     expect(await settleUILanguage('en', async () => false, null)).toBe('en');
     expect(await settleUILanguage('en', async () => { throw new Error('x'); }, null)).toBe('en');
     expect(await settleUILanguage('ja', async () => false, 'en')).toBe('en');
+  });
+});
+
+describe('起動時の案内の言語の切り替え', () => {
+  it('手を付けていない空の図だけを作り直しの対象にする', () => {
+    const st = useTEMStore.getState();
+    expect(isPristineEmptyDoc(st.doc, false)).toBe(true);
+    expect(isPristineEmptyDoc(st.doc, true)).toBe(false);
+    st.addBox({ type: 'normal' });
+    const after = useTEMStore.getState();
+    expect(isPristineEmptyDoc(after.doc, false)).toBe(false);
   });
 });

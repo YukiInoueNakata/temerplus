@@ -1,10 +1,10 @@
 # はじめてのガイド（開くところから図の出力まで）
 
+> **English version of this guide: [getting-started.en.md](getting-started.en.md)**
+
 TEMer Plus は，TEA（複線径路等至性アプローチ）で用いる **複線径路等至性モデリング（TEM）の図を描くためのツール** です．
 このガイドは，はじめての人が TEMer Plus を開き，図を描いて，画像や論文用のレポートにするまでの手順です．
 画面の写真のとおりに，赤い枠のところを順に押していけば進めます．
-
-English version: [getting-started.en.md](getting-started.en.md)
 
 - [1. 開く](#1-開く)
 - [2. デモの図を見る](#2-デモの図を見る)

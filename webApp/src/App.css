@@ -1090,3 +1090,6 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
 .temer-hide-handles .react-flow__handle {
   opacity: 0;
 }
+
+/* 起動時の案内（TEMer へようこそ）の言語の切り替え。閉じるボタンの左に寄せる（2026-11-08） */
+.startup-language-switch { margin-left: auto; margin-right: 12px; }

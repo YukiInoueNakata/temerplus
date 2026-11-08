@@ -5,7 +5,7 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { saveUILanguage, type UILanguage } from '../utils/uiLanguage';
+import { LanguageSwitch } from './LanguageSwitch';
 import { useTEMStore } from '../store/store';
 import type { BoxType } from '../types';
 import { pickBetweenAnchors } from '../utils/sdsgBetween';
@@ -90,7 +90,7 @@ export function Ribbon({
         ))}
         <div style={{ flex: 1 }} />
         <LayoutToggle />
-        {SHOW_LOCALE_TOGGLE && <LocaleToggle />}
+        {SHOW_LOCALE_TOGGLE && <LanguageSwitch />}
         <SaveButton onSave={onSave} />
       </div>
       <div className="ribbon-body">
@@ -113,28 +113,6 @@ export function Ribbon({
 // 各ダイアログ）まで広げたら true に戻す。i18n の基盤（i18next / locales）は
 // そのまま残してある。
 const SHOW_LOCALE_TOGGLE = true;
-
-// 画面の言語の切り替え（利用者の好み。ブラウザに保存し、図のファイルは変えない）
-function LocaleToggle() {
-  const { i18n } = useTranslation();
-  const lang: UILanguage = i18n.language === 'en' ? 'en' : 'ja';
-  // 言語の切り替えボタンは両方の言語で書く（訳さない）
-  const toggleTitle = 'Language / 言語'; // i18n-ok
-  const toggleLabel = lang === 'ja' ? '日本語 / English' : 'English / 日本語'; // i18n-ok
-  return (
-    <button
-      className="ribbon-btn-small"
-      onClick={() => {
-        const next: UILanguage = lang === 'ja' ? 'en' : 'ja';
-        saveUILanguage(next);
-        void i18n.changeLanguage(next);
-      }}
-      title={toggleTitle}
-    >
-      {toggleLabel}
-    </button>
-  );
-}
 
 function LayoutToggle() {
   const layout = useTEMStore((s) => s.doc.settings.layout);

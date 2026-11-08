@@ -1,10 +1,10 @@
 # Getting started (from opening the app to exporting a diagram)
 
+> **日本語版のガイド (Japanese version): [getting-started.ja.md](getting-started.ja.md)**
+
 TEMer Plus is a **drawing tool for diagrams of Trajectory Equifinality Modeling (TEM)**, used in the Trajectory Equifinality Approach (TEA).
 This guide walks a first-time user through opening TEMer Plus, drawing a diagram, and exporting it as an image or as a Word report for a paper.
 Follow the screenshots and click the places outlined in red.
-
-日本語版: [getting-started.ja.md](getting-started.ja.md)
 
 The interface is currently in Japanese. The screenshots show the Japanese labels, and the English names are given in the text (for example, 挿入 = Insert).
 

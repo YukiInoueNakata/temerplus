@@ -33,7 +33,7 @@ TEMer Plus は [PolyForm Noncommercial License 1.0.0](./LICENSE) で公開して
 商用ライセンスの相談や、商用にあたるか判断に迷う場合は、作者に問い合わせてください。
 
 - 著作権者: 中田友貴（Yuki Inoue Nakata）、立命館大学 総合心理学部
-- 連絡: [GitHub Issues](https://github.com/YukiInoueNakata/temerplus/issues) から連絡をください（具体的な条件は個別にご相談します）。
+- メール: dj.y.nakata@gmail.com （具体的な条件は個別にご相談します）
 - 立命館大学の産学連携の窓口を通しての相談もできます。
 
 教育機関との共同研究などは、条件を相談のうえ減額や無償にすることもあります。
@@ -53,7 +53,7 @@ corporate training materials, requires a separate license.
 
 For commercial licensing, or if you are unsure whether your use is commercial, please
 contact the author, Yuki Inoue Nakata (College of Comprehensive Psychology, Ritsumeikan
-University), via [GitHub Issues](https://github.com/YukiInoueNakata/temerplus/issues).
+University), by email at dj.y.nakata@gmail.com .
 Inquiries through Ritsumeikan University's industry–academia collaboration office are also
 possible. Terms are discussed individually; discounts or free licenses may be offered for
 educational partnerships and research collaborations.

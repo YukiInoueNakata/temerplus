@@ -334,7 +334,8 @@ export function guessLineFieldKind(header: string): LineCsvFieldKind {
 const LINE_TYPE_DICT: Record<string, LineType> = {
   rline: 'RLine', solid: 'RLine', '実線': 'RLine', '実線矢印': 'RLine', // i18n-ok 利用者のファイルの値と照合
   xline: 'XLine', dashed: 'XLine', dotted: 'XLine', '点線': 'XLine', '点線矢印': 'XLine', '破線': 'XLine', // i18n-ok 同上
-  'solid arrow': 'RLine', 'dashed arrow': 'XLine', 'dotted arrow': 'XLine', // 英語の用語名（terms.csv の line.*）
+  'solid path': 'RLine', 'dashed path': 'XLine', // 英語の用語名（terms.csv の line.*）
+  'solid arrow': 'RLine', 'dashed arrow': 'XLine', 'dotted arrow': 'XLine', // 前の英語の用語名（2026-11-08 まで）
 };
 const LINE_SHAPE_DICT: Record<string, LineShape> = {
   straight: 'straight', '直線': 'straight', // i18n-ok 利用者のファイルの値と照合

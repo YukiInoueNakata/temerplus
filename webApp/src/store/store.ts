@@ -2201,8 +2201,12 @@ export const useTEMStore = create<Store>()(
             // 時間の矢印の文字と凡例の題が前の言語の既定のままなら、新しい言語の既定に替える
             // （利用者が書き換えた文字は残す。替えないと「凡例」「非可逆的時間」だけ前の言語で残る。2026-11-08）
             if (prev === locale) return;
+            // 前の版の既定も既定として扱う（英語の時間の矢印は 2026-11-08 まで 'Irreversible time'）
+            const LEGACY_DEFAULTS: Record<string, string[]> = { 'terms:timeArrow': ['Irreversible time'] };
             const swap = (cur: string | undefined, key: string) =>
-              cur === i18n.t(key, { lng: prev }) ? i18n.t(key, { lng: locale }) : cur;
+              cur === i18n.t(key, { lng: prev }) || (cur != null && (LEGACY_DEFAULTS[key] ?? []).includes(cur))
+                ? i18n.t(key, { lng: locale })
+                : cur;
             if (d.settings.timeArrow) d.settings.timeArrow.label = swap(d.settings.timeArrow.label, 'terms:timeArrow') ?? d.settings.timeArrow.label;
             if (d.settings.legend) d.settings.legend.title = swap(d.settings.legend.title, 'terms:legend') ?? d.settings.legend.title;
           }),

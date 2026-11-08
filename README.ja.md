@@ -7,14 +7,14 @@
 
 [English](README.md) | 日本語
 
-TEA（複線径路等至アプローチ）で用いる、**複線径路等至性モデル（TEM）の図を描くためのツール**です。
+TEA（複線径路等至性アプローチ）で用いる、**複線径路等至性モデリング（TEM）の図を描くためのツール**です。
 ブラウザで動くので、**インストールもアカウントの登録もいりません**。
 
 **TEMer Plus を開く: https://yukiinouenakata.github.io/temerplus/**
 
 経験の Box と、TEM に固有の点（分岐点・必須通過点・等至点・両極化した等至点など）を置き、
 実現した径路・実現しなかった径路でつなぎ、非可逆的時間に沿って社会的方向づけ（SD）・
-社会的ガイド（SG）を加えて、**PNG / SVG / PDF / PPTX** や **論文用のレポート（Word）** に
+社会的助勢（SG）を加えて、**PNG / SVG / PDF / PPTX** や **論文用のレポート（Word）** に
 出力できます。図のデータは手元のブラウザの中だけで処理され、サーバーへは送られません。
 
 構成: **React + TypeScript + Vite + React Flow**（GitHub Pages で公開している静的な Web アプリ）
@@ -24,7 +24,7 @@ TEA（複線径路等至アプローチ）で用いる、**複線径路等至性
 ## なぜ作ったか
 
 TEM の図には独自の決まりがあります。Box の種類を枠の線で示し、実現した径路と実現しなかった径路を
-描き分け、社会的方向づけ・社会的ガイド・時期区分を置き、非可逆的時間を一方向に流します。
+描き分け、社会的方向づけ・社会的助勢・時期区分を置き、非可逆的時間を一方向に流します。
 これまでは PowerPoint や Illustrator で手で描くことが多く、表記をそろえること、分析が進むたびに
 Box を並べ替えること、論文で表記の決まりを報告することに手間がかかっていました。
 TEMer Plus は、これらの要素を構造を持ったデータ（種類、時間軸・項目軸の上の位置、Box どうしの
@@ -110,7 +110,7 @@ DOI は、Zenodo で最初のリリースが保存されたあとにここに書
 ```bibtex
 @software{nakata_temer_plus,
   author  = {Nakata, Yuki Inoue},
-  title   = {TEMer Plus: A Drawing Tool for the Trajectory Equifinality Model (TEM)},
+  title   = {TEMer Plus: A Drawing Tool for Trajectory Equifinality Modeling (TEM)},
   year    = {2026},
   version = {0.2.0},
   url     = {https://github.com/YukiInoueNakata/temerplus}

@@ -7,7 +7,7 @@
 
 English | [日本語版 README はこちら (Japanese)](README.ja.md)
 
-A **drawing tool for diagrams of the Trajectory Equifinality Model (TEM)**, used in the
+A **drawing tool for diagrams of Trajectory Equifinality Modeling (TEM)**, used in the
 Trajectory Equifinality Approach (TEA) in cultural psychology and qualitative research.
 TEMer Plus runs in the browser: **no installation and no account are needed**.
 
@@ -126,7 +126,7 @@ A DOI will be added here after the first archived release on Zenodo.
 ```bibtex
 @software{nakata_temer_plus,
   author  = {Nakata, Yuki Inoue},
-  title   = {TEMer Plus: A Drawing Tool for the Trajectory Equifinality Model (TEM)},
+  title   = {TEMer Plus: A Drawing Tool for Trajectory Equifinality Modeling (TEM)},
   year    = {2026},
   version = {0.2.0},
   url     = {https://github.com/YukiInoueNakata/temerplus}

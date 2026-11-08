@@ -1,6 +1,6 @@
 # Getting started (from opening the app to exporting a diagram)
 
-TEMer Plus is a **drawing tool for diagrams of the Trajectory Equifinality Model (TEM)**, used in the Trajectory Equifinality Approach (TEA).
+TEMer Plus is a **drawing tool for diagrams of Trajectory Equifinality Modeling (TEM)**, used in the Trajectory Equifinality Approach (TEA).
 This guide walks a first-time user through opening TEMer Plus, drawing a diagram, and exporting it as an image or as a Word report for a paper.
 Follow the screenshots and click the places outlined in red.
 

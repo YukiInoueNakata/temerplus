@@ -51,7 +51,7 @@ nav.linestyle,Line（矢印）,Line (arrow),設定 の左の一覧 のタブ名
 nav.linestyle.keywords,Line 矢印 径路 既定 default 線種 RLine XLine 形状 straight elbow curve 直線 L字 曲線 色 太さ strokeWidth オフセット offset マージン margin 角度 angle 一括適用 全Lineに適用,Line arrow path default line type RLine XLine shape straight elbow curve color width strokeWidth offset margin angle apply to all lines,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
 nav.typelabel,タイプラベル,Type labels,設定 の左の一覧 のタブ名
 nav.typelabel.keywords,種別 バッジ type label 連番 numbered 表示切替 visibility,type badge label numbered visibility,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
-nav.timearrow,非可逆的時間,Irreversible time,設定 の左の一覧 のタブ名
+nav.timearrow,非可逆的時間,Irreversible Time,設定 の左の一覧 のタブ名
 nav.timearrow.keywords,時間 矢印 arrow irreversible auto insert 線の太さ stroke ラベル位置,time arrow irreversible auto insert line width stroke label position,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
 nav.period,時期区分,Period,設定 の左の一覧 のタブ名
 nav.period.keywords,時期 period 区分 divider band 位置 stroke fontSize,period label divider band position stroke fontSize,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）

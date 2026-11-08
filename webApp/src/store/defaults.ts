@@ -29,7 +29,7 @@ export const DEFAULT_SETTINGS: ProjectSettings = {
   },
   showLegend: true,
   legendPosition: 'right',
-  timelineLabel: { ja: '非可逆的時間', en: 'Irreversible time' }, // i18n-ok 日英の対そのもの
+  timelineLabel: { ja: '非可逆的時間', en: 'Irreversible Time' }, // i18n-ok 日英の対そのもの
   timelineAutoInsert: true,
   defaultFont: 'system-ui',
   defaultFontSize: 13,

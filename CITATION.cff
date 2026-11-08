@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
-title: "TEMer Plus: A Drawing Tool for the Trajectory Equifinality Model (TEM)"
+title: "TEMer Plus: A Drawing Tool for Trajectory Equifinality Modeling (TEM)"
 abstract: >-
-  A browser-based drawing tool for diagrams of the Trajectory Equifinality Model
+  A browser-based drawing tool for diagrams of Trajectory Equifinality Modeling
   (TEM), used in the Trajectory Equifinality Approach (TEA) in cultural psychology
   and qualitative research. It handles TEM-specific elements (bifurcation points,
   obligatory passage points, equifinality points, social direction and social
@@ -20,7 +20,7 @@ url: "https://yukiinouenakata.github.io/temerplus/"
 version: "0.2.0"
 date-released: "2026-11-08"
 keywords:
-  - Trajectory Equifinality Model
+  - Trajectory Equifinality Modeling
   - TEM
   - Trajectory Equifinality Approach
   - TEA

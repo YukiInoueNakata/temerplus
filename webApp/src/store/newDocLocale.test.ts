@@ -46,7 +46,7 @@ describe('新しい図の言語＝画面の言語', () => {
     expect(currentUILocale()).toBe('en');
     const doc = createEmptyDocument();
     expect(doc.settings.locale).toBe('en');
-    expect(doc.settings.timeArrow.label).toBe('Irreversible time');
+    expect(doc.settings.timeArrow.label).toBe('Irreversible Time');
     expect(doc.settings.legend.title).toBe('Legend');
     // 既定の設定そのもの（古いファイルの補完に使う）は変えない
     expect(DEFAULT_SETTINGS.locale).toBe('ja');
@@ -65,7 +65,7 @@ describe('新しい図の言語＝画面の言語', () => {
   it('locale を渡せば画面の言語によらずその言語で作る', () => {
     const settings = createDefaultSettings('en');
     expect(settings.locale).toBe('en');
-    expect(settings.timeArrow.label).toBe('Irreversible time');
+    expect(settings.timeArrow.label).toBe('Irreversible Time');
     expect(createEmptyDocument('ja').settings.timeArrow.label).toBe('非可逆的時間');
   });
 

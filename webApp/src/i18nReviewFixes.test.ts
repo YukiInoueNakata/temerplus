@@ -4,7 +4,7 @@ import i18n from './i18n';
 import { initialUILanguage, hasPriorUse } from './utils/uiLanguage';
 import { useTEMStore } from './store/store';
 import { summarizeCodes, type MaxqdaSegment } from './utils/maxqdaImport';
-import { mapBoxType, mapSDSGType } from './utils/csvImport';
+import { mapBoxType, mapSDSGType, mapLineType } from './utils/csvImport';
 import { BOX_TYPE_LABELS } from './store/defaults';
 
 afterEach(async () => {
@@ -38,7 +38,7 @@ describe('図の言語を変えたときの凡例の題と時間の矢印の文�
     st.setLocale('en');
     const s = useTEMStore.getState().doc.settings;
     expect(s.legend.title).toBe('Legend');
-    expect(s.timeArrow.label).toBe('Irreversible time');
+    expect(s.timeArrow.label).toBe('Irreversible Time');
     useTEMStore.getState().setLocale('ja');
     const s2 = useTEMStore.getState().doc.settings;
     expect(s2.legend.title).toBe('凡例');
@@ -89,5 +89,24 @@ describe('SG の呼び名（社会的助勢）と TEM の英語名（Modeling）
   });
   it('取り込みは旧称も SG として読む', () => {
     for (const w of ['社会的助勢', '社会的ガイド', '社会的ガイダンス', '社会的支援']) expect(mapSDSGType(w)).toBe('SG');
+  });
+});
+
+describe('凡例と用語の表の英語（Irreversible Time・Solid path）', () => {
+  it('用語の表は凡例と同じ英語', () => {
+    expect(i18n.t('terms:timeArrow', { lng: 'en' })).toBe('Irreversible Time');
+    expect(i18n.t('terms:line.RLine', { lng: 'en' })).toBe('Solid path');
+    expect(i18n.t('terms:line.XLine', { lng: 'en' })).toBe('Dashed path');
+  });
+  it('前の既定 Irreversible time の図も、図の言語を日本語にすると非可逆的時間に替わる', () => {
+    useTEMStore.getState().setLocale('en');
+    useTEMStore.setState((st) => ({ doc: { ...st.doc, settings: { ...st.doc.settings, timeArrow: { ...st.doc.settings.timeArrow, label: 'Irreversible time' } } } }));
+    useTEMStore.getState().setLocale('ja');
+    expect(useTEMStore.getState().doc.settings.timeArrow.label).toBe('非可逆的時間');
+  });
+  it('取り込みは新旧どちらの英語も線として読む', () => {
+    expect(mapLineType('Solid path')).toBe('RLine');
+    expect(mapLineType('Dashed path')).toBe('XLine');
+    expect(mapLineType('Solid arrow')).toBe('RLine');
   });
 });

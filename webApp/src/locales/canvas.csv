@@ -1,6 +1,6 @@
 ﻿key,ja,en,note
 "noSheet","シートがありません","No sheet","図の画面（シートが 1 枚も無いとき）"
-"timeArrow.title","ダブルクリックで非可逆的時間タブを開く","Double-click to open the Irreversible time tab","図の上の非可逆的時間の矢印の説明（マウスを重ねたとき）"
+"timeArrow.title","ダブルクリックで非可逆的時間タブを開く","Double-click to open the Irreversible Time tab","図の上の非可逆的時間の矢印の説明（マウスを重ねたとき）"
 "zoomIn","ズームイン","Zoom in","図の画面の左下のボタンの説明（マウスを重ねたとき）"
 "zoomOut","ズームアウト","Zoom out","図の画面の左下のボタンの説明（マウスを重ねたとき）"
 "fitAll","全体フィット","Fit all","図の画面の左下のボタンの説明（マウスを重ねたとき）"

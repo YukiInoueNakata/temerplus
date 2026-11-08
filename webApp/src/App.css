@@ -1093,3 +1093,10 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
 
 /* 起動時の案内（TEMer へようこそ）の言語の切り替え。閉じるボタンの左に寄せる（2026-11-08） */
 .startup-language-switch { margin-left: auto; margin-right: 12px; }
+
+/* Box の右クリックのメニュー（BoxQuickEdit.tsx。2026-11-08） */
+.box-context-menu { min-width: 220px; background: #fff; border: 1px solid #c8c8c8; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.18); padding: 4px 0; font-size: 13px; }
+.box-context-menu-title { padding: 4px 12px 2px; color: #666; font-size: 11px; }
+.box-context-menu-item { display: flex; width: 100%; align-items: center; gap: 4px; padding: 5px 12px; border: none; background: none; text-align: left; cursor: pointer; font: inherit; }
+.box-context-menu-item:hover { background: #e8f0fe; }
+.box-context-menu-sep { height: 1px; background: #e5e5e5; margin: 4px 0; }

@@ -108,6 +108,8 @@ interface Actions {
   addBox: (partial?: Partial<Box>, sheetId?: string) => string;
   updateBox: (id: string, patch: Partial<Box>) => void;
   updateBoxes: (ids: string[], patch: Partial<Box>) => void;
+  /** 選んでいる Box とメモをまとめて dx・dy（px）だけ動かす（矢印のキー・浮かぶツールバー用。1 回で「元に戻す」1 回） */
+  nudgeSelection: (dx: number, dy: number) => void;
   removeBox: (id: string) => void;
   removeBoxes: (ids: string[]) => void;
 
@@ -579,6 +581,18 @@ export const useTEMStore = create<Store>()(
                 }
               });
             }
+          }),
+          dirty: true,
+        }));
+      },
+      nudgeSelection: (dx, dy) => {
+        const sel = get().selection;
+        if (sel.boxIds.length === 0 && sel.noteIds.length === 0) return;
+        if (dx === 0 && dy === 0) return;
+        set((state) => ({
+          doc: mutateActiveSheet(state.doc, (sheet) => {
+            sheet.boxes.forEach((b) => { if (sel.boxIds.includes(b.id)) { b.x += dx; b.y += dy; } });
+            (sheet.notes ?? []).forEach((n) => { if (sel.noteIds.includes(n.id)) { n.x += dx; n.y += dy; } });
           }),
           dirty: true,
         }));
@@ -2040,6 +2054,12 @@ export const useTEMStore = create<Store>()(
                 if (b.id === boxId) {
                   b.type = newType as Box['type'];
                   b.id = newId;
+                  // 文字が前の種別の既定の名前のまま（リボンから足した Box など）なら、新しい種別の名前に替える。
+                  // 書き換えた文字は残す（2026-11-08。種別を変えても「通常」と残っていた）
+                  const lng = d.settings.locale ?? 'ja';
+                  if (b.label === i18n.t(`terms:boxType.${oldType}`, { lng })) {
+                    b.label = i18n.t(`terms:boxType.${newType}`, { lng });
+                  }
                 }
               });
               sh.lines.forEach((l) => {

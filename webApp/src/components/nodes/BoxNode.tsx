@@ -9,7 +9,8 @@
 // ============================================================================
 
 import { useEffect, useRef, useState } from 'react';
-import { Handle, NodeResizer, Position, type NodeProps } from 'reactflow';
+import { Handle, NodeResizer, NodeToolbar, Position, type NodeProps } from 'reactflow';
+import { BoxFloatingToolbar } from '../BoxQuickEdit';
 import type { Box } from '../../types';
 import { BOX_RENDER_SPECS } from '../../store/defaults';
 import { resolveBoxVisuals, resolveBoxBorderDraw } from '../../utils/boxPreset';
@@ -84,6 +85,8 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
     const t = window.setTimeout(() => setResizerReady(true), 350);
     return () => window.clearTimeout(t);
   }, [selected]);
+  // 選んでいる Box のうち最後に選んだものか（浮かぶツールバーはその上にだけ出す）
+  const isPrimarySelected = useTEMStore((st) => { const ids = st.selection.boxIds; return ids.length > 0 && ids[ids.length - 1] === nodeId; });
 
   // キーボード（Enter / F2）や React Flow の onNodeDoubleClick からの編集開始を受ける
   const editingNodeId = useTEMStore((st) => st.editingNodeId);
@@ -451,6 +454,13 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
 
   return (
     <div style={{ position: 'relative' }}>
+      {/* 選んだ Box の上の小さなツールバー（種別・Item レベル）。複数を選んでいるときは最後に選んだ 1 つの上だけ。
+          種別の文字（BFP-1 など）に重ならないよう少し離す。2026-11-08 ユーザー要望 */}
+      {!isPreview && (
+        <NodeToolbar isVisible={!!selected && isPrimarySelected && !editing} position={Position.Top} offset={30}>
+          <BoxFloatingToolbar boxType={data.type} />
+        </NodeToolbar>
+      )}
       <NodeResizer
         isVisible={!!selected && resizerReady && !editing && !resizeDisabled}
         minWidth={30}

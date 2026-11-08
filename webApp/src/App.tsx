@@ -29,6 +29,9 @@ import demoTemEnRaw from '../sample-tem/kanzaki2021_figure1_en.tem?raw';
 // 原文連動デモ (Phase 4: 逐語録 ↔ Box リンク)
 import transcriptDemoRaw from '../sample-tem/transcript_demo.tem?raw';
 import { useTEMStore } from './store/store';
+import { LEVEL_PX } from './store/defaults';
+import { SELECTABLE_BOX_TYPES } from './utils/typeDisplay';
+import { changeSelectedBoxesType } from './components/BoxQuickEdit';
 import {
   saveToFile,
   loadFromFile,
@@ -397,6 +400,27 @@ export default function App() {
         }
       }
       if (e.key === 'Escape' && !isEditing) { store.clearSelection(); return; }
+      // 矢印のキーで選んだ Box・メモを動かす（2026-11-08 ユーザー要望「位置の調整が面倒」）。
+      // 図形を動かせるのは「選択」「範囲選択」のモードだけ（「移動」のモードは画面を動かすモードなので動かさない）。
+      // 1 回でスナップの間隔、Shift と一緒なら 1 レベル（LEVEL_PX）。向きは画面のとおり（横型・縦型で同じ）
+      if (!isEditing && !ctrl && !e.altKey && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+        const sel = store.selection;
+        if ((sel.boxIds.length > 0 || sel.noteIds.length > 0) && store.view.canvasMode !== 'move') {
+          e.preventDefault();
+          const step = e.shiftKey ? LEVEL_PX : Math.max(1, store.doc.settings.snap?.gridPx ?? 10);
+          const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
+          const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0;
+          store.nudgeSelection(dx, dy);
+          return;
+        }
+      }
+      // 数字のキー 1〜7 で選んだ Box の種別を変える（順は SELECTABLE_BOX_TYPES: 通常・分岐点・等至点・両極化した等至点・
+      // 必須通過点・潜在経験・その他）。2026-11-08 ユーザー要望
+      if (!isEditing && !ctrl && !e.altKey && !e.shiftKey && /^[1-7]$/.test(k) && store.selection.boxIds.length > 0) {
+        e.preventDefault();
+        changeSelectedBoxesType(SELECTABLE_BOX_TYPES[Number(k) - 1]);
+        return;
+      }
       // 操作のモードの切り替え（2026-11-08 ユーザー要望）。作図ソフトでよく使う割り当て: V=選択・H=移動（手）・M=範囲選択
       if (!isEditing && !ctrl && !e.altKey && !e.shiftKey) {
         const mode = k === 'v' ? 'pointer' : k === 'h' ? 'move' : k === 'm' ? 'select' : null;

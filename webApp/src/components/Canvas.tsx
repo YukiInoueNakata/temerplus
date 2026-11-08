@@ -21,6 +21,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useTEMStore, useActiveSheet } from '../store/store';
+import { BoxContextMenu } from './BoxQuickEdit';
 import { BoxNode, type BoxNodeData } from './nodes/BoxNode';
 import { SDSGNode, type SDSGNodeData } from './nodes/SDSGNode';
 import { NoteNode, NoteLeaderOverlay, type NoteNodeData } from './nodes/NoteNode';
@@ -847,6 +848,17 @@ function CanvasInner({
   // ノード側の onDoubleClick は、1 回目のクリックによる選択で再描画が起き、
   // 2 回目と対象がずれると dblclick が共通祖先（ペイン）へ飛んでしまい発火しない。
   // そこでキャンバス側でも拾い、座標から対象ノードを判定して編集を要求する。
+  // Box の右クリックのメニュー（種別・Item レベル・編集・削除）。2026-11-08 ユーザー要望
+  const [boxMenu, setBoxMenu] = useState<{ x: number; y: number } | null>(null);
+  const onNodeContextMenu = useCallback((event: React.MouseEvent, node: Node) => {
+    if (node.type !== 'box') return;
+    event.preventDefault();
+    const { boxIds } = useTEMStore.getState().selection;
+    // 選んでいない Box を右クリックしたら、その Box だけを選ぶ（選んでいる Box の上なら、選んだまま全部に効く）
+    if (!boxIds.includes(node.id)) setSelection([node.id], [], []);
+    setBoxMenu({ x: event.clientX, y: event.clientY });
+  }, [setSelection]);
+
   const onPaneClick = useCallback(() => {
     setSelection([], []);
     setGuides({ v: [], h: [] });
@@ -928,6 +940,7 @@ function CanvasInner({
             onConnect={onConnect}
             onSelectionChange={onSelectionChange}
             onNodeClick={onNodeClick}
+            onNodeContextMenu={onNodeContextMenu}
             // React Flow がノード単位で検出するダブルクリック。ノード内部の
             // onDoubleClick は 1 回目のクリックで選択→再描画が起きると 2 回目の
             // 対象がずれて発火しないため、こちらを主経路にする
@@ -947,6 +960,9 @@ function CanvasInner({
             zoomOnPinch={true}
             snapToGrid={false}
             snapGrid={[gridPx, gridPx]}
+            // React Flow に元からある「フォーカスのある図形を矢印のキーで動かす」機能は止める。矢印のキーは App の
+            // nudgeSelection（選んだ Box・メモをまとめて動かす）が受け持つ（二重に動かないように。2026-11-08）
+            disableKeyboardA11y
             fitView
             // 最初に図形が現れたときの自動の画面合わせは等倍より大きくしない（上限 5 倍のままだと、空の図に最初の
             // メモや Box を足したとき 500% に拡大されていた。2026-11-08）
@@ -971,6 +987,7 @@ function CanvasInner({
           <CustomWheelHandler layout={layout} />
           <HorizontalScrollbar />
           <VerticalScrollbar />
+          {boxMenu && <BoxContextMenu x={boxMenu.x} y={boxMenu.y} onClose={() => setBoxMenu(null)} />}
         </div>
       </div>
     </div>

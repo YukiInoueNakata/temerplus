@@ -1,0 +1,12 @@
+﻿key,ja,en,note
+menu.type,種別（{{count}} 個）,Type ({{count}} boxes),Box の右クリックのメニュー > 種別の見出し（選んでいる Box の数）
+menu.type_one,種別（{{count}} 個）,Type ({{count}} box),件数が 1 のときの英語の形（日本語は使われない）
+menu.itemUp,{{arrow}} Item レベルを 1 上げる,{{arrow}} Raise Item level by 1,Box の右クリックのメニュー
+menu.itemDown,{{arrow}} Item レベルを 1 下げる,{{arrow}} Lower Item level by 1,Box の右クリックのメニュー
+menu.edit,文字を編集,Edit text,Box の右クリックのメニュー（Box が 1 つのとき）
+menu.delete,削除,Delete,Box の右クリックのメニュー
+toolbar.type.title,種別を変える（数字のキー 1〜7 でも変えられます）,Change the type (number keys 1–7 also work),選んだ Box の上に出るツールバー > 種別の選択肢の説明
+toolbar.itemUp.title,Item レベルを 1 上げる（Shift と矢印のキーでも動かせます）,Raise Item level by 1 (Shift + arrow keys also work),選んだ Box の上に出るツールバー > ボタンの説明
+toolbar.itemDown.title,Item レベルを 1 下げる（Shift と矢印のキーでも動かせます）,Lower Item level by 1 (Shift + arrow keys also work),選んだ Box の上に出るツールバー > ボタンの説明
+toolbar.count,{{count}} 個に適用,Applies to {{count}} boxes,選んだ Box の上に出るツールバー > 複数を選んでいるとき
+toolbar.count_one,{{count}} 個に適用,Applies to {{count}} box,件数が 1 のときの英語の形（日本語は使われない）

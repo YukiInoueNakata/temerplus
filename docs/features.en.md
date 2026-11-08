@@ -41,6 +41,7 @@ Names in parentheses are the ribbon tabs and buttons where each feature lives.
 ## Editing
 
 - **Modes**: Pan (move the view; key H), Select (move shapes; key V), Area select (key M) (Edit > Mode). Boxes, notes, symbols, and other shapes are moved by dragging them in Select mode.
+- **Quick Box edits**: right-click a Box for a menu with its type, raising or lowering the Item level, editing the text, and deleting. Selecting a Box shows a small toolbar above it for the type and the Item level. Number keys 1–7 change the type (1 experience, 2 bifurcation point, 3 equifinality point, 4 polarized equifinality point, 5 obligatory passage point, 6 latent experience, 7 other), and arrow keys move it (with Shift, by one level). With several Boxes selected, all of them change. Arrow keys move shapes in Select and Area select modes.
 - **Basics**: undo and redo, copy, paste, duplicate, delete, select all (Edit).
 - **Size**: fit a Box's width and height to its text (Edit > Fit to text); match width, height, size, or font size (Arrange).
 - **Alignment**: align left, center, right, top, middle, bottom; distribute horizontally (Arrange > Align and size); bring to front or send to back (Arrange > Order).

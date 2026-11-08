@@ -31,6 +31,7 @@ import {
   removeSourceRefsForTranscript,
 } from '../utils/sourceRefTracking';
 import {
+  usesVerticalBoxText,
   createEmptyDocument,
   createEmptySheet,
   DEFAULT_VIEW_STATE,
@@ -568,12 +569,13 @@ export const useTEMStore = create<Store>()(
         }
         set((s) => {
           const layout = s.doc.settings.layout;
-          const defaultTextOrientation = layout === 'horizontal' ? 'vertical' : 'horizontal';
-          // defaultBoxSize は横型想定。縦型では -90° 回転に合わせて W/H を swap
+          // defaultBoxSize は縦書き（横型の日本語の図）を想定。横書きの Box（縦型、英語などの図）では W/H を入れ替える
+          const vt = usesVerticalBoxText(layout, s.doc.settings.locale);
+          const defaultTextOrientation = vt ? 'vertical' : 'horizontal';
           const baseW = s.doc.settings.defaultBoxSize.width;
           const baseH = s.doc.settings.defaultBoxSize.height;
-          const defaultWidth = layout === 'horizontal' ? baseW : baseH;
-          const defaultHeight = layout === 'horizontal' ? baseH : baseW;
+          const defaultWidth = vt ? baseW : baseH;
+          const defaultHeight = vt ? baseH : baseW;
           return {
             doc: mutateSheet(s.doc, targetSheetId, (sh) => {
               const defaults: Box = {
@@ -2190,18 +2192,18 @@ export const useTEMStore = create<Store>()(
               d.metadata.modifiedAt = new Date().toISOString();
               const toVertical = layout === 'vertical';
               d.sheets.forEach((sheet) => {
+                // 中心を -90°（戻すときは +90°）回す。縦書きにする図（横型の日本語・中国語）に出入りするときは縦横の
+                // 大きさを入れ替え、英語などの横書きのままの Box は大きさを変えない（2026-11-08）
+                const vtAfter = usesVerticalBoxText(layout, d.settings.locale);
+                const vtBefore = usesVerticalBoxText(currentLayout, d.settings.locale);
                 sheet.boxes.forEach((b) => {
-                  const ox = b.x, oy = b.y, ow = b.width, oh = b.height;
-                  if (toVertical) {
-                    b.x = -(oy + oh);
-                    b.y = ox;
-                  } else {
-                    b.x = oy;
-                    b.y = -(ox + ow);
-                  }
-                  b.width = oh;
-                  b.height = ow;
-                  b.textOrientation = layout === 'horizontal' ? 'vertical' : 'horizontal';
+                  const cx = b.x + b.width / 2, cy = b.y + b.height / 2;
+                  const ncx = toVertical ? -cy : cy;
+                  const ncy = toVertical ? cx : -cx;
+                  if (vtAfter !== vtBefore) { const w = b.width; b.width = b.height; b.height = w; }
+                  b.x = ncx - b.width / 2;
+                  b.y = ncy - b.height / 2;
+                  b.textOrientation = vtAfter ? 'vertical' : 'horizontal';
                 });
                 // SDSG も同じ rotation を適用する:
                 //  - width/height, spaceWidth/spaceHeight は swap（視覚的な -90° 回転）
@@ -2718,8 +2720,9 @@ export const useTEMStore = create<Store>()(
         const isH = layout === 'horizontal';
         const baseW = st.doc.settings.defaultBoxSize.width;
         const baseH = st.doc.settings.defaultBoxSize.height;
-        const w = isH ? baseW : baseH;
-        const h = isH ? baseH : baseW;
+        const vt = usesVerticalBoxText(layout, st.doc.settings.locale);
+        const w = vt ? baseW : baseH;
+        const h = vt ? baseH : baseW;
         // 時間の方向の始まり: 今ある Box のいちばん後ろの次（無ければ 0）。間隔は Box を足すときと同じ 150px
         const STEP = 150;
         const timeEnd = sheet.boxes.length > 0
@@ -2744,7 +2747,7 @@ export const useTEMStore = create<Store>()(
             y: isH ? -itemPx : time,
             width: w,
             height: h,
-            textOrientation: isH ? 'vertical' : 'horizontal',
+            textOrientation: vt ? 'vertical' : 'horizontal',
             segmentId: sg.id,
             sourceRefs: [{
               id: genSourceRefId(),

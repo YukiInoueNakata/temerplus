@@ -3,6 +3,7 @@
 // ============================================================================
 
 import type {
+  LayoutDirection,
   ProjectSettings,
   Sheet,
   TEMDocument,
@@ -334,6 +335,15 @@ export function createDefaultSettings(locale: Locale = currentUILocale()): Proje
   };
 }
 
+/**
+ * Box の文字を縦書きにするか。横型の図で、図の言語が日本語・中国語のときだけ（2026-11-08）。
+ * 英語などを縦書きにすると 1 字ずつ縦に積まれて読めないので、横書き・横長の Box にする
+ */
+export function usesVerticalBoxText(layout: LayoutDirection, locale?: string): boolean {
+  const l = (locale ?? 'ja').toLowerCase();
+  return layout === 'horizontal' && (l.startsWith('ja') || l.startsWith('zh'));
+}
+
 export function createSampleSheet(name: string, order: number, locale: Locale = currentUILocale()): Sheet {
   const sheet = createEmptySheet(name, order);
   const tl = (key: string, opts: Record<string, unknown> = {}) => i18n.t(key, { ...opts, lng: locale });
@@ -348,6 +358,15 @@ export function createSampleSheet(name: string, order: number, locale: Locale = 
     { id: 'EFP1',   type: 'EFP',    label: tl('defaults:sample.efp'), x: 700, y: 100, width: 70, height: 120, textOrientation: 'vertical' },
     { id: 'P_EFP1', type: 'P-EFP',  label: tl('defaults:sample.pefp'), x: 700, y: 300, width: 70, height: 120, textOrientation: 'vertical' },
   ];
+  // 英語などの図は横書き・横長の Box にする（中心はそのまま）
+  if (!usesVerticalBoxText('horizontal', locale)) {
+    for (const b of boxes) {
+      const cx = b.x + b.width / 2, cy = b.y + b.height / 2;
+      [b.width, b.height] = [b.height, b.width];
+      b.x = cx - b.width / 2; b.y = cy - b.height / 2;
+      b.textOrientation = 'horizontal';
+    }
+  }
   const lines: Line[] = [
     { id: 'RL_1', type: 'RLine', from: 'Item1', to: 'OPP1',   connectionMode: 'center-to-center', shape: 'straight' },
     { id: 'RL_2', type: 'RLine', from: 'OPP1',  to: 'BFP1',   connectionMode: 'center-to-center', shape: 'straight' },

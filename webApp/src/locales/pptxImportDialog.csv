@@ -1,0 +1,52 @@
+﻿key,ja,en,note
+title,PowerPoint の TEM 図から取り込み（{{step}} / 3）,Import a TEM diagram from PowerPoint ({{step}} / 3),PowerPoint から取り込みの画面の題
+role.box,Box,Box,PowerPoint から取り込み > 図形の役割の選択肢
+role.sd,SD,SD,PowerPoint から取り込み > 図形の役割の選択肢（Social direction の略号）
+role.sg,SG,SG,PowerPoint から取り込み > 図形の役割の選択肢（Social guidance の略号）
+role.sdsgLabel,SD/SG のラベル,SD/SG label,PowerPoint から取り込み > 図形の役割の選択肢
+role.subLabel,サブラベル（Box・SD/SG の下の文字）,"Sublabel (text under a Box, SD or SG)",PowerPoint から取り込み > 図形の役割の選択肢
+role.line,Line（矢印）,Line (arrow),PowerPoint から取り込み > 図形の役割の選択肢
+role.period,時期ラベル,Period label,PowerPoint から取り込み > 図形の役割の選択肢
+role.note,メモ（付箋）,Note (sticky note),PowerPoint から取り込み > 図形の役割の選択肢
+role.timeArrow,時間の矢印（取り込まない）,Time arrow (not imported),PowerPoint から取り込み > 図形の役割の選択肢
+role.ignore,（無視）,(Ignore),PowerPoint から取り込み > 図形の役割の選択肢
+error.noSlides,スライドがありませんでした,The file has no slides,PowerPoint から取り込み > 読み込めなかったときの注意
+reason.manual,手で変更,Changed by hand,PowerPoint から取り込み > 図形の上の吹き出し（役割を推測した理由）
+error.importFailed,取り込みの途中で失敗しました: {{message}},Import failed partway: {{message}},PowerPoint から取り込み > 取り込めなかったときの注意
+done.summary,"Box {{boxes}}、Line {{lines}}、SD/SG {{sdsg}}、時期ラベル {{periods}}、メモ {{notes}} を取り込みました","Imported {{boxes}} Boxes, {{lines}} Lines, {{sdsg}} SD/SG, {{periods}} period labels and {{notes}} notes",PowerPoint から取り込み > 取り込んだ後の知らせ
+done.warnings,確認してほしいこと {{count}} 件:,{{count}} things to check:,PowerPoint から取り込み > 取り込んだ後の知らせ（警告の一覧の見出し）
+step1.heading,1. ファイルを選ぶ,1. Choose a file,PowerPoint から取り込み > 手順 1 の見出し
+step1.hint,PowerPoint（.pptx）で描いた TEM 図。図形の見た目（枠・吹き出しの向き・矢印・文字）から Box や SD/SG を推測します。,"A TEM diagram drawn in PowerPoint (.pptx). Boxes and SD/SG are guessed from how the shapes look (outline, callout direction, arrows, text).",PowerPoint から取り込み > 手順 1 の説明
+step1.drop,ここに .pptx をドロップ、またはクリックして選択,"Drop a .pptx here, or click to choose one",PowerPoint から取り込み > ファイルを落とす枠
+step2.heading,2. 図形の役割を確かめる,2. Check the role of each shape,PowerPoint から取り込み > 手順 2 の見出し
+step2.hint,{{filename}}・スライド {{slide}}（図形 {{shapes}} 個）。見た目から推測した役割が入っています。違うものは右の一覧で直してください。縮図の図形にマウスを乗せると一覧の行が、行に乗せると縮図の図形が強調されます。,"{{filename}}, slide {{slide}} ({{shapes}} shapes). Roles are guessed from how the shapes look. Fix any wrong ones in the list on the right. Hovering a shape in the preview highlights its row, and hovering a row highlights the shape.",PowerPoint から取り込み > 手順 2 の説明
+step2.slide,スライド,Slide,PowerPoint から取り込み > スライドの選択のラベル
+step2.slideOption,スライド {{index}}（図形 {{shapes}}）,Slide {{index}} ({{shapes}} shapes),PowerPoint から取り込み > スライドの選択肢
+step2.showIgnored,無視する図形も表示,Show ignored shapes,PowerPoint から取り込み > チェックボックス
+col.shape,図形,Shape,PowerPoint から取り込み > 図形の一覧の列名
+col.role,役割,Role,PowerPoint から取り込み > 図形の一覧の列名
+col.detail,詳細,Details,PowerPoint から取り込み > 図形の一覧の列名
+shape.tooltip,（{{kind}}・推測: {{reason}}）,"({{kind}}, guessed: {{reason}})",PowerPoint から取り込み > 図形の名前の吹き出し（図形の形と推測の理由）
+shape.noText,（{{kind}}）,({{kind}}),PowerPoint から取り込み > 文字の無い図形の表示（図形の形）
+line.RLine,実線（実際の径路）,Solid (realized path),PowerPoint から取り込み > 矢印の種類の選択肢
+line.XLine,点線（想定される径路）,Dashed (unrealized path),PowerPoint から取り込み > 矢印の種類の選択肢
+notSelected,（未選択）,(Not selected),PowerPoint から取り込み > ラベルの持ち主の選択肢
+owner.position,"{{role}}（{{x}},{{y}}）","{{role}} ({{x}}, {{y}})",PowerPoint から取り込み > ラベルの持ち主の選択肢（SD/SG と位置）
+step3.heading,3. 取り込む内容を確かめる,3. Review what will be imported,PowerPoint から取り込み > 手順 3 の見出し
+sep,・,", ",PowerPoint から取り込み > 件数の並びの区切り
+count.periodLabels,時期ラベル,Period labels,PowerPoint から取り込み > 件数の並び
+count.notes,メモ,Notes,PowerPoint から取り込み > 件数の並び
+step3.scale,大きさ（1pt あたりの px）,Scale (px per 1 pt),PowerPoint から取り込み > 設定のラベル
+step3.scale.tip,PowerPoint の 1pt を何 px にするか。大きいほど図が広がり、文字に余裕ができます,How many px one PowerPoint pt becomes. Larger values spread the diagram out and give text more room.,PowerPoint から取り込み > 設定の吹き出し
+step3.smallToDescription,小さい文字は Box の説明へ,Small text goes to the Box description,PowerPoint から取り込み > 設定のラベル
+step3.smallToDescription.tip,Box の中で本文より小さい文字（コード名など）を、ラベルでなく Box の説明に入れる,"Put text smaller than the main text inside a Box (such as code names) into the Box description, not the label",PowerPoint から取り込み > 設定の吹き出し
+step3.keepFontSize,元の文字サイズを保つ,Keep the original font size,PowerPoint から取り込み > 設定のラベル
+step3.toNewSheet,新しいシートに取り込む,Import into a new sheet,PowerPoint から取り込み > 設定のラベル
+step3.verticalWarning,いまの図は縦型です。PowerPoint の配置（横型）のまま取り込むので、取り込み後に向きを確かめてください。,"The current diagram is vertical. The PowerPoint layout (horizontal) is imported as is, so check the orientation after importing.",PowerPoint から取り込み > 縦型の図のときの注意
+step3.warnings,確認してほしいこと（{{count}} 件）,Things to check ({{count}}),PowerPoint から取り込み > 警告の一覧の見出し
+step3.links,推定した矢印と SD/SG の紐付け,Guessed arrows and SD/SG attachments,PowerPoint から取り込み > 見出し
+noLabel,（ラベルなし）,(No label),PowerPoint から取り込み > ラベルの無い SD/SG の表示
+back,戻る,Back,PowerPoint から取り込み > ボタン
+cancel,キャンセル,Cancel,PowerPoint から取り込み > ボタン
+next,次へ,Next,PowerPoint から取り込み > ボタン
+import,取り込む,Import,PowerPoint から取り込み > ボタン

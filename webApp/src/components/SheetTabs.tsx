@@ -3,6 +3,7 @@
 // ============================================================================
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore } from '../store/store';
 
 interface ContextMenuState {
@@ -21,18 +22,19 @@ export function SheetTabs() {
   const renameSheet = useTEMStore((s) => s.renameSheet);
   const duplicateSheet = useTEMStore((s) => s.duplicateSheet);
   const [menu, setMenu] = useState<ContextMenuState | null>(null);
+  const { t } = useTranslation('sheetTabs');
 
   const handleRename = (id: string, currentName: string) => {
-    const newName = prompt('シート名を変更', currentName);
+    const newName = prompt(t('prompt.rename'), currentName);
     if (newName && newName !== currentName) renameSheet(id, newName);
   };
 
   const handleDelete = (id: string) => {
     if (sheets.length <= 1) {
-      alert('最後のシートは削除できません');
+      alert(t('alert.lastSheet'));
       return;
     }
-    if (confirm('このシートを削除しますか？（取り消せません）')) removeSheet(id);
+    if (confirm(t('confirm.delete'))) removeSheet(id);
   };
 
   const handleContextMenu = (e: React.MouseEvent, id: string, name: string) => {
@@ -50,12 +52,12 @@ export function SheetTabs() {
             onClick={() => setActive(sheet.id)}
             onDoubleClick={() => handleRename(sheet.id, sheet.name)}
             onContextMenu={(e) => handleContextMenu(e, sheet.id, sheet.name)}
-            title="右クリックで操作メニュー"
+            title={t('tab.title')}
           >
             {sheet.name}
           </div>
         ))}
-        <button className="sheet-add" onClick={() => addSheet()} title="新規シート">+</button>
+        <button className="sheet-add" onClick={() => addSheet()} title={t('add.title')}>+</button>
       </div>
 
       {menu && (
@@ -105,6 +107,7 @@ function SheetContextMenu({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [adj, setAdj] = useState<{ x: number; y: number } | null>(null);
+  const { t } = useTranslation('sheetTabs');
 
   // メニューの実サイズを測って画面外にはみ出さないよう補正
   useEffect(() => {
@@ -148,19 +151,19 @@ function SheetContextMenu({
       style={{ position: 'fixed', left: adj?.x ?? menu.x, top: adj?.y ?? menu.y, zIndex: 2000 }}
     >
       <div className="context-menu-header">{menu.sheetName}</div>
-      <button className="context-menu-item" onClick={() => run(actions.rename)}>名前を変更</button>
-      <button className="context-menu-item" onClick={() => run(actions.duplicate)}>複製</button>
+      <button className="context-menu-item" onClick={() => run(actions.rename)}>{t('menu.rename')}</button>
+      <button className="context-menu-item" onClick={() => run(actions.duplicate)}>{t('menu.duplicate')}</button>
       <div className="context-menu-separator" />
-      <button className="context-menu-item" onClick={() => run(actions.moveLeft)}>← 左へ移動</button>
-      <button className="context-menu-item" onClick={() => run(actions.moveRight)}>→ 右へ移動</button>
+      <button className="context-menu-item" onClick={() => run(actions.moveLeft)}>{t('menu.moveLeft')}</button>
+      <button className="context-menu-item" onClick={() => run(actions.moveRight)}>{t('menu.moveRight')}</button>
       <div className="context-menu-separator" />
       <button
         className="context-menu-item danger"
         onClick={() => run(actions.delete)}
         disabled={!canDelete}
-        title={!canDelete ? '最後のシートは削除できません' : ''}
+        title={!canDelete ? t('menu.delete.disabled') : ''}
       >
-        削除
+        {t('menu.delete')}
       </button>
     </div>
   );

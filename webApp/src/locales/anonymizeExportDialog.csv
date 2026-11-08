@@ -1,0 +1,18 @@
+﻿key,ja,en,note
+"title","匿名化エクスポート","Anonymized export","匿名化して書き出す画面 > 見出し"
+"alert.noTargets","匿名化対象が 1 件もありません。
+取り込み時に匿名化していないか、追加の対象を入力してください。","There is nothing to anonymize.
+No names were anonymized when the transcripts were imported. Enter additional targets.","匿名化して書き出す画面 > 置き換える名前が 1 つも無いときの注意"
+"hint.intro","原文に含まれる人名・組織名を仮名に置換した <strong>.tem</strong> を別ファイル名 (<code>{{file}}</code>) で書き出します。元のドキュメントには影響しません。","Saves a <strong>.tem</strong> file in which personal and organization names in the transcripts are replaced with pseudonyms, under a separate file name (<code>{{file}}</code>). The original document is not changed.","匿名化して書き出す画面 > 説明の 1 段目（file は書き出すファイル名。<strong>・<code> のタグは残す）"
+"hint.replaced","置換対象: 段落本文・段落の話者欄・SourceRef.quoteText・Box / Line / SDSG の description。","Replaced: paragraph text, paragraph speaker fields, SourceRef.quoteText, and the description of Boxes, Lines and SD/SG.","匿名化して書き出す画面 > 説明の 2 段目（置き換える所。プロパティ名は訳さない）"
+"hint.notReplaced","置換しないもの: Box.label / Line.label / SDSG.label (解析者の概念名なので個別確認が必要)。","Not replaced: Box.label / Line.label / SDSG.label (these are the analyst's concept names; check them one by one).","匿名化して書き出す画面 > 説明の 3 段目"
+"existing.title","既存の匿名化マップ ({{count}} 件)","Existing anonymization maps ({{count}} entries)","匿名化して書き出す画面 > 取り込み時に作った置き換え表の見出し"
+"existing.none","原文が登録されていません。","No transcripts registered.","匿名化して書き出す画面 > 逐語録が無いとき"
+"existing.session","第{{n}}回","Session {{n}}","匿名化して書き出す画面 > 逐語録のインタビューの回"
+"existing.count","{{title}}: {{count}} 件","{{title}}: {{count}} entries","匿名化して書き出す画面 > 逐語録ごとの置き換えの数（title は逐語録の題）"
+"additional.title","追加の匿名化対象 (任意)","Additional targets (optional)","匿名化して書き出す画面 > 追加で置き換える名前の節の見出し"
+"additional.names","氏名・組織名","Names and organizations","匿名化して書き出す画面 > 入力欄の名前"
+"additional.placeholder","コンマ区切り (例: 山田太郎, X 大学, 田中先生)","Comma-separated (e.g. Taro Yamada, X University, Ms. Tanaka)","匿名化して書き出す画面 > 入力欄の例"
+"additional.prefix","仮名 prefix","Pseudonym prefix","匿名化して書き出す画面 > 仮名の頭に付ける語の欄"
+"cancel","キャンセル","Cancel","匿名化して書き出す画面 > ボタン"
+"export","匿名化版を書き出す","Export anonymized copy","匿名化して書き出す画面 > 書き出すボタン"

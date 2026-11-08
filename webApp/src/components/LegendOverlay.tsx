@@ -7,6 +7,7 @@
 // ============================================================================
 
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useStore as useReactFlowStore } from 'reactflow';
 import { useTEMStore } from '../store/store';
 import { computeLegendItems, computeLegendColumns, type LegendItem } from '../utils/legend';
@@ -16,6 +17,7 @@ import type { ProjectSettings } from '../types';
 import { useTEMView } from '../context/TEMViewContext';
 
 export function LegendOverlay({ onOpenSettings }: { onOpenSettings?: () => void }) {
+  const { t } = useTranslation('legendOverlay');
   const view = useTEMView();
   const sheet = view.sheet;
   const legend = view.settings.legend;
@@ -225,7 +227,7 @@ export function LegendOverlay({ onOpenSettings }: { onOpenSettings?: () => void 
       {!isPreview && (
         <div
           onMouseDown={startDrag}
-          title="ドラッグで移動"
+          title={t('drag.title')}
           style={{
             cursor: 'grab',
             fontSize: titleFontSize,
@@ -283,7 +285,7 @@ export function LegendOverlay({ onOpenSettings }: { onOpenSettings?: () => void 
       {!isPreview && (
         <div
           onMouseDown={startDrag}
-          title="ドラッグで移動"
+          title={t('drag.title')}
           style={{
             cursor: 'grab',
             fontSize: titleFontSize,
@@ -303,7 +305,7 @@ export function LegendOverlay({ onOpenSettings }: { onOpenSettings?: () => void 
   const bareHandle = !showTitle && !isPreview ? (
     <div
       onMouseDown={startDrag}
-      title="ドラッグで移動"
+      title={t('drag.title')}
       style={{
         position: 'absolute',
         top: 2 * zoom,
@@ -349,7 +351,7 @@ export function LegendOverlay({ onOpenSettings }: { onOpenSettings?: () => void 
     <div
       onDoubleClick={openSettings}
       onClick={onSingleClick}
-      title="クリックで選択、ダブルクリックで凡例設定"
+      title={t('legend.title')}
       // 複数ページの画像出力で、画面の凡例を写さず各ページに描き直すときの目印（exportImage の LEGEND_OVERLAY_CLASS と同じ）
       className="temer-legend-overlay"
       style={wrapperStyle}
@@ -385,7 +387,7 @@ export function LegendOverlay({ onOpenSettings }: { onOpenSettings?: () => void 
             };
             setResizing(true);
           }}
-          title="ドラッグで凡例の大きさを変更"
+          title={t('resize.title')}
           style={{
             position: 'absolute',
             right: 0,

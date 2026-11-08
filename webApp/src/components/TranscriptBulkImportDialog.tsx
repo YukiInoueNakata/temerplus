@@ -13,6 +13,7 @@
 // ============================================================================
 
 import { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore } from '../store/store';
 import { produce } from 'immer';
 import {
@@ -47,6 +48,7 @@ export function TranscriptBulkImportDialog({
   open: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('transcriptBulkImportDialog');
   const participants = useTEMStore((s) => s.doc.participants);
   const addTranscript = useTEMStore((s) => s.addTranscript);
 
@@ -56,7 +58,7 @@ export function TranscriptBulkImportDialog({
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [globalAnonymize, setGlobalAnonymize] = useState('');
-  const [anonymizePrefix, setAnonymizePrefix] = useState('協力者');
+  const [anonymizePrefix, setAnonymizePrefix] = useState('協力者'); // i18n-ok 匿名化の仮名の既定値（逐語録のデータに入る）
 
   const reset = () => {
     setRows([]);
@@ -94,7 +96,7 @@ export function TranscriptBulkImportDialog({
       }
       const titleParts: string[] = [];
       if (hints.participantHint) titleParts.push(hints.participantHint);
-      if (hints.sessionHint !== undefined) titleParts.push(`第${hints.sessionHint}回`);
+      if (hints.sessionHint !== undefined) titleParts.push(`第${hints.sessionHint}回`); // i18n-ok 逐語録の題の既定値（データ）
       const title = titleParts.length > 0 ? titleParts.join(' ') : filenameNoExt;
 
       let initial: ImportInitialResult | undefined;
@@ -171,7 +173,7 @@ export function TranscriptBulkImportDialog({
 
     // 各 Transcript を追加
     const anonMap = globalAnonymize.trim()
-      ? buildAnonymizationMap(globalAnonymize, anonymizePrefix.trim() || '協力者')
+      ? buildAnonymizationMap(globalAnonymize, anonymizePrefix.trim() || '協力者') // i18n-ok 匿名化の仮名の既定値（データ）
       : null;
 
     for (const r of enabledRows) {
@@ -184,7 +186,7 @@ export function TranscriptBulkImportDialog({
         const sn = r.sessionNumber.trim() === '' ? undefined : Math.max(1, Math.floor(Number(r.sessionNumber)));
         let transcript;
         if (!r.initial) {
-          errs.push(`${r.file.name}: パース失敗`);
+          errs.push(t('error.parseFailed', { name: r.file.name }));
           done++;
           setProgress({ done, total: enabledRows.length });
           continue;
@@ -209,13 +211,13 @@ export function TranscriptBulkImportDialog({
             sessionNumber: sn,
           });
         } else {
-          errs.push(`${r.file.name}: 段落が抽出できませんでした`);
+          errs.push(t('error.noParagraphs', { name: r.file.name }));
           done++;
           setProgress({ done, total: enabledRows.length });
           continue;
         }
         if (transcript.paragraphs.length === 0) {
-          errs.push(`${r.file.name}: 段落が 0 件 (列推測が外れている可能性があります)`);
+          errs.push(t('error.zeroParagraphs', { name: r.file.name }));
           done++;
           setProgress({ done, total: enabledRows.length });
           continue;
@@ -251,15 +253,15 @@ export function TranscriptBulkImportDialog({
     <div className="modal-backdrop" onClick={() => { reset(); onClose(); }} style={{ zIndex: 1050 }}>
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 900, maxWidth: '95vw', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
         <div className="modal-header">
-          <h3>原文を一括取り込み</h3>
+          <h3>{t('title')}</h3>
           <button onClick={() => { reset(); onClose(); }} className="modal-close">×</button>
         </div>
         <div className="modal-body" style={{ flex: 1, overflow: 'auto' }}>
           <section className="settings-section">
-            <h4>1. ファイル選択 (複数ファイル or フォルダ)</h4>
+            <h4>{t('step1.heading')}</h4>
             <p className="hint" style={{ marginTop: 0 }}>
-              対応形式: .txt / .md / .csv / .tsv / .xlsx / .xls / .docx<br />
-              ファイル名から協力者・回数を自動推測します (例: <code>A_第1回.docx</code>, <code>Yamada_v3.txt</code>, <code>interview_C_3.csv</code>)。
+              {t('step1.formats')}<br />
+              {t('step1.filenameHint')} (<code>{t('step1.example1')}</code>, <code>Yamada_v3.txt</code>, <code>interview_C_3.csv</code>)
             </p>
             <input
               ref={inputRef}
@@ -273,7 +275,7 @@ export function TranscriptBulkImportDialog({
               disabled={busy}
             />
             <span style={{ marginLeft: 8, fontSize: 12, color: '#666' }}>
-              ※ フォルダ選択 (上の input) / または以下から複数ファイル選択:
+              {t('step1.folderOrFiles')}
             </span>
             <br />
             <input
@@ -289,10 +291,10 @@ export function TranscriptBulkImportDialog({
           {rows.length > 0 && (
             <>
               <section className="settings-section">
-                <h4>2. 取り込み内容を確認 ({enabledCount} / {rows.length} 件選択)</h4>
+                <h4>{t('step2.heading', { selected: enabledCount, total: rows.length })}</h4>
                 {hasParseErrors && (
                   <p style={{ color: '#c0392b', fontSize: 12 }}>
-                    ⚠ いくつかのファイルでパースに失敗しています (灰色行)。チェックを外すと除外できます。
+                    ⚠ {t('step2.parseErrors')}
                   </p>
                 )}
                 <div style={{ overflowX: 'auto' }}>
@@ -300,11 +302,11 @@ export function TranscriptBulkImportDialog({
                     <thead>
                       <tr style={{ background: '#f5f5f5' }}>
                         <th style={th}></th>
-                        <th style={th}>ファイル名</th>
-                        <th style={th}>協力者</th>
-                        <th style={th}>第N回</th>
-                        <th style={th}>タイトル</th>
-                        <th style={th}>備考</th>
+                        <th style={th}>{t('col.filename')}</th>
+                        <th style={th}>{t('col.participant')}</th>
+                        <th style={th}>{t('col.session')}</th>
+                        <th style={th}>{t('col.title')}</th>
+                        <th style={th}>{t('col.note')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -321,11 +323,11 @@ export function TranscriptBulkImportDialog({
                           <td style={td}>
                             <div style={{ fontWeight: 600 }}>{r.file.name}</div>
                             {r.initial?.paragraphs && (
-                              <div style={{ color: '#666', fontSize: 11 }}>{r.initial.paragraphs.length} 段落 / {r.initial.format}</div>
+                              <div style={{ color: '#666', fontSize: 11 }}>{t('row.paragraphs', { count: r.initial.paragraphs.length, format: r.initial.format })}</div>
                             )}
                             {r.initial?.tabular && (
                               <div style={{ color: '#666', fontSize: 11 }}>
-                                {r.initial.tabular.sheets[0].rows.length} 行 / {r.initial.format} (列マッピングは推測値)
+                                {t('row.tabular', { count: r.initial.tabular.sheets[0].rows.length, format: r.initial.format })}
                               </div>
                             )}
                           </td>
@@ -344,8 +346,8 @@ export function TranscriptBulkImportDialog({
                               }}
                               style={{ width: 120, fontSize: 11 }}
                             >
-                              <option value="__new__">新規作成</option>
-                              <option value="__none__">未割当</option>
+                              <option value="__new__">{t('participant.new')}</option>
+                              <option value="__none__">{t('participant.none')}</option>
                               {participants.map((p) => (
                                 <option key={p.id} value={p.id}>{p.pseudonym ?? p.id}</option>
                               ))}
@@ -355,7 +357,7 @@ export function TranscriptBulkImportDialog({
                                 type="text"
                                 value={r.newParticipantName}
                                 onChange={(e) => updateRow(i, { newParticipantName: e.target.value })}
-                                placeholder="新規名"
+                                placeholder={t('participant.newName')}
                                 style={{ width: 100, fontSize: 11, marginTop: 2, display: 'block' }}
                               />
                             )}
@@ -385,7 +387,7 @@ export function TranscriptBulkImportDialog({
                             )}
                             {!r.parseError && r.participantHint && (
                               <span style={{ color: '#888', fontSize: 11 }}>
-                                推測: {r.participantHint}{r.sessionHint !== undefined ? ` / 第${r.sessionHint}回` : ''}
+                                {r.sessionHint !== undefined ? t('row.guessWithSession', { participant: r.participantHint, session: r.sessionHint }) : t('row.guess', { participant: r.participantHint })}
                               </span>
                             )}
                           </td>
@@ -397,18 +399,18 @@ export function TranscriptBulkImportDialog({
               </section>
 
               <section className="settings-section">
-                <h4>3. 一括匿名化 (任意)</h4>
+                <h4>{t('step3.heading')}</h4>
                 <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-                  <label>氏名・組織名</label>
+                  <label>{t('step3.names')}</label>
                   <textarea
                     value={globalAnonymize}
                     onChange={(e) => setGlobalAnonymize(e.target.value)}
-                    placeholder="コンマ区切り (例: 山田太郎, X 大学, 田中)"
+                    placeholder={t('step3.namesPlaceholder')}
                     style={{ flex: 1, minHeight: 50, fontSize: 12, fontFamily: 'inherit', resize: 'vertical' }}
                   />
                 </div>
                 <div className="setting-row">
-                  <label>仮名 prefix</label>
+                  <label>{t('step3.prefix')}</label>
                   <input
                     type="text"
                     value={anonymizePrefix}
@@ -417,7 +419,7 @@ export function TranscriptBulkImportDialog({
                   />
                 </div>
                 <p className="hint">
-                  全ファイル共通で適用します。各 Transcript の metadata.anonymizationMap に記録されます。
+                  {t('step3.hint')}
                 </p>
               </section>
             </>
@@ -425,12 +427,12 @@ export function TranscriptBulkImportDialog({
 
           {progress && (
             <p style={{ fontSize: 12, color: '#1e6091' }}>
-              取り込み中... {progress.done} / {progress.total}
+              {t('progress', { done: progress.done, total: progress.total })}
             </p>
           )}
           {errors.length > 0 && (
             <div style={{ marginTop: 12, padding: 8, background: '#fef3c7', borderLeft: '3px solid #f59e0b', fontSize: 12 }}>
-              <strong>取り込み完了 (一部エラー):</strong>
+              <strong>{t('doneWithErrors')}</strong>
               <ul style={{ paddingLeft: 16, margin: '4px 0' }}>
                 {errors.map((e, i) => <li key={i}>{e}</li>)}
               </ul>
@@ -439,14 +441,14 @@ export function TranscriptBulkImportDialog({
         </div>
         <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between' }}>
           <button className="ribbon-btn-small" onClick={() => { reset(); onClose(); }} disabled={busy}>
-            {errors.length > 0 ? '閉じる' : 'キャンセル'}
+            {errors.length > 0 ? t('close') : t('cancel')}
           </button>
           <button
             className="ribbon-btn-primary"
             disabled={busy || enabledCount === 0}
             onClick={doImport}
           >
-            {busy ? '取り込み中...' : `${enabledCount} 件を一括取り込み`}
+            {busy ? t('importing') : t('importButton', { count: enabledCount })}
           </button>
         </div>
       </div>

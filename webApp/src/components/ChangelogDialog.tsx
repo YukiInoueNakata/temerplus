@@ -4,14 +4,20 @@
 // ============================================================================
 
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import changelogData from '../data/changelog.json';
 import { sortEntries, CHANGELOG_SEEN_KEY, type ChangelogEntry } from '../utils/changelog';
 
 const entries = sortEntries(changelogData as ChangelogEntry[]);
 
-const KIND_COLOR: Record<string, string> = { 新機能: '#1a7f37', 改善: '#0969da', 修正: '#9a6700' };
+// kind は changelog.json の値（日本語のまま持つ）。表示の名前は changelogDialog.csv の kind.*
+const KIND_COLOR: Record<string, string> = { 新機能: '#1a7f37', 改善: '#0969da', 修正: '#9a6700' }; // i18n-ok データの値
+const KIND_KEY: Record<string, string> = { 新機能: 'kind.new', 改善: 'kind.improved', 修正: 'kind.fixed' }; // i18n-ok データの値
 
 export function ChangelogDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t, i18n } = useTranslation('changelogDialog');
+  // 本文は画面の言語で選ぶ（英語は changelog.json の en。無ければ日本語）
+  const isEn = i18n.language === 'en';
   useEffect(() => {
     if (!open || !entries[0]) return;
     try {
@@ -27,7 +33,7 @@ export function ChangelogDialog({ open, onClose }: { open: boolean; onClose: () 
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 640 }}>
         <div className="modal-header">
-          <h3>更新情報</h3>
+          <h3>{t('title')}</h3>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
         <div className="modal-body" style={{ maxHeight: '65vh', overflowY: 'auto', lineHeight: 1.6 }}>
@@ -37,9 +43,12 @@ export function ChangelogDialog({ open, onClose }: { open: boolean; onClose: () 
               <ul style={{ margin: 0, paddingLeft: 20 }}>
                 {e.items.map((it, i) => (
                   <li key={i} style={{ marginBottom: 4 }}>
-                    <span style={{ color: KIND_COLOR[it.kind], fontWeight: 600, marginRight: 6 }}>{it.kind}</span>
-                    <strong>{it.title}</strong>
-                    {it.detail && <div style={{ fontSize: '0.92em', color: '#444' }}>{it.detail}</div>}
+                    <span style={{ color: KIND_COLOR[it.kind], fontWeight: 600, marginRight: 6 }}>{KIND_KEY[it.kind] ? t(KIND_KEY[it.kind]) : it.kind}</span>
+                    <strong>{isEn && it.en?.title ? it.en.title : it.title}</strong>
+                    {(() => {
+                      const detail = isEn && it.en?.title ? it.en.detail : it.detail;
+                      return detail && <div style={{ fontSize: '0.92em', color: '#444' }}>{detail}</div>;
+                    })()}
                   </li>
                 ))}
               </ul>
@@ -47,7 +56,7 @@ export function ChangelogDialog({ open, onClose }: { open: boolean; onClose: () 
           ))}
         </div>
         <div className="modal-footer">
-          <button onClick={onClose}>閉じる</button>
+          <button onClick={onClose}>{t('close')}</button>
         </div>
       </div>
     </div>

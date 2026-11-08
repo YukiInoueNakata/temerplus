@@ -5,11 +5,13 @@
 // ============================================================================
 
 import { useStore as useReactFlowStore } from 'reactflow';
+import { useTranslation } from 'react-i18next';
 import { computePeriodLabels, computePeriodBandBounds } from '../utils/periodLabels';
 import { renderVerticalAwareText } from '../utils/verticalText';
 import { useTEMView } from '../context/TEMViewContext';
 
 export function PeriodLabelsOverlay({ onOpenSettings }: { onOpenSettings?: () => void } = {}) {
+  const { t } = useTranslation('periodLabelsOverlay');
   const view = useTEMView();
   const sheet = view.sheet;
   const layout = view.settings.layout;
@@ -81,7 +83,7 @@ export function PeriodLabelsOverlay({ onOpenSettings }: { onOpenSettings?: () =>
         onMouseDown={editable ? stop : undefined}
         onClick={editable ? stop : undefined}
         onDoubleClick={editable ? (e) => { e.preventDefault(); e.stopPropagation(); onOpenSettings?.(); } : undefined}
-        title={editable ? 'ダブルクリックで時期区分設定を開く' : undefined}
+        title={editable ? t('title') : undefined}
       >
         {renderVerticalAwareText(text, isVert)}
       </div>

@@ -1,0 +1,64 @@
+﻿key,ja,en,note
+title,データシート,Data sheet,左の表のパネルの題
+show,データシートを表示,Show the data sheet,データシート > 畳んだパネルの吹き出し
+resize,幅を調整,Resize,データシート > パネルの端の吹き出し
+filter,絞り込み,Filter,データシート > 絞り込みの入力欄（薄字）
+delete,削除,Delete,データシート > 行の削除ボタンの吹き出し
+col.type,種別,Type,データシート > 表の列名
+col.label,ラベル,Label,データシート > 表の列名
+box.newIdPrompt,新しいIDを入力,Enter a new ID,データシート > Box の ID を変える入力の問い
+box.renameFailed,IDの変更に失敗しました（重複または無効なID）,Could not change the ID (duplicate or invalid ID),データシート > ID を変えられなかったときの注意
+box.clipboardReadFailed,クリップボードを読み取れませんでした。ブラウザの許可を確認するか、ラベル欄に直接貼り付けてください（複数行は自動で分割されます）。,"Could not read the clipboard. Check the browser permission, or paste directly into a label cell (multiple lines are split automatically).",データシート > クリップボードを読めなかったときの注意
+box.clipboardEmpty,クリップボードにテキストがありません。Excel などで行をコピーしてからお使いください。,"There is no text on the clipboard. Copy rows in Excel or another app first.",データシート > クリップボードが空のときの注意
+box.selected,選択 {{count}}個,{{count}} selected,データシート > 選んだ Box の数
+box.copy,コピー,Copy,データシート > ボタン
+box.copy.tip,選択中の {{count}} 行をコピー（下の「挿入」ボタンで貼り付け）,"Copy the {{count}} selected rows (paste with the ""Insert"" buttons below)",データシート > コピーボタンの吹き出し
+box.copy.tipNone,行のチェックボックスで出来事を選択してください,Select events with the row checkboxes,データシート > コピーボタンの吹き出し（何も選んでいないとき）
+box.clipboardCount,クリップボード {{count}}行,Clipboard: {{count}} rows,データシート > アプリ内のクリップボードの行数
+box.pasteMode,貼付モード:,Paste mode:,データシート > 貼り付けの方式のラベル
+box.pasteMode.tip,クリップボード挿入時の座標決定方式,How positions are set when inserting from the clipboard,データシート > 貼り付けの方式の吹き出し
+box.pasteMode.offset,+20 オフセット,+20 offset,データシート > 貼り付けの方式の選択肢
+box.pasteMode.midpoint,中間配置（前後 Box の中間 Time）,Midpoint (time halfway between neighboring Boxes),データシート > 貼り付けの方式の選択肢
+box.pasteMode.offsetShort,+20オフセット,+20 offset,データシート > 挿入ボタンの吹き出しの中の方式名
+box.pasteMode.midpointShort,中間配置,midpoint,データシート > 挿入ボタンの吹き出しの中の方式名
+box.selectAll,表示中の全て選択/解除,Select / deselect all shown,データシート > 見出しのチェックボックスの吹き出し
+box.select.tip,クリック: 単独選択 / {{ctrl}}クリック: 追加 / Shift+クリック: 範囲選択,Click: select one / {{ctrl}}click: add / Shift+click: select range,データシート > 行のチェックボックスの吹き出し（{{ctrl}} は Ctrl+ か Mac の記号）
+box.id.tip,ダブルクリックで変更,Double-click to change,データシート > ID の欄の吹き出し
+box.type.tip,変更するとIDも自動更新,Changing it also updates the ID,データシート > 種別の欄の吹き出し
+box.label.tip,Excelから複数行コピペ可,You can paste multiple rows from Excel,データシート > ラベルの欄の吹き出し
+box.insertBelow.tip,この下にコピーした行を挿入（{{count}} 行、モード: {{mode}}）,"Insert the copied rows below ({{count}} rows, mode: {{mode}})",データシート > 行の挿入ボタンの吹き出し
+box.insertBelowText.tip,この下に Excel / テキストの行を挿入（OS のクリップボードを 1 行 = 1 Box として読み込みます）,Insert rows from Excel / text below (each line of the system clipboard becomes one Box),データシート > 行の挿入ボタンの吹き出し（アプリ内のクリップボードが空のとき）
+box.insertHere.tip,ここに{{count}}個挿入,Insert {{count}} here,データシート > 行の間の挿入ボタンの吹き出し
+box.insertHere,＋ここに挿入,+ Insert here,データシート > 行の間の挿入ボタン
+box.insertHereN,＋ここに{{count}}個挿入,+ Insert {{count}} here,データシート > 行の間の挿入ボタン（2 個以上）
+box.noMatch,該当するBoxがありません,No matching Boxes,データシート > 絞り込みで何も無いとき
+box.empty,Boxがありません。下の「+追加」で作成,"No Boxes yet. Create one with ""+ Add new"" below",データシート > Box が無いとき
+box.add,＋ 新規追加,+ Add new,データシート > ボタン
+box.add.tip,末尾に新規Boxを追加,Add a new Box at the end,データシート > 追加ボタンの吹き出し
+box.insertCount,挿入個数:,Insert count:,データシート > 一度に挿入する数のラベル
+box.insertCount.tip,挿入ボタンで追加する個数,How many to add with the insert buttons,データシート > 一度に挿入する数の吹き出し
+box.insertCount.unit,個,items,データシート > 一度に挿入する数の単位
+line.hint,※ Lineはキャンバスで接続,Connect Lines on the canvas,データシート > Line の表の説明
+line.RLine,実線,Solid,データシート > 線の種類の選択肢
+line.XLine,点線,Dashed,データシート > 線の種類の選択肢
+line.empty,Lineがありません,No Lines yet,データシート > Line が無いとき
+sdsg.needBox,先に Box を 1 つ以上作成してください,Create at least one Box first,データシート > SD/SG を足せないときの注意
+sdsg.addSD,+ SD 追加,+ Add SD,データシート > ボタン
+sdsg.addSG,+ SG 追加,+ Add SG,データシート > ボタン
+sdsg.attachLine,Line {{id}} に紐づけ,Attach to Line {{id}},データシート > 追加した SD/SG の付け先の説明
+sdsg.attachLastBox,最後の Box {{id}} に紐づけ,Attach to the last Box {{id}},データシート > 追加した SD/SG の付け先の説明
+sdsg.noBox,Box がありません,No Boxes,データシート > 追加した SD/SG の付け先の説明
+sdsg.col.mode,モード,Mode,データシート > SD/SG の表の列名
+sdsg.col.target1,対象 1,Target 1,データシート > SD/SG の表の列名
+sdsg.col.target2,対象 2,Target 2,データシート > SD/SG の表の列名
+sdsg.current,（現: {{id}}）,(current: {{id}}),データシート > 付け先の選択肢（今の付け先が一覧に無いとき）
+sdsg.none,（未指定）,(None),データシート > 2 つ目の付け先の選択肢
+sdsg.empty,SD/SG はまだありません。上のボタンから追加できます。,No SD/SG yet. Add them with the buttons above.,データシート > SD/SG が無いとき
+slot.disabled.tip,クリップボードに貼り付け可能な要素がありません,Nothing on the clipboard to paste,データシート > 挿入の帯の吹き出し
+slot.text.tip,OS のクリップボードのテキストを 1 行 = 1 Box として末尾に挿入します（Excel の複数行コピーに対応）,Inserts the system clipboard text at the end with one line = one Box (works with rows copied from Excel),データシート > 挿入の帯の吹き出し
+slot.paste.tip,ここにコピーした行を挿入（{{count}} 行）,Insert the copied rows here ({{count}} rows),データシート > 挿入の帯の吹き出し
+slot.text,＋ Excel / テキストの行をここに挿入,+ Insert rows from Excel / text here,データシート > 挿入の帯
+slot.paste,＋ コピーした行をここに挿入,+ Insert copied rows here,データシート > 挿入の帯
+slot.pasteN,＋ コピーした行をここに挿入 ({{count}} 行),+ Insert copied rows here ({{count}} rows),データシート > 挿入の帯（行数つき）
+row.paste.tip,この下にクリップボードを挿入（{{count}} 行）,Insert the clipboard below ({{count}} rows),データシート > 行の挿入ボタンの吹き出し（SD/SG）
+row.clipboardEmpty,クリップボード空,Clipboard is empty,データシート > 行の挿入ボタンの吹き出し（SD/SG）

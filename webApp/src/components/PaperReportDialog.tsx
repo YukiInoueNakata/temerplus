@@ -6,6 +6,7 @@
 // ============================================================================
 
 import { useEffect, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useTEMStore } from '../store/store';
 import {
   CONVENTION_MEANINGS,
@@ -36,13 +37,14 @@ import type {
 
 type Tab = ReportTab;
 
-const TABS: { key: Tab; label: string }[] = [
-  { key: 'general', label: '概要' },
-  { key: 'notation', label: '記号体系' },
-  { key: 'participants', label: '協力者' },
-  { key: 'interview', label: 'インタビュー' },
-  { key: 'visual', label: '表記方針' },
-  { key: 'export', label: '出力' },
+// 表示名は描画のときに t(labelKey) で引く
+const TABS: { key: Tab; labelKey: string }[] = [
+  { key: 'general', labelKey: 'tab.general' },
+  { key: 'notation', labelKey: 'tab.notation' },
+  { key: 'participants', labelKey: 'tab.participants' },
+  { key: 'interview', labelKey: 'tab.interview' },
+  { key: 'visual', labelKey: 'tab.visual' },
+  { key: 'export', labelKey: 'tab.export' },
 ];
 
 export function PaperReportDialog({
@@ -52,6 +54,7 @@ export function PaperReportDialog({
   open: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('paperReportDialog');
   const [tab, setTab] = useState<Tab>('general');
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -138,7 +141,7 @@ export function PaperReportDialog({
       setConfirming(false);
     } catch (e) {
       console.error(e);
-      alert(`レポート出力に失敗しました: ${e instanceof Error ? e.message : String(e)}`);
+      alert(t('alert.failed', { message: e instanceof Error ? e.message : String(e) }));
     } finally {
       setBusy(false);
     }
@@ -151,19 +154,19 @@ export function PaperReportDialog({
           className="modal-header"
           onMouseDown={onHeaderMouseDown}
           style={{ cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }}
-          title="ドラッグで移動"
+          title={t('drag')}
         >
-          <h3>論文用レポート</h3>
+          <h3>{t('title')}</h3>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
         <div className="settings-tabs">
-          {TABS.map((t) => (
+          {TABS.map((tb) => (
             <button
-              key={t.key}
-              className={tab === t.key && !confirming ? 'settings-tab active' : 'settings-tab'}
-              onClick={() => { setTab(t.key); setConfirming(false); }}
+              key={tb.key}
+              className={tab === tb.key && !confirming ? 'settings-tab active' : 'settings-tab'}
+              onClick={() => { setTab(tb.key); setConfirming(false); }}
             >
-              {t.label}
+              {t(tb.labelKey)}
             </button>
           ))}
         </div>
@@ -176,7 +179,7 @@ export function PaperReportDialog({
               setContent={setContent}
               busy={busy}
               onExport={runExport}
-              onContinue={(t) => { setConfirming(false); if (t) setTab(t); }}
+              onContinue={(next) => { setConfirming(false); if (next) setTab(next); }}
             />
           )}
           {!confirming && tab === 'general' && <GeneralSection updateMeta={updateMeta} />}
@@ -186,9 +189,9 @@ export function PaperReportDialog({
           {!confirming && tab === 'visual' && <VisualSection updateMeta={updateMeta} />}
           {!confirming && tab === 'export' && (
             <section className="settings-section">
-              <h4>出力設定</h4>
+              <h4>{t('export.title')}</h4>
               <div className="setting-row">
-                <label>現在のキャンバスを図として含める</label>
+                <label>{t('export.includeDiagram')}</label>
                 <input
                   type="checkbox"
                   checked={includeDiagram}
@@ -196,7 +199,7 @@ export function PaperReportDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>原文引用 (sourceRefs) を結果セクションに含める</label>
+                <label>{t('export.includeSourceRefs')}</label>
                 <input
                   type="checkbox"
                   checked={includeSourceRefs}
@@ -205,29 +208,29 @@ export function PaperReportDialog({
               </div>
               {includeSourceRefs && (
                 <div className="setting-row">
-                  <label>引用表記スタイル</label>
+                  <label>{t('export.sourceRefStyle')}</label>
                   <select
                     value={sourceRefStyle}
                     onChange={(e) => setSourceRefStyle(e.target.value as 'bracket' | 'apa')}
                   >
-                    <option value="bracket">[原文 T1 §4]「…」 (角括弧)</option>
-                    <option value="apa">（A, 第1回, §4）「…」 (APA 風)</option>
+                    <option value="bracket">{t('export.style.bracket')}</option>
+                    <option value="apa">{t('export.style.apa')}</option>
                   </select>
                 </div>
               )}
               <p className="hint">
-                .docx（Word 形式）として出力します。レポートには以下が含まれます:
+                {t('export.hint.intro')}
                 <br />
-                ・記号体系 / 協力者 / インタビュー / 表記方針（方法相当）
+                {t('export.hint.methods')}
                 <br />
-                ・TEM 図（任意・PNG 埋込）
+                {t('export.hint.diagram')}
                 <br />
-                ・<b>結果</b>: 時期区分・OPP・BFP・EFP・P-EFP・2nd EFP・P-2nd EFP・通常 Box・注釈・径路（実線/点線）・SD・SG を漏れなくリスト化
+                <Trans t={t} i18nKey="export.hint.results" components={{ b: <b /> }} />
                 <br />
-                ・用語凡例
+                {t('export.hint.glossary')}
                 <br />
-                各要素の「説明」フィールド（PropertyPanel から編集可）が記入されていればそのまま挿入されます。
-                出力の前に確認画面で、入力状況・図にあるメモや記号を載せるか・未入力の項目の扱いを選びます。
+                {t('export.hint.description')}
+                {t('export.hint.confirm')}
               </p>
               <div className="setting-row" style={{ justifyContent: 'flex-start' }}>
                 <button
@@ -235,14 +238,14 @@ export function PaperReportDialog({
                   onClick={openConfirm}
                   disabled={busy}
                 >
-                  レポートを生成...
+                  {t('export.generate')}
                 </button>
               </div>
             </section>
           )}
         </div>
         <div className="modal-footer">
-          <button className="ribbon-btn-small" onClick={onClose} disabled={busy}>閉じる</button>
+          <button className="ribbon-btn-small" onClick={onClose} disabled={busy}>{t('close')}</button>
         </div>
       </div>
     </div>
@@ -256,12 +259,13 @@ export function PaperReportDialog({
 type UpdateMeta = (fn: (m: ReturnType<typeof useTEMStore.getState>['doc']['metadata']) => void) => void;
 
 function GeneralSection({ updateMeta }: { updateMeta: UpdateMeta }) {
+  const { t } = useTranslation('paperReportDialog');
   const doc = useTEMStore((s) => s.doc);
   return (
     <section className="settings-section">
-      <h4>概要</h4>
+      <h4>{t('general.title')}</h4>
       <div className="setting-row">
-        <label>タイトル</label>
+        <label>{t('general.docTitle')}</label>
         <input
           type="text"
           value={doc.metadata.title ?? ''}
@@ -270,7 +274,7 @@ function GeneralSection({ updateMeta }: { updateMeta: UpdateMeta }) {
         />
       </div>
       <div className="setting-row">
-        <label>著者</label>
+        <label>{t('general.author')}</label>
         <input
           type="text"
           value={doc.metadata.author ?? ''}
@@ -279,7 +283,7 @@ function GeneralSection({ updateMeta }: { updateMeta: UpdateMeta }) {
         />
       </div>
       <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-        <label>備考（レポート末尾）</label>
+        <label>{t('general.notes')}</label>
         <textarea
           value={doc.metadata.reportNotes ?? ''}
           onChange={(e) => updateMeta((m) => { m.reportNotes = e.target.value; })}
@@ -291,6 +295,7 @@ function GeneralSection({ updateMeta }: { updateMeta: UpdateMeta }) {
 }
 
 function NotationSection({ updateMeta }: { updateMeta: UpdateMeta }) {
+  const { t } = useTranslation('paperReportDialog');
   const ns = useTEMStore((s) => s.doc.metadata.notationSystem);
   const doc = useTEMStore((s) => s.doc);
   const symbols = usedSymbols(doc);
@@ -302,35 +307,34 @@ function NotationSection({ updateMeta }: { updateMeta: UpdateMeta }) {
   };
   return (
     <section className="settings-section">
-      <h4>記号体系</h4>
+      <h4>{t('notation.title')}</h4>
       <p className="hint">
-        この図で各記号が何を意味するかを宣言します。既定の表記は荒川・安田・サトウ（2012）を参照したもので、
-        「標準」ではなく出発点です。変えた点があれば補足説明に書きます。
+        {t('notation.hint')}
       </p>
       <div className="setting-row">
-        <label>基準</label>
+        <label>{t('notation.base')}</label>
         <select
           value={ns?.base ?? 'Arakawa2012'}
           onChange={(e) => update({ base: e.target.value as NotationSystem['base'] })}
         >
-          <option value="Arakawa2012">荒川・安田・サトウ 2012（既定）</option>
-          <option value="custom">独自</option>
-          <option value="other">その他</option>
+          <option value="Arakawa2012">{t('notation.base.arakawa')}</option>
+          <option value="custom">{t('notation.base.custom')}</option>
+          <option value="other">{t('notation.base.other')}</option>
         </select>
       </div>
       <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-        <label>補足説明</label>
+        <label>{t('notation.description')}</label>
         <textarea
           value={ns?.customDescription ?? ''}
           onChange={(e) => update({ customDescription: e.target.value })}
           style={{ width: 320, height: 80, resize: 'vertical' }}
-          placeholder="独自/その他を選択した場合、具体的な記号体系を説明"
+          placeholder={t('notation.description.placeholder')}
         />
       </div>
       {symbols.length > 0 && (
         <>
-          <h4 style={{ marginTop: 16 }}>図中の記号の意味</h4>
-          <p className="hint">図に置いた記号（★・〇 など）の意味です。確認画面で「載せる」を選ぶと、記号体系の宣言に書き出します。</p>
+          <h4 style={{ marginTop: 16 }}>{t('notation.symbols.title')}</h4>
+          <p className="hint">{t('notation.symbols.hint')}</p>
           {symbols.map((sym) => (
             <div className="setting-row" key={sym}>
               <label>{sym}</label>
@@ -339,7 +343,7 @@ function NotationSection({ updateMeta }: { updateMeta: UpdateMeta }) {
                 value={meanings[sym] ?? ''}
                 onChange={(e) => updateMeta((m) => { m.symbolMeanings = { ...(m.symbolMeanings ?? {}), [sym]: e.target.value }; })}
                 style={{ width: 320 }}
-                placeholder="例: 語りの中で本人が強調した転機"
+                placeholder={t('notation.symbols.placeholder')}
               />
             </div>
           ))}
@@ -350,6 +354,7 @@ function NotationSection({ updateMeta }: { updateMeta: UpdateMeta }) {
 }
 
 function ParticipantsSection({ updateMeta }: { updateMeta: UpdateMeta }) {
+  const { t } = useTranslation('paperReportDialog');
   const pi = useTEMStore((s) => s.doc.metadata.participantsInfo);
   const update = (patch: Partial<ParticipantsInfo>) => {
     updateMeta((m) => {
@@ -361,9 +366,9 @@ function ParticipantsSection({ updateMeta }: { updateMeta: UpdateMeta }) {
   };
   return (
     <section className="settings-section">
-      <h4>協力者情報</h4>
+      <h4>{t('participants.title')}</h4>
       <div className="setting-row">
-        <label>協力者数</label>
+        <label>{t('participants.count')}</label>
         <input
           type="number"
           min={0}
@@ -373,7 +378,7 @@ function ParticipantsSection({ updateMeta }: { updateMeta: UpdateMeta }) {
         />
       </div>
       <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-        <label>記述（属性など）</label>
+        <label>{t('participants.description')}</label>
         <textarea
           value={pi?.description ?? ''}
           onChange={(e) => update({ description: e.target.value })}
@@ -381,22 +386,22 @@ function ParticipantsSection({ updateMeta }: { updateMeta: UpdateMeta }) {
         />
       </div>
       <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-        <label>HSI 水準の説明</label>
+        <label>{t('participants.hsi')}</label>
         <textarea
           value={pi?.hsiDescription ?? ''}
           onChange={(e) => update({ hsiDescription: e.target.value })}
           style={{ width: 320, height: 60, resize: 'vertical' }}
-          placeholder="歴史的構造化招待（HSI）の水準の説明"
+          placeholder={t('participants.hsi.placeholder')}
         />
       </div>
       <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-        <label>仮名（カンマ区切り）</label>
+        <label>{t('participants.pseudonyms')}</label>
         <input
           type="text"
           value={(pi?.pseudonyms ?? []).join(', ')}
           onChange={(e) => update({ pseudonyms: e.target.value.split(/,\s*/).filter(Boolean) })}
           style={{ width: 320 }}
-          placeholder="例: A, B, C"
+          placeholder={t('participants.pseudonyms.placeholder')}
         />
       </div>
     </section>
@@ -404,6 +409,7 @@ function ParticipantsSection({ updateMeta }: { updateMeta: UpdateMeta }) {
 }
 
 function InterviewSection({ updateMeta }: { updateMeta: UpdateMeta }) {
+  const { t } = useTranslation('paperReportDialog');
   const iv = useTEMStore((s) => s.doc.metadata.interview);
   const update = (patch: Partial<InterviewInfo>) => {
     updateMeta((m) => {
@@ -415,28 +421,28 @@ function InterviewSection({ updateMeta }: { updateMeta: UpdateMeta }) {
   };
   return (
     <section className="settings-section">
-      <h4>インタビュー方法</h4>
+      <h4>{t('interview.title')}</h4>
       <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-        <label>方法</label>
+        <label>{t('interview.method')}</label>
         <textarea
           value={iv?.method ?? ''}
           onChange={(e) => update({ method: e.target.value })}
           style={{ width: 320, height: 60, resize: 'vertical' }}
-          placeholder="半構造化面接 など"
+          placeholder={t('interview.method.placeholder')}
         />
       </div>
       <div className="setting-row">
-        <label>所要時間/期間</label>
+        <label>{t('interview.duration')}</label>
         <input
           type="text"
           value={iv?.durationDescription ?? ''}
           onChange={(e) => update({ durationDescription: e.target.value })}
           style={{ width: 280 }}
-          placeholder="例: 1回あたり約60分、計3回"
+          placeholder={t('interview.duration.placeholder')}
         />
       </div>
       <div className="setting-row">
-        <label>回数</label>
+        <label>{t('interview.times')}</label>
         <input
           type="number"
           min={0}
@@ -446,16 +452,16 @@ function InterviewSection({ updateMeta }: { updateMeta: UpdateMeta }) {
         />
       </div>
       <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-        <label>分析の組合せ</label>
+        <label>{t('interview.analysis')}</label>
         <textarea
           value={iv?.analysisCombination ?? ''}
           onChange={(e) => update({ analysisCombination: e.target.value })}
           style={{ width: 320, height: 60, resize: 'vertical' }}
-          placeholder="例: TEM + M-GTA"
+          placeholder={t('interview.analysis.placeholder')}
         />
       </div>
       <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-        <label>備考</label>
+        <label>{t('interview.notes')}</label>
         <textarea
           value={iv?.notes ?? ''}
           onChange={(e) => update({ notes: e.target.value })}
@@ -467,6 +473,7 @@ function InterviewSection({ updateMeta }: { updateMeta: UpdateMeta }) {
 }
 
 function VisualSection({ updateMeta }: { updateMeta: UpdateMeta }) {
+  const { t } = useTranslation('paperReportDialog');
   const vc = useTEMStore((s) => s.doc.metadata.visualConventions);
   const update = (key: keyof VisualConventions, val: VisualConventionEntry | undefined) => {
     updateMeta((m) => {
@@ -498,7 +505,7 @@ function VisualSection({ updateMeta }: { updateMeta: UpdateMeta }) {
         </div>
         {(meaning === 'yes' || meaning === 'loose') && (
           <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-            <label>説明</label>
+            <label>{t('visual.description')}</label>
             <textarea
               value={cur?.description ?? ''}
               onChange={(e) => update(props.keyName, {
@@ -519,8 +526,8 @@ function VisualSection({ updateMeta }: { updateMeta: UpdateMeta }) {
 
   return (
     <section className="settings-section">
-      <h4>表記方針</h4>
-      <p className="hint">図中で意味を持たせた表記について明文化します（学会での透明性向上）。各項目は「意味あり / 緩やかに意味あり / 意味なし」から選びます。</p>
+      <h4>{t('visual.title')}</h4>
+      <p className="hint">{t('visual.hint')}</p>
       {VISUAL_CONVENTION_ITEMS.map((it) => (
         <Entry key={it.key} name={it.label} keyName={it.key} hint={it.hint} />
       ))}
@@ -551,6 +558,7 @@ function ReportConfirm({
   onExport: () => void;
   onContinue: (tab?: ReportTab) => void;
 }) {
+  const { t } = useTranslation('paperReportDialog');
   const doc = useTEMStore((s) => s.doc);
   const status = computeReportStatus(doc, content);
   const counts = reportContentCounts(doc);
@@ -564,27 +572,27 @@ function ReportConfirm({
   );
   const choiceBox = (title: string, children: React.ReactNode, unset: boolean) => (
     <div style={{ border: '1px solid #ddd', borderRadius: 4, padding: '6px 8px', marginBottom: 6, background: unset ? '#fff8e1' : '#fafafa' }}>
-      <div style={{ fontWeight: 600, marginBottom: 2 }}>{title}{unset && <span style={{ color: '#b36b00', marginLeft: 6 }}>（選んでください）</span>}</div>
+      <div style={{ fontWeight: 600, marginBottom: 2 }}>{title}{unset && <span style={{ color: '#b36b00', marginLeft: 6 }}>{t('confirm.choose')}</span>}</div>
       <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>{children}</div>
     </div>
   );
 
   return (
     <section className="settings-section">
-      <h4>論文用レポート出力前の確認</h4>
-      <p className="hint">入力は強制しません。「記入しない」まま出力することもできます。</p>
+      <h4>{t('confirm.title')}</h4>
+      <p className="hint">{t('confirm.hint')}</p>
 
-      <div style={{ fontWeight: 600, margin: '8px 0 4px' }}>入力状況</div>
+      <div style={{ fontWeight: 600, margin: '8px 0 4px' }}>{t('confirm.status')}</div>
       <table style={{ borderCollapse: 'collapse', fontSize: '0.92em', width: '100%' }}>
         <tbody>
           {status.map((it) => (
             <tr key={it.key} style={{ borderBottom: '1px solid #eee' }}>
               <td style={{ width: 44, color: STATE_COLOR[it.state], fontWeight: 700 }}>{REPORT_STATE_LABEL[it.state]}</td>
-              <td>{it.label}{it.detail ? `（${it.detail}）` : ''}</td>
+              <td>{it.label}{it.detail ? t('confirm.status.detail', { detail: it.detail }) : ''}</td>
               <td style={{ textAlign: 'right' }}>
                 {it.state !== 'done' && (it.tab
-                  ? <button className="ribbon-btn-small" onClick={() => onContinue(it.tab)} disabled={busy}>入力する</button>
-                  : <span className="hint">各要素のプロパティで書けます</span>)}
+                  ? <button className="ribbon-btn-small" onClick={() => onContinue(it.tab)} disabled={busy}>{t('confirm.fillIn')}</button>
+                  : <span className="hint">{t('confirm.inProperties')}</span>)}
               </td>
             </tr>
           ))}
@@ -592,37 +600,37 @@ function ReportConfirm({
       </table>
 
       {(counts.notes > 0 || counts.symbols > 0 || counts.comments > 0) && (
-        <div style={{ fontWeight: 600, margin: '12px 0 4px' }}>図にある要素を載せるか</div>
+        <div style={{ fontWeight: 600, margin: '12px 0 4px' }}>{t('confirm.content')}</div>
       )}
-      {counts.notes > 0 && choiceBox(`メモ（${counts.notes} 件。うちメモのプロパティで「論文レポートに載せる」にしたもの ${counts.flaggedNotes} 件）`, <>
-        {radio('rc-notes', content.notes === 'all', () => setContent((c) => ({ ...c, notes: 'all' })), 'すべて注記に載せる')}
-        {radio('rc-notes', content.notes === 'flagged', () => setContent((c) => ({ ...c, notes: 'flagged' })), `「載せる」にしたものだけ（${counts.flaggedNotes} 件）`)}
-        {radio('rc-notes', content.notes === 'none', () => setContent((c) => ({ ...c, notes: 'none' })), '載せない（図からも除く）')}
+      {counts.notes > 0 && choiceBox(t('confirm.notes.title', { n: counts.notes, flagged: counts.flaggedNotes }), <>
+        {radio('rc-notes', content.notes === 'all', () => setContent((c) => ({ ...c, notes: 'all' })), t('confirm.notes.all'))}
+        {radio('rc-notes', content.notes === 'flagged', () => setContent((c) => ({ ...c, notes: 'flagged' })), t('confirm.notes.flagged', { flagged: counts.flaggedNotes }))}
+        {radio('rc-notes', content.notes === 'none', () => setContent((c) => ({ ...c, notes: 'none' })), t('confirm.excludeAndRemove'))}
       </>, !content.notes)}
-      {counts.symbols > 0 && choiceBox(`記号（★・〇 など ${counts.symbols} 件）`, <>
-        {radio('rc-symbols', content.symbols === true, () => setContent((c) => ({ ...c, symbols: true })), '載せる（図に残し、意味を記号体系の宣言に書く）')}
-        {radio('rc-symbols', content.symbols === false, () => setContent((c) => ({ ...c, symbols: false })), '載せない（図からも除く）')}
+      {counts.symbols > 0 && choiceBox(t('confirm.symbols.title', { n: counts.symbols }), <>
+        {radio('rc-symbols', content.symbols === true, () => setContent((c) => ({ ...c, symbols: true })), t('confirm.symbols.include'))}
+        {radio('rc-symbols', content.symbols === false, () => setContent((c) => ({ ...c, symbols: false })), t('confirm.excludeAndRemove'))}
       </>, content.symbols === undefined)}
-      {counts.comments > 0 && choiceBox(`コメント（${counts.comments} 件）`, <>
-        {radio('rc-comments', content.comments === true, () => setContent((c) => ({ ...c, comments: true })), '結果の「コメント」に載せる')}
-        {radio('rc-comments', content.comments === false, () => setContent((c) => ({ ...c, comments: false })), '載せない')}
+      {counts.comments > 0 && choiceBox(t('confirm.comments.title', { n: counts.comments }), <>
+        {radio('rc-comments', content.comments === true, () => setContent((c) => ({ ...c, comments: true })), t('confirm.comments.include'))}
+        {radio('rc-comments', content.comments === false, () => setContent((c) => ({ ...c, comments: false })), t('confirm.exclude'))}
       </>, content.comments === undefined)}
 
-      <div style={{ fontWeight: 600, margin: '12px 0 4px' }}>未入力の項目</div>
+      <div style={{ fontWeight: 600, margin: '12px 0 4px' }}>{t('confirm.missing')}</div>
       <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-        {radio('rc-omit', omitMissing, () => setOmitMissing(true), '出力に含めない')}
-        {radio('rc-omit', !omitMissing, () => setOmitMissing(false), '「（未入力）」と書いて含める（Word で抜けが分かる）')}
+        {radio('rc-omit', omitMissing, () => setOmitMissing(true), t('confirm.missing.omit'))}
+        {radio('rc-omit', !omitMissing, () => setOmitMissing(false), t('confirm.missing.mark'))}
       </div>
 
       <div className="setting-row" style={{ justifyContent: 'flex-start', gap: 8, marginTop: 14 }}>
-        <button className="ribbon-btn-small" onClick={() => onContinue(firstTodo)} disabled={busy}>記入を続ける</button>
+        <button className="ribbon-btn-small" onClick={() => onContinue(firstTodo)} disabled={busy}>{t('confirm.continue')}</button>
         <button
           className="ribbon-btn-primary"
           onClick={onExport}
           disabled={busy || missingChoices.length > 0}
-          title={missingChoices.length > 0 ? `載せるかを選んでください: ${missingChoices.join('、')}` : undefined}
+          title={missingChoices.length > 0 ? t('confirm.chooseFirst', { items: missingChoices.join(t('list.separator')) }) : undefined}
         >
-          {busy ? '生成中...' : 'このまま出力する'}
+          {busy ? t('confirm.generating') : t('confirm.export')}
         </button>
       </div>
     </section>

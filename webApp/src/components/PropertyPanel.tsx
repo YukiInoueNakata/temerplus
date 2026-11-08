@@ -3,6 +3,7 @@
 // ============================================================================
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import type { Box, BoxType, SDSG, Line, AutoFitBoxMode, Note } from '../types';
 import { NOTE_SYMBOLS, applySymbolToText } from '../utils/noteStyle';
@@ -30,6 +31,7 @@ interface PropertyPanelProps {
 }
 
 export function PropertyPanel({ onOpenLegendSettings, onOpenTranscriptViewer }: PropertyPanelProps = {}) {
+  const { t } = useTranslation('propertyPanel');
   const visible = useTEMStore((s) => s.view.propertyPanelVisible);
   const toggle = useTEMStore((s) => s.togglePropertyPanel);
   const selection = useTEMStore((s) => s.selection);
@@ -58,9 +60,9 @@ export function PropertyPanel({ onOpenLegendSettings, onOpenTranscriptViewer }: 
 
   if (!visible) {
     return (
-      <div className="panel-collapsed right" onClick={toggle} title="プロパティを表示">
+      <div className="panel-collapsed right" onClick={toggle} title={t('panel.show')}>
         <span style={{ writingMode: 'vertical-rl', fontWeight: 600, color: '#444', letterSpacing: '0.1em' }}>
-          プロパティ
+          {t('panel.title')}
         </span>
       </div>
     );
@@ -79,11 +81,11 @@ export function PropertyPanel({ onOpenLegendSettings, onOpenTranscriptViewer }: 
       <div
         className="panel-resizer left"
         onMouseDown={(e) => { e.preventDefault(); setResizing(true); }}
-        title="幅を調整"
+        title={t('panel.resize')}
       />
       <div className="panel-header">
-        <span>▼ プロパティ {hasSelection && `(${selectedBoxes.length + selectedLines.length})`}</span>
-        <button className="panel-toggle" onClick={toggle} title="最小化">×</button>
+        <span>▼ {t('panel.title')} {hasSelection && `(${selectedBoxes.length + selectedLines.length})`}</span>
+        <button className="panel-toggle" onClick={toggle} title={t('panel.minimize')}>×</button>
       </div>
       <div className="panel-body">
         {!hasSelection && !selection.legendSelected && <EmptyState />}
@@ -101,6 +103,7 @@ export function PropertyPanel({ onOpenLegendSettings, onOpenTranscriptViewer }: 
 // 凡例選択時のプロパティ（軽量 UI。詳細は SettingsDialog > 凡例 タブへ）
 // ============================================================================
 function LegendProperties({ onOpenSettings }: { onOpenSettings?: () => void }) {
+  const { t } = useTranslation('propertyPanel');
   const doc = useTEMStore((s) => s.doc);
   const lg = doc.settings.legend;
   const layout = doc.settings.layout;
@@ -130,12 +133,12 @@ function LegendProperties({ onOpenSettings }: { onOpenSettings?: () => void }) {
 
   return (
     <div className="prop-section">
-      <h4>凡例</h4>
+      <h4>{t('terms:legend')}</h4>
       <p className="hint" style={{ marginTop: 0, fontSize: '0.82em' }}>
-        キャンバス上でドラッグ、または下の数値で位置調整。詳細は「詳細設定」から。
+        {t('legend.hint')}
       </p>
       <div className="prop-row">
-        <label>エクスポートに含める</label>
+        <label>{t('legend.includeInExport')}</label>
         <input
           type="checkbox"
           checked={lg.includeInExport !== false}
@@ -143,7 +146,7 @@ function LegendProperties({ onOpenSettings }: { onOpenSettings?: () => void }) {
         />
       </div>
       <div className="prop-row">
-        <label>タイトル表示</label>
+        <label>{t('legend.showTitle')}</label>
         <input
           type="checkbox"
           checked={lg.showTitle !== false}
@@ -152,17 +155,17 @@ function LegendProperties({ onOpenSettings }: { onOpenSettings?: () => void }) {
       </div>
       {lg.showTitle !== false && (
         <div className="prop-row">
-          <label>タイトル</label>
+          <label>{t('legend.title')}</label>
           <input
             type="text"
             value={lg.title ?? ''}
             onChange={(e) => updateLegend({ title: e.target.value })}
-            placeholder="凡例"
+            placeholder={t('terms:legend')}
           />
         </div>
       )}
       <div className="prop-row">
-        <label>位置 X / Y</label>
+        <label>{t('common.positionXY')}</label>
         <div style={{ display: 'flex', gap: 4 }}>
           <input
             type="number"
@@ -180,17 +183,17 @@ function LegendProperties({ onOpenSettings }: { onOpenSettings?: () => void }) {
         </div>
       </div>
       <div className="prop-row">
-        <label>指定方式（{layout === 'vertical' ? '縦型' : '横型'}）</label>
+        <label>{layout === 'vertical' ? t('legend.layoutMode.vertical') : t('legend.layoutMode.horizontal')}</label>
         <select
           value={currentMode}
           onChange={(e) => updateLegend({ [layoutModeKey]: e.target.value as 'columns' | 'rows' } as Partial<typeof lg>)}
         >
-          <option value="columns">列数で指定</option>
-          <option value="rows">行数で指定</option>
+          <option value="columns">{t('legend.byColumns')}</option>
+          <option value="rows">{t('legend.byRows')}</option>
         </select>
       </div>
       <div className="prop-row">
-        <label>{currentMode === 'rows' ? '行数' : '列数'}</label>
+        <label>{currentMode === 'rows' ? t('legend.rows') : t('legend.columns')}</label>
         <input
           type="number"
           min={1}
@@ -205,12 +208,12 @@ function LegendProperties({ onOpenSettings }: { onOpenSettings?: () => void }) {
         />
       </div>
       <div className="prop-row">
-        <label>説明文を表示</label>
+        <label>{t('legend.showDescriptions')}</label>
         <input
           type="checkbox"
           checked={lg.showDescriptions === true}
           onChange={(e) => updateLegend({ showDescriptions: e.target.checked })}
-          title="各項目の説明文を横に並べる（幅が増える）"
+          title={t('legend.showDescriptions.tooltip')}
         />
       </div>
       <div className="prop-row" style={{ justifyContent: 'flex-start', gap: 6, marginTop: 8 }}>
@@ -218,9 +221,9 @@ function LegendProperties({ onOpenSettings }: { onOpenSettings?: () => void }) {
           <button
             className="ribbon-btn-small"
             onClick={onOpenSettings}
-            title="背景色 / 枠線 / フォント / 項目別ラベル上書き 等の詳細設定"
+            title={t('legend.advanced.tooltip')}
           >
-            詳細設定...
+            {t('legend.advanced')}
           </button>
         )}
       </div>
@@ -229,11 +232,12 @@ function LegendProperties({ onOpenSettings }: { onOpenSettings?: () => void }) {
 }
 
 function EmptyState() {
+  const { t } = useTranslation('propertyPanel');
   return (
     <div className="prop-empty">
-      <p>図形を選択するとプロパティが表示されます</p>
+      <p>{t('empty.message')}</p>
       <p style={{ fontSize: '0.92em', color: '#888', marginTop: 12 }}>
-        Tip: キャンバスで Box や Line をクリック（Shift+クリックで追加選択）
+        {t('empty.tip')}
       </p>
     </div>
   );
@@ -267,10 +271,11 @@ function LabelWithToolbar({ box, updateBox }: {
   box: Box;
   updateBox: (id: string, patch: Partial<Box>) => void;
 }) {
+  const { t } = useTranslation('propertyPanel');
   const taRef = useRef<HTMLTextAreaElement | null>(null);
   return (
     <div className="prop-row" style={{ alignItems: 'flex-start', flexDirection: 'column', gap: 4 }}>
-      <label>ラベル</label>
+      <label>{t('common.label')}</label>
       <RichTextToolbar
         textareaRef={taRef}
         value={box.label}
@@ -285,7 +290,7 @@ function LabelWithToolbar({ box, updateBox }: {
         style={{ width: '100%', resize: 'vertical' }}
       />
       <div style={{ fontSize: '0.75em', color: '#888' }}>
-        例: これは &lt;b&gt;重要&lt;/b&gt; な &lt;color=#cc0000&gt;分岐点&lt;/color&gt;
+        {t('label.example')}
       </div>
     </div>
   );
@@ -295,6 +300,9 @@ type PropTab = 'basic' | 'label' | 'idLabel' | 'subLabel' | 'autoFit';
 type LineTab = 'basic' | 'endpoint' | 'info';
 
 function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpenTranscriptViewer?: (focusBoxId?: string) => void }) {
+  const { t, i18n } = useTranslation('propertyPanel');
+  // Box の種類の名前: 日本語の画面は従来どおり BOX_TYPE_LABELS、それ以外は用語の表（terms）から引く
+  const boxTypeLabel = (bt: BoxType) => (i18n.language.startsWith('ja') ? BOX_TYPE_LABELS[bt].ja : t(`terms:boxType.${bt}`));
   const updateBox = useTEMStore((s) => s.updateBox);
   const updateBoxes = useTEMStore((s) => s.updateBoxes);
   const removeBoxes = useTEMStore((s) => s.removeBoxes);
@@ -326,10 +334,10 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
 
   const handleRenameId = () => {
     if (isMulti) return;
-    const newId = prompt('新しいIDを入力', first.id);
+    const newId = prompt(t('box.renameId.prompt'), first.id);
     if (!newId || newId === first.id) return;
     const ok = renameBoxId(first.id, newId);
-    if (!ok) alert('IDの変更に失敗しました（重複または無効なID）');
+    if (!ok) alert(t('box.renameId.failed'));
   };
 
   const renderNumInput = (
@@ -357,14 +365,14 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
 
   return (
     <div className="prop-section">
-      <h4>Box {isMulti && <span className="multi-badge">{boxes.length}個</span>}</h4>
+      <h4>Box {isMulti && <span className="multi-badge">{t('common.count', { count: boxes.length })}</span>}</h4>
 
       <div className="settings-tabs" style={{ marginBottom: 8, padding: 0 }}>
-        <button className={tab === 'basic' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('basic')}>基本</button>
-        <button className={tab === 'label' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('label')}>ラベル</button>
-        <button className={tab === 'idLabel' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('idLabel')}>タイプラベル</button>
-        <button className={tab === 'subLabel' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('subLabel')}>サブラベル</button>
-        <button className={tab === 'autoFit' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('autoFit')}>自動調整</button>
+        <button className={tab === 'basic' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('basic')}>{t('tab.basic')}</button>
+        <button className={tab === 'label' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('label')}>{t('common.label')}</button>
+        <button className={tab === 'idLabel' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('idLabel')}>{t('tab.typeLabel')}</button>
+        <button className={tab === 'subLabel' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('subLabel')}>{t('tab.subLabel')}</button>
+        <button className={tab === 'autoFit' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('autoFit')}>{t('tab.autoFit')}</button>
       </div>
 
       {/* ========== 基本 ========== */}
@@ -374,12 +382,12 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
             <label>ID</label>
             <div style={{ display: 'flex', gap: 4 }}>
               <input value={first.id} readOnly style={{ flex: 1, fontFamily: 'monospace' }} />
-              <button className="style-btn" onClick={handleRenameId} title="ID変更">✎</button>
+              <button className="style-btn" onClick={handleRenameId} title={t('box.renameId')}>✎</button>
             </div>
           </div>
         )}
         <div className="prop-row">
-          <label>種別{!isMulti && <span style={{ fontSize: '0.85em', color: '#888', marginLeft: 6 }}>（変更時にID自動更新）</span>}</label>
+          <label>{t('common.type')}{!isMulti && <span style={{ fontSize: '0.85em', color: '#888', marginLeft: 6 }}>{t('box.type.autoId')}</span>}</label>
           <select
             value={commonType ?? ''}
             onChange={(e) => {
@@ -389,13 +397,13 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
             }}
           >
             {commonType === undefined && <option value=""></option>}
-            {SELECTABLE_BOX_TYPES.map((t) => (
-              <option key={t} value={t}>{BOX_TYPE_LABELS[t].ja}</option>
+            {SELECTABLE_BOX_TYPES.map((bt) => (
+              <option key={bt} value={bt}>{boxTypeLabel(bt)}</option>
             ))}
           </select>
         </div>
         <div className="prop-row">
-          <label title="ほかの Box をまとめて囲む大きな枠にする（例: 複数の具体的な中身をまとめた P-EFP）。常に背面に描き、枠を動かすと中の Box も一緒に動く。オンにすると文字を横書き・上寄せ（見出し）にする">まとめ枠</label>
+          <label title={t('box.group.tooltip')}>{t('box.group')}</label>
           <input
             type="checkbox"
             checked={boxes.every((b) => b.isGroup)}
@@ -410,15 +418,15 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
         {/* 併記種別: 主種別に加えてもう 1 つの種別を採番・凡例に出す（例: 分岐点かつ必須通過点） */}
         {commonType !== undefined && commonType !== 'other' && (
           <div className="prop-row">
-            <label>併記する種別</label>
+            <label>{t('box.secondaryType')}</label>
             <select
               value={getCommon(boxes, 'secondaryType') ?? ''}
               onChange={(e) => updateBoxes(ids, { secondaryType: (e.target.value || undefined) as BoxType | undefined })}
-              title="主種別が枠線の見た目を決め、併記種別は種別ラベルと凡例に追加されます（例: BFP-2 / OPP-1）"
+              title={t('box.secondaryType.tooltip')}
             >
-              <option value="">なし</option>
-              {SECONDARY_BOX_TYPES.filter((t) => t !== commonType).map((t) => (
-                <option key={t} value={t}>{BOX_TYPE_LABELS[t].ja}</option>
+              <option value="">{t('common.none')}</option>
+              {SECONDARY_BOX_TYPES.filter((bt) => bt !== commonType).map((bt) => (
+                <option key={bt} value={bt}>{boxTypeLabel(bt)}</option>
               ))}
             </select>
           </div>
@@ -427,16 +435,16 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
         {commonType === 'other' && (
           <>
             <div className="prop-row">
-              <label>種別ラベル（自由記入）</label>
+              <label>{t('box.customTypeLabel')}</label>
               <input
                 value={getCommon(boxes, 'customTypeLabel') ?? ''}
-                placeholder="例: TLMG、促進的記号…"
+                placeholder={t('box.customTypeLabel.placeholder')}
                 onChange={(e) => updateBoxes(ids, { customTypeLabel: e.target.value })}
-                title="空欄なら種別ラベルは表示されません。凡例には入力したラベルで出ます"
+                title={t('box.customTypeLabel.tooltip')}
               />
             </div>
             <div className="prop-row">
-              <label>同名の Box に連番を振る</label>
+              <label>{t('box.customTypeNumbered')}</label>
               <input
                 type="checkbox"
                 checked={getCommon(boxes, 'customTypeNumbered') === true}
@@ -447,7 +455,7 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
         )}
         {!isMulti && (
           <div className="prop-row">
-            <label>位置（Time / Item Level）</label>
+            <label>{t('box.position')}</label>
             <div style={{ display: 'flex', gap: 4 }}>
               <input
                 type="number"
@@ -472,11 +480,11 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
             </div>
           </div>
         )}
-        {renderNumInput('幅 (px)', commonWidth, (v) => updateBoxes(ids, { width: v }), 20, 1000)}
-        {renderNumInput('高さ (px)', commonHeight, (v) => updateBoxes(ids, { height: v }), 20, 1000)}
-        <CollapsibleSection title="IDバッジ" sectionKey="box-basic-id-badge" compact defaultOpen={false}>
+        {renderNumInput(t('common.widthPx'), commonWidth, (v) => updateBoxes(ids, { width: v }), 20, 1000)}
+        {renderNumInput(t('common.heightPx'), commonHeight, (v) => updateBoxes(ids, { height: v }), 20, 1000)}
+        <CollapsibleSection title={t('common.idBadge')} sectionKey="box-basic-id-badge" compact defaultOpen={false}>
           <div className="prop-row">
-            <label>フォントサイズ</label>
+            <label>{t('common.fontSize')}</label>
             <input
               type="number"
               min={6}
@@ -487,19 +495,19 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
             />
           </div>
           <div className="prop-row">
-            <label>位置調整 Time / Item (px)</label>
+            <label>{t('common.offsetTimeItem')}</label>
             <div style={{ display: 'flex', gap: 4 }}>
               <input
                 type="number"
                 value={getCommon(boxes, 'idOffsetX') ?? 0}
                 onChange={(e) => updateBoxes(ids, { idOffsetX: Number(e.target.value) })}
-                title="時間軸方向のオフセット (レイアウト切替に追従)"
+                title={t('common.offsetTime.tooltip')}
               />
               <input
                 type="number"
                 value={getCommon(boxes, 'idOffsetY') ?? 0}
                 onChange={(e) => updateBoxes(ids, { idOffsetY: Number(e.target.value) })}
-                title="項目軸方向のオフセット"
+                title={t('common.offsetItem.tooltip')}
               />
             </div>
           </div>
@@ -526,45 +534,45 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
           onUnderlineToggle={(v) => updateBoxes(ids, { style: { ...first.style, underline: v } })}
         />
         <ColorRow
-          label="文字色"
+          label={t('common.textColor')}
           value={first.style?.color}
           onChange={(c) => updateBoxes(ids, { style: { ...first.style, color: c } })}
-          defaultLabel="既定 (#222)"
+          defaultLabel={t('color.default222')}
         />
         <ColorRow
-          label="背景色"
+          label={t('common.bgColor')}
           value={first.style?.backgroundColor}
           onChange={(c) => updateBoxes(ids, { style: { ...first.style, backgroundColor: c } })}
           allowNone
-          defaultLabel="既定 (白)"
+          defaultLabel={t('color.defaultWhite')}
         />
         <ColorRow
-          label="枠線色"
+          label={t('common.borderColor')}
           value={first.style?.borderColor}
           onChange={(c) => updateBoxes(ids, { style: { ...first.style, borderColor: c } })}
           allowNone
-          defaultLabel="既定 (#222)"
+          defaultLabel={t('color.default222')}
         />
         <div className="prop-row">
-          <label>テキスト方向</label>
+          <label>{t('box.textOrientation')}</label>
           <select
             value={commonOrientation}
             onChange={(e) => updateBoxes(ids, { textOrientation: e.target.value as 'horizontal' | 'vertical' })}
           >
-            <option value="horizontal">横書き</option>
-            <option value="vertical">縦書き</option>
+            <option value="horizontal">{t('box.textOrientation.horizontal')}</option>
+            <option value="vertical">{t('box.textOrientation.vertical')}</option>
           </select>
         </div>
         {commonOrientation === 'vertical' && (
           <div className="prop-row">
-            <label>半角英数の向き（縦書き時）</label>
+            <label>{t('box.asciiUpright')}</label>
             <select
               value={getCommon(boxes, 'asciiUpright') === undefined ? '' : (getCommon(boxes, 'asciiUpright') ? 'upright' : 'mixed')}
               onChange={(e) => updateBoxes(ids, { asciiUpright: e.target.value === 'upright' })}
             >
               {getCommon(boxes, 'asciiUpright') === undefined && <option value=""></option>}
-              <option value="upright">縦向き（上下に積む）</option>
-              <option value="mixed">横倒し（伝統的）</option>
+              <option value="upright">{t('ascii.upright.stacked')}</option>
+              <option value="mixed">{t('ascii.rotated.traditional')}</option>
             </select>
           </div>
         )}
@@ -581,16 +589,16 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
       {/* ========== タイプラベル（種別バッジ） ========== */}
       {tab === 'idLabel' && <>
         <p className="hint" style={{ marginTop: 0 }}>
-          Box 種別を表すバッジの装飾です。連番表記を ON にすると同種別 Box が複数のとき自動連番:<br />
-          EFP / P-EFP: "EFP" → "2nd EFP" → "3rd EFP" … / その他: "OPP-1" / "BFP-2" …
+          {t('box.typeLabel.hint1')}<br />
+          {t('box.typeLabel.hint2')}
         </p>
         <div className="prop-row">
-          <label>連番表記</label>
+          <label>{t('common.numbered')}</label>
           <input
             type="checkbox"
             checked={getCommon(boxes, 'typeLabelNumbered') !== false}
             onChange={(e) => updateBoxes(ids, { typeLabelNumbered: e.target.checked ? undefined : false })}
-            title="OFF にすると種別名のみ表示（例: OPP-1 → OPP）"
+            title={t('box.numbered.tooltip')}
           />
         </div>
         <FontSizeRow
@@ -602,7 +610,7 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
         <FontFamilyRow
           value={getCommon(boxes, 'typeLabelFontFamily')}
           onChange={(v) => updateBoxes(ids, { typeLabelFontFamily: v })}
-          emptyOptionLabel="（Box本体と同じ）"
+          emptyOptionLabel={t('common.sameAsBox')}
         />
         <BoldItalicUnderlineRow
           bold={getCommon(boxes, 'typeLabelBold') !== false}
@@ -611,40 +619,40 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
           onItalicToggle={(v) => updateBoxes(ids, { typeLabelItalic: v })}
         />
         <div className="prop-row">
-          <label>半角英数向き（縦型）</label>
+          <label>{t('box.typeLabel.ascii')}</label>
           <select
             value={getCommon(boxes, 'typeLabelAsciiUpright') === undefined
               ? ''
               : (getCommon(boxes, 'typeLabelAsciiUpright') ? 'upright' : 'mixed')}
             onChange={(e) => updateBoxes(ids, { typeLabelAsciiUpright: e.target.value === 'upright' })}
           >
-            {getCommon(boxes, 'typeLabelAsciiUpright') === undefined && <option value="">（Box本体と同じ）</option>}
-            <option value="upright">縦向き</option>
-            <option value="mixed">横倒し</option>
+            {getCommon(boxes, 'typeLabelAsciiUpright') === undefined && <option value="">{t('common.sameAsBox')}</option>}
+            <option value="upright">{t('ascii.upright')}</option>
+            <option value="mixed">{t('ascii.rotated')}</option>
           </select>
         </div>
         <ColorRow
-          label="文字色"
+          label={t('common.textColor')}
           value={getCommon(boxes, 'typeLabelColor')}
           onChange={(c) => updateBoxes(ids, { typeLabelColor: c })}
-          defaultLabel="既定 (#222)"
+          defaultLabel={t('color.default222')}
         />
         <ColorRow
-          label="背景色"
+          label={t('common.bgColor')}
           value={getCommon(boxes, 'typeLabelBackgroundColor')}
           onChange={(c) => updateBoxes(ids, { typeLabelBackgroundColor: c })}
           allowNone
-          defaultLabel="既定 (透明)"
+          defaultLabel={t('color.defaultTransparent')}
         />
         <ColorRow
-          label="枠線色"
+          label={t('common.borderColor')}
           value={getCommon(boxes, 'typeLabelBorderColor')}
           onChange={(c) => updateBoxes(ids, { typeLabelBorderColor: c })}
           allowNone
-          defaultLabel="既定 (枠なし)"
+          defaultLabel={t('color.defaultNoBorder')}
         />
         <div className="prop-row">
-          <label>枠線太さ (px)</label>
+          <label>{t('common.borderWidthPx')}</label>
           <input
             type="number"
             min={0}
@@ -653,7 +661,7 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
             value={getCommon(boxes, 'typeLabelBorderWidth') ?? 0}
             placeholder={getCommon(boxes, 'typeLabelBorderWidth') === undefined ? '' : ''}
             onChange={(e) => updateBoxes(ids, { typeLabelBorderWidth: Number(e.target.value) })}
-            title="0 = 枠線なし"
+            title={t('common.borderWidth.tooltip')}
           />
         </div>
       </>}
@@ -661,16 +669,16 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
       {/* ========== サブラベル ========== */}
       {tab === 'subLabel' && <>
         <div className="prop-row">
-          <label>サブラベル（協力者ID等）</label>
+          <label>{t('box.subLabel')}</label>
           <input
             type="text"
             value={!isMulti ? (first.subLabel ?? '') : (commonSubLabel ?? '')}
-            placeholder={isMulti && commonSubLabel === undefined ? '' : '例: Aさん'}
+            placeholder={isMulti && commonSubLabel === undefined ? '' : t('box.subLabel.placeholder')}
             onChange={(e) => updateBoxes(ids, { subLabel: e.target.value })}
           />
         </div>
         <div className="prop-row">
-          <label>フォントサイズ</label>
+          <label>{t('common.fontSize')}</label>
           <input
             type="number"
             min={6}
@@ -681,57 +689,57 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
           />
         </div>
         <div className="prop-row">
-          <label>位置調整 Time / Item (px)</label>
+          <label>{t('common.offsetTimeItem')}</label>
           <div style={{ display: 'flex', gap: 4 }}>
             <input
               type="number"
               value={commonSubOffX ?? 0}
               onChange={(e) => updateBoxes(ids, { subLabelOffsetX: Number(e.target.value) })}
-              title="時間軸方向のオフセット (レイアウト切替に追従)"
+              title={t('common.offsetTime.tooltip')}
             />
             <input
               type="number"
               value={commonSubOffY ?? 0}
               onChange={(e) => updateBoxes(ids, { subLabelOffsetY: Number(e.target.value) })}
-              title="項目軸方向のオフセット"
+              title={t('common.offsetItem.tooltip')}
             />
           </div>
         </div>
         <div className="prop-row">
-          <label>半角英数の向き（縦型）</label>
+          <label>{t('box.subLabel.ascii')}</label>
           <select
             value={getCommon(boxes, 'subLabelAsciiUpright') === undefined
               ? ''
               : (getCommon(boxes, 'subLabelAsciiUpright') ? 'upright' : 'mixed')}
             onChange={(e) => updateBoxes(ids, { subLabelAsciiUpright: e.target.value === 'upright' })}
           >
-            {getCommon(boxes, 'subLabelAsciiUpright') === undefined && <option value="">（Box本体と同じ）</option>}
-            <option value="upright">縦向き（上下積み）</option>
-            <option value="mixed">横倒し（伝統的）</option>
+            {getCommon(boxes, 'subLabelAsciiUpright') === undefined && <option value="">{t('common.sameAsBox')}</option>}
+            <option value="upright">{t('ascii.upright.stacked2')}</option>
+            <option value="mixed">{t('ascii.rotated.traditional')}</option>
           </select>
         </div>
         <ColorRow
-          label="文字色"
+          label={t('common.textColor')}
           value={getCommon(boxes, 'subLabelColor')}
           onChange={(c) => updateBoxes(ids, { subLabelColor: c })}
-          defaultLabel="既定 (#555)"
+          defaultLabel={t('color.default555')}
         />
         <ColorRow
-          label="背景色"
+          label={t('common.bgColor')}
           value={getCommon(boxes, 'subLabelBackgroundColor')}
           onChange={(c) => updateBoxes(ids, { subLabelBackgroundColor: c })}
           allowNone
-          defaultLabel="既定 (白半透明)"
+          defaultLabel={t('color.defaultTranslucentWhite')}
         />
         <ColorRow
-          label="枠線色"
+          label={t('common.borderColor')}
           value={getCommon(boxes, 'subLabelBorderColor')}
           onChange={(c) => updateBoxes(ids, { subLabelBorderColor: c })}
           allowNone
-          defaultLabel="既定 (枠なし)"
+          defaultLabel={t('color.defaultNoBorder')}
         />
         <div className="prop-row">
-          <label>枠線太さ (px)</label>
+          <label>{t('common.borderWidthPx')}</label>
           <input
             type="number"
             min={0}
@@ -740,7 +748,7 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
             value={getCommon(boxes, 'subLabelBorderWidth') ?? 0}
             placeholder={getCommon(boxes, 'subLabelBorderWidth') === undefined ? '' : ''}
             onChange={(e) => updateBoxes(ids, { subLabelBorderWidth: Number(e.target.value) })}
-            title="0 = 枠線なし"
+            title={t('common.borderWidth.tooltip')}
           />
         </div>
       </>}
@@ -748,16 +756,16 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
       {/* ========== 自動調整 ========== */}
       {tab === 'autoFit' && <>
         <div className="prop-row">
-          <label>文字サイズを自動調整</label>
+          <label>{t('box.autoFitText')}</label>
           <input
             type="checkbox"
             checked={getCommon(boxes, 'autoFitText') === true}
             onChange={(e) => updateBoxes(ids, { autoFitText: e.target.checked })}
-            title="Box に収まる最大サイズへ文字を縮小・拡大"
+            title={t('box.autoFitText.tooltip')}
           />
         </div>
         <div className="prop-row">
-          <label>Box 自動拡張モード</label>
+          <label>{t('box.autoFitBoxMode')}</label>
           <select
             value={getCommon(boxes, 'autoFitBoxMode') ?? ''}
             onChange={(e) => {
@@ -765,49 +773,49 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
               updateBoxes(ids, { autoFitBoxMode: v === '' ? undefined : (v as AutoFitBoxMode) });
             }}
           >
-            <option value="">（全体既定に従う）</option>
-            <option value="none">自動拡張なし</option>
-            <option value="width-fixed">横幅固定で高さ自動</option>
-            <option value="height-fixed">高さ固定で横幅自動</option>
+            <option value="">{t('box.autoFitBoxMode.inherit')}</option>
+            <option value="none">{t('box.autoFitBoxMode.none')}</option>
+            <option value="width-fixed">{t('box.autoFitBoxMode.widthFixed')}</option>
+            <option value="height-fixed">{t('box.autoFitBoxMode.heightFixed')}</option>
           </select>
         </div>
         <p className="hint" style={{ margin: 0 }}>
-          文字サイズ自動調整が ON のとき自動拡張モードは停止します（同時有効不可）
+          {t('box.autoFit.hint')}
         </p>
         <div className="prop-row" style={{ flexWrap: 'wrap', gap: 4, justifyContent: 'flex-start' }}>
           <button className="ribbon-btn-small"
             onClick={() => useTEMStore.getState().fitBoxesToLabel(ids)}
-            title="現在のラベル文字数に合わせて Box サイズを最小化">Box を文字に合わせる</button>
+            title={t('box.fitToLabel.tooltip')}>{t('box.fitToLabel')}</button>
           <button className="ribbon-btn-small"
             onClick={() => useTEMStore.getState().fitBoxesTextToBox(ids)}
-            title="Box のサイズに合わせて文字サイズを自動調整（1 回適用）">文字を Box に合わせる</button>
+            title={t('box.fitTextToBox.tooltip')}>{t('box.fitTextToBox')}</button>
           {isMulti && (
             <>
               <button className="ribbon-btn-small"
-                onClick={() => useTEMStore.getState().matchBoxesSize(ids, 'width')}>幅揃え</button>
+                onClick={() => useTEMStore.getState().matchBoxesSize(ids, 'width')}>{t('match.width')}</button>
               <button className="ribbon-btn-small"
-                onClick={() => useTEMStore.getState().matchBoxesSize(ids, 'height')}>高さ揃え</button>
+                onClick={() => useTEMStore.getState().matchBoxesSize(ids, 'height')}>{t('match.height')}</button>
               <button className="ribbon-btn-small"
-                onClick={() => useTEMStore.getState().matchBoxesSize(ids, 'both')}>サイズ揃え</button>
+                onClick={() => useTEMStore.getState().matchBoxesSize(ids, 'both')}>{t('match.size')}</button>
               <button className="ribbon-btn-small"
-                onClick={() => useTEMStore.getState().matchBoxesFontSize(ids)}>文字サイズ揃え</button>
+                onClick={() => useTEMStore.getState().matchBoxesFontSize(ids)}>{t('match.fontSize')}</button>
             </>
           )}
         </div>
-        <CollapsibleSection title="論文レポート用" sectionKey="box-autofit-paper-report" compact defaultOpen={false}>
+        <CollapsibleSection title={t('common.paperReport')} sectionKey="box-autofit-paper-report" compact defaultOpen={false}>
           {!isMulti && (
             <div className="prop-row" style={{ alignItems: 'flex-start' }}>
-              <label>説明文</label>
+              <label>{t('common.description')}</label>
               <textarea
                 value={first.description ?? ''}
                 onChange={(e) => updateBoxes([first.id], { description: e.target.value })}
                 style={{ width: '100%', minHeight: 60, resize: 'vertical' }}
-                placeholder="この Box の意味・解釈（論文レポートに出力）"
+                placeholder={t('box.description.placeholder')}
               />
             </div>
           )}
           <div className="prop-row">
-            <label>説明不要（自明）</label>
+            <label>{t('common.noDescriptionNeeded')}</label>
             <input
               type="checkbox"
               checked={getCommon(boxes, 'noDescriptionNeeded') === true}
@@ -825,7 +833,7 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
       )}
 
       <div className="prop-row">
-        <button className="danger-btn" onClick={() => removeBoxes(ids)}>削除</button>
+        <button className="danger-btn" onClick={() => removeBoxes(ids)}>{t('common.delete')}</button>
       </div>
     </div>
   );
@@ -835,6 +843,7 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
 // SDSG Properties
 // ============================================================================
 function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOpenTranscriptViewer?: (focusBoxId?: string) => void }) {
+  const { t } = useTranslation('propertyPanel');
   const updateSDSG = useTEMStore((s) => s.updateSDSG);
   const updateSDSGs = useTEMStore((s) => s.updateSDSGs);
   const matchSDSGsSize = useTEMStore((s) => s.matchSDSGsSize);
@@ -882,8 +891,8 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
   const commonSubBorderColor = getCommon(sdsgs, 'subLabelBorderColor');
   const commonSubBorderWidth = getCommon(sdsgs, 'subLabelBorderWidth');
   const isH = sdsgLayout === 'horizontal';
-  const topBandLabel = isH ? '上部 (SD) に配置' : '右側 (SD) に配置';
-  const bottomBandLabel = isH ? '下部 (SG) に配置' : '左側 (SG) に配置';
+  const topBandLabel = isH ? t('sdsg.band.top.h') : t('sdsg.band.top.v');
+  const bottomBandLabel = isH ? t('sdsg.band.bottom.h') : t('sdsg.band.bottom.v');
 
   // outOfRange 判定 (選択中の SDSG いずれかが帯からはみ出しているか)
   const projectSettings = useTEMStore((s) => s.doc.settings);
@@ -929,25 +938,25 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
       );
       if (blocked) {
         alert(
-          `既定では SD は上部(SD)帯のみ、SG は下部(SG)帯のみ配置可能です。\n逆向きに配置するには設定 > SD/SG 配置 で「組合せ制限を解除」を ON にしてください。`,
+          t('sdsg.mismatch.alert'),
         );
         return;
       }
     }
-    if (!confirm('配置モードを変更すると、時間/項目オフセットと帯内 Inset がリセットされます。よろしいですか?')) return;
+    if (!confirm(t('sdsg.spaceMode.confirm'))) return;
     setSDSGSpaceMode(ids, newMode);
   };
 
   return (
     <div className="prop-section">
-      <h4>SD/SG {isMulti && <span className="multi-badge">{sdsgs.length}個</span>}</h4>
+      <h4>SD/SG {isMulti && <span className="multi-badge">{t('common.count', { count: sdsgs.length })}</span>}</h4>
 
       <div className="settings-tabs" style={{ marginBottom: 8, padding: 0 }}>
-        <button className={tab === 'basic' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('basic')}>基本</button>
-        <button className={tab === 'label' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('label')}>ラベル</button>
-        <button className={tab === 'idLabel' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('idLabel')}>タイプラベル</button>
-        <button className={tab === 'subLabel' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('subLabel')}>サブラベル</button>
-        <button className={tab === 'autoFit' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('autoFit')}>自動調整</button>
+        <button className={tab === 'basic' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('basic')}>{t('tab.basic')}</button>
+        <button className={tab === 'label' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('label')}>{t('common.label')}</button>
+        <button className={tab === 'idLabel' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('idLabel')}>{t('tab.typeLabel')}</button>
+        <button className={tab === 'subLabel' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('subLabel')}>{t('tab.subLabel')}</button>
+        <button className={tab === 'autoFit' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('autoFit')}>{t('tab.autoFit')}</button>
       </div>
 
       {!isMulti && (
@@ -959,17 +968,17 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
               <input value={first.id} readOnly style={{ fontFamily: 'monospace', fontSize: '0.85em' }} />
             </div>
             <div className="prop-row">
-              <label>種別</label>
+              <label>{t('common.type')}</label>
               <select
                 value={first.type}
                 onChange={(e) => updateSDSG(first.id, { type: e.target.value as 'SD' | 'SG' })}
               >
-                <option value="SD">SD (社会的方向づけ)</option>
-                <option value="SG">SG (社会的ガイド)</option>
+                <option value="SD">{t('sdsg.type.SD')}</option>
+                <option value="SG">{t('sdsg.type.SG')}</option>
               </select>
             </div>
             <div className="prop-row">
-              <label>紐付け対象 (attachedTo)</label>
+              <label>{t('sdsg.attachedTo')}</label>
               {sheet ? (
                 <select
                   value={first.attachedTo}
@@ -979,7 +988,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                   {/* 現在値が Box / Line どちらにも無い場合の救済 */}
                   {!sheet.boxes.some((b) => b.id === first.attachedTo)
                     && !sheet.lines.some((l) => l.id === first.attachedTo) && (
-                    <option value={first.attachedTo}>（現: {first.attachedTo}）</option>
+                    <option value={first.attachedTo}>{t('sdsg.attachedTo.current', { id: first.attachedTo })}</option>
                   )}
                   <optgroup label="Box">
                     {sheet.boxes.map((b) => (
@@ -997,7 +1006,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
 
             {/* 2 つ目の対象（attachedTo2）— 値を入れた瞬間 between に、空に戻すと single に自動切替 */}
             <div className="prop-row">
-              <label>2 つ目の対象 (attachedTo2)</label>
+              <label>{t('sdsg.attachedTo2')}</label>
               {sheet ? (
                 <select
                   value={first.attachedTo2 ?? ''}
@@ -1016,9 +1025,9 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                     }
                   }}
                   style={{ fontFamily: 'monospace', fontSize: '0.85em' }}
-                  title="値を選ぶと between モードになります。空（未指定）に戻すと single モードに戻ります"
+                  title={t('sdsg.attachedTo2.tooltip')}
                 >
-                  <option value="">（未指定 / single モード）</option>
+                  <option value="">{t('sdsg.attachedTo2.none')}</option>
                   <optgroup label="Box">
                     {sheet.boxes.filter((b) => b.id !== first.attachedTo).map((b) => (
                       <option key={b.id} value={b.id}>Box: {b.id} — {b.label}</option>
@@ -1034,33 +1043,33 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
             </div>
             {first.anchorMode === 'between' && first.attachedTo2 && (
               <div className="prop-row">
-                <label>幅の定義</label>
+                <label>{t('sdsg.betweenMode')}</label>
                 <select
                   value={first.betweenMode ?? 'edge-to-edge'}
                   onChange={(e) => updateSDSG(first.id, { betweenMode: e.target.value as 'edge-to-edge' | 'center-to-center' })}
                 >
-                  <option value="edge-to-edge">Box 外辺から外辺まで（Time 軸両端を覆う）</option>
-                  <option value="center-to-center">Box 中心から Box 中心まで</option>
+                  <option value="edge-to-edge">{t('sdsg.betweenMode.edge')}</option>
+                  <option value="center-to-center">{t('sdsg.betweenMode.center')}</option>
                 </select>
               </div>
             )}
             {first.anchorMode === 'between' && first.attachedTo2 && (
-              <CollapsibleSection title="幅で示して複数 Box に影響（案 X）" sectionKey="sdsg-influence" compact defaultOpen={true}>
+              <CollapsibleSection title={t('sdsg.influence')} sectionKey="sdsg-influence" compact defaultOpen={true}>
                 <p className="hint" style={{ marginTop: 0 }}>
-                  本体を四角形にし、影響先の各 Box へ太い矢印を 1 本ずつ引きます。矢印は SD/SG の枠から Box の枠まで。
+                  {t('sdsg.influence.hint')}
                 </p>
                 <div className="prop-row">
-                  <label>本体の形</label>
+                  <label>{t('sdsg.shape')}</label>
                   <select
                     value={first.shape ?? 'pentagon'}
                     onChange={(e) => updateSDSG(first.id, { shape: e.target.value as 'pentagon' | 'rect' })}
                   >
-                    <option value="pentagon">五角形（ホームベース型）</option>
-                    <option value="rect">四角形（幅で示す）</option>
+                    <option value="pentagon">{t('sdsg.shape.pentagon')}</option>
+                    <option value="rect">{t('sdsg.shape.rect')}</option>
                   </select>
                 </div>
                 <div className="prop-row" style={{ alignItems: 'flex-start' }}>
-                  <label>影響先の Box</label>
+                  <label>{t('sdsg.influenceTargets')}</label>
                   <div style={{ maxHeight: 140, overflowY: 'auto', border: '1px solid #ddd', borderRadius: 4, padding: 4, width: '100%' }}>
                     {(sheet?.boxes ?? []).map((b) => {
                       const cur = first.influenceTargets ?? [];
@@ -1088,7 +1097,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                   </div>
                 </div>
                 <div className="prop-row">
-                  <label>矢印の太さ (px)</label>
+                  <label>{t('sdsg.influenceStrokeWidth')}</label>
                   <input
                     type="number" min={1} max={12} step={0.5}
                     value={first.influenceStrokeWidth ?? 3}
@@ -1104,7 +1113,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
 
             {/* 配置方式 */}
             <div className="prop-row">
-              <label>配置方式</label>
+              <label>{t('sdsg.spaceMode')}</label>
               <select
                 value={(first.spaceMode === 'band-top' || first.spaceMode === 'band-bottom') ? 'band' : 'attached'}
                 onChange={(e) => {
@@ -1117,8 +1126,8 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                   }
                 }}
               >
-                <option value="attached">attached（Box に追従）</option>
-                <option value="band">band（専用帯に配置）</option>
+                <option value="attached">{t('sdsg.spaceMode.attached')}</option>
+                <option value="band">{t('sdsg.spaceMode.band')}</option>
               </select>
             </div>
 
@@ -1126,7 +1135,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
             {(first.spaceMode === 'band-top' || first.spaceMode === 'band-bottom') && (
               <>
                 <div className="prop-row">
-                  <label>帯位置</label>
+                  <label>{t('sdsg.bandPosition')}</label>
                   <select
                     value={first.spaceMode}
                     onChange={(e) => changeSpaceMode(e.target.value as 'band-top' | 'band-bottom')}
@@ -1138,15 +1147,14 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                 {!sdsgSpace?.enabled && (
                   <div className="prop-row" style={{ padding: 6, background: '#fff8e1', border: '1px solid #ffc107', borderRadius: 4 }}>
                     <span style={{ fontSize: '0.85em', color: '#856404' }}>
-                      ⚠ SD/SG 配置機能が OFF です。band モード変更時に自動で ON になります。
+                      {t('sdsg.bandDisabled')}
                     </span>
                   </div>
                 )}
                 {first.anchorMode === 'between' && (
                   <div className="prop-row" style={{ padding: 6, background: '#e3f2fd', border: '1px solid #2196f3', borderRadius: 4 }}>
                     <span style={{ fontSize: '0.82em', color: '#0d47a1' }}>
-                      ℹ between + band 組合せ: 時間軸方向の幅は 2 Box 間のスパンで自動計算されます (spaceWidth/spaceHeight の時間軸値は無視)。
-                      row と spaceInsetItem で アイテム軸配置を制御できます。
+                      {t('sdsg.betweenBand.hint')}
                     </span>
                   </div>
                 )}
@@ -1164,66 +1172,66 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                     }}
                   >
                     <span style={{ fontSize: '0.85em', color: '#a02722', fontWeight: 'bold' }}>
-                      ⚠ 帯からはみ出しています（{outOfRangeSDSGs.length}件）
+                      {t('sdsg.outOfRange', { count: outOfRangeSDSGs.length })}
                     </span>
                     <span style={{ fontSize: '0.78em', color: '#5b1a17' }}>
-                      row 数が帯の高さを超えています。以下のいずれかで解消:
+                      {t('sdsg.outOfRange.hint')}
                     </span>
                     <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                       <button
                         className="ribbon-btn-small"
                         onClick={fixEnableAutoExpand}
-                        title="帯を縦方向に自動拡張 (manual heightMode に切替 + autoExpandHeight ON)"
-                      >帯を拡張</button>
+                        title={t('sdsg.fix.expand.tooltip')}
+                      >{t('sdsg.fix.expand')}</button>
                       <button
                         className="ribbon-btn-small"
                         onClick={fixEnableShrink}
-                        title="SDSG を row span に合わせて自動圧縮 (shrinkToFitRow ON)"
-                      >SDSG を圧縮</button>
+                        title={t('sdsg.fix.shrink.tooltip')}
+                      >{t('sdsg.fix.shrink')}</button>
                       <button
                         className="ribbon-btn-small"
                         onClick={fixDecreaseRow}
-                        title="選択中 SDSG の row を 1 つ内側 (Box 寄り) へ"
-                      >row を内側へ</button>
+                        title={t('sdsg.fix.rowInward.tooltip')}
+                      >{t('sdsg.fix.rowInward')}</button>
                     </div>
                   </div>
                 )}
-                <CollapsibleSection title="帯モード詳細" sectionKey="sdsg-basic-band-detail" compact defaultOpen={true}>
+                <CollapsibleSection title={t('sdsg.bandDetail')} sectionKey="sdsg-basic-band-detail" compact defaultOpen={true}>
                 <div className="prop-row">
-                  <label>帯内 Row 指定</label>
+                  <label>{t('sdsg.bandRow')}</label>
                   <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                     <input
                       type="number"
                       min={0}
                       step={1}
                       value={first.spaceRowOverride ?? ''}
-                      placeholder="自動"
+                      placeholder={t('common.auto')}
                       onChange={(e) => {
                         const v = e.target.value;
                         updateSDSG(first.id, { spaceRowOverride: v === '' ? undefined : Math.max(0, Number(v)) });
                       }}
                       style={{ width: 60 }}
-                      title="帯内で割り当てる row を手動指定（0=最内側 Box 群寄り、大きいほど外側）。空欄で自動整列"
+                      title={t('sdsg.bandRow.tooltip')}
                     />
                     <button className="ribbon-btn-small"
                       onClick={() => {
                         const cur = first.spaceRowOverride ?? 0;
                         updateSDSG(first.id, { spaceRowOverride: Math.max(0, cur - 1) });
                       }}
-                      title="row を 1 つ内側（Box 群寄り）へ">↑</button>
+                      title={t('sdsg.bandRow.up.tooltip')}>↑</button>
                     <button className="ribbon-btn-small"
                       onClick={() => {
                         const cur = first.spaceRowOverride ?? 0;
                         updateSDSG(first.id, { spaceRowOverride: cur + 1 });
                       }}
-                      title="row を 1 つ外側へ">↓</button>
+                      title={t('sdsg.bandRow.down.tooltip')}>↓</button>
                     <button className="ribbon-btn-small"
                       onClick={() => updateSDSG(first.id, { spaceRowOverride: undefined })}
-                      title="自動整列に戻す">自動</button>
+                      title={t('sdsg.bandRow.auto.tooltip')}>{t('common.auto')}</button>
                   </div>
                 </div>
                 <div className="prop-row">
-                  <label>帯内 Time オフセット (px)</label>
+                  <label>{t('sdsg.bandInsetTime')}</label>
                   <input
                     type="number"
                     step={0.5}
@@ -1232,7 +1240,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                   />
                 </div>
                 <div className="prop-row">
-                  <label>帯内 Item オフセット (px)</label>
+                  <label>{t('sdsg.bandInsetItem')}</label>
                   <input
                     type="number"
                     step={0.5}
@@ -1241,31 +1249,31 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                   />
                 </div>
                 <div className="prop-row">
-                  <label>{isH ? '幅 (時間軸, px)' : '幅 (アイテム軸, px)'}</label>
+                  <label>{isH ? t('sdsg.spaceWidth.time') : t('sdsg.spaceWidth.item')}</label>
                   <input
                     type="number"
                     value={first.spaceWidth ?? first.width ?? 70}
                     onChange={(e) => updateSDSG(first.id, { spaceWidth: Number(e.target.value) })}
                     title={isH
-                      ? '時間軸方向の SDSG 幅。attached Box の幅に制約されないので、前後 Box を跨いで広げられる'
-                      : 'アイテム軸方向の SDSG 幅。row span が自動クランプする場合があります (shrinkToFitRow)'}
+                      ? t('sdsg.spaceWidth.time.tooltip')
+                      : t('sdsg.spaceWidth.item.tooltip')}
                   />
                 </div>
                 <div className="prop-row">
-                  <label>{isH ? '高さ (アイテム軸, px)' : '高さ (時間軸, px)'}</label>
+                  <label>{isH ? t('sdsg.spaceHeight.item') : t('sdsg.spaceHeight.time')}</label>
                   <input
                     type="number"
                     value={first.spaceHeight ?? first.height ?? 40}
                     onChange={(e) => updateSDSG(first.id, { spaceHeight: Number(e.target.value) })}
                     title={isH
-                      ? 'アイテム軸方向の SDSG 高さ。row span が自動クランプする場合があります (shrinkToFitRow)'
-                      : '時間軸方向の SDSG 高さ。attached Box の高さに制約されないので、前後 Box を跨いで広げられる'}
+                      ? t('sdsg.spaceHeight.item.tooltip')
+                      : t('sdsg.spaceHeight.time.tooltip')}
                   />
                 </div>
                 <p className="hint" style={{ margin: '0 0 6px', fontSize: '0.8em', color: '#666' }}>
                   {isH
-                    ? '幅=時間軸方向、高さ=アイテム軸方向。attached Box の幅を超える値を設定すれば、前後 Box を跨いだ帯内 SDSG も可能。'
-                    : '幅=アイテム軸方向、高さ=時間軸方向。attached Box の高さを超える値を設定すれば、前後 Box を跨いだ帯内 SDSG も可能。'}
+                    ? t('sdsg.spaceSize.hint.h')
+                    : t('sdsg.spaceSize.hint.v')}
                 </p>
                 </CollapsibleSection>
               </>
@@ -1273,9 +1281,9 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
 
             {/* attached モード固有の設定（attachedTo2 / anchorMode / betweenMode は上の共通 UI を使用） */}
             {(first.spaceMode == null || first.spaceMode === 'attached') && (
-              <CollapsibleSection title="attached モード詳細" sectionKey="sdsg-basic-attached-detail" compact defaultOpen={true}>
+              <CollapsibleSection title={t('sdsg.attachedDetail')} sectionKey="sdsg-basic-attached-detail" compact defaultOpen={true}>
                 <div className="prop-row">
-                  <label>時間オフセット (px)</label>
+                  <label>{t('sdsg.timeOffset')}</label>
                   <input
                     type="number"
                     step={0.5}
@@ -1284,7 +1292,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                   />
                 </div>
                 <div className="prop-row">
-                  <label>項目オフセット (px)</label>
+                  <label>{t('sdsg.itemOffset')}</label>
                   <input
                     type="number"
                     step={0.5}
@@ -1302,11 +1310,11 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                   const timeIsWidth = sdsgLayout === 'horizontal';
                   const widthIgnored = isBetween && timeIsWidth;
                   const heightIgnored = isBetween && !timeIsWidth;
-                  const reason = 'between モードでは時間軸方向のサイズが 2 Box 間のスパンから自動計算されます';
+                  const reason = t('sdsg.betweenSize.reason');
                   return (
                     <>
                       <div className="prop-row">
-                        <label>幅 (px)</label>
+                        <label>{t('common.widthPx')}</label>
                         <input
                           type="number"
                           min={10}
@@ -1322,7 +1330,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
                         />
                       </div>
                       <div className="prop-row">
-                        <label>高さ (px)</label>
+                        <label>{t('common.heightPx')}</label>
                         <input
                           type="number"
                           min={10}
@@ -1347,7 +1355,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
             )}
 
             <div className="prop-row">
-              <label>矩形部分の比率</label>
+              <label>{t('sdsg.rectRatio')}</label>
               <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                 <input
                   type="range"
@@ -1371,7 +1379,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
             </div>
           </>}
           <div className="prop-row">
-            <label>IDバッジ フォントサイズ</label>
+            <label>{t('sdsg.idFontSize')}</label>
             <input
               type="number"
               min={6}
@@ -1382,19 +1390,19 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
             />
           </div>
           <div className="prop-row">
-            <label>IDバッジ位置調整 Time / Item (px)</label>
+            <label>{t('sdsg.idOffset')}</label>
             <div style={{ display: 'flex', gap: 4 }}>
               <input
                 type="number"
                 value={getCommon(sdsgs, 'idOffsetX') ?? 0}
                 onChange={(e) => updateSDSGs(ids, { idOffsetX: Number(e.target.value) })}
-                title="時間軸方向のオフセット (レイアウト切替に追従)"
+                title={t('common.offsetTime.tooltip')}
               />
               <input
                 type="number"
                 value={getCommon(sdsgs, 'idOffsetY') ?? 0}
                 onChange={(e) => updateSDSGs(ids, { idOffsetY: Number(e.target.value) })}
-                title="項目軸方向のオフセット"
+                title={t('common.offsetItem.tooltip')}
               />
             </div>
           </div>
@@ -1405,20 +1413,20 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
       {tab === 'label' && (<>
         {!isMulti && (
           <div className="prop-row">
-            <label>ラベル</label>
+            <label>{t('common.label')}</label>
             <textarea
               value={first.label}
               onChange={(e) => updateSDSG(first.id, { label: e.target.value })}
               rows={2}
               style={{ width: '100%', resize: 'vertical', fontFamily: 'inherit' }}
-              title="改行できます（キャンバスのダブルクリック編集と同じ）"
+              title={t('sdsg.label.tooltip')}
             />
           </div>
         )}
         <FontFamilyRow
           value={commonFont}
           onChange={(v) => updateSDSGs(ids, { style: { fontFamily: v } })}
-          emptyOptionLabel="（UI 既定）"
+          emptyOptionLabel={t('sdsg.fontFamily.uiDefault')}
         />
         <FontSizeRow
           value={commonFS}
@@ -1435,24 +1443,24 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
           onUnderlineToggle={(v) => updateSDSGs(ids, { style: { underline: v } })}
         />
         <ColorRow
-          label="文字色"
+          label={t('common.textColor')}
           value={commonTextColor}
           onChange={(c) => updateSDSGs(ids, { style: { color: c } })}
-          defaultLabel="既定 (#222)"
+          defaultLabel={t('color.default222')}
         />
         <ColorRow
-          label="背景色"
+          label={t('common.bgColor')}
           value={commonBg}
           onChange={(c) => updateSDSGs(ids, { style: { backgroundColor: c } })}
           allowNone
-          defaultLabel="既定 (白)"
+          defaultLabel={t('color.defaultWhite')}
         />
         <ColorRow
-          label="枠線色"
+          label={t('common.borderColor')}
           value={commonBorder}
           onChange={(c) => updateSDSGs(ids, { style: { borderColor: c } })}
           allowNone
-          defaultLabel="既定 (#333)"
+          defaultLabel={t('color.default333')}
         />
         <TextAlignRow
           value={commonTextAlign}
@@ -1463,35 +1471,35 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
           onChange={(v) => updateSDSGs(ids, { style: { verticalAlign: v } })}
         />
         <div className="prop-row">
-          <label>配置領域</label>
+          <label>{t('sdsg.labelArea')}</label>
           <select
             value={getCommon(sdsgs, 'labelArea') ?? 'pentagon'}
             onChange={(e) => updateSDSGs(ids, { labelArea: e.target.value as 'pentagon' | 'rect' })}
-            title="ラベルを配置する領域。pentagon=五角形全体（既定） / rect=矩形部分のみ"
+            title={t('sdsg.labelArea.tooltip')}
           >
-            <option value="pentagon">五角形全体</option>
-            <option value="rect">矩形部分のみ</option>
+            <option value="pentagon">{t('sdsg.labelArea.pentagon')}</option>
+            <option value="rect">{t('sdsg.labelArea.rect')}</option>
           </select>
         </div>
         <div className="prop-row">
-          <label>位置調整 Time / Item (px)</label>
+          <label>{t('common.offsetTimeItem')}</label>
           <div style={{ display: 'flex', gap: 4 }}>
             <input
               type="number"
               value={getCommon(sdsgs, 'labelOffsetX') ?? 0}
               onChange={(e) => updateSDSGs(ids, { labelOffsetX: Number(e.target.value) })}
-              title="時間軸方向のラベル位置オフセット (+ で時間が進む方向、− で戻る方向)。レイアウト切替に追従。中央揃え時は視覚補正済"
+              title={t('sdsg.labelOffsetTime.tooltip')}
             />
             <input
               type="number"
               value={getCommon(sdsgs, 'labelOffsetY') ?? 0}
               onChange={(e) => updateSDSGs(ids, { labelOffsetY: Number(e.target.value) })}
-              title="項目軸方向のラベル位置オフセット。レイアウト切替に追従"
+              title={t('sdsg.labelOffsetItem.tooltip')}
             />
           </div>
         </div>
         <div className="prop-row">
-          <label>ASCII縦向き（縦型レイアウト）</label>
+          <label>{t('sdsg.asciiUpright')}</label>
           <input
             type="checkbox"
             checked={commonAscii ?? true}
@@ -1504,16 +1512,16 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
       {/* ========== タイプラベル（種別バッジ SD/SG） ========== (複数選択対応) */}
       {tab === 'idLabel' && (<>
         <p className="hint" style={{ marginTop: 0 }}>
-          SD/SG 種別を表すバッジの装飾です。連番表記を ON にすると複数のとき自動で連番化（SD1, SD2, …）。
+          {t('sdsg.typeLabel.hint')}
         </p>
         <div className="prop-row">
-          <label>連番表記</label>
+          <label>{t('common.numbered')}</label>
           <input
             type="checkbox"
             checked={commonTLNumbered !== false}
             ref={(el) => { if (el) el.indeterminate = commonTLNumbered === undefined; }}
             onChange={(e) => updateSDSGs(ids, { typeLabelNumbered: e.target.checked ? undefined : false })}
-            title="OFF にすると SD / SG のみ表示（連番を付けない）"
+            title={t('sdsg.numbered.tooltip')}
           />
         </div>
         <FontSizeRow
@@ -1525,7 +1533,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
         <FontFamilyRow
           value={commonTLFontFamily}
           onChange={(v) => updateSDSGs(ids, { typeLabelFontFamily: v })}
-          emptyOptionLabel="（本文と同じ）"
+          emptyOptionLabel={t('sdsg.sameAsBody')}
         />
         <BoldItalicUnderlineRow
           bold={commonTLBold !== false}
@@ -1534,7 +1542,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
           onItalicToggle={(v) => updateSDSGs(ids, { typeLabelItalic: v })}
         />
         <div className="prop-row">
-          <label>ASCII縦向き（縦型レイアウト）</label>
+          <label>{t('sdsg.asciiUpright')}</label>
           <input
             type="checkbox"
             checked={commonTLAscii ?? (commonAscii ?? true)}
@@ -1543,27 +1551,27 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
           />
         </div>
         <ColorRow
-          label="文字色"
+          label={t('common.textColor')}
           value={commonTLColor}
           onChange={(c) => updateSDSGs(ids, { typeLabelColor: c })}
-          defaultLabel="既定 (#222)"
+          defaultLabel={t('color.default222')}
         />
         <ColorRow
-          label="背景色"
+          label={t('common.bgColor')}
           value={commonTLBg}
           onChange={(c) => updateSDSGs(ids, { typeLabelBackgroundColor: c })}
           allowNone
-          defaultLabel="既定 (透明)"
+          defaultLabel={t('color.defaultTransparent')}
         />
         <ColorRow
-          label="枠線色"
+          label={t('common.borderColor')}
           value={commonTLBorderColor}
           onChange={(c) => updateSDSGs(ids, { typeLabelBorderColor: c })}
           allowNone
-          defaultLabel="既定 (枠なし)"
+          defaultLabel={t('color.defaultNoBorder')}
         />
         <div className="prop-row">
-          <label>枠線太さ (px)</label>
+          <label>{t('common.borderWidthPx')}</label>
           <input
             type="number"
             min={0}
@@ -1572,7 +1580,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
             value={commonTLBorderWidth ?? 0}
             placeholder={commonTLBorderWidth === undefined ? '' : ''}
             onChange={(e) => updateSDSGs(ids, { typeLabelBorderWidth: Number(e.target.value) })}
-            title="0 = 枠線なし"
+            title={t('common.borderWidth.tooltip')}
           />
         </div>
       </>)}
@@ -1581,7 +1589,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
       {tab === 'subLabel' && (<>
         {!isMulti && (
           <div className="prop-row">
-            <label>サブラベル</label>
+            <label>{t('tab.subLabel')}</label>
             <input
               type="text"
               value={first.subLabel ?? ''}
@@ -1591,11 +1599,11 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
         )}
         {isMulti && (
           <p className="hint" style={{ margin: '0 0 4px', fontSize: '0.82em', color: '#888' }}>
-            ラベル本文は単一選択時のみ編集できます（現在 {sdsgs.length} 個選択中）。
+            {t('sdsg.subLabel.multiHint', { count: sdsgs.length })}
           </p>
         )}
         <div className="prop-row">
-          <label>フォントサイズ</label>
+          <label>{t('common.fontSize')}</label>
           <input
             type="number"
             min={6}
@@ -1606,7 +1614,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
           />
         </div>
         <div className="prop-row">
-          <label>位置 X / Y</label>
+          <label>{t('common.positionXY')}</label>
           <div style={{ display: 'flex', gap: 4 }}>
             <input
               type="number"
@@ -1623,7 +1631,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
           </div>
         </div>
         <div className="prop-row">
-          <label>ASCII縦向き（縦型レイアウト）</label>
+          <label>{t('sdsg.asciiUpright')}</label>
           <input
             type="checkbox"
             checked={commonSubAscii ?? (commonAscii ?? true)}
@@ -1632,27 +1640,27 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
           />
         </div>
         <ColorRow
-          label="文字色"
+          label={t('common.textColor')}
           value={commonSubColor}
           onChange={(c) => updateSDSGs(ids, { subLabelColor: c })}
-          defaultLabel="既定 (#555)"
+          defaultLabel={t('color.default555')}
         />
         <ColorRow
-          label="背景色"
+          label={t('common.bgColor')}
           value={commonSubBg}
           onChange={(c) => updateSDSGs(ids, { subLabelBackgroundColor: c })}
           allowNone
-          defaultLabel="既定 (白半透明)"
+          defaultLabel={t('color.defaultTranslucentWhite')}
         />
         <ColorRow
-          label="枠線色"
+          label={t('common.borderColor')}
           value={commonSubBorderColor}
           onChange={(c) => updateSDSGs(ids, { subLabelBorderColor: c })}
           allowNone
-          defaultLabel="既定 (枠なし)"
+          defaultLabel={t('color.defaultNoBorder')}
         />
         <div className="prop-row">
-          <label>枠線太さ (px)</label>
+          <label>{t('common.borderWidthPx')}</label>
           <input
             type="number"
             min={0}
@@ -1661,7 +1669,7 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
             value={commonSubBorderWidth ?? 0}
             placeholder={commonSubBorderWidth === undefined ? '' : ''}
             onChange={(e) => updateSDSGs(ids, { subLabelBorderWidth: Number(e.target.value) })}
-            title="0 = 枠線なし"
+            title={t('common.borderWidth.tooltip')}
           />
         </div>
       </>)}
@@ -1670,24 +1678,23 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
       {tab === 'autoFit' && (<>
         {!isMulti && (
           <p className="hint" style={{ marginTop: 0, color: '#888' }}>
-            複数の SD/SG を選択すると「幅揃え」「高さ揃え」「サイズ揃え」「文字サイズ揃え」のバッチ操作が行えます。
+            {t('sdsg.autoFit.singleHint')}
           </p>
         )}
         {isMulti && (
           <>
             <p className="hint" style={{ marginTop: 0 }}>
-              選択した {sdsgs.length} 個の SD/SG に対するバッチ操作。基準は先頭（選択順の最初）の値。
-              band モードは spaceWidth/spaceHeight、attached は width/height に反映されます。
+              {t('sdsg.autoFit.multiHint', { count: sdsgs.length })}
             </p>
             <div className="prop-row" style={{ flexWrap: 'wrap', gap: 4, justifyContent: 'flex-start' }}>
               <button className="ribbon-btn-small"
-                onClick={() => matchSDSGsSize(ids, 'width')}>幅揃え</button>
+                onClick={() => matchSDSGsSize(ids, 'width')}>{t('match.width')}</button>
               <button className="ribbon-btn-small"
-                onClick={() => matchSDSGsSize(ids, 'height')}>高さ揃え</button>
+                onClick={() => matchSDSGsSize(ids, 'height')}>{t('match.height')}</button>
               <button className="ribbon-btn-small"
-                onClick={() => matchSDSGsSize(ids, 'both')}>サイズ揃え</button>
+                onClick={() => matchSDSGsSize(ids, 'both')}>{t('match.size')}</button>
               <button className="ribbon-btn-small"
-                onClick={() => matchSDSGsFontSize(ids)}>文字サイズ揃え</button>
+                onClick={() => matchSDSGsFontSize(ids)}>{t('match.fontSize')}</button>
             </div>
           </>
         )}
@@ -1701,13 +1708,14 @@ function SDSGProperties({ sdsgs, onOpenTranscriptViewer }: { sdsgs: SDSG[]; onOp
       )}
 
       <div className="prop-row">
-        <button className="danger-btn" onClick={() => sdsgs.forEach((s) => removeSDSG(s.id))}>削除</button>
+        <button className="danger-btn" onClick={() => sdsgs.forEach((s) => removeSDSG(s.id))}>{t('common.delete')}</button>
       </div>
     </div>
   );
 }
 
 function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOpenTranscriptViewer?: (focusBoxId?: string) => void }) {
+  const { t } = useTranslation('propertyPanel');
   const updateLines = useTEMStore((s) => s.updateLines);
   const removeLines = useTEMStore((s) => s.removeLines);
   const sheet = useActiveSheet();
@@ -1733,39 +1741,39 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
 
   return (
     <div className="prop-section">
-      <h4>Line {isMulti && <span className="multi-badge">{lines.length}個</span>}</h4>
+      <h4>Line {isMulti && <span className="multi-badge">{t('common.count', { count: lines.length })}</span>}</h4>
 
       <div className="settings-tabs" style={{ marginBottom: 8, padding: 0 }}>
-        <button className={tab === 'basic' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('basic')}>基本</button>
-        <button className={tab === 'endpoint' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('endpoint')}>端点</button>
-        <button className={tab === 'info' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('info')}>詳細</button>
+        <button className={tab === 'basic' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('basic')}>{t('tab.basic')}</button>
+        <button className={tab === 'endpoint' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('endpoint')}>{t('tab.endpoint')}</button>
+        <button className={tab === 'info' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('info')}>{t('tab.info')}</button>
       </div>
 
       {tab === 'basic' && <>
       <div className="prop-row">
-        <label>線種</label>
+        <label>{t('line.type')}</label>
         <select value={commonType ?? ''} onChange={(e) => updateLines(ids, { type: e.target.value as 'RLine' | 'XLine' })}>
           {commonType === undefined && <option value=""></option>}
-          <option value="RLine">実線（実現径路）</option>
-          <option value="XLine">点線（未実現径路）</option>
+          <option value="RLine">{t('line.type.RLine')}</option>
+          <option value="XLine">{t('line.type.XLine')}</option>
         </select>
       </div>
 
       <div className="prop-row">
-        <label>形状</label>
+        <label>{t('line.shape')}</label>
         <select
           value={commonShape ?? ''}
           onChange={(e) => updateLines(ids, { shape: e.target.value as 'straight' | 'elbow' | 'curve' })}
         >
           {commonShape === undefined && <option value=""></option>}
-          <option value="straight">直線</option>
-          <option value="elbow">L字接続</option>
-          <option value="curve">曲線</option>
+          <option value="straight">{t('line.shape.straight')}</option>
+          <option value="elbow">{t('line.shape.elbow')}</option>
+          <option value="curve">{t('line.shape.curve')}</option>
         </select>
       </div>
       {commonShape === 'elbow' && (
         <div className="prop-row">
-          <label>L字 中継位置 (0〜1)</label>
+          <label>{t('line.elbowBendRatio')}</label>
           <input
             type="number"
             min={0}
@@ -1777,14 +1785,14 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
               const v = Math.max(0, Math.min(1, Number(e.target.value) || 0));
               updateLines(ids, { elbowBendRatio: v });
             }}
-            title="折れ位置の比率。0 = from 寄り / 0.5 = 中央 / 1 = to 寄り"
+            title={t('line.elbowBendRatio.tooltip')}
           />
         </div>
       )}
       {commonShape === 'curve' && (
         <>
           <div className="prop-row">
-            <label>曲率 (0〜1)</label>
+            <label>{t('line.curveIntensity')}</label>
             <input
               type="number"
               min={0}
@@ -1797,24 +1805,24 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
                 const v = Math.max(0, Math.min(1, Number(e.target.value) || 0));
                 updateLines(ids, { curveIntensity: v });
               }}
-              title="0=ほぼ直線、0.5=標準、1=大きく膨らむ。制御点を手動設定中は無効"
+              title={t('line.curveIntensity.tooltip')}
             />
           </div>
           <div className="prop-row">
-            <label>制御点</label>
+            <label>{t('line.controlPoints')}</label>
             <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
               <span style={{ fontSize: '0.82em', color: '#666' }}>
                 {lines.some((l) => l.controlPoints && l.controlPoints.length >= 2)
-                  ? '手動設定中（Canvas のハンドルでドラッグ編集可）'
-                  : '自動（曲率から算出）'}
+                  ? t('line.controlPoints.manual')
+                  : t('line.controlPoints.auto')}
               </span>
               <button
                 className="ribbon-btn-small"
                 onClick={() => updateLines(ids, { controlPoints: undefined })}
                 disabled={!lines.some((l) => l.controlPoints && l.controlPoints.length >= 2)}
-                title="制御点の手動設定を解除して曲率計算に戻す"
+                title={t('line.controlPoints.reset.tooltip')}
               >
-                自動に戻す
+                {t('line.controlPoints.reset')}
               </button>
             </div>
           </div>
@@ -1829,15 +1837,15 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
         return (
           <>
             <div className="prop-row">
-              <label>線の色</label>
+              <label>{t('line.color')}</label>
               <ColorPicker
                 value={commonLineColor}
                 onChange={(c) => updateLines(ids, { style: { ...first.style, color: c } })}
-                defaultLabel="既定 (#222)"
+                defaultLabel={t('color.default222')}
               />
             </div>
             <div className="prop-row">
-              <label>線の太さ (px)</label>
+              <label>{t('line.strokeWidth')}</label>
               <input
                 type="number"
                 min={0.5}
@@ -1855,9 +1863,9 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
       </>}
 
       {tab === 'endpoint' && <>
-      <CollapsibleSection title="角度モード" sectionKey="line-angle" compact defaultOpen={true}>
+      <CollapsibleSection title={t('line.angleMode')} sectionKey="line-angle" compact defaultOpen={true}>
         <div className="prop-row">
-          <label>角度モード</label>
+          <label>{t('line.angleMode')}</label>
           <input
             type="checkbox"
             checked={!!commonAngleMode}
@@ -1868,11 +1876,11 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
         </div>
         {(commonShape === 'elbow' || commonShape === 'curve') && (
           <p className="hint" style={{ margin: '0 0 4px', fontSize: '0.82em', color: '#888' }}>
-            L字 / 曲線形状中は角度モードは無効です。
+            {t('line.angleMode.disabled')}
           </p>
         )}
         <div className="prop-row">
-          <label>角度 (°)</label>
+          <label>{t('line.angleDeg')}</label>
           <input
             type="number"
             min={-85}
@@ -1885,19 +1893,19 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
               const v = Math.max(-85, Math.min(85, Number(e.target.value) || 0));
               updateLines(ids, { angleDeg: v });
             }}
-            title="-85〜85°。時間軸方向 0° を基準、正で視覚的に上（横型）/右（縦型）に傾く"
+            title={t('line.angleDeg.tooltip')}
           />
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="始点・終点オフセット" sectionKey="line-offset" compact>
+      <CollapsibleSection title={t('line.offsets')} sectionKey="line-offset" compact>
         {allAngleOn && (
           <p className="hint" style={{ margin: '0 0 4px', fontSize: '0.82em', color: '#888' }}>
-            角度モード中はオフセットで端点を調整。マージン（方向沿い）は無効。
+            {t('line.offsets.angleHint')}
           </p>
         )}
         <div className="prop-row">
-          <label>始点 Time / Item (px)</label>
+          <label>{t('line.startOffset')}</label>
           <div style={{ display: 'flex', gap: 4 }}>
             <input
               type="number"
@@ -1914,7 +1922,7 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
           </div>
         </div>
         <div className="prop-row">
-          <label>終点 Time / Item (px)</label>
+          <label>{t('line.endOffset')}</label>
           <div style={{ display: 'flex', gap: 4 }}>
             <input
               type="number"
@@ -1931,7 +1939,7 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
           </div>
         </div>
         <div className="prop-row">
-          <label>始点マージン (方向沿い px)</label>
+          <label>{t('line.startMargin')}</label>
           <input
             type="number"
             value={commonStartMargin ?? 0}
@@ -1941,7 +1949,7 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
           />
         </div>
         <div className="prop-row">
-          <label>終点マージン (方向沿い px)</label>
+          <label>{t('line.endMargin')}</label>
           <input
             type="number"
             value={commonEndMargin ?? 0}
@@ -1972,9 +1980,9 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
             const index = siblings.findIndex((l) => l.id === first.id);
             return (
               <div className="prop-row">
-                <label>並列位置</label>
+                <label>{t('line.parallel')}</label>
                 <div style={{ fontSize: '0.85em', color: '#666' }}>
-                  {index + 1} 本目 / {siblings.length} 本（同一 from→to）
+                  {t('line.parallel.value', { n: index + 1, total: siblings.length })}
                 </div>
               </div>
             );
@@ -1983,20 +1991,20 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
       )}
 
       {/* 論文用 description */}
-      <h5 style={{ margin: '10px 0 4px', fontSize: '0.92em', color: '#555' }}>論文レポート用</h5>
+      <h5 style={{ margin: '10px 0 4px', fontSize: '0.92em', color: '#555' }}>{t('common.paperReport')}</h5>
       {!isMulti && (
         <div className="prop-row" style={{ alignItems: 'flex-start' }}>
-          <label>説明文</label>
+          <label>{t('common.description')}</label>
           <textarea
             value={first.description ?? ''}
             onChange={(e) => updateLines([first.id], { description: e.target.value })}
             style={{ width: '100%', minHeight: 60, resize: 'vertical' }}
-            placeholder="この Line の意味・解釈（論文レポートに出力）"
+            placeholder={t('line.description.placeholder')}
           />
         </div>
       )}
       <div className="prop-row">
-        <label>説明不要（自明）</label>
+        <label>{t('common.noDescriptionNeeded')}</label>
         <input
           type="checkbox"
           checked={getCommon(lines, 'noDescriptionNeeded') === true}
@@ -2004,9 +2012,9 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
         />
       </div>
 
-      <CollapsibleSection title="IDバッジ" sectionKey="line-id-badge" compact defaultOpen={false}>
+      <CollapsibleSection title={t('common.idBadge')} sectionKey="line-id-badge" compact defaultOpen={false}>
         <div className="prop-row">
-          <label>フォントサイズ</label>
+          <label>{t('common.fontSize')}</label>
           <input
             type="number"
             min={6}
@@ -2017,19 +2025,19 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
           />
         </div>
         <div className="prop-row">
-          <label>位置調整 Time / Item (px)</label>
+          <label>{t('common.offsetTimeItem')}</label>
           <div style={{ display: 'flex', gap: 4 }}>
             <input
               type="number"
               value={getCommon(lines, 'idOffsetX') ?? 0}
               onChange={(e) => updateLines(ids, { idOffsetX: Number(e.target.value) })}
-              title="時間軸方向のオフセット (レイアウト切替に追従)"
+              title={t('common.offsetTime.tooltip')}
             />
             <input
               type="number"
               value={getCommon(lines, 'idOffsetY') ?? -12}
               onChange={(e) => updateLines(ids, { idOffsetY: Number(e.target.value) })}
-              title="項目軸方向のオフセット"
+              title={t('common.offsetItem.tooltip')}
             />
           </div>
         </div>
@@ -2044,7 +2052,7 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
       )}
 
       <div className="prop-row">
-        <button className="danger-btn" onClick={() => removeLines(ids)}>削除</button>
+        <button className="danger-btn" onClick={() => removeLines(ids)}>{t('common.delete')}</button>
       </div>
     </div>
   );
@@ -2054,6 +2062,7 @@ function LineProperties({ lines, onOpenTranscriptViewer }: { lines: Line[]; onOp
 // Note Properties（図上のメモ）
 // ============================================================================
 function NoteProperties({ notes }: { notes: Note[] }) {
+  const { t } = useTranslation('propertyPanel');
   const updateNotes = useTEMStore((s) => s.updateNotes);
   const removeNotes = useTEMStore((s) => s.removeNotes);
   const sheet = useActiveSheet();
@@ -2067,14 +2076,13 @@ function NoteProperties({ notes }: { notes: Note[] }) {
 
   return (
     <div className="prop-section">
-      <h4>メモ {isMulti && <span className="badge">{notes.length}個</span>}</h4>
+      <h4>{t('note.title')} {isMulti && <span className="badge">{t('common.count', { count: notes.length })}</span>}</h4>
       <p className="hint" style={{ marginTop: 0 }}>
-        解釈やコメントを書く付箋です。Box と違って径路のレベルに乗らず、採番・凡例には出ません。
-        見た目を「文字だけ」にすると、★・〇 などの強調の記号を図の好きな位置に置けます。
+        {t('note.hint')}
       </p>
       {!isMulti && (
         <div className="prop-row">
-          <label>本文</label>
+          <label>{t('note.text')}</label>
           <textarea
             value={first.text}
             onChange={(e) => updateNotes(ids, { text: e.target.value })}
@@ -2084,25 +2092,25 @@ function NoteProperties({ notes }: { notes: Note[] }) {
         </div>
       )}
       <div className="prop-row">
-        <label>見た目</label>
+        <label>{t('note.style')}</label>
         <select
           value={getCommon(notes, 'style') ?? 'note'}
           onChange={(e) => updateNotes(ids, { style: e.target.value as Note['style'] })}
         >
-          <option value="note">付箋（黄色・点線枠）</option>
-          <option value="callout">吹き出し（白・実線枠）</option>
-          <option value="text">文字だけ（枠・背景なし。★・〇 などの記号用）</option>
+          <option value="note">{t('note.style.note')}</option>
+          <option value="callout">{t('note.style.callout')}</option>
+          <option value="text">{t('note.style.text')}</option>
         </select>
       </div>
       <div className="prop-row" style={{ flexWrap: 'wrap', gap: 4 }}>
-        <label>記号</label>
+        <label>{t('note.symbols')}</label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
           {NOTE_SYMBOLS.map((sym) => (
             <button
               key={sym}
               className="row-btn"
               style={{ minWidth: 26, fontSize: '1.05em' }}
-              title={'「文字だけ」のメモは先頭の記号を入れ替える（後ろの文字は残る）。ほかのメモは本文の末尾に足す'}
+              title={t('note.symbols.tooltip')}
               onClick={() => notes.forEach((n) => updateNotes([n.id], {
                 text: n.style === 'text' ? applySymbolToText(n.text, sym) : `${n.text}${sym}`,
               }))}
@@ -2111,17 +2119,17 @@ function NoteProperties({ notes }: { notes: Note[] }) {
         </div>
       </div>
       <ColorRow
-        label="文字色"
+        label={t('common.textColor')}
         value={getCommon(notes, 'color')}
         onChange={(c) => updateNotes(ids, { color: c })}
-        defaultLabel="既定 (#333)"
+        defaultLabel={t('color.default333')}
       />
       <div className="prop-row">
-        <label>文字サイズ (px)</label>
+        <label>{t('note.fontSize')}</label>
         <input
           type="number" min={6} max={72} step={1}
           value={getCommon(notes, 'fontSize') ?? ''}
-          placeholder="既定"
+          placeholder={t('note.fontSize.default')}
           onChange={(e) => {
             const v = Number(e.target.value);
             updateNotes(ids, { fontSize: e.target.value === '' || !Number.isFinite(v) ? undefined : Math.max(6, Math.min(72, v)) });
@@ -2129,37 +2137,37 @@ function NoteProperties({ notes }: { notes: Note[] }) {
         />
       </div>
       <div className="prop-row">
-        <label>引き出し線</label>
+        <label>{t('note.showLeader')}</label>
         <input
           type="checkbox"
           checked={getCommon(notes, 'showLeader') === true}
           onChange={(e) => updateNotes(ids, { showLeader: e.target.checked || undefined })}
-          title="対象の Box / SD・SG へ点線を引く（既定 OFF）"
+          title={t('note.showLeader.tooltip')}
         />
       </div>
       {getCommon(notes, 'showLeader') === true && (
         <div className="prop-row">
-          <label>対象</label>
+          <label>{t('note.leaderTo')}</label>
           <select
             value={getCommon(notes, 'leaderTo') ?? ''}
             onChange={(e) => updateNotes(ids, { leaderTo: e.target.value || undefined })}
           >
-            <option value="">（選択）</option>
-            {targets.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+            <option value="">{t('note.leaderTo.placeholder')}</option>
+            {targets.map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}
           </select>
         </div>
       )}
       <div className="prop-row">
-        <label>レポートに含める</label>
+        <label>{t('note.includeInReport')}</label>
         <input
           type="checkbox"
           checked={getCommon(notes, 'includeInReport') === true}
           onChange={(e) => updateNotes(ids, { includeInReport: e.target.checked || undefined })}
-          title="論文レポートの「注記」に載せる（既定 OFF）"
+          title={t('note.includeInReport.tooltip')}
         />
       </div>
       <div className="prop-row">
-        <button className="btn-danger" style={{ width: '100%' }} onClick={() => removeNotes(ids)}>削除</button>
+        <button className="btn-danger" style={{ width: '100%' }} onClick={() => removeNotes(ids)}>{t('common.delete')}</button>
       </div>
     </div>
   );

@@ -1,0 +1,367 @@
+﻿key,ja,en,note
+common.auto,自動,Auto,設定（複数の箇所で共通） の空欄の時の表示（自動）
+common.autoParen,（自動）,(Auto),設定（複数の箇所で共通） の選択肢（自動）
+common.top,上部,Top,設定（複数の箇所で共通） の選択肢（位置）
+common.bottom,下部,Bottom,設定（複数の箇所で共通） の選択肢（位置）
+common.left,左側,Left,設定（複数の箇所で共通） の選択肢（位置）
+common.right,右側,Right,設定（複数の箇所で共通） の選択肢（位置）
+common.middle,中央,Middle,設定（複数の箇所で共通） の選択肢（上下の揃え）
+common.center,中央,Center,設定（複数の箇所で共通） の選択肢（揃え）
+common.bold,太字,Bold,設定（複数の箇所で共通） のボタンのツールチップ
+common.italic,斜体,Italic,設定（複数の箇所で共通） のボタンのツールチップ
+common.underline,下線,Underline,設定（複数の箇所で共通） のボタンのツールチップ
+common.fontSize,フォントサイズ,Font size,設定（複数の箇所で共通） の項目名
+common.labelSideHorizontal,ラベル位置（横型レイアウト）,Label position (horizontal layout),設定（複数の箇所で共通） の項目名
+common.labelSideVertical,ラベル位置（縦型レイアウト）,Label position (vertical layout),設定（複数の箇所で共通） の項目名
+common.itemReference,Item軸の基準,Item axis reference,設定（複数の箇所で共通） の項目名
+common.itemReference.max,最大Item_Level（上側）,Max Item_Level (upper side),設定（複数の箇所で共通） の選択肢
+common.itemReference.min,最小Item_Level（下側）,Min Item_Level (lower side),設定（複数の箇所で共通） の選択肢
+common.offsetFromReference,基準からのオフセット,Offset from reference,設定（複数の箇所で共通） の項目名
+common.showWhileEditing,編集中も表示,Show while editing,設定（複数の箇所で共通） の項目名
+common.includeInExport,エクスポートに含める,Include in export,設定（複数の箇所で共通） の項目名
+common.delete,削除,Delete,設定（複数の箇所で共通） のボタン
+common.borderWidthPx,枠線太さ (px),Border width (px),設定（複数の箇所で共通） の項目名
+common.backgroundColor,背景色,Background color,設定（複数の箇所で共通） の項目名
+common.borderColor,枠線色,Border color,設定（複数の箇所で共通） の項目名
+common.textColor,文字色,Text color,設定（複数の箇所で共通） の項目名
+common.shape,形状,Shape,設定（複数の箇所で共通） の項目名
+common.lineColor,枠線の色,Border color,設定（複数の箇所で共通） の項目名
+common.frameColor,枠の色,Frame color,設定（複数の箇所で共通） の項目名
+common.label,ラベル,Label,設定（複数の箇所で共通） の項目名・表の見出し
+common.display,表示,Display,設定（複数の箇所で共通） の見出し
+common.hidden,非表示,Hidden,設定（複数の箇所で共通） の選択肢（ラベルを出さない）
+common.show,表示,Show,設定（複数の箇所で共通） の項目名・選択肢
+common.hide,非表示,Hide,設定（複数の箇所で共通） の選択肢
+common.layout,レイアウト,Layout,設定（複数の箇所で共通） の項目名・見出し
+common.title,タイトル,Title,設定（複数の箇所で共通） の項目名・見出し
+common.defaultColor,既定 ({{color}}),Default ({{color}}),設定（複数の箇所で共通） の色の既定値の表示（{{color}} は色の値）
+common.confirmContinue,よろしいですか?,Continue?,設定（複数の箇所で共通） の確認の文の最後
+dialog.title,設定,Settings,設定 の枠 の見出し
+dialog.dragToMove,ドラッグで移動,Drag to move,設定 の枠 の見出しのツールチップ
+dialog.searchPlaceholder,設定項目を検索...,Search settings...,設定 の枠 の検索欄の薄い字
+dialog.close,閉じる,Close,設定 の枠 のボタン
+nav.general,全体,General,設定 の左の一覧 のタブ名
+nav.general.keywords,レイアウト 言語 locale UI フォントサイズ リボン文字サイズ Level 刻み 用紙枠 paper guide Box 自動拡張 auto expand 文字サイズ自動,layout language locale UI font size ribbon text size level step paper guide Box auto expand auto fit text,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
+nav.snap,スナップ,Snap,設定 の左の一覧 のタブ名
+nav.snap.keywords,グリッド grid snap 整列 ガイド guide 距離 刻み,grid snap align alignment guide distance step,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
+nav.group.elements,図要素,Diagram elements,設定 の左の一覧 のグループ名
+nav.boxstyle,Box スタイル,Box style,設定 の左の一覧 のタブ名
+nav.boxstyle.keywords,Box プリセット 様式 normal BFP OPP EFP P-EFP 2nd annotation 枠線 背景色 文字色 borderColor backgroundColor borderWidth,Box preset style normal BFP OPP EFP P-EFP 2nd annotation border background text color borderColor backgroundColor borderWidth,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
+nav.linestyle,Line（矢印）,Line (arrow),設定 の左の一覧 のタブ名
+nav.linestyle.keywords,Line 矢印 径路 既定 default 線種 RLine XLine 形状 straight elbow curve 直線 L字 曲線 色 太さ strokeWidth オフセット offset マージン margin 角度 angle 一括適用 全Lineに適用,Line arrow path default line type RLine XLine shape straight elbow curve color width strokeWidth offset margin angle apply to all lines,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
+nav.typelabel,タイプラベル,Type labels,設定 の左の一覧 のタブ名
+nav.typelabel.keywords,種別 バッジ type label 連番 numbered 表示切替 visibility,type badge label numbered visibility,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
+nav.timearrow,非可逆的時間,Irreversible time,設定 の左の一覧 のタブ名
+nav.timearrow.keywords,時間 矢印 arrow irreversible auto insert 線の太さ stroke ラベル位置,time arrow irreversible auto insert line width stroke label position,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
+nav.period,時期区分,Period,設定 の左の一覧 のタブ名
+nav.period.keywords,時期 period 区分 divider band 位置 stroke fontSize,period label divider band position stroke fontSize,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
+nav.legend,凡例,Legend,設定 の左の一覧 のタブ名
+nav.legend.keywords,凡例 legend タイトル title フォント columns 背景 枠線 項目別 上書き overrides showDescription,legend title font columns background border item overrides showDescription,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
+nav.sdsgspace,SD/SG 配置,SD/SG placement,設定 の左の一覧 のタブ名
+nav.sdsgspace.keywords,SD SG 帯 band 配置 row heightLevel offsetLevel autoExpand shrinkToFitRow autoArrange allowMismatched,SD SG band placement row heightLevel offsetLevel autoExpand shrinkToFitRow autoArrange allowMismatched,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
+nav.project,プロジェクト,Project,設定 の左の一覧 のタブ名
+nav.project.keywords,プロジェクト project メタデータ metadata タイトル 既定値 defaults Box サイズ フォント,project metadata title defaults Box size font,設定 の左の一覧 の検索の語（空白区切り・画面には出ない）
+lineDefaults.type,線種,Line type,設定 > Line（矢印）の既定 の項目名
+lineDefaults.RLine,実線（実現径路）,Solid (realized path),設定 > Line（矢印）の既定 の選択肢
+lineDefaults.XLine,点線（未実現径路）,Dashed (unrealized path),設定 > Line（矢印）の既定 の選択肢
+lineDefaults.straight,直線,Straight,設定 > Line（矢印）の既定 の選択肢（形状）
+lineDefaults.elbow,L字接続,Elbow,設定 > Line（矢印）の既定 の選択肢（形状）
+lineDefaults.curve,曲線,Curve,設定 > Line（矢印）の既定 の選択肢（形状）
+lineDefaults.elbowBendRatio,L字 中継位置 (0〜1),Elbow bend position (0–1),設定 > Line（矢印）の既定 の項目名
+lineDefaults.elbowBendRatio.tip,折れ位置の比率。0 = from 寄り / 0.5 = 中央 / 1 = to 寄り,Bend position ratio. 0 = near from / 0.5 = middle / 1 = near to,設定 > Line（矢印）の既定 のツールチップ
+lineDefaults.curveIntensity,曲率 (0〜1),Curvature (0–1),設定 > Line（矢印）の既定 の項目名
+lineDefaults.curveIntensity.tip,0=ほぼ直線、0.5=標準、1=大きく膨らむ,"0 = nearly straight, 0.5 = standard, 1 = strongly curved",設定 > Line（矢印）の既定 のツールチップ
+lineDefaults.color,線の色,Line color,設定 > Line（矢印）の既定 の項目名
+lineDefaults.strokeWidth,線の太さ (px),Line width (px),設定 > Line（矢印）の既定 の項目名
+general.language,言語,Language,設定 > 全体 の項目名（図の表記の言語）
+general.uiFontSize,UI フォントサイズ（px）,UI font size (px),設定 > 全体 の項目名
+general.ribbonFontSize,リボン文字サイズ（px）,Ribbon text size (px),設定 > 全体 の項目名
+general.editing,編集補助,Editing aids,設定 > 全体 の見出し
+general.levelStep,Level 調整刻み,Level step,設定 > 全体 の項目名
+general.levelStep.hint,プロパティパネルで Item/Time レベルを矢印キー/スピナーで調整する際の刻み幅,Step size when adjusting Item/Time levels with the arrow keys or spinners in the properties panel,設定 > 全体 の説明文
+general.boxAutoFit,Box 自動調整（既定）,Box auto-fit (default),設定 > 全体 の小見出し
+general.autoFitBoxMode,自動拡張モード（Box 個別未指定時）,Auto-expand mode (when not set per Box),設定 > 全体 の項目名
+general.autoFitBoxMode.none,自動拡張なし,No auto-expand,設定 > 全体 の選択肢
+general.autoFitBoxMode.widthFixed,横幅固定で高さ自動,"Fixed width, auto height",設定 > 全体 の選択肢
+general.autoFitBoxMode.heightFixed,高さ固定で横幅自動,"Fixed height, auto width",設定 > 全体 の選択肢
+general.autoFitText,文字サイズ自動調整（既定、全 Box）,"Auto-fit text size (default, all Boxes)",設定 > 全体 の項目名
+general.autoFit.hint1,自動拡張: ラベルが収まらない時、どちら側を増やすか（Box 個別プロパティで上書き可）,Auto-expand: which side grows when the label does not fit (can be overridden per Box),設定 > 全体 の説明文（1 行目）
+general.autoFit.hint2,文字サイズ自動調整: Box に収まる最大文字サイズを自動設定（同時有効不可。個別設定優先）,Auto-fit text size: sets the largest text size that fits in the Box (cannot be used together with auto-expand; per-Box settings take precedence),設定 > 全体 の説明文（2 行目）
+general.lineDefaults,Line（矢印）の既定,Line (arrow) defaults,設定 > 全体 の見出し
+general.lineDefaults.hint1,これから引く矢印の初期値です。既存の矢印は変わりません。,Initial values for arrows you draw from now on. Existing arrows are not changed.,設定 > 全体 の説明文（1 文目）
+general.lineDefaults.hint2,端点のオフセット・マージン・角度と「全 Line に適用」は「Line（矢印）」タブにあります。,"Endpoint offsets, margins, angle and ""Apply to all lines"" are on the ""Line (arrow)"" tab.",設定 > 全体 の説明文（2 文目）
+general.openLineTab,Line（矢印）の詳細設定を開く,Open Line (arrow) details,設定 > 全体 のボタン
+paper.title,用紙枠,Paper guide,設定 > 全体 > 用紙枠 の見出し
+paper.hint1,表示タブの「用紙枠」ボタンで ON/OFF。横型レイアウトは長辺=横、縦型は長辺=縦。,"Turn on or off with the ""Paper guide"" button on the View tab. In horizontal layout the long side is horizontal; in vertical layout it is vertical.",設定 > 全体 > 用紙枠 の説明文（1 文目）
+paper.hint2,短辺中央が Level 0 になるよう描画、枠外は薄グレーでマスク。,Drawn so that the center of the short side is Level 0; the area outside is masked in light gray.,設定 > 全体 > 用紙枠 の説明文（2 文目）
+paper.size,用紙サイズ,Paper size,設定 > 全体 > 用紙枠 の項目名
+paper.size.A4,A4（1:√2 ≈ 1:1.414）,A4 (1:√2 ≈ 1:1.414),設定 > 全体 > 用紙枠 の選択肢
+paper.size.A3,A3（A4 と同比率）,A3 (same ratio as A4),設定 > 全体 > 用紙枠 の選択肢
+paper.size.16x9,16:9（スライド）,16:9 (slide),設定 > 全体 > 用紙枠 の選択肢
+paper.size.custom,カスタム,Custom,設定 > 全体 > 用紙枠 の選択肢
+paper.customShort,カスタム短辺 (px),Custom short side (px),設定 > 全体 > 用紙枠 の項目名
+paper.customLong,カスタム長辺 (px),Custom long side (px),設定 > 全体 > 用紙枠 の項目名
+paper.pageCount,枚数（長辺方向）,Pages (along the long side),設定 > 全体 > 用紙枠 の項目名
+paper.maskOutside,枠外を薄グレーで表示,Gray out the area outside,設定 > 全体 > 用紙枠 の項目名
+snap.showGrid,グリッドを表示,Show grid,設定 > スナップ の項目名
+snap.enable,スナップを有効化,Enable snap,設定 > スナップ の項目名
+snap.hint,「グリッド」は点の表示のみ。「スナップ」は Box ドラッグ時に位置をグリッドに吸着させます（両者は独立）。,"""Grid"" only shows the dots. ""Snap"" makes a Box snap to the grid while dragging (the two are independent).",設定 > スナップ の説明文
+snap.gridSpacing,グリッド間隔,Grid spacing,設定 > スナップ の見出し
+snap.gridPx,グリッド（px）,Grid (px),設定 > スナップ の項目名
+snap.gridPx.hint,グリッド表示の点間隔とスナップ吸着距離を兼ねる（既定 10px）。25〜50 程度にするとスナップの効きが体感しやすくなります。,Used both as the dot spacing of the grid and as the snap distance (default 10px). About 25–50 makes snapping easier to notice.,設定 > スナップ の説明文
+snap.alignGuides,整列ガイド,Alignment guides,設定 > スナップ の見出し
+snap.alignGuides.show,他 Box と整列時にガイド線を表示,Show guide lines when aligned with other Boxes,設定 > スナップ の項目名
+snap.distancePx,距離スナップ（px）,Distance snap (px),設定 > スナップ の項目名
+boxTypeLabel.normal,normal（通常）,normal (Normal),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.BFP,BFP（分岐点）,BFP (Bifurcation point),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.EFP,EFP（等至点）,EFP (Equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.P-EFP,P-EFP（両極化等至点）,P-EFP (Polarized equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.OPP,OPP（必須通過点）,OPP (Obligatory passage point),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.2nd-EFP,2nd-EFP（第二等至点）,2nd-EFP (Second equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.P-2nd-EFP,P-2nd-EFP（両極化第二等至点）,P-2nd-EFP (Polarized second equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.annotation,annotation（潜在経験）,annotation (Latent experience),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.SD,SD（社会的方向づけ）,SD (Social direction),設定 > タイプラベル と Box スタイル の種類の名前
+boxTypeLabel.SG,SG（社会的ガイド）,SG (Social guidance),設定 > タイプラベル と Box スタイル の種類の名前
+typeLabel.title,タイプラベル（種別バッジ）表示,Type label (type badge) visibility,設定 > タイプラベル の見出し
+typeLabel.hint,各種別について、キャンバス上のタイプラベルを個別に表示／非表示できます。,Show or hide the type label on the canvas for each type.,設定 > タイプラベル の説明文
+typeLabel.bulk,一括:,All:,設定 > タイプラベル の一括のボタンの前の字
+typeLabel.showAll,すべて表示,Show all,設定 > タイプラベル のボタン
+typeLabel.hideAll,すべて非表示,Hide all,設定 > タイプラベル のボタン
+theme.selectTheme,テーマを選択してください,Select a theme.,設定 > Box スタイル の警告の文
+theme.confirmApply,"「{{name}}」を適用します。
+現在の Box タイプ別プリセットは上書きされます。よろしいですか？","Apply ""{{name}}""?
+The current Box presets for each type will be overwritten.",設定 > Box スタイル の確認の文（{{name}} はテーマ名）
+theme.confirmResetAll,"すべての Box タイプのプリセットを削除し、自動（工場出荷時）に戻します。
+よろしいですか？",Delete the presets for all Box types and return them to Auto (factory defaults)?,設定 > Box スタイル の確認の文
+theme.promptName,新しいテーマ名を入力してください:,Enter a name for the new theme:,設定 > Box スタイル の入力を求める文
+theme.selectUserToOverwrite,上書き対象のユーザテーマを選択してください,Select a user theme to overwrite.,設定 > Box スタイル の警告の文
+theme.confirmOverwrite,ユーザテーマ「{{name}}」を現在の設定で上書きします。よろしいですか？,"Overwrite the user theme ""{{name}}"" with the current settings?",設定 > Box スタイル の確認の文（{{name}} はテーマ名）
+theme.selectUserToDelete,削除対象のユーザテーマを選択してください,Select a user theme to delete.,設定 > Box スタイル の警告の文
+theme.confirmDelete,ユーザテーマ「{{name}}」を削除します。よろしいですか？,"Delete the user theme ""{{name}}""?",設定 > Box スタイル の確認の文（{{name}} はテーマ名）
+theme.selectToExport,エクスポートするテーマを選択してください,Select a theme to export.,設定 > Box スタイル の警告の文
+theme.noValidTheme,有効なテーマが見つかりませんでした。JSON 形式を確認してください。,No valid themes were found. Check the JSON format.,設定 > Box スタイル の警告の文
+theme.imported,{{n}} 件のテーマをユーザテーマとしてインポートしました,Imported {{n}} theme(s) as user themes.,設定 > Box スタイル の知らせの文（{{n}} は件数）
+boxStyle.title,Box スタイルプリセット,Box style presets,設定 > Box スタイル の見出し
+boxStyle.hint1,Box タイプごとの既定スタイルを指定できます。,Set the default style for each Box type.,設定 > Box スタイル の説明文（1 文目）
+boxStyle.hint2,未指定の項目は「自動」として下位レイヤー（Box 個別値・既定値）に委ねられます。,"Items left unset are ""Auto"" and fall back to lower layers (per-Box values and defaults).",設定 > Box スタイル の説明文（2 文目）
+theme.label,テーマ:,Theme:,設定 > Box スタイル のテーマの選択欄の前の字
+theme.selectPlaceholder,（選択してください）,(Select),設定 > Box スタイル の選択肢（未選択）
+theme.group.builtin,組み込み,Built-in,設定 > Box スタイル の選択肢のグループ名
+theme.group.user,ユーザ,User,設定 > Box スタイル の選択肢のグループ名
+theme.apply,適用,Apply,設定 > Box スタイル のボタン
+theme.apply.tip,選択中のテーマを設定全体に適用,Apply the selected theme to all settings,設定 > Box スタイル のボタンのツールチップ
+theme.resetAll,すべて自動に戻す,Reset all to Auto,設定 > Box スタイル のボタン
+theme.resetAll.tip,すべての Box タイプを自動（工場出荷時）に戻す,Return all Box types to Auto (factory defaults),設定 > Box スタイル のボタンのツールチップ
+theme.saveNew,現状を保存...,Save current...,設定 > Box スタイル のボタン
+theme.saveNew.tip,現在の設定を新しいユーザテーマとして保存,Save the current settings as a new user theme,設定 > Box スタイル のボタンのツールチップ
+theme.overwrite,上書き,Overwrite,設定 > Box スタイル のボタン
+theme.overwrite.tip,ユーザテーマを現在の設定で上書き,Overwrite the user theme with the current settings,設定 > Box スタイル のボタンのツールチップ
+theme.delete.tip,ユーザテーマを削除,Delete the user theme,設定 > Box スタイル のボタンのツールチップ
+theme.export,エクスポート,Export,設定 > Box スタイル のボタン
+theme.export.tip,選択中のテーマを JSON エクスポート,Export the selected theme as JSON,設定 > Box スタイル のボタンのツールチップ
+theme.exportCurrent,現在設定をエクスポート,Export current settings,設定 > Box スタイル のボタン
+theme.exportCurrent.tip,現在の設定そのものを JSON でエクスポート（テーマ未選択でも OK）,Export the current settings as JSON (no theme selection needed),設定 > Box スタイル のボタンのツールチップ
+theme.import,インポート...,Import...,設定 > Box スタイル のボタン
+theme.import.tip,JSON ファイルを選んでユーザテーマとしてインポート,Choose a JSON file and import it as user themes,設定 > Box スタイル のボタンのツールチップ
+boxStyle.editing,編集中:,Editing:,設定 > Box スタイル の編集中の種類の前の字
+boxStyle.borderAndShape,枠線・形状,Border and shape,設定 > Box スタイル の小見出し
+boxStyle.borderStyle,枠線スタイル,Border style,設定 > Box スタイル の項目名
+boxStyle.border.solid,実線,Solid,設定 > Box スタイル の選択肢（枠線）
+boxStyle.border.dashed,破線,Dashed,設定 > Box スタイル の選択肢（枠線）
+boxStyle.border.dotted,点線,Dotted,設定 > Box スタイル の選択肢（枠線）
+boxStyle.border.double,二重線,Double,設定 > Box スタイル の選択肢（枠線）
+boxStyle.shape.rect,矩形,Rectangle,設定 > Box スタイル の選択肢（形状）
+boxStyle.shape.ellipse,楕円,Ellipse,設定 > Box スタイル の選択肢（形状）
+boxStyle.body,本体の色・文字,Body color and text,設定 > Box スタイル の小見出し
+boxStyle.fontSize,文字サイズ (px),Text size (px),設定 > Box スタイル の項目名
+boxStyle.typeLabelColors,タイプラベル色,Type label colors,設定 > Box スタイル の小見出し
+boxStyle.subLabelColors,サブラベル色,Sub-label colors,設定 > Box スタイル の小見出し
+boxStyle.resetType.tip,{{type}} のプリセットを削除し、工場出荷時 + Box 個別設定のみで描画,Delete the {{type}} preset and draw with factory defaults plus per-Box settings only,設定 > Box スタイル のボタンのツールチップ（{{type}} は Box の種類）
+boxStyle.resetType,このタイプを工場出荷時に戻す,Reset this type to factory defaults,設定 > Box スタイル のボタン
+line.defaultStyle,既定スタイル,Default style,設定 > Line（矢印） の見出し
+line.defaultStyle.hint,ここで決めた値が、これから引く矢印の初期値になります。既存の矢印は変わりません（下の「全 Line に適用」で反映できます）。同じ項目は「全体」タブからも変更できます。,"These values become the initial values for arrows you draw from now on. Existing arrows are not changed (use ""Apply to all lines"" below). The same items can also be changed on the ""General"" tab.",設定 > Line（矢印） の説明文
+line.endpoints,端点,Endpoints,設定 > Line（矢印） の見出し
+line.endpoints.hint,矢印の始点・終点をずらす既定値。角度モードが ON のときオフセットは無効になり、マージンだけが効きます（プロパティパネルの挙動と同じ）。,"Default shifts for the start and end points of arrows. When angle mode is on, offsets are ignored and only margins apply (same as in the properties panel).",設定 > Line（矢印） の説明文
+line.startOffset,始点オフセット Time / Item (px),Start offset Time / Item (px),設定 > Line（矢印） の項目名
+line.endOffset,終点オフセット Time / Item (px),End offset Time / Item (px),設定 > Line（矢印） の項目名
+line.startMargin,始点マージン (px),Start margin (px),設定 > Line（矢印） の項目名
+line.startMargin.tip,始点から方向ベクトル沿いに離す距離。重なり回避に使う,Distance to move away from the start point along the direction. Used to avoid overlaps.,設定 > Line（矢印） のツールチップ
+line.endMargin,終点マージン (px),End margin (px),設定 > Line（矢印） の項目名
+line.angleMode,角度モード,Angle mode,設定 > Line（矢印） の項目名
+line.angleDeg,角度 (-85〜85 度),Angle (-85 to 85 degrees),設定 > Line（矢印） の項目名
+line.bulk,一括適用,Apply to all,設定 > Line（矢印） の見出し
+line.bulk.hint,現在のシート（{{sheet}}）の Line {{n}} 本に既定スタイルを適用します。SD/SG の一括配置と同じくシート単位です。,"Applies the default style to the {{n}} lines on the current sheet ({{sheet}}). Like bulk SD/SG placement, this works per sheet.",設定 > Line（矢印） の説明文（{{sheet}} はシート名、{{n}} は本数）
+line.bulk.includeType,線種（実線 / 点線）も揃える,Also unify line type (solid / dashed),設定 > Line（矢印） の項目名
+line.bulk.includeType.warn,実現径路（実線）と未実現径路（点線）の区別が失われます。,The distinction between realized (solid) and unrealized (dashed) paths will be lost.,設定 > Line（矢印） の注意の文
+line.bulk.resetControlPoints,曲線の手動制御点もリセット,Also reset manual curve control points,設定 > Line（矢印） の項目名
+line.bulk.controlPoints.hint,OFF のままなら、Canvas で手動調整した制御点は温存されます（現在のシートで手動設定は {{n}} 本）。,"When off, control points adjusted by hand on the canvas are kept ({{n}} lines on the current sheet have manual control points).",設定 > Line（矢印） の説明文（{{n}} は本数）
+line.bulk.confirm.apply,現在のシートの全 Line ({{n}} 本) に既定スタイルを適用します。,Apply the default style to all lines on the current sheet ({{n}}).,設定 > Line（矢印） の確認の文（{{n}} は本数）
+line.bulk.confirm.reset,個別に設定した形状・色・太さ・オフセット・マージン・角度はリセットされます。,"Shape, color, width, offsets, margins and angle set on individual lines will be reset.",設定 > Line（矢印） の確認の文
+line.bulk.confirm.type,線種も揃えるため、実線 / 点線の区別が失われます。,"Line types will be unified, so the solid / dashed distinction will be lost.",設定 > Line（矢印） の確認の文
+line.bulk.confirm.controlPoints,手動で調整した曲線の制御点 ({{n}} 本) も破棄されます。,Manually adjusted curve control points ({{n}} lines) will also be discarded.,設定 > Line（矢印） の確認の文（{{n}} は本数）
+line.bulk.apply,既定スタイルを全 Line に適用,Apply default style to all lines,設定 > Line（矢印） のボタン
+sdsg.noData,SD/SG 配置の設定データがありません。,No SD/SG placement settings.,設定 > SD/SG 配置 の説明文
+sdsg.band.topH,上部 (SD),Top (SD),設定 > SD/SG 配置 の帯の見出し（横型）
+sdsg.band.topV,右側 (SD),Right (SD),設定 > SD/SG 配置 の帯の見出し（縦型）
+sdsg.band.bottomH,下部 (SG),Bottom (SG),設定 > SD/SG 配置 の帯の見出し（横型）
+sdsg.band.bottomV,左側 (SG),Left (SG),設定 > SD/SG 配置 の帯の見出し（縦型）
+sdsg.mode,SD/SG 配置モード,SD/SG placement mode,設定 > SD/SG 配置 の見出し
+sdsg.mode.hint1,SD/SG を Box 群の外側に用意した「帯」に配置するモードです。,"Places SD/SG in ""bands"" outside the group of Boxes.",設定 > SD/SG 配置 の説明文（1 文目）
+sdsg.mode.hint2,時期区分や非可逆的時間の内側に帯を設け、SD/SG を一列に並べます。,"The bands sit inside the period and the irreversible time, and SD/SG are lined up in a row.",設定 > SD/SG 配置 の説明文（2 文目）
+sdsg.enable,機能を有効化,Enable,設定 > SD/SG 配置 の項目名
+sdsg.enable.hint,OFF: 従来通り attachedTo Box に追従 / ON: 上部(SD)帯・下部(SG)帯を選べる,OFF: follows the attachedTo Box as before / ON: the top (SD) and bottom (SG) bands can be used,設定 > SD/SG 配置 の説明文
+sdsg.band.use,この帯を使う,Use this band,設定 > SD/SG 配置 の項目名
+sdsg.band.height,帯の高さ,Band height,設定 > SD/SG 配置 の項目名
+sdsg.band.height.auto,自動（SDSG/ラベルに合わせる）,Auto (fit SD/SG and label),設定 > SD/SG 配置 の選択肢
+sdsg.band.height.manual,手動指定,Manual,設定 > SD/SG 配置 の選択肢
+sdsg.band.heightLevel,高さ (Level),Height (Level),設定 > SD/SG 配置 の項目名
+sdsg.band.reference,配置基準,Placement reference,設定 > SD/SG 配置 の項目名
+sdsg.band.reference.boxes,Box 群の外側（直接）,Outside the Boxes (direct),設定 > SD/SG 配置 の選択肢
+sdsg.band.reference.period,時期区分の内側,Inside the period,設定 > SD/SG 配置 の選択肢
+sdsg.band.reference.timearrow,非可逆的時間の内側,Inside the irreversible time,設定 > SD/SG 配置 の選択肢
+sdsg.band.offsetLevel,基準からの距離 (Level),Distance from reference (Level),設定 > SD/SG 配置 の項目名
+sdsg.band.showBorder,編集時に帯範囲を表示,Show band area while editing,設定 > SD/SG 配置 の項目名
+sdsg.band.fill,背景塗りつぶし,Background fill,設定 > SD/SG 配置 の項目名
+sdsg.band.fill.tinted,薄く塗る,Light tint,設定 > SD/SG 配置 の選択肢
+sdsg.band.fill.none,塗らない（枠線のみ）,None (border only),設定 > SD/SG 配置 の選択肢
+sdsg.band.labelPosition,ラベル位置,Label position,設定 > SD/SG 配置 の項目名
+sdsg.band.labelPosition.topLeft,左上,Top left,設定 > SD/SG 配置 の選択肢
+sdsg.band.labelPosition.topRight,右上,Top right,設定 > SD/SG 配置 の選択肢
+sdsg.band.labelPosition.bottomLeft,左下,Bottom left,設定 > SD/SG 配置 の選択肢
+sdsg.band.labelPosition.bottomRight,右下,Bottom right,設定 > SD/SG 配置 の選択肢
+sdsg.behavior,配置の挙動,Placement behavior,設定 > SD/SG 配置 の見出し
+sdsg.autoArrange,重なり時に自動整列,Auto-arrange when overlapping,設定 > SD/SG 配置 の項目名
+sdsg.autoArrange.hint,ON: 同じ時間位置で重なる SDSG を帯内で自動的に縦積み / OFF: 重なっても整列しない,ON: SD/SG overlapping at the same time position are stacked automatically in the band / OFF: they are not arranged,設定 > SD/SG 配置 の説明文
+sdsg.shrinkToFitRow,row が多い時、SDSG を帯内に圧縮,Shrink SD/SG to fit the band when there are many rows,設定 > SD/SG 配置 の項目名
+sdsg.shrinkToFitRow.hint,ON: SDSG の高さを row span に合わせて自動圧縮 / OFF: はみ出しを許容（赤枠で警告）。主に manual 高さモードで効果あり,ON: SD/SG height is shrunk to fit the row span / OFF: overflow is allowed (warned with a red frame). Mainly affects manual height mode,設定 > SD/SG 配置 の説明文
+sdsg.autoExpandHeight,row が多い時、帯を自動拡張,Auto-expand the band when there are many rows,設定 > SD/SG 配置 の項目名
+sdsg.autoExpandHeight.manualOnly,(manual モード時),(manual mode),設定 > SD/SG 配置 の項目名の補足
+sdsg.autoExpandHeight.hint1,ON: heightLevel を超える row 数が必要な時、帯を一時的に拡張（描画時のみ、設定値は保持）。,"ON: when more rows than heightLevel are needed, the band is expanded temporarily (only when drawing; the setting is kept).",設定 > SD/SG 配置 の説明文（1 文目）
+sdsg.autoExpandHeight.hint2,auto 高さモードでは常に row 数に応じて自動拡張されるため、この設定は manual モード時のみ影響します。,"In auto height mode the band always expands with the number of rows, so this setting only affects manual mode.",設定 > SD/SG 配置 の説明文（2 文目）
+sdsg.allowMismatched,組合せ制限を解除,Remove placement restriction,設定 > SD/SG 配置 の項目名
+sdsg.allowMismatched.hint,既定では SD は上部(SD)帯のみ、SG は下部(SG)帯のみに配置可能。ON にすると逆向き（SD を下部(SG)帯、SG を上部(SD)帯）も許可されます,"By default SD can be placed only in the top (SD) band and SG only in the bottom (SG) band. When on, the reverse (SD in the bottom (SG) band, SG in the top (SD) band) is also allowed",設定 > SD/SG 配置 の説明文
+sdsg.autoFlip,band 位置で方向点を自動反転,Flip the direction point by band position,設定 > SD/SG 配置 の項目名
+sdsg.autoFlip.hint,ON: 種別と band 位置が食い違う時（例: SD を下部(SG)帯、SG を上部(SD)帯）に五角形の点を反転させ、常に Box 群を指す向きにします。OFF: 種別固有の向き（SD=下向き / SG=上向き、横型の場合）を維持,"ON: when the type and band position do not match (e.g. SD in the bottom (SG) band, SG in the top (SD) band), the point of the pentagon is flipped so it always points toward the Boxes. OFF: keeps the direction of the type (SD = down / SG = up in horizontal layout)",設定 > SD/SG 配置 の説明文
+sdsg.bulk,一括配置,Bulk placement,設定 > SD/SG 配置 の見出し
+sdsg.autoPlaceSD,SD の既定配置,Default SD placement,設定 > SD/SG 配置 の項目名
+sdsg.autoPlaceSG,SG の既定配置,Default SG placement,設定 > SD/SG 配置 の項目名
+sdsg.place.none,配置しない（attached）,Do not place (attached),設定 > SD/SG 配置 の選択肢
+sdsg.place.top,上部(SD)帯,Top (SD) band,設定 > SD/SG 配置 の選択肢
+sdsg.place.bottomNeedsUnlock,下部(SG)帯（要組合せ解除）,Bottom (SG) band (requires removing the restriction),設定 > SD/SG 配置 の選択肢
+sdsg.place.topNeedsUnlock,上部(SD)帯（要組合せ解除）,Top (SD) band (requires removing the restriction),設定 > SD/SG 配置 の選択肢
+sdsg.place.bottom,下部(SG)帯,Bottom (SG) band,設定 > SD/SG 配置 の選択肢
+sdsg.bulk.confirm,全 SD/SG の配置を既定設定で一括変更します。個別の offset はリセットされます。よろしいですか?,Change the placement of all SD/SG to the default settings? Individual offsets will be reset.,設定 > SD/SG 配置 の確認の文
+sdsg.bulk.apply,既定配置を全 SD/SG に適用,Apply default placement to all SD/SG,設定 > SD/SG 配置 のボタン
+project.docInfo,ドキュメント情報,Document info,設定 > プロジェクト の見出し
+project.createdAt,作成日,Created,設定 > プロジェクト の項目名
+project.history,編集履歴,Edit history,設定 > プロジェクト の項目名
+project.historyCount,{{n}}/50件,{{n}}/50,設定 > プロジェクト の履歴の件数（{{n}} は件数）
+project.defaults,既定値,Defaults,設定 > プロジェクト の見出し
+project.defaultBoxSize,Box の既定サイズ,Default Box size,設定 > プロジェクト の小見出し
+project.defaultBoxSize.hint1,「挿入」タブで Box を追加するときや CSV インポート時のデフォルトサイズ（ピクセル）。,"Default size (pixels) when adding a Box from the ""Insert"" tab or importing a CSV.",設定 > プロジェクト の説明文（1 文目）
+project.defaultBoxSize.hint2,テキスト方向は現在のレイアウトに応じて自動設定されます（横型 → 縦書き / 縦型 → 横書き）。,Text direction is set automatically from the current layout (horizontal → vertical text / vertical → horizontal text).,設定 > プロジェクト の説明文（2 文目）
+project.defaultBoxWidth,既定Box幅 (px),Default Box width (px),設定 > プロジェクト の項目名
+project.defaultBoxHeight,既定Box高さ (px),Default Box height (px),設定 > プロジェクト の項目名
+project.presets,プリセット:,Presets:,設定 > プロジェクト のボタンの前の字
+project.preset.tall,縦長 (60×100),Tall (60×100),設定 > プロジェクト のボタン
+project.preset.wide,横長 (100×50),Wide (100×50),設定 > プロジェクト のボタン
+project.preset.square,正方形 (80×80),Square (80×80),設定 > プロジェクト のボタン
+project.textDefaults,文字の既定,Text defaults,設定 > プロジェクト の小見出し
+project.defaultFont,既定フォント,Default font,設定 > プロジェクト の項目名
+project.defaultFontSize,既定サイズ (pt),Default size (pt),設定 > プロジェクト の項目名
+period.bandStyle,描画スタイル,Drawing style,設定 > 時期区分 の項目名
+period.bandStyle.band,帯（|---時期1---|---時期2---|）,Band (|---Period 1---|---Period 2---|),設定 > 時期区分 の選択肢
+period.bandStyle.tick,点（ラベル + 短い区切り）,Tick (label + short divider),設定 > 時期区分 の選択肢
+period.showDividers,区切り線を描画,Draw dividers,設定 > 時期区分 の項目名
+period.enterLabel,ラベルを入力してください,Enter a label.,設定 > 時期区分 の警告の文
+period.list,時期ラベル（現シート）,Period labels (current sheet),設定 > 時期区分 の見出し
+period.list.hint,メインウィンドウの時期ラベルをダブルクリック、または「表示」タブの「時期編集...」でもここが開きます。,"This also opens when you double-click a period label in the main window or use ""Edit periods..."" on the ""View"" tab.",設定 > 時期区分 の説明文
+period.newLabel,新規ラベル,New label,設定 > 時期区分 の項目名
+period.newLabel.placeholder,例: 入学前,e.g. Before entering school,設定 > 時期区分 の入力欄の薄い字（例）
+period.add,追加,Add,設定 > 時期区分 のボタン
+period.empty,まだ時期ラベルがありません。,No period labels yet.,設定 > 時期区分 の説明文
+legend.targets,表示対象,Items to show,設定 > 凡例 の見出し
+legend.autoGenerate,自動生成（使用記号を抽出）,Auto-generate (collect symbols in use),設定 > 凡例 の項目名
+legend.includeBoxes,Box 種別を含む,Include Box types,設定 > 凡例 の項目名
+legend.includeLines,Line 種別を含む,Include line types,設定 > 凡例 の項目名
+legend.includeSDSG,SD/SG を含む,Include SD/SG,設定 > 凡例 の項目名
+legend.includeTimeArrow,非可逆的時間を含む,Include irreversible time,設定 > 凡例 の項目名
+legend.showTitle,タイトルを表示,Show title,設定 > 凡例 の項目名
+legend.titleText,タイトル文字列,Title text,設定 > 凡例 の項目名
+legend.titlePosition,タイトルの配置位置,Title position,設定 > 凡例 の項目名
+legend.titleWritingMode,タイトルの書き方向,Title writing direction,設定 > 凡例 の項目名
+legend.writing.horizontal,横書き,Horizontal,設定 > 凡例 の選択肢（書き方向）
+legend.writing.vertical,縦書き,Vertical,設定 > 凡例 の選択肢（書き方向）
+legend.titleAlign,タイトルの揃え,Title alignment,設定 > 凡例 の項目名
+legend.align.left,左揃え,Left,設定 > 凡例 の選択肢
+legend.align.center,中央揃え,Center,設定 > 凡例 の選択肢
+legend.align.right,右揃え,Right,設定 > 凡例 の選択肢
+legend.titleVerticalAlign,タイトルの上下揃え（左側配置時）,Title vertical alignment (when on the left),設定 > 凡例 の項目名
+legend.vAlign.top,上,Top,設定 > 凡例 の選択肢（上下の揃え）
+legend.vAlign.bottom,下,Bottom,設定 > 凡例 の選択肢（上下の揃え）
+legend.titleFont,タイトル フォント,Title font,設定 > 凡例 の項目名
+legend.sameAsBody,（本文と同じ）,(Same as body),設定 > 凡例 の選択肢
+legend.titleSize,タイトル サイズ (px),Title size (px),設定 > 凡例 の項目名
+legend.titleSize.default,既定 {{n}},Default {{n}},設定 > 凡例 の空欄の時の表示（{{n}} は既定の大きさ）
+legend.titleDecoration,タイトル 装飾,Title style,設定 > 凡例 の項目名
+legend.layout.hint1,凡例は「列数で指定」または「行数で指定」を選択できます。,"The legend layout can be set ""By columns"" or ""By rows"".",設定 > 凡例 の説明文（1 文目）
+legend.layout.hint2,行数指定時は項目数から列数が自動算出されます。,"When set by rows, the number of columns is calculated from the number of items.",設定 > 凡例 の説明文（2 文目）
+legend.horizontal.mode,横型: 指定方式,Horizontal: layout by,設定 > 凡例 の項目名
+legend.horizontal.rows,横型: 行数,Horizontal: rows,設定 > 凡例 の項目名
+legend.horizontal.columns,横型: 列数,Horizontal: columns,設定 > 凡例 の項目名
+legend.vertical.mode,縦型: 指定方式,Vertical: layout by,設定 > 凡例 の項目名
+legend.vertical.rows,縦型: 行数,Vertical: rows,設定 > 凡例 の項目名
+legend.vertical.columns,縦型: 列数,Vertical: columns,設定 > 凡例 の項目名
+legend.mode.columns,列数で指定,By columns,設定 > 凡例 の選択肢
+legend.mode.rows,行数で指定,By rows,設定 > 凡例 の選択肢
+legend.sampleWidth,サンプル図形 幅 (px),Sample shape width (px),設定 > 凡例 の項目名
+legend.sampleHeight,サンプル図形 高さ (px),Sample shape height (px),設定 > 凡例 の項目名
+legend.bodyFont,本文 フォント,Body font,設定 > 凡例 の項目名
+legend.uiDefault,（UI 既定）,(UI default),設定 > 凡例 の選択肢
+legend.bodyFontSize,本文 フォントサイズ (px),Body font size (px),設定 > 凡例 の項目名
+legend.minWidth,最小幅 (px),Minimum width (px),設定 > 凡例 の項目名
+legend.showDescriptions,2行目（説明文）を既定で表示,Show the second line (description) by default,設定 > 凡例 の項目名
+legend.fixedSize,サイズ（固定）,Size (fixed),設定 > 凡例 の見出し
+legend.fixedSize.hint1,凡例の幅・高さを固定すると、キャンバスのスクロールや zoom に関係なく同じ見た目になります。,Fixing the width and height keeps the legend looking the same regardless of canvas scrolling or zoom.,設定 > 凡例 の説明文（1 文目）
+legend.fixedSize.hint2,未入力の場合は内容に合わせて自動。右下のハンドルをドラッグしても調整できます。,"If left empty, the size fits the content. You can also drag the handle at the bottom right.",設定 > 凡例 の説明文（2 文目）
+legend.width,幅 (px),Width (px),設定 > 凡例 の項目名
+legend.height,高さ (px),Height (px),設定 > 凡例 の項目名
+legend.resetSize,自動に戻す,Reset to Auto,設定 > 凡例 のボタン
+legend.backgroundAndBorder,背景・枠線,Background and border,設定 > 凡例 の見出し
+legend.background,背景,Background,設定 > 凡例 の項目名
+legend.background.white,白,White,設定 > 凡例 の選択肢
+legend.background.none,透明（背景なし）,Transparent (no background),設定 > 凡例 の選択肢
+legend.borderWidth,枠線の太さ (px、0=透明),"Border width (px, 0 = none)",設定 > 凡例 の項目名
+legend.separator,タイトルと項目の区切り線,Separator between title and items,設定 > 凡例 の見出し
+legend.separator.color,色,Color,設定 > 凡例 の項目名
+legend.overrides,項目別の表記 (上書き設定),Per-item text (overrides),設定 > 凡例 の見出し
+legend.overrides.hint1,現在使用中の凡例項目について、ラベル（1行目）と説明文（2行目）を上書きできます。,You can override the label (first line) and description (second line) of the legend items in use.,設定 > 凡例 の説明文（1 文目）
+legend.overrides.hint2,空欄にすると既定に戻ります。,Leave empty to use the default.,設定 > 凡例 の説明文（2 文目）
+legend.overrides.allSecondLine,すべての項目の2行目:,Second line of all items:,設定 > 凡例 のボタンの前の字
+legend.overrides.showAll,一括表示,Show all,設定 > 凡例 のボタン
+legend.overrides.hideAll,一括非表示,Hide all,設定 > 凡例 のボタン
+legend.overrides.resetAll,既定に戻す,Reset to default,設定 > 凡例 のボタン
+legend.overrides.resetAll.tip,項目別設定を解除して全体既定に従う,Clear per-item settings and follow the overall default,設定 > 凡例 のボタンのツールチップ
+legend.overrides.empty,現シートには凡例項目がありません,The current sheet has no legend items,設定 > 凡例 の説明文
+legend.overrides.label,ラベル（1行目）,Label (first line),設定 > 凡例 の項目名
+legend.overrides.description,説明（2行目）,Description (second line),設定 > 凡例 の項目名
+legend.overrides.showDescription,2行目を表示,Show second line,設定 > 凡例 の項目名
+legend.overrides.inheritShown,（全体既定 =表示）,(Default: shown),設定 > 凡例 の選択肢（全体の既定に従う・今は表示）
+legend.overrides.inheritHidden,（全体既定 =非表示）,(Default: hidden),設定 > 凡例 の選択肢（全体の既定に従う・今は非表示）
+legend.overrides.clear,この項目の上書きを解除,Clear overrides for this item,設定 > 凡例 のボタン
+legend.footer.hint,凡例はキャンバス上でドラッグして位置調整、ダブルクリックでこの設定を開けます,Drag the legend on the canvas to move it; double-click it to open these settings,設定 > 凡例 の説明文
+timeArrow.autoInsert,エクスポート時に自動挿入,Insert automatically on export,設定 > 非可逆的時間 の項目名
+timeArrow.alwaysVisible,編集中も常時表示,Always show while editing,設定 > 非可逆的時間 の項目名
+timeArrow.startExtension,開始レベル拡張（minTimeLevel に加算）,Start level extension (added to minTimeLevel),設定 > 非可逆的時間 の項目名
+timeArrow.endExtension,終了レベル拡張（maxTimeLevel に加算）,End level extension (added to maxTimeLevel),設定 > 非可逆的時間 の項目名
+timeArrow.itemOffset,基準からのオフセット（±レベル）,Offset from reference (± level),設定 > 非可逆的時間 の項目名
+timeArrow.itemOffset.tip,+ で外側（基準位置から Box 群の反対側へ）、- で内側（Box 群寄り）,"+ moves outward (away from the Boxes), - moves inward (toward the Boxes)",設定 > 非可逆的時間 のツールチップ
+timeArrow.labelOffset,ラベルオフセット (px),Label offset (px),設定 > 非可逆的時間 の項目名
+timeArrow.labelAlignHorizontal,ラベル揃え（横型：矢印方向）,Label alignment (horizontal: along the arrow),設定 > 非可逆的時間 の項目名
+timeArrow.labelAlign.end,右寄り（矢印先端側）,Right (arrow head side),設定 > 非可逆的時間 の選択肢
+timeArrow.labelAlignVertical,ラベル揃え（縦型：矢印方向）,Label alignment (vertical: along the arrow),設定 > 非可逆的時間 の項目名
+timeArrow.labelAlign.start,上寄り（矢印始点側）,Top (arrow start side),設定 > 非可逆的時間 の選択肢
+timeArrow.labelFont,ラベル フォント,Label font,設定 > 非可逆的時間 の項目名
+timeArrow.uiDefault,（UI既定）,(UI default),設定 > 非可逆的時間 の選択肢
+timeArrow.labelDecoration,ラベル 装飾,Label style,設定 > 非可逆的時間 の項目名
+timeArrow.strokeWidth,線の太さ (pt),Line width (pt),設定 > 非可逆的時間 の項目名

@@ -3,6 +3,7 @@
 // ============================================================================
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import { computePeriodLabels, computePeriodBandBounds } from '../utils/periodLabels';
 import { LEVEL_PX } from '../store/defaults';
@@ -10,6 +11,7 @@ import { LEVEL_PX } from '../store/defaults';
 const fmtLevel = (v: number) => (Math.round(v * 100) / 100).toString();
 
 export function PeriodLabelsDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation('periodLabelsDialog');
   const sheet = useActiveSheet();
   const addPeriodLabel = useTEMStore((s) => s.addPeriodLabel);
   const updatePeriodLabel = useTEMStore((s) => s.updatePeriodLabel);
@@ -57,7 +59,7 @@ export function PeriodLabelsDialog({ open, onClose }: { open: boolean; onClose: 
 
   const handleAdd = () => {
     if (!newLabel.trim()) {
-      alert('ラベルを入力してください');
+      alert(t('alert.empty'));
       return;
     }
     addPeriodLabel(newLabel.trim(), newPosition);
@@ -69,25 +71,25 @@ export function PeriodLabelsDialog({ open, onClose }: { open: boolean; onClose: 
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>時期ラベル</h3>
+          <h3>{t('title')}</h3>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
         <div className="modal-body">
           <section className="settings-section">
-            <h4>新規追加</h4>
+            <h4>{t('add.title')}</h4>
             <div className="setting-row">
-              <label>時期ラベル</label>
+              <label>{t('add.label')}</label>
               <input
                 type="text"
                 value={newLabel}
                 onChange={(e) => setNewLabel(e.target.value)}
-                placeholder="例: 入学前、就職後"
+                placeholder={t('add.placeholder')}
                 style={{ width: 180 }}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
               />
             </div>
             <div className="setting-row">
-              <label>Time_Level（時間軸位置）</label>
+              <label>{t('add.position')}</label>
               <input
                 type="number"
                 step="0.5"
@@ -97,22 +99,22 @@ export function PeriodLabelsDialog({ open, onClose }: { open: boolean; onClose: 
               />
             </div>
             <div className="setting-row" style={{ justifyContent: 'flex-end' }}>
-              <button className="ribbon-btn-primary" onClick={handleAdd}>追加</button>
+              <button className="ribbon-btn-primary" onClick={handleAdd}>{t('add.button')}</button>
             </div>
           </section>
 
           <section className="settings-section">
-            <h4>現在の時期ラベル</h4>
+            <h4>{t('list.title')}</h4>
             {sheet && sheet.periodLabels.length === 0 && (
-              <p className="hint">まだ時期ラベルがありません。</p>
+              <p className="hint">{t('list.none')}</p>
             )}
             {sheet && sheet.periodLabels.length > 0 && (
               <table style={{ width: '100%', fontSize: '0.92em' }}>
                 <thead>
                   <tr>
-                    <th style={{ textAlign: 'left' }}>ラベル</th>
+                    <th style={{ textAlign: 'left' }}>{t('col.label')}</th>
                     <th style={{ textAlign: 'left', width: 80 }}>Time_Level</th>
-                    {isBand && <th style={{ textAlign: 'left', width: 110 }}>帯の範囲</th>}
+                    {isBand && <th style={{ textAlign: 'left', width: 110 }}>{t('col.range')}</th>}
                     <th style={{ width: 40 }}></th>
                   </tr>
                 </thead>
@@ -140,12 +142,12 @@ export function PeriodLabelsDialog({ open, onClose }: { open: boolean; onClose: 
                         {isBand && (
                           <td style={{ color: '#555', whiteSpace: 'nowrap' }}>
                             {rangeById.has(pl.id)
-                              ? `${fmtLevel(rangeById.get(pl.id)![0])} 〜 ${fmtLevel(rangeById.get(pl.id)![1])}`
+                              ? t('range', { from: fmtLevel(rangeById.get(pl.id)![0]), to: fmtLevel(rangeById.get(pl.id)![1]) })
                               : ''}
                           </td>
                         )}
                         <td>
-                          <button className="row-btn danger" onClick={() => removePeriodLabel(pl.id)} title="削除">×</button>
+                          <button className="row-btn danger" onClick={() => removePeriodLabel(pl.id)} title={t('delete')}>×</button>
                         </td>
                       </tr>
                     ))}
@@ -157,24 +159,20 @@ export function PeriodLabelsDialog({ open, onClose }: { open: boolean; onClose: 
           <p className="hint">
             {isBand ? (
               <>
-                {'Time_Level は時間軸上の位置（Box の Time_Level と同じ目盛り）です。'
-                  + '帯の表示では、各時期の Time_Level を代表点として、区切りは隣り合う 2 つの時期の Time_Level のちょうど中間に引かれ、'
-                  + 'ラベルは区切りと区切りの真ん中に置かれます（両端は時間矢印の端）。'
-                  + 'そのため 1 つの値を変えると両側の区切りが動き、隣の時期の値を越えると順番が入れ替わります。'
-                  + '区切りを置きたい位置の前後に、各時期の値を置いてください（範囲は右の列で確認できます）。'}
+                {t('hint.band')}
                 <br />
               </>
             ) : (
               <>
-                Time_Level は時間軸上の位置（Box の Time_Level と同じ目盛り）で、ラベルの中心がその位置に来ます。<br />
+                {t('hint.point')}<br />
               </>
             )}
-            時期ラベルは「表示」タブの「時期」トグルで表示/非表示を切替できます。<br />
-            位置の調整（基準・オフセット）は「設定」ダイアログから。
+            {t('hint.toggle')}<br />
+            {t('hint.settings')}
           </p>
         </div>
         <div className="modal-footer">
-          <button className="ribbon-btn-primary" onClick={onClose}>閉じる</button>
+          <button className="ribbon-btn-primary" onClick={onClose}>{t('close')}</button>
         </div>
       </div>
     </div>

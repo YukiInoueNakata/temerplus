@@ -1,0 +1,16 @@
+﻿key,ja,en,note
+label.font,フォント,Font,プロパティ > ラベルの装飾の欄の名前（フォントの種類）
+label.fontSize,フォントサイズ,Font size,プロパティ > ラベルの装飾の欄の名前
+label.decoration,装飾,Style,プロパティ > ラベルの装飾の欄の名前（太字・斜体・下線のボタンの行）
+label.align,左右方向の揃え,Horizontal alignment,プロパティ > ラベルの装飾の欄の名前
+label.valign,上下方向の揃え,Vertical alignment,プロパティ > ラベルの装飾の欄の名前
+mixed,（混在）,(Mixed),複数選んだ要素で値が違うときの選択肢・入力欄の薄い文字
+bold,太字,Bold,太字ボタン「B」の説明（マウスを乗せると出る）
+italic,斜体,Italic,斜体ボタン「I」の説明
+underline,下線,Underline,下線ボタン「U」の説明
+align.left,左揃え,Left,左右方向の揃えの選択肢
+align.center,中央,Center,左右方向の揃えの選択肢
+align.right,右揃え,Right,左右方向の揃えの選択肢
+valign.top,上揃え,Top,上下方向の揃えの選択肢
+valign.middle,中央,Middle,上下方向の揃えの選択肢
+valign.bottom,下揃え,Bottom,上下方向の揃えの選択肢

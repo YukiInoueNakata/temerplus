@@ -7,6 +7,8 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { useTEMStore } from '../store/store';
 import type { BoxType, SDSGType } from '../types';
 import { pickBetweenAnchors } from '../utils/sdsgBetween';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 import { shortcutLabel } from '../utils/platform';
 
 export interface CommandPaletteCallbacks {
@@ -36,16 +38,7 @@ interface Command {
   run: () => void;
 }
 
-const CATEGORY_LABELS: Record<Category, string> = {
-  file: 'ファイル',
-  edit: '編集',
-  insert: '挿入',
-  view: '表示',
-  align: '整列・サイズ',
-  export: '出力',
-  tools: 'ツール',
-  help: 'ヘルプ',
-};
+// 分類の見出しは commandPalette.csv の category.<分類>
 
 export function CommandPalette({
   open,
@@ -60,6 +53,8 @@ export function CommandPalette({
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
+  const { t } = useTranslation('commandPalette');
+  const categoryLabel = (c: Category) => t(`category.${c}`);
 
   const commands = useCommands(callbacks);
 
@@ -79,9 +74,10 @@ export function CommandPalette({
     return commands.filter((c) =>
       c.label.toLowerCase().includes(q)
       || c.keywords.toLowerCase().includes(q)
-      || CATEGORY_LABELS[c.category].toLowerCase().includes(q),
+      || categoryLabel(c.category).toLowerCase().includes(q),
     );
-  }, [commands, query]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [commands, query, t]);
 
   // active index を範囲内にクランプ
   useEffect(() => {
@@ -144,26 +140,26 @@ export function CommandPalette({
         onClick={(e) => e.stopPropagation()}
         onKeyDown={onKeyDown}
         role="dialog"
-        aria-label="コマンドパレット"
+        aria-label={t('aria')}
       >
         <input
           ref={inputRef}
           type="search"
           value={query}
           onChange={(e) => { setQuery(e.target.value); setActiveIndex(0); }}
-          placeholder="コマンドを検索 (例: 保存, 整列, グリッド, 凡例)"
+          placeholder={t('placeholder')}
           className="command-palette-input"
         />
         <div className="command-palette-list" ref={listRef}>
           {filtered.length === 0 && (
-            <div className="command-palette-empty">該当するコマンドがありません</div>
+            <div className="command-palette-empty">{t('empty')}</div>
           )}
           {orderedCategories.map((cat) => {
             const items = grouped[cat];
             if (!items || items.length === 0) return null;
             return (
               <div key={cat}>
-                <div className="command-palette-category">{CATEGORY_LABELS[cat]}</div>
+                <div className="command-palette-category">{categoryLabel(cat)}</div>
                 {items.map((cmd) => {
                   const idx = runningIdx++;
                   const active = idx === activeIndex;
@@ -188,9 +184,9 @@ export function CommandPalette({
           })}
         </div>
         <div className="command-palette-footer">
-          <span>↑↓ 選択</span>
-          <span>Enter 実行</span>
-          <span>Esc 閉じる</span>
+          <span>{t('footer.select')}</span>
+          <span>{t('footer.run')}</span>
+          <span>{t('footer.close')}</span>
         </div>
       </div>
     </div>
@@ -215,6 +211,7 @@ function useCommands(callbacks: CommandPaletteCallbacks): Command[] {
   const toggleLeftRuler = useTEMStore((s) => s.toggleLeftRuler);
   const toggleLegend = useTEMStore((s) => s.toggleLegend);
   const requestFit = useTEMStore((s) => s.requestFit);
+  const { t } = useTranslation('commandPalette');
 
   return useMemo(() => {
     const store = useTEMStore.getState;
@@ -222,67 +219,67 @@ function useCommands(callbacks: CommandPaletteCallbacks): Command[] {
 
     const cmds: Command[] = [
       // === File ===
-      { id: 'file.new', label: '新規作成', keywords: 'new file 新規 ファイル', category: 'file', shortcut: shortcutLabel('Ctrl+N'),
+      { id: 'file.new', label: t('cmd.file.new'), keywords: 'new file 新規 ファイル', category: 'file', shortcut: shortcutLabel('Ctrl+N'), // i18n-ok 検索用の語（日本語で引けるように残す）
         run: callbacks.onNew },
-      { id: 'file.open', label: '開く...', keywords: 'open file 開く 読み込み load', category: 'file', shortcut: shortcutLabel('Ctrl+O'),
+      { id: 'file.open', label: t('cmd.file.open'), keywords: 'open file 開く 読み込み load', category: 'file', shortcut: shortcutLabel('Ctrl+O'), // i18n-ok 検索用の語（日本語で引けるように残す）
         run: callbacks.onOpen },
-      { id: 'file.save', label: '保存', keywords: 'save file 保存', category: 'file', shortcut: shortcutLabel('Ctrl+S'),
+      { id: 'file.save', label: t('cmd.file.save'), keywords: 'save file 保存', category: 'file', shortcut: shortcutLabel('Ctrl+S'), // i18n-ok 検索用の語（日本語で引けるように残す）
         run: callbacks.onSave },
-      { id: 'file.save-as', label: '名前を付けて保存...', keywords: 'save as 名前 保存', category: 'file', shortcut: shortcutLabel('Ctrl+Shift+S'),
+      { id: 'file.save-as', label: t('cmd.file.save-as'), keywords: 'save as 名前 保存', category: 'file', shortcut: shortcutLabel('Ctrl+Shift+S'), // i18n-ok 検索用の語（日本語で引けるように残す）
         run: callbacks.onSaveAs },
 
       // === Edit ===
-      { id: 'edit.undo', label: '元に戻す', keywords: 'undo 元に戻す', category: 'edit', shortcut: shortcutLabel('Ctrl+Z'),
+      { id: 'edit.undo', label: t('cmd.edit.undo'), keywords: 'undo 元に戻す', category: 'edit', shortcut: shortcutLabel('Ctrl+Z'), // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => temporal().undo() },
-      { id: 'edit.redo', label: 'やり直し', keywords: 'redo やり直し', category: 'edit', shortcut: shortcutLabel('Ctrl+Y', 'Ctrl+Shift+Z'),
+      { id: 'edit.redo', label: t('cmd.edit.redo'), keywords: 'redo やり直し', category: 'edit', shortcut: shortcutLabel('Ctrl+Y', 'Ctrl+Shift+Z'), // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => temporal().redo() },
-      { id: 'edit.select-all', label: '全選択', keywords: 'select all 全選択', category: 'edit', shortcut: shortcutLabel('Ctrl+A'),
+      { id: 'edit.select-all', label: t('cmd.edit.select-all'), keywords: 'select all 全選択', category: 'edit', shortcut: shortcutLabel('Ctrl+A'), // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => store().selectAll() },
-      { id: 'edit.copy', label: 'コピー', keywords: 'copy コピー clipboard', category: 'edit', shortcut: shortcutLabel('Ctrl+C'),
+      { id: 'edit.copy', label: t('cmd.edit.copy'), keywords: 'copy コピー clipboard', category: 'edit', shortcut: shortcutLabel('Ctrl+C'), // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => store().copyToClipboard() },
-      { id: 'edit.paste', label: '貼り付け', keywords: 'paste 貼り付け clipboard', category: 'edit', shortcut: shortcutLabel('Ctrl+V'),
+      { id: 'edit.paste', label: t('cmd.edit.paste'), keywords: 'paste 貼り付け clipboard', category: 'edit', shortcut: shortcutLabel('Ctrl+V'), // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => store().pasteFromClipboard() },
-      { id: 'edit.duplicate', label: '複製', keywords: 'duplicate 複製 copy', category: 'edit', shortcut: shortcutLabel('Ctrl+D'),
+      { id: 'edit.duplicate', label: t('cmd.edit.duplicate'), keywords: 'duplicate 複製 copy', category: 'edit', shortcut: shortcutLabel('Ctrl+D'), // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => { store().copyToClipboard(); store().pasteFromClipboard(); } },
-      { id: 'edit.delete', label: '削除 (選択中)', keywords: 'delete 削除', category: 'edit', shortcut: 'Delete',
+      { id: 'edit.delete', label: t('cmd.edit.delete'), keywords: 'delete 削除', category: 'edit', shortcut: 'Delete', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => {
           const sel = store().selection;
           if (sel.boxIds.length > 0) store().removeBoxes(sel.boxIds);
           if (sel.lineIds.length > 0) store().removeLines(sel.lineIds);
           if (sel.sdsgIds.length > 0) sel.sdsgIds.forEach((id) => store().removeSDSG(id));
         } },
-      { id: 'edit.clear-sel', label: '選択を解除', keywords: 'clear selection 選択解除', category: 'edit', shortcut: 'Esc',
+      { id: 'edit.clear-sel', label: t('cmd.edit.clear-sel'), keywords: 'clear selection 選択解除', category: 'edit', shortcut: 'Esc', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => store().clearSelection() },
-      { id: 'edit.fit-to-label-both', label: 'Box を文字に合わせる (幅・高さ)', keywords: 'fit label 文字 サイズ', category: 'edit',
+      { id: 'edit.fit-to-label-both', label: t('cmd.edit.fit-to-label-both'), keywords: 'fit label 文字 サイズ', category: 'edit', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => {
           const ids = store().selection.boxIds;
-          if (ids.length === 0) { alert('Box を選択してください'); return; }
+          if (ids.length === 0) { alert(t('alert.selectBox')); return; }
           store().fitBoxesToLabel(ids, 'both');
         } },
-      { id: 'edit.fit-to-label-w', label: 'Box 幅を文字に合わせる', keywords: 'fit width label 幅', category: 'edit',
+      { id: 'edit.fit-to-label-w', label: t('cmd.edit.fit-to-label-w'), keywords: 'fit width label 幅', category: 'edit', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => {
           const ids = store().selection.boxIds;
-          if (ids.length === 0) { alert('Box を選択してください'); return; }
+          if (ids.length === 0) { alert(t('alert.selectBox')); return; }
           store().fitBoxesToLabel(ids, 'width');
         } },
-      { id: 'edit.fit-to-label-h', label: 'Box 高さを文字に合わせる', keywords: 'fit height label 高さ', category: 'edit',
+      { id: 'edit.fit-to-label-h', label: t('cmd.edit.fit-to-label-h'), keywords: 'fit height label 高さ', category: 'edit', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => {
           const ids = store().selection.boxIds;
-          if (ids.length === 0) { alert('Box を選択してください'); return; }
+          if (ids.length === 0) { alert(t('alert.selectBox')); return; }
           store().fitBoxesToLabel(ids, 'height');
         } },
 
       // === Insert ===
       ...(['normal', 'BFP', 'OPP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'annotation', 'other'] as BoxType[]).map((type): Command => ({
         id: `insert.box.${type}`,
-        label: `Box: ${type} を追加`,
-        keywords: `insert box add ${type} ${type === 'normal' ? '通常' : ''}`,
+        label: t('cmd.insert.box', { type }),
+        keywords: `insert box add ${type} ${type === 'normal' ? '通常' : ''}`, // i18n-ok 検索用の語（日本語で引けるように残す）
         category: 'insert',
         run: () => store().addBox({ type }),
       })),
       ...(['SD', 'SG'] as SDSGType[]).map((type): Command => ({
         id: `insert.sdsg.${type}`,
-        label: `${type} を追加 (1個=single / 2個以上=between)`,
+        label: t('cmd.insert.sdsg', { type }),
         keywords: `insert sdsg add ${type} between`,
         category: 'insert',
         run: () => {
@@ -291,7 +288,7 @@ function useCommands(callbacks: CommandPaletteCallbacks): Command[] {
           const sheet = st.doc.sheets.find((s) => s.id === st.doc.activeSheetId);
           const isH = st.doc.settings.layout === 'horizontal';
           if (sel.boxIds.length === 0 && sel.lineIds.length === 0) {
-            alert('Box か Line を選択してください'); return;
+            alert(t('alert.selectBoxOrLine')); return;
           }
           if (sel.boxIds.length === 0) {
             st.addSDSG({ type, attachedTo: sel.lineIds[0], label: type });
@@ -315,31 +312,31 @@ function useCommands(callbacks: CommandPaletteCallbacks): Command[] {
           });
         },
       })),
-      { id: 'insert.line.rline', label: 'Line: RLine (実線) を追加', keywords: 'insert line rline 実線', category: 'insert',
+      { id: 'insert.line.rline', label: t('cmd.insert.line.rline'), keywords: 'insert line rline 実線', category: 'insert', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => {
           const sel = store().selection.boxIds;
-          if (sel.length < 2) { alert('Box を 2 つ以上選択してください'); return; }
+          if (sel.length < 2) { alert(t('alert.selectTwoOrMore')); return; }
           for (let i = 0; i < sel.length - 1; i++) store().addLine(sel[i], sel[i + 1], { type: 'RLine' });
         } },
-      { id: 'insert.line.xline', label: 'Line: XLine (点線) を追加', keywords: 'insert line xline 点線', category: 'insert',
+      { id: 'insert.line.xline', label: t('cmd.insert.line.xline'), keywords: 'insert line xline 点線', category: 'insert', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => {
           const sel = store().selection.boxIds;
-          if (sel.length < 2) { alert('Box を 2 つ以上選択してください'); return; }
+          if (sel.length < 2) { alert(t('alert.selectTwoOrMore')); return; }
           for (let i = 0; i < sel.length - 1; i++) store().addLine(sel[i], sel[i + 1], { type: 'XLine' });
         } },
-      { id: 'insert.between', label: '2 選択 Box の間に挿入...', keywords: 'insert between 間 box', category: 'insert',
+      { id: 'insert.between', label: t('cmd.insert.between'), keywords: 'insert between 間 box', category: 'insert', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: callbacks.onOpenInsertBetween },
-      { id: 'insert.period-labels', label: '時期ラベル...', keywords: 'period label 時期ラベル', category: 'insert',
+      { id: 'insert.period-labels', label: t('cmd.insert.period-labels'), keywords: 'period label 時期ラベル', category: 'insert', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: callbacks.onOpenPeriodLabels },
 
       // === View ===
-      { id: 'view.toggle-grid', label: `グリッド: ${view.showGrid ? 'OFF' : 'ON'}`, keywords: 'grid toggle グリッド', category: 'view',
+      { id: 'view.toggle-grid', label: t('cmd.view.toggle-grid', { state: view.showGrid ? 'OFF' : 'ON' }), keywords: 'grid toggle グリッド', category: 'view', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: toggleGrid },
-      { id: 'view.toggle-snap', label: `スナップ: ${view.snapEnabled ? 'OFF' : 'ON'}`, keywords: 'snap toggle スナップ', category: 'view',
+      { id: 'view.toggle-snap', label: t('cmd.view.toggle-snap', { state: view.snapEnabled ? 'OFF' : 'ON' }), keywords: 'snap toggle スナップ', category: 'view', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: toggleSnap },
-      { id: 'view.toggle-paper', label: `用紙枠: ${view.showPaperGuides ? 'OFF' : 'ON'}`, keywords: 'paper guide toggle 用紙枠', category: 'view',
+      { id: 'view.toggle-paper', label: t('cmd.view.toggle-paper', { state: view.showPaperGuides ? 'OFF' : 'ON' }), keywords: 'paper guide toggle 用紙枠', category: 'view', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: togglePaperGuides },
-      { id: 'view.toggle-all-ids', label: `全 ID バッジ: 切替`, keywords: 'id badge toggle ID', category: 'view',
+      { id: 'view.toggle-all-ids', label: t('cmd.view.toggle-all-ids'), keywords: 'id badge toggle ID', category: 'view',
         run: toggleAllIds },
       { id: 'view.toggle-box-ids', label: `Box ID: ${view.showBoxIds ? 'OFF' : 'ON'}`, keywords: 'box id badge', category: 'view',
         run: toggleBoxIds },
@@ -347,86 +344,86 @@ function useCommands(callbacks: CommandPaletteCallbacks): Command[] {
         run: toggleSDSGIds },
       { id: 'view.toggle-line-ids', label: `Line ID: ${view.showLineIds ? 'OFF' : 'ON'}`, keywords: 'line id badge', category: 'view',
         run: toggleLineIds },
-      { id: 'view.toggle-top-ruler', label: `上ルーラー: ${view.showTopRuler ? 'OFF' : 'ON'}`, keywords: 'top ruler 上ルーラー', category: 'view',
+      { id: 'view.toggle-top-ruler', label: t('cmd.view.toggle-top-ruler', { state: view.showTopRuler ? 'OFF' : 'ON' }), keywords: 'top ruler 上ルーラー', category: 'view', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: toggleTopRuler },
-      { id: 'view.toggle-left-ruler', label: `左ルーラー: ${view.showLeftRuler ? 'OFF' : 'ON'}`, keywords: 'left ruler 左ルーラー', category: 'view',
+      { id: 'view.toggle-left-ruler', label: t('cmd.view.toggle-left-ruler', { state: view.showLeftRuler ? 'OFF' : 'ON' }), keywords: 'left ruler 左ルーラー', category: 'view', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: toggleLeftRuler },
-      { id: 'view.toggle-legend', label: `凡例: ${view.showLegend ? 'OFF' : 'ON'}`, keywords: 'legend toggle 凡例', category: 'view',
+      { id: 'view.toggle-legend', label: t('cmd.view.toggle-legend', { state: view.showLegend ? 'OFF' : 'ON' }), keywords: 'legend toggle 凡例', category: 'view', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: toggleLegend },
-      { id: 'view.fit-all', label: 'フィット: 全要素', keywords: 'fit zoom view フィット', category: 'view',
+      { id: 'view.fit-all', label: t('cmd.view.fit-all'), keywords: 'fit zoom view フィット', category: 'view', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => requestFit('all') },
-      { id: 'view.fit-width', label: 'フィット: 幅', keywords: 'fit width 幅', category: 'view',
+      { id: 'view.fit-width', label: t('cmd.view.fit-width'), keywords: 'fit width 幅', category: 'view', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => requestFit('width') },
-      { id: 'view.fit-height', label: 'フィット: 高さ', keywords: 'fit height 高さ', category: 'view',
+      { id: 'view.fit-height', label: t('cmd.view.fit-height'), keywords: 'fit height 高さ', category: 'view', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => requestFit('height') },
 
       // === Align ===
-      { id: 'align.left', label: '左揃え', keywords: 'align left 左揃え', category: 'align',
+      { id: 'align.left', label: t('cmd.align.left'), keywords: 'align left 左揃え', category: 'align', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => alignBoxes('left') },
-      { id: 'align.center-h', label: '水平中央揃え', keywords: 'align center horizontal 中央', category: 'align',
+      { id: 'align.center-h', label: t('cmd.align.center-h'), keywords: 'align center horizontal 中央', category: 'align', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => alignBoxes('center-h') },
-      { id: 'align.right', label: '右揃え', keywords: 'align right 右揃え', category: 'align',
+      { id: 'align.right', label: t('cmd.align.right'), keywords: 'align right 右揃え', category: 'align', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => alignBoxes('right') },
-      { id: 'align.top', label: '上揃え', keywords: 'align top 上揃え', category: 'align',
+      { id: 'align.top', label: t('cmd.align.top'), keywords: 'align top 上揃え', category: 'align', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => alignBoxes('top') },
-      { id: 'align.middle', label: '垂直中央揃え', keywords: 'align middle vertical 中央', category: 'align',
+      { id: 'align.middle', label: t('cmd.align.middle'), keywords: 'align middle vertical 中央', category: 'align', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => alignBoxes('middle') },
-      { id: 'align.bottom', label: '下揃え', keywords: 'align bottom 下揃え', category: 'align',
+      { id: 'align.bottom', label: t('cmd.align.bottom'), keywords: 'align bottom 下揃え', category: 'align', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => alignBoxes('bottom') },
-      { id: 'align.distribute-h', label: '水平等間隔', keywords: 'align distribute 等間隔', category: 'align',
+      { id: 'align.distribute-h', label: t('cmd.align.distribute-h'), keywords: 'align distribute 等間隔', category: 'align', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => alignBoxes('distribute-h') },
-      { id: 'align.match-w', label: '幅を揃える', keywords: 'match width 幅 揃える', category: 'align',
+      { id: 'align.match-w', label: t('cmd.align.match-w'), keywords: 'match width 幅 揃える', category: 'align', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => matchSize('width') },
-      { id: 'align.match-h', label: '高さを揃える', keywords: 'match height 高さ 揃える', category: 'align',
+      { id: 'align.match-h', label: t('cmd.align.match-h'), keywords: 'match height 高さ 揃える', category: 'align', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => matchSize('height') },
-      { id: 'align.match-both', label: 'サイズを揃える (幅・高さ)', keywords: 'match size サイズ 揃える', category: 'align',
+      { id: 'align.match-both', label: t('cmd.align.match-both'), keywords: 'match size サイズ 揃える', category: 'align', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => matchSize('both') },
-      { id: 'align.match-fontsize', label: '文字サイズを揃える', keywords: 'match font size 文字 揃える', category: 'align',
+      { id: 'align.match-fontsize', label: t('cmd.align.match-fontsize'), keywords: 'match font size 文字 揃える', category: 'align', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => {
           const ids = store().selection.boxIds;
-          if (ids.length < 2) { alert('2 つ以上の Box を選択してください'); return; }
+          if (ids.length < 2) { alert(t('alert.selectTwoOrMore')); return; }
           store().matchBoxesFontSize(ids);
         } },
 
       // === Export ===
-      { id: 'export.preview', label: '出力プレビュー...', keywords: 'export preview 出力 PNG SVG PDF PPTX', category: 'export',
+      { id: 'export.preview', label: t('cmd.export.preview'), keywords: 'export preview 出力 PNG SVG PDF PPTX', category: 'export', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: callbacks.onOpenExport },
-      { id: 'export.paper-report', label: '論文レポート...', keywords: 'paper report 論文 レポート docx', category: 'export',
+      { id: 'export.paper-report', label: t('cmd.export.paper-report'), keywords: 'paper report 論文 レポート docx', category: 'export', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: callbacks.onOpenPaperReport },
-      { id: 'tools.transcript', label: 'インタビュー原文ビューア...', keywords: 'transcript interview 原文 インタビュー 逐語録 リンク', category: 'tools',
+      { id: 'tools.transcript', label: t('cmd.tools.transcript'), keywords: 'transcript interview 原文 インタビュー 逐語録 リンク', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: callbacks.onOpenTranscript },
 
       // === Tools / Settings ===
-      { id: 'tools.settings', label: '設定を開く...', keywords: 'settings preferences 設定', category: 'tools',
+      { id: 'tools.settings', label: t('cmd.tools.settings'), keywords: 'settings preferences 設定', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => callbacks.onOpenSettings() },
-      { id: 'tools.settings.general', label: '設定: 全体', keywords: 'settings general 全体 レイアウト 言語', category: 'tools',
+      { id: 'tools.settings.general', label: t('cmd.tools.settings.general'), keywords: 'settings general 全体 レイアウト 言語', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => callbacks.onOpenSettings('general') },
-      { id: 'tools.settings.snap', label: '設定: スナップ', keywords: 'settings snap スナップ', category: 'tools',
+      { id: 'tools.settings.snap', label: t('cmd.tools.settings.snap'), keywords: 'settings snap スナップ', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => callbacks.onOpenSettings('snap') },
-      { id: 'tools.settings.boxstyle', label: '設定: Box スタイル', keywords: 'settings boxstyle Box プリセット', category: 'tools',
+      { id: 'tools.settings.boxstyle', label: t('cmd.tools.settings.boxstyle'), keywords: 'settings boxstyle Box プリセット', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => callbacks.onOpenSettings('boxstyle') },
-      { id: 'tools.settings.typelabel', label: '設定: タイプラベル', keywords: 'settings typelabel タイプラベル', category: 'tools',
+      { id: 'tools.settings.typelabel', label: t('cmd.tools.settings.typelabel'), keywords: 'settings typelabel タイプラベル', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => callbacks.onOpenSettings('typelabel') },
-      { id: 'tools.settings.timearrow', label: '設定: 非可逆的時間', keywords: 'settings timearrow 時間 矢印', category: 'tools',
+      { id: 'tools.settings.timearrow', label: t('cmd.tools.settings.timearrow'), keywords: 'settings timearrow 時間 矢印', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => callbacks.onOpenSettings('timearrow') },
-      { id: 'tools.settings.period', label: '設定: 時期区分', keywords: 'settings period 時期', category: 'tools',
+      { id: 'tools.settings.period', label: t('cmd.tools.settings.period'), keywords: 'settings period 時期', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => callbacks.onOpenSettings('period') },
-      { id: 'tools.settings.legend', label: '設定: 凡例', keywords: 'settings legend 凡例', category: 'tools',
+      { id: 'tools.settings.legend', label: t('cmd.tools.settings.legend'), keywords: 'settings legend 凡例', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => callbacks.onOpenSettings('legend') },
-      { id: 'tools.settings.sdsgspace', label: '設定: SD/SG 配置', keywords: 'settings sdsg 帯 band 配置', category: 'tools',
+      { id: 'tools.settings.sdsgspace', label: t('cmd.tools.settings.sdsgspace'), keywords: 'settings sdsg 帯 band 配置', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => callbacks.onOpenSettings('sdsgspace') },
-      { id: 'tools.settings.project', label: '設定: プロジェクト', keywords: 'settings project プロジェクト メタデータ 既定値', category: 'tools',
+      { id: 'tools.settings.project', label: t('cmd.tools.settings.project'), keywords: 'settings project プロジェクト メタデータ 既定値', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: () => callbacks.onOpenSettings('project') },
-      { id: 'tools.csv-import', label: 'CSV インポート...', keywords: 'csv import インポート', category: 'tools',
+      { id: 'tools.csv-import', label: t('cmd.tools.csv-import'), keywords: 'csv import インポート', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: callbacks.onOpenCSVImport },
-      { id: 'tools.shift-content', label: 'コンテンツをシフト...', keywords: 'shift content シフト', category: 'tools',
+      { id: 'tools.shift-content', label: t('cmd.tools.shift-content'), keywords: 'shift content シフト', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: callbacks.onOpenShiftContent },
-      { id: 'tools.resize', label: 'リサイズ...', keywords: 'resize リサイズ', category: 'tools',
+      { id: 'tools.resize', label: t('cmd.tools.resize'), keywords: 'resize リサイズ', category: 'tools', // i18n-ok 検索用の語（日本語で引けるように残す）
         run: callbacks.onOpenResize },
 
       // === Help ===
-      { id: 'help.about', label: 'バージョン情報', keywords: 'about version バージョン', category: 'help',
-        run: () => alert('TEMer Plus v0.2.0\n著者: 中田友貴\nライセンス: PolyForm Noncommercial 1.0.0') },
+      { id: 'help.about', label: t('cmd.help.about'), keywords: 'about version バージョン', category: 'help', // i18n-ok 検索用の語（日本語で引けるように残す）
+        run: () => alert(t('about.message', { version: 'v0.2.0' })) },
     ];
 
     return cmds;
@@ -434,14 +431,14 @@ function useCommands(callbacks: CommandPaletteCallbacks): Command[] {
   }, [view.showGrid, view.snapEnabled, view.showPaperGuides, view.showBoxIds, view.showSDSGIds,
       view.showLineIds, view.showTopRuler, view.showLeftRuler, view.showLegend,
       callbacks, toggleGrid, toggleSnap, togglePaperGuides, toggleBoxIds, toggleSDSGIds, toggleLineIds,
-      toggleAllIds, toggleTopRuler, toggleLeftRuler, toggleLegend, requestFit]);
+      toggleAllIds, toggleTopRuler, toggleLeftRuler, toggleLegend, requestFit, t]);
 }
 
 // AlignButton (Ribbon.tsx) の整列ロジックを再現
 function alignBoxes(type: 'left' | 'center-h' | 'right' | 'top' | 'middle' | 'bottom' | 'distribute-h') {
   const store = useTEMStore.getState();
   const ids = store.selection.boxIds;
-  if (ids.length < 2) { alert('2 つ以上の Box を選択してください'); return; }
+  if (ids.length < 2) { alert(i18n.t('commandPalette:alert.selectTwoOrMore')); return; }
   const sheet = store.doc.sheets.find((s) => s.id === store.doc.activeSheetId);
   if (!sheet) return;
   const boxes = sheet.boxes.filter((b) => ids.includes(b.id));
@@ -485,6 +482,6 @@ function alignBoxes(type: 'left' | 'center-h' | 'right' | 'top' | 'middle' | 'bo
 function matchSize(mode: 'width' | 'height' | 'both') {
   const store = useTEMStore.getState();
   const ids = store.selection.boxIds;
-  if (ids.length < 2) { alert('2 つ以上の Box を選択してください'); return; }
+  if (ids.length < 2) { alert(i18n.t('commandPalette:alert.selectTwoOrMore')); return; }
   store.matchBoxesSize(ids, mode);
 }

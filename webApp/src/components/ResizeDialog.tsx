@@ -7,6 +7,7 @@
 // ============================================================================
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import { computeContentBounds } from '../utils/fitBounds';
 import { shortcutLabel } from '../utils/platform';
@@ -20,6 +21,7 @@ type Mode = 'percent' | 'paper';
 type FitMode = 'width' | 'height' | 'both';
 
 export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation('resizeDialog');
   const sheet = useActiveSheet();
   const doc = useTEMStore((s) => s.doc);
   const resize = useTEMStore((s) => s.resizeActiveSheet);
@@ -103,24 +105,24 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
   const applyResize = () => {
     const { xScale, yScale } = computed;
     if (!isFinite(xScale) || !isFinite(yScale) || xScale <= 0 || yScale <= 0) {
-      alert('倍率が不正です');
+      alert(t('alert.invalid'));
       return;
     }
     if (xScale === 1 && yScale === 1) {
-      alert('倍率が 1.0 のためリサイズ不要です');
+      alert(t('alert.noChange'));
       return;
     }
     const xp = (xScale * 100).toFixed(1);
     const yp = (yScale * 100).toFixed(1);
     const msg = xScale === yScale
-      ? `現在のシートを ${xp}% にリサイズします。`
-      : `現在のシートを 横 ${xp}% / 縦 ${yp}% にリサイズします。`;
+      ? t('confirm.uniform', { p: xp })
+      : t('confirm.xy', { x: xp, y: yp });
     const modeLabel = scaleMode === 'preserve-size'
-      ? '\n（Box サイズは維持、位置間隔のみ調整）'
+      ? '\n' + t('confirm.preserveSize')
       : scaleMode === 'size-only'
-        ? '\n（位置は維持、Box サイズと文字のみ調整）'
+        ? '\n' + t('confirm.sizeOnly')
         : '';
-    if (!confirm(`${msg}${modeLabel}\n（${shortcutLabel('Ctrl+Z')} で取り消し可能）`)) return;
+    if (!confirm(`${msg}${modeLabel}\n${t('confirm.undo', { key: shortcutLabel('Ctrl+Z') })}`)) return;
     resize({ xScale, yScale }, { includeFontSize, mode: scaleMode });
     onClose();
   };
@@ -132,29 +134,29 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
           className="modal-header"
           onMouseDown={onHeaderMouseDown}
           style={{ cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }}
-          title="ドラッグで移動"
+          title={t('drag')}
         >
-          <h3>シートのリサイズ</h3>
+          <h3>{t('title')}</h3>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
         <div className="modal-body" style={{ minHeight: 300 }}>
           <p className="hint" style={{ marginTop: 0 }}>
-            アクティブシートの図全体（Box 座標・サイズ、Line、SDSG、時期ラベル位置）を一度にリサイズします。
+            {t('hint.what')}
             <br />
-            実データを変更します。{shortcutLabel('Ctrl+Z')} で取り消せます。
+            {t('hint.undo', { key: shortcutLabel('Ctrl+Z') })}
           </p>
           <section className="settings-section">
             <div className="setting-row">
-              <label>モード</label>
+              <label>{t('mode')}</label>
               <select value={mode} onChange={(e) => setMode(e.target.value as Mode)}>
-                <option value="percent">パーセント指定</option>
-                <option value="paper">用紙サイズにフィット</option>
+                <option value="percent">{t('mode.percent')}</option>
+                <option value="paper">{t('mode.paper')}</option>
               </select>
             </div>
             {mode === 'percent' && (
               <>
                 <div className="setting-row">
-                  <label>縦横を独立して指定</label>
+                  <label>{t('independent')}</label>
                   <input
                     type="checkbox"
                     checked={independentAxes}
@@ -163,7 +165,7 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
                 </div>
                 {!independentAxes && (
                   <div className="setting-row">
-                    <label>倍率 (%)</label>
+                    <label>{t('scale')}</label>
                     <input
                       type="number"
                       min={1}
@@ -178,7 +180,7 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
                 {independentAxes && (
                   <>
                     <div className="setting-row">
-                      <label>横倍率 (%)</label>
+                      <label>{t('scale.x')}</label>
                       <input
                         type="number"
                         min={1}
@@ -190,7 +192,7 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
                       />
                     </div>
                     <div className="setting-row">
-                      <label>縦倍率 (%)</label>
+                      <label>{t('scale.y')}</label>
                       <input
                         type="number"
                         min={1}
@@ -208,7 +210,7 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
             {mode === 'paper' && (
               <>
                 <div className="setting-row">
-                  <label>用紙サイズ</label>
+                  <label>{t('paperSize')}</label>
                   <select
                     value={paperSize}
                     onChange={(e) => setPaperSize(e.target.value as typeof paperSize)}
@@ -220,15 +222,15 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
                   </select>
                 </div>
                 <div className="setting-row">
-                  <label>フィット方式</label>
+                  <label>{t('fit')}</label>
                   <select value={fitMode} onChange={(e) => setFitMode(e.target.value as FitMode)}>
-                    <option value="both">両方に収める（縦横アスペクト維持）</option>
-                    <option value="width">横幅だけ収める</option>
-                    <option value="height">縦幅だけ収める</option>
+                    <option value="both">{t('fit.both')}</option>
+                    <option value="width">{t('fit.width')}</option>
+                    <option value="height">{t('fit.height')}</option>
                   </select>
                 </div>
                 <div className="setting-row">
-                  <label>用紙内余白比率</label>
+                  <label>{t('margin')}</label>
                   <input
                     type="number"
                     min={0}
@@ -244,7 +246,7 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
           </section>
 
           <section className="settings-section">
-            <h4 style={{ margin: '0 0 4px' }}>スケールモード</h4>
+            <h4 style={{ margin: '0 0 4px' }}>{t('scaleMode')}</h4>
             <div className="setting-row">
               <label>
                 <input
@@ -252,7 +254,7 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
                   name="scaleMode"
                   checked={scaleMode === 'full'}
                   onChange={() => setScaleMode('full')}
-                /> 全体（位置・Box サイズ両方）
+                /> {t('scaleMode.full')}
               </label>
             </div>
             <div className="setting-row">
@@ -262,7 +264,7 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
                   name="scaleMode"
                   checked={scaleMode === 'preserve-size'}
                   onChange={() => setScaleMode('preserve-size')}
-                /> 位置のみ（Box サイズ・文字は維持）
+                /> {t('scaleMode.preserveSize')}
               </label>
             </div>
             <div className="setting-row">
@@ -272,19 +274,19 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
                   name="scaleMode"
                   checked={scaleMode === 'size-only'}
                   onChange={() => setScaleMode('size-only')}
-                /> Box と文字のみ（位置は維持）
+                /> {t('scaleMode.sizeOnly')}
               </label>
             </div>
             <p className="hint" style={{ marginTop: 4 }}>
               {scaleMode === 'full'
-                ? '座標・サイズ・文字すべて倍率でスケール'
+                ? t('scaleMode.full.hint')
                 : scaleMode === 'preserve-size'
-                  ? 'Box / SDSG のサイズ・フォントは不変、位置（矢印の長さ）のみスケール'
-                  : '位置と時期区分は不変、Box / SDSG のサイズ・フォントのみスケール。Box 同士が重なる場合があります'}
+                  ? t('scaleMode.preserveSize.hint')
+                  : t('scaleMode.sizeOnly.hint')}
             </p>
             {scaleMode === 'full' && (
               <div className="setting-row">
-                <label>文字サイズも連動</label>
+                <label>{t('includeFontSize')}</label>
                 <input
                   type="checkbox"
                   checked={includeFontSize}
@@ -295,37 +297,37 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
           </section>
 
           <section className="settings-section" style={{ background: '#f6f9fc', padding: 8, borderRadius: 4, border: '1px solid #e0e8f0' }}>
-            <div style={{ fontWeight: 600, marginBottom: 4 }}>プレビュー</div>
+            <div style={{ fontWeight: 600, marginBottom: 4 }}>{t('preview')}</div>
             {!bbox ? (
-              <p className="hint" style={{ margin: 0 }}>（シートに図形がありません）</p>
+              <p className="hint" style={{ margin: 0 }}>{t('preview.empty')}</p>
             ) : (
               <>
                 <div className="setting-row">
-                  <span>現在のサイズ:</span>
+                  <span>{t('preview.current')}</span>
                   <span>{Math.round(bbox.width)} × {Math.round(bbox.height)} px</span>
                 </div>
                 <div className="setting-row">
-                  <span>リサイズ後:</span>
+                  <span>{t('preview.after')}</span>
                   <span style={{ fontWeight: 600, color: '#2684ff' }}>
                     {Math.round(bbox.width * computed.xScale)} × {Math.round(bbox.height * computed.yScale)} px
                   </span>
                 </div>
                 <div className="setting-row">
-                  <span>倍率:</span>
+                  <span>{t('preview.scale')}</span>
                   <span style={{ fontWeight: 600 }}>
                     {computed.xScale === computed.yScale
                       ? `${(computed.xScale * 100).toFixed(1)} %`
-                      : `横 ${(computed.xScale * 100).toFixed(1)} % / 縦 ${(computed.yScale * 100).toFixed(1)} %`}
+                      : t('preview.xy', { x: (computed.xScale * 100).toFixed(1), y: (computed.yScale * 100).toFixed(1) })}
                   </span>
                 </div>
                 {scaleMode === 'preserve-size' && (
                   <p className="hint" style={{ margin: '4px 0 0', color: '#059' }}>
-                    ※ Box サイズは変わらず、Box 間隔（矢印の長さ）のみ調整されます
+                    {t('preview.note.preserveSize')}
                   </p>
                 )}
                 {scaleMode === 'size-only' && (
                   <p className="hint" style={{ margin: '4px 0 0', color: '#059' }}>
-                    ※ 位置は変わらず、Box と文字のサイズのみ調整されます
+                    {t('preview.note.sizeOnly')}
                   </p>
                 )}
               </>
@@ -333,9 +335,9 @@ export function ResizeDialog({ open, onClose }: { open: boolean; onClose: () => 
           </section>
         </div>
         <div className="modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-          <button className="ribbon-btn-small" onClick={onClose}>キャンセル</button>
+          <button className="ribbon-btn-small" onClick={onClose}>{t('cancel')}</button>
           <button className="ribbon-btn-primary" onClick={applyResize}>
-            リサイズを適用
+            {t('apply')}
           </button>
         </div>
       </div>

@@ -5,6 +5,7 @@
 // ============================================================================
 
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import {
   detectOverlaps,
@@ -32,6 +33,7 @@ export function OverlapCheckDialog({
   showInStatusBar: boolean;
   onChangeShowInStatusBar: (next: boolean) => void;
 }) {
+  const { t } = useTranslation('overlapCheckDialog');
   const doc = useTEMStore((s) => s.doc);
   const sheet = useActiveSheet();
   const setSelection = useTEMStore((s) => s.setSelection);
@@ -68,13 +70,13 @@ export function OverlapCheckDialog({
     <div className="modal-backdrop" onClick={onClose} style={{ zIndex: 1200 }}>
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 720, maxWidth: '94vw' }}>
         <div className="modal-header">
-          <h3>重なりチェック</h3>
+          <h3>{t('title')}</h3>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
         <div className="modal-body" style={{ maxHeight: '64vh', overflowY: 'auto' }}>
           <p className="hint">
-            現在のシート（{sheet?.name ?? '-'}）の要素の位置から、視覚的にぶつかっている箇所を計算します。
-            行をクリックすると、その要素を選択して画面を寄せます。
+            {t('hint.compute', { sheet: sheet?.name ?? '-' })}
+            {t('hint.click')}
           </p>
 
           <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', margin: '10px 0 14px' }}>
@@ -89,14 +91,14 @@ export function OverlapCheckDialog({
 
           {issues.length === 0 ? (
             <p style={{ padding: '18px 0', color: '#2e7d32' }}>
-              重なりは見つかりませんでした。
+              {t('none')}
             </p>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.92em' }}>
               <thead>
                 <tr style={{ textAlign: 'left', borderBottom: '1px solid #ddd' }}>
-                  <th style={{ padding: '4px 6px', width: 130 }}>種類</th>
-                  <th style={{ padding: '4px 6px' }}>内容</th>
+                  <th style={{ padding: '4px 6px', width: 130 }}>{t('col.kind')}</th>
+                  <th style={{ padding: '4px 6px' }}>{t('col.detail')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -105,7 +107,7 @@ export function OverlapCheckDialog({
                     key={`${issue.kind}-${i}`}
                     onClick={() => jumpTo(issue)}
                     style={{ borderBottom: '1px solid #f0f0f0', cursor: 'pointer' }}
-                    title="クリックで該当箇所を選択して表示"
+                    title={t('row.tooltip')}
                   >
                     <td style={{ padding: '4px 6px', color: '#666', whiteSpace: 'nowrap' }}>
                       {OVERLAP_CHECK_LABELS[issue.kind]}
@@ -124,9 +126,9 @@ export function OverlapCheckDialog({
               checked={showInStatusBar}
               onChange={(e) => onChangeShowInStatusBar(e.target.checked)}
             />
-            ステータスバーに件数を常時表示
+            {t('statusBar')}
           </label>
-          <button className="ribbon-btn-primary" onClick={onClose}>閉じる</button>
+          <button className="ribbon-btn-primary" onClick={onClose}>{t('close')}</button>
         </div>
       </div>
     </div>

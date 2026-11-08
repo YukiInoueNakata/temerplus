@@ -7,6 +7,7 @@
 // 複数選択時の「（混在）」プレースホルダが自動表示される。
 // ============================================================================
 
+import { useTranslation } from 'react-i18next';
 import type { TextAlign, VerticalAlign } from '../types';
 import { FONT_OPTIONS } from '../store/defaults';
 import { ColorPicker } from './ColorPicker';
@@ -18,7 +19,7 @@ import { ColorPicker } from './ColorPicker';
 export function FontFamilyRow({
   value,
   onChange,
-  label = 'フォント',
+  label: labelProp,
   emptyOptionLabel,
   rowClassName = 'prop-row',
 }: {
@@ -29,6 +30,8 @@ export function FontFamilyRow({
   emptyOptionLabel?: string;
   rowClassName?: string;
 }) {
+  const { t } = useTranslation('decorationEditor');
+  const label = labelProp ?? t('label.font');
   return (
     <div className={rowClassName}>
       <label>{label}</label>
@@ -36,7 +39,7 @@ export function FontFamilyRow({
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value || undefined)}
       >
-        {value === undefined && <option value="">（混在）</option>}
+        {value === undefined && <option value="">{t('mixed')}</option>}
         {emptyOptionLabel && <option value="">{emptyOptionLabel}</option>}
         {FONT_OPTIONS.map((f) => (
           <option key={f.value} value={f.value}>{f.label}</option>
@@ -53,7 +56,7 @@ export function FontFamilyRow({
 export function FontSizeRow({
   value,
   onChange,
-  label = 'フォントサイズ',
+  label: labelProp,
   fallbackValue = 13,
   placeholderText,
   emptyAllowed = false,
@@ -75,7 +78,9 @@ export function FontSizeRow({
   /** ラベル/値の row class 名 (PropertyPanel: prop-row, SettingsDialog: setting-row) */
   rowClassName?: string;
 }) {
-  const placeholder = placeholderText ?? (value === undefined ? '（混在）' : '');
+  const { t } = useTranslation('decorationEditor');
+  const label = labelProp ?? t('label.fontSize');
+  const placeholder = placeholderText ?? (value === undefined ? t('mixed') : '');
   return (
     <div className={rowClassName}>
       <label>{label}</label>
@@ -106,7 +111,7 @@ export function BoldItalicUnderlineRow({
   onBoldToggle,
   onItalicToggle,
   onUnderlineToggle,
-  label = '装飾',
+  label: labelProp,
 }: {
   bold: boolean | undefined;
   italic: boolean | undefined;
@@ -118,6 +123,8 @@ export function BoldItalicUnderlineRow({
   onUnderlineToggle?: (next: boolean) => void;
   label?: string;
 }) {
+  const { t } = useTranslation('decorationEditor');
+  const label = labelProp ?? t('label.decoration');
   return (
     <div className="prop-row">
       <label>{label}</label>
@@ -125,18 +132,18 @@ export function BoldItalicUnderlineRow({
         <button
           className={bold ? 'style-btn active' : 'style-btn'}
           onClick={() => onBoldToggle(!bold)}
-          title="太字"
+          title={t('bold')}
         ><b>B</b></button>
         <button
           className={italic ? 'style-btn active' : 'style-btn'}
           onClick={() => onItalicToggle(!italic)}
-          title="斜体"
+          title={t('italic')}
         ><i>I</i></button>
         {onUnderlineToggle && (
           <button
             className={underline ? 'style-btn active' : 'style-btn'}
             onClick={() => onUnderlineToggle(!underline)}
-            title="下線"
+            title={t('underline')}
           ><u>U</u></button>
         )}
       </div>
@@ -185,12 +192,14 @@ export function ColorRow({
 export function TextAlignRow({
   value,
   onChange,
-  label = '左右方向の揃え',
+  label: labelProp,
 }: {
   value: TextAlign | undefined;
   onChange: (v: TextAlign) => void;
   label?: string;
 }) {
+  const { t } = useTranslation('decorationEditor');
+  const label = labelProp ?? t('label.align');
   return (
     <div className="prop-row">
       <label>{label}</label>
@@ -198,10 +207,10 @@ export function TextAlignRow({
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value as TextAlign)}
       >
-        {value === undefined && <option value="">（混在）</option>}
-        <option value="left">左揃え</option>
-        <option value="center">中央</option>
-        <option value="right">右揃え</option>
+        {value === undefined && <option value="">{t('mixed')}</option>}
+        <option value="left">{t('align.left')}</option>
+        <option value="center">{t('align.center')}</option>
+        <option value="right">{t('align.right')}</option>
       </select>
     </div>
   );
@@ -214,12 +223,14 @@ export function TextAlignRow({
 export function VerticalAlignRow({
   value,
   onChange,
-  label = '上下方向の揃え',
+  label: labelProp,
 }: {
   value: VerticalAlign | undefined;
   onChange: (v: VerticalAlign) => void;
   label?: string;
 }) {
+  const { t } = useTranslation('decorationEditor');
+  const label = labelProp ?? t('label.valign');
   return (
     <div className="prop-row">
       <label>{label}</label>
@@ -227,10 +238,10 @@ export function VerticalAlignRow({
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value as VerticalAlign)}
       >
-        {value === undefined && <option value="">（混在）</option>}
-        <option value="top">上揃え</option>
-        <option value="middle">中央</option>
-        <option value="bottom">下揃え</option>
+        {value === undefined && <option value="">{t('mixed')}</option>}
+        <option value="top">{t('valign.top')}</option>
+        <option value="middle">{t('valign.middle')}</option>
+        <option value="bottom">{t('valign.bottom')}</option>
       </select>
     </div>
   );

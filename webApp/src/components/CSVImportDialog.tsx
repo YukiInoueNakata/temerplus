@@ -5,12 +5,9 @@
 // ============================================================================
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import {
-  FIELD_LABELS,
-  LINE_FIELD_LABELS,
-  SDSG_FIELD_LABELS,
-  PERIOD_LABEL_FIELD_LABELS,
   buildBoxesFromRows,
   buildLinesFromRows,
   buildSDSGsFromRows,
@@ -42,16 +39,20 @@ const SDSG_FIELD_OPTIONS: SDSGCsvFieldKind[] = [
 ];
 const PERIOD_FIELD_OPTIONS: PeriodLabelCsvFieldKind[] = ['ignore', 'id', 'position', 'label'];
 
-const ENTITY_LABELS: Record<EntityKind, string> = {
-  box: 'Box',
-  line: 'Line（矢印）',
-  sdsg: 'SDSG（社会的方向 / ガイド）',
-  period: '時期ラベル',
+/** 取り込む対象の表示名のキー（locales/csvImportDialog.csv） */
+const ENTITY_LABEL_KEYS: Record<EntityKind, string> = {
+  box: 'entity.box',
+  line: 'entity.line',
+  sdsg: 'entity.sdsg',
+  period: 'entity.period',
 };
 
 type InsertMode = 'append' | 'new-sheet' | 'between';
 
 export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t, i18n } = useTranslation('csvImportDialog');
+  /** Box の種類の表示名（日本語は従来の表示名、ほかの言語は TEM の用語の表） */
+  const boxTypeLabel = (bt: string) => (i18n.language === 'ja' ? BOX_TYPE_LABELS[bt].ja : t(`terms:boxType.${bt}`));
   const doc = useTEMStore((s) => s.doc);
   const sheet = useActiveSheet();
   const importBoxes = useTEMStore((s) => s.importBoxes);
@@ -120,10 +121,10 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
   // エンティティ別 helper
   const fieldOptionsFor = (kind: EntityKind): { value: string; label: string }[] => {
     switch (kind) {
-      case 'box': return BOX_FIELD_OPTIONS.map((f) => ({ value: f, label: FIELD_LABELS[f] }));
-      case 'line': return LINE_FIELD_OPTIONS.map((f) => ({ value: f, label: LINE_FIELD_LABELS[f] }));
-      case 'sdsg': return SDSG_FIELD_OPTIONS.map((f) => ({ value: f, label: SDSG_FIELD_LABELS[f] }));
-      case 'period': return PERIOD_FIELD_OPTIONS.map((f) => ({ value: f, label: PERIOD_LABEL_FIELD_LABELS[f] }));
+      case 'box': return BOX_FIELD_OPTIONS.map((f) => ({ value: f, label: t(`field.box.${f}`) }));
+      case 'line': return LINE_FIELD_OPTIONS.map((f) => ({ value: f, label: t(`field.line.${f}`) }));
+      case 'sdsg': return SDSG_FIELD_OPTIONS.map((f) => ({ value: f, label: t(`field.sdsg.${f}`) }));
+      case 'period': return PERIOD_FIELD_OPTIONS.map((f) => ({ value: f, label: t(`field.period.${f}`) }));
     }
   };
 
@@ -173,7 +174,7 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
       setHasHeader(p.probableHeader);
       recomputeMapping(p, entityKind);
     } catch (e) {
-      setError(`CSV パースに失敗: ${e instanceof Error ? e.message : String(e)}`);
+      setError(t('error.parse', { message: e instanceof Error ? e.message : String(e) }));
     }
   };
 
@@ -210,15 +211,15 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
         levelPx: LEVEL_PX,
       });
       if (result.boxes.length === 0) {
-        setError('インポート可能な Box がありませんでした。ラベル列を割り当てましたか？');
+        setError(t('error.noBoxes'));
         return;
       }
       if (insertMode === 'new-sheet') {
-        const newId = addSheet('CSV インポート');
+        const newId = addSheet('CSV インポート'); // i18n-ok 新しいシートの名前（図のデータ）
         switchSheet(newId);
         setTimeout(() => {
           importBoxes(result.boxes, result.lines);
-          finishImport(`${result.boxes.length} 件の Box、${result.lines.length} 件の Line をインポートしました`, result.errors);
+          finishImport(t('done.boxes', { boxes: result.boxes.length, lines: result.lines.length }), result.errors);
         }, 0);
         return;
       }
@@ -231,7 +232,7 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
       } else {
         importBoxes(result.boxes, result.lines);
       }
-      finishImport(`${result.boxes.length} 件の Box、${result.lines.length} 件の Line をインポートしました`, result.errors);
+      finishImport(t('done.boxes', { boxes: result.boxes.length, lines: result.lines.length }), result.errors);
       return;
     }
 
@@ -245,11 +246,11 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
         validBoxIds,
       });
       if (result.lines.length === 0) {
-        setError('インポート可能な Line がありませんでした。from / to 列を割り当て、from/to の値が現在のシートの Box ID と一致する必要があります。');
+        setError(t('error.noLines'));
         return;
       }
       importLines(result.lines);
-      finishImport(`${result.lines.length} 件の Line をインポートしました`, result.errors);
+      finishImport(t('done.lines', { count: result.lines.length }), result.errors);
       return;
     }
 
@@ -262,11 +263,11 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
         validLineIds,
       });
       if (result.sdsgs.length === 0) {
-        setError('インポート可能な SDSG がありませんでした。type と attachedTo 列が必要です。');
+        setError(t('error.noSdsg'));
         return;
       }
       importSDSGs(result.sdsgs);
-      finishImport(`${result.sdsgs.length} 件の SDSG をインポートしました`, result.errors);
+      finishImport(t('done.sdsg', { count: result.sdsgs.length }), result.errors);
       return;
     }
 
@@ -277,16 +278,16 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
       existingIds,
     });
     if (result.periodLabels.length === 0) {
-      setError('インポート可能な時期ラベルがありませんでした。position と label 列を割り当ててください。');
+      setError(t('error.noPeriods'));
       return;
     }
     importPeriodLabels(result.periodLabels);
-    finishImport(`${result.periodLabels.length} 件の時期ラベルをインポートしました`, result.errors);
+    finishImport(t('done.periods', { count: result.periodLabels.length }), result.errors);
   };
 
   const finishImport = (successMsg: string, errors: string[]) => {
     if (errors.length > 0) {
-      alert(`インポート完了（警告 ${errors.length} 件）\n\n${errors.join('\n')}`);
+      alert(`${t('done.withWarnings', { count: errors.length })}\n\n${errors.join('\n')}`);
     } else {
       alert(successMsg);
     }
@@ -303,18 +304,18 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
           className="modal-header"
           onMouseDown={onHeaderMouseDown}
           style={{ cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }}
-          title="ドラッグで移動"
+          title={t('dragToMove')}
         >
-          <h3>CSV インポート</h3>
+          <h3>{t('title')}</h3>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
         <div className="modal-body" style={{ minHeight: 420 }}>
           <section className="settings-section">
             <div className="setting-row">
-              <label>インポート対象</label>
+              <label>{t('target')}</label>
               <select value={entityKind} onChange={(e) => onChangeEntity(e.target.value as EntityKind)}>
-                {(Object.keys(ENTITY_LABELS) as EntityKind[]).map((k) => (
-                  <option key={k} value={k}>{ENTITY_LABELS[k]}</option>
+                {(Object.keys(ENTITY_LABEL_KEYS) as EntityKind[]).map((k) => (
+                  <option key={k} value={k}>{t(ENTITY_LABEL_KEYS[k])}</option>
                 ))}
               </select>
             </div>
@@ -323,7 +324,7 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
           {!parsed && (
             <section className="settings-section">
               <p className="hint" style={{ marginTop: 0 }}>
-                CSV ファイルを選択してください。1 行目にヘッダがある場合は自動判定します。
+                {t('chooseFile')}
               </p>
               <input
                 ref={fileInputRef}
@@ -336,33 +337,33 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
               />
               {error && <p style={{ color: '#c33', fontSize: '0.88em' }}>{error}</p>}
               <div style={{ marginTop: 16, fontSize: '0.85em', color: '#666' }}>
-                <strong>仕様メモ ({ENTITY_LABELS[entityKind]}):</strong>
+                <strong>{t('spec.heading', { target: t(ENTITY_LABEL_KEYS[entityKind]) })}</strong>
                 <ul style={{ marginTop: 4 }}>
                   {entityKind === 'box' && (
                     <>
-                      <li>必須列: ラベル（label）</li>
-                      <li>オプション列: 種別 / Time Level / Item Level / ID / サブラベル / 説明 / 幅 / 高さ</li>
-                      <li>種別は英名（BFP / EFP / P-EFP / OPP / annotation / 2nd-EFP）または日本語（分岐点・等至点・両極化等至点・必須通過点・潜在経験・第二等至点）</li>
+                      <li>{t('spec.box.required')}</li>
+                      <li>{t('spec.box.optional')}</li>
+                      <li>{t('spec.box.types')}</li>
                     </>
                   )}
                   {entityKind === 'line' && (
                     <>
-                      <li>必須列: from（始点 Box ID）/ to（終点 Box ID）</li>
-                      <li>オプション列: ID / type (RLine/XLine) / shape (straight/elbow/curve) / label / 説明</li>
-                      <li>from / to は<strong>現在のシート</strong>に存在する Box ID と一致する必要があります</li>
+                      <li>{t('spec.line.required')}</li>
+                      <li>{t('spec.line.optional')}</li>
+                      <li>{t('spec.line.before')}<strong>{t('spec.line.currentSheet')}</strong>{t('spec.line.after')}</li>
                     </>
                   )}
                   {entityKind === 'sdsg' && (
                     <>
-                      <li>必須列: type (SD/SG) / attachedTo（Box または Line ID）</li>
-                      <li>オプション列: ID / label / attachedTo2 / anchorMode (single/between) / spaceMode (attached/band-top/band-bottom) / subLabel / 説明</li>
-                      <li>attachedTo2 を指定すると between モードになります（明示的に single を指定すれば single）</li>
+                      <li>{t('spec.sdsg.required')}</li>
+                      <li>{t('spec.sdsg.optional')}</li>
+                      <li>{t('spec.sdsg.between')}</li>
                     </>
                   )}
                   {entityKind === 'period' && (
                     <>
-                      <li>必須列: position（Time Level の数値）/ label</li>
-                      <li>オプション列: ID</li>
+                      <li>{t('spec.period.required')}</li>
+                      <li>{t('spec.period.optional')}</li>
                     </>
                   )}
                 </ul>
@@ -374,7 +375,7 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
             <>
               <section className="settings-section">
                 <div className="setting-row">
-                  <label>1 行目はヘッダ</label>
+                  <label>{t('hasHeader')}</label>
                   <input
                     type="checkbox"
                     checked={hasHeader}
@@ -382,32 +383,32 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
                   />
                 </div>
                 <div className="setting-row">
-                  <label>区切り文字</label>
+                  <label>{t('delimiter')}</label>
                   <span style={{ fontFamily: 'monospace' }}>{JSON.stringify(parsed.delimiter)}</span>
                 </div>
                 <div className="setting-row">
-                  <label>検出行数</label>
-                  <span>{parsed.rows.length}（ヘッダ除外: {hasHeader ? parsed.rows.length - 1 : parsed.rows.length}）</span>
+                  <label>{t('rowCount')}</label>
+                  <span>{t('rowCountValue', { total: parsed.rows.length, data: hasHeader ? parsed.rows.length - 1 : parsed.rows.length })}</span>
                 </div>
                 <div className="setting-row">
                   <button
                     className="ribbon-btn-small"
                     onClick={() => { setParsed(null); setMapping([]); }}
                   >
-                    別ファイルを選ぶ
+                    {t('chooseAnother')}
                   </button>
                 </div>
               </section>
 
               <section className="settings-section">
-                <h4>列マッピング</h4>
+                <h4>{t('mapping.heading')}</h4>
                 <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
                   <table style={{ borderCollapse: 'collapse', fontSize: '0.85em' }}>
                     <thead>
                       <tr>
-                        <th style={{ border: '1px solid #ddd', padding: '4px 6px', background: '#f5f5f5' }}>列 #</th>
-                        <th style={{ border: '1px solid #ddd', padding: '4px 6px', background: '#f5f5f5' }}>ヘッダ / 値例</th>
-                        <th style={{ border: '1px solid #ddd', padding: '4px 6px', background: '#f5f5f5' }}>割当</th>
+                        <th style={{ border: '1px solid #ddd', padding: '4px 6px', background: '#f5f5f5' }}>{t('mapping.column')}</th>
+                        <th style={{ border: '1px solid #ddd', padding: '4px 6px', background: '#f5f5f5' }}>{t('mapping.header')}</th>
+                        <th style={{ border: '1px solid #ddd', padding: '4px 6px', background: '#f5f5f5' }}>{t('mapping.assign')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -442,49 +443,49 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
 
               {showBoxOptions && (
                 <section className="settings-section">
-                  <h4>配置オプション</h4>
+                  <h4>{t('options.heading')}</h4>
                   <div className="setting-row">
-                    <label>種別未指定時のデフォルト</label>
+                    <label>{t('options.defaultType')}</label>
                     <select value={defaultType} onChange={(e) => setDefaultType(e.target.value as BoxType)}>
-                      {Object.entries(BOX_TYPE_LABELS).map(([k, v]) => (
-                        <option key={k} value={k}>{v.ja} ({k})</option>
+                      {Object.keys(BOX_TYPE_LABELS).map((k) => (
+                        <option key={k} value={k}>{boxTypeLabel(k)} ({k})</option>
                       ))}
                     </select>
                   </div>
                   <div className="setting-row">
-                    <label>挿入方式</label>
+                    <label>{t('options.insertMode')}</label>
                     <select value={insertMode} onChange={(e) => setInsertMode(e.target.value as InsertMode)}>
-                      <option value="append">現在のシート末尾に追加（最大 Time_Level の右隣）</option>
-                      <option value="between">指定 Box の間に挿入（以降をシフト）</option>
-                      <option value="new-sheet">新規シートに作成</option>
+                      <option value="append">{t('options.append')}</option>
+                      <option value="between">{t('options.between')}</option>
+                      <option value="new-sheet">{t('options.newSheet')}</option>
                     </select>
                   </div>
                   {insertMode === 'between' && sheet && (
                     <>
                       <div className="setting-row">
-                        <label>この Box の直後に挿入</label>
+                        <label>{t('options.after')}</label>
                         <select value={afterBoxId} onChange={(e) => { setAfterBoxId(e.target.value); setBeforeBoxId(''); }}>
-                          <option value="">（指定しない）</option>
+                          <option value="">{t('options.none')}</option>
                           {sheet.boxes.map((b) => (
                             <option key={b.id} value={b.id}>{b.id}: {b.label}</option>
                           ))}
                         </select>
                       </div>
                       <div className="setting-row">
-                        <label>またはこの Box の直前に挿入</label>
+                        <label>{t('options.before')}</label>
                         <select
                           value={beforeBoxId}
                           onChange={(e) => { setBeforeBoxId(e.target.value); setAfterBoxId(''); }}
                           disabled={!!afterBoxId}
                         >
-                          <option value="">（指定しない）</option>
+                          <option value="">{t('options.none')}</option>
                           {sheet.boxes.map((b) => (
                             <option key={b.id} value={b.id}>{b.id}: {b.label}</option>
                           ))}
                         </select>
                       </div>
                       <div className="setting-row">
-                        <label>シフト時のギャップ (px)</label>
+                        <label>{t('options.gap')}</label>
                         <input
                           type="number"
                           min={0}
@@ -496,7 +497,7 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
                     </>
                   )}
                   <div className="setting-row">
-                    <label>Box を順次接続</label>
+                    <label>{t('options.autoConnect')}</label>
                     <input
                       type="checkbox"
                       checked={autoConnect}
@@ -505,10 +506,10 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
                   </div>
                   {autoConnect && (
                     <div className="setting-row">
-                      <label>接続線種</label>
+                      <label>{t('options.lineType')}</label>
                       <select value={lineType} onChange={(e) => setLineType(e.target.value as 'RLine' | 'XLine')}>
-                        <option value="RLine">実線（実現径路）</option>
-                        <option value="XLine">点線（未実現径路）</option>
+                        <option value="RLine">{t('options.RLine')}</option>
+                        <option value="XLine">{t('options.XLine')}</option>
                       </select>
                     </div>
                   )}
@@ -517,19 +518,19 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
 
               {entityKind === 'line' && (
                 <section className="settings-section">
-                  <h4>配置オプション</h4>
+                  <h4>{t('options.heading')}</h4>
                   <div className="setting-row">
-                    <label>type 未指定時のデフォルト</label>
+                    <label>{t('options.defaultLineType')}</label>
                     <select value={lineType} onChange={(e) => setLineType(e.target.value as 'RLine' | 'XLine')}>
-                      <option value="RLine">実線（RLine）</option>
-                      <option value="XLine">点線（XLine）</option>
+                      <option value="RLine">{t('options.RLineCode')}</option>
+                      <option value="XLine">{t('options.XLineCode')}</option>
                     </select>
                   </div>
                 </section>
               )}
 
               <section className="settings-section">
-                <h4>プレビュー（先頭 5 行）</h4>
+                <h4>{t('preview')}</h4>
                 <table style={{ borderCollapse: 'collapse', fontSize: '0.82em' }}>
                   <tbody>
                     {previewRows.map((row, i) => (
@@ -550,10 +551,10 @@ export function CSVImportDialog({ open, onClose }: { open: boolean; onClose: () 
           )}
         </div>
         <div className="modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-          <button className="ribbon-btn-small" onClick={onClose}>キャンセル</button>
+          <button className="ribbon-btn-small" onClick={onClose}>{t('cancel')}</button>
           {parsed && (
             <button className="ribbon-btn-primary" onClick={runImport}>
-              インポート
+              {t('import')}
             </button>
           )}
         </div>

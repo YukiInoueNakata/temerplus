@@ -4,6 +4,7 @@
 // ============================================================================
 
 import type { RefObject } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface RichTextToolbarProps {
   textareaRef: RefObject<HTMLTextAreaElement>;
@@ -15,6 +16,7 @@ export interface RichTextToolbarProps {
 type Wrap = { open: string; close: string };
 
 export function RichTextToolbar({ textareaRef, value, onChange, compact }: RichTextToolbarProps) {
+  const { t } = useTranslation('richTextToolbar');
   const applyWrap = (wrap: Wrap) => {
     const el = textareaRef.current;
     if (!el) return;
@@ -45,19 +47,19 @@ export function RichTextToolbar({ textareaRef, value, onChange, compact }: RichT
   };
 
   const askSize = () => {
-    const input = prompt('フォントサイズ (px)', '14');
+    const input = prompt(t('prompt.size'), '14');
     if (!input) return;
     const n = Number(input);
     if (!isFinite(n) || n <= 0) return;
     applyWrap({ open: `<size=${n}>`, close: '</size>' });
   };
   const askColor = () => {
-    const input = prompt('色 (#ff0000 など)', '#cc0000');
+    const input = prompt(t('prompt.color'), '#cc0000');
     if (!input) return;
     applyWrap({ open: `<color=${input}>`, close: '</color>' });
   };
   const askFont = () => {
-    const input = prompt('フォント名', 'Meiryo');
+    const input = prompt(t('prompt.font'), 'Meiryo');
     if (!input) return;
     applyWrap({ open: `<font="${input}">`, close: '</font>' });
   };
@@ -68,7 +70,7 @@ export function RichTextToolbar({ textareaRef, value, onChange, compact }: RichT
         type="button"
         style={{ ...btnStyle, fontWeight: 700 }}
         onClick={() => applyWrap({ open: '<b>', close: '</b>' })}
-        title="太字"
+        title={t('bold')}
       >
         B
       </button>
@@ -76,7 +78,7 @@ export function RichTextToolbar({ textareaRef, value, onChange, compact }: RichT
         type="button"
         style={{ ...btnStyle, fontStyle: 'italic' }}
         onClick={() => applyWrap({ open: '<i>', close: '</i>' })}
-        title="斜体"
+        title={t('italic')}
       >
         I
       </button>
@@ -84,7 +86,7 @@ export function RichTextToolbar({ textareaRef, value, onChange, compact }: RichT
         type="button"
         style={{ ...btnStyle, textDecoration: 'underline' }}
         onClick={() => applyWrap({ open: '<u>', close: '</u>' })}
-        title="下線"
+        title={t('underline')}
       >
         U
       </button>
@@ -92,17 +94,17 @@ export function RichTextToolbar({ textareaRef, value, onChange, compact }: RichT
         type="button"
         style={{ ...btnStyle, textDecoration: 'line-through' }}
         onClick={() => applyWrap({ open: '<s>', close: '</s>' })}
-        title="取消線"
+        title={t('strikethrough')}
       >
         S
       </button>
-      <button type="button" style={btnStyle} onClick={askSize} title="文字サイズ">
+      <button type="button" style={btnStyle} onClick={askSize} title={t('size')}>
         Aa
       </button>
-      <button type="button" style={btnStyle} onClick={askColor} title="文字色">
+      <button type="button" style={btnStyle} onClick={askColor} title={t('color')}>
         🎨
       </button>
-      <button type="button" style={btnStyle} onClick={askFont} title="フォント">
+      <button type="button" style={btnStyle} onClick={askFont} title={t('font')}>
         Fn
       </button>
     </div>

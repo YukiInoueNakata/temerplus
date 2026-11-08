@@ -1,0 +1,5 @@
+﻿key,ja,en,note
+"cp1.title","cp1 をドラッグで移動","Drag to move cp1","曲線の矢印の制御点 1 の説明（マウスを重ねたとき）"
+"cp2.title","cp2 をドラッグで移動","Drag to move cp2","曲線の矢印の制御点 2 の説明（マウスを重ねたとき）"
+"bend.title.h","L字の折れ位置をドラッグで調整（左右方向）","Drag to adjust the bend of the L-shaped line (left and right)","L 字の矢印の折れ目のつまみの説明（横型）"
+"bend.title.v","L字の折れ位置をドラッグで調整（上下方向）","Drag to adjust the bend of the L-shaped line (up and down)","L 字の矢印の折れ目のつまみの説明（縦型）"

@@ -8,6 +8,7 @@
 // ============================================================================
 
 import { useEffect, useState, type ErrorInfo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore } from '../store/store';
 import { saveAutoBackup } from '../utils/fileIO';
 
@@ -20,6 +21,7 @@ const stamp = () => {
 export function CrashScreen({ error, info }: { error: Error; info?: ErrorInfo | null }) {
   const [backup, setBackup] = useState<'saving' | 'saved' | 'failed'>('saving');
   const [copied, setCopied] = useState(false);
+  const { t } = useTranslation('crashScreen');
 
   useEffect(() => {
     // 描画が止まってもストアの中身は残っているので、そのまま退避する
@@ -28,26 +30,26 @@ export function CrashScreen({ error, info }: { error: Error; info?: ErrorInfo | 
   }, []);
 
   const details = [
-    `TEMer エラー報告 ${new Date().toISOString()}`,
-    `メッセージ: ${error.message}`,
-    `ブラウザ: ${navigator.userAgent}`,
+    t('report.title', { time: new Date().toISOString() }),
+    t('report.message', { message: error.message }),
+    t('report.browser', { ua: navigator.userAgent }),
     `URL: ${location.href}`,
     '',
-    '部品の位置（componentStack）:',
-    info?.componentStack?.trim() ?? '（なし）',
+    t('report.componentStack'),
+    info?.componentStack?.trim() ?? t('report.none'),
     '',
-    'スタック:',
-    error.stack ?? '（なし）',
+    t('report.stack'),
+    error.stack ?? t('report.none'),
   ].join('\n');
 
   const saveTem = () => {
     const doc = useTEMStore.getState().doc;
-    const title = (doc.metadata?.title || 'TEM図').replace(/[/\\:*?"<>|]/g, '_');
+    const title = (doc.metadata?.title || t('file.defaultTitle')).replace(/[/\\:*?"<>|]/g, '_');
     const blob = new Blob([JSON.stringify(doc, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${title}_エラー時の退避_${stamp()}.tem`;
+    a.download = `${title}_${t('file.suffix')}_${stamp()}.tem`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -65,28 +67,27 @@ export function CrashScreen({ error, info }: { error: Error; info?: ErrorInfo | 
 
   return (
     <div style={{ padding: 24, fontFamily: 'sans-serif', maxWidth: 760, margin: '40px auto', lineHeight: 1.6 }}>
-      <h2 style={{ color: '#c00' }}>予期しないエラーが発生しました</h2>
+      <h2 style={{ color: '#c00' }}>{t('heading')}</h2>
       <p style={{ fontSize: 14 }}>
-        アプリの描画中にエラーが発生しました。作業中の図は次の方法で取り戻せます。
+        {t('intro')}
       </p>
       <ol style={{ fontSize: 14 }}>
         <li>
-          {backup === 'saving' && '作業中の図を自動保存に退避しています…'}
-          {backup === 'saved' && '作業中の図を自動保存に退避しました。下の「再読み込み」を押し、表示される確認で「OK（復元する）」を選んでください。「キャンセル」を選ぶと退避した内容は消えます。'}
-          {backup === 'failed' && '自動保存への退避に失敗しました。下の「作業中の図を .tem として保存」で保存してから再読み込みしてください。'}
+          {backup === 'saving' && t('backup.saving')}
+          {backup === 'saved' && t('backup.saved')}
+          {backup === 'failed' && t('backup.failed')}
         </li>
         <li>
-          復元してもまたエラーになる場合は、「作業中の図を .tem として保存」でファイルに保存しておき、
-          そのファイルと下の「エラーの詳細」を開発者に送ってください。
+          {t('advice')}
         </li>
       </ol>
       <div style={{ margin: '12px 0' }}>
-        <button style={btn} onClick={saveTem}>作業中の図を .tem として保存</button>
-        <button style={btn} onClick={copy}>{copied ? 'コピーしました' : 'エラーの詳細をコピー'}</button>
-        <button style={btn} onClick={() => window.location.reload()}>再読み込み</button>
+        <button style={btn} onClick={saveTem}>{t('saveTem')}</button>
+        <button style={btn} onClick={copy}>{copied ? t('copied') : t('copyDetails')}</button>
+        <button style={btn} onClick={() => window.location.reload()}>{t('reload')}</button>
       </div>
       <details>
-        <summary style={{ cursor: 'pointer', fontSize: 13 }}>エラーの詳細</summary>
+        <summary style={{ cursor: 'pointer', fontSize: 13 }}>{t('details')}</summary>
         <pre style={{ background: '#f8f8f8', padding: 12, fontSize: 12, whiteSpace: 'pre-wrap', borderRadius: 4 }}>
           {details}
         </pre>

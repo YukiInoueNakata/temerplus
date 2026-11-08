@@ -1,0 +1,4 @@
+﻿key,ja,en,note
+"drag.title","ドラッグで移動","Drag to move","図の上の凡例のつまみの説明（マウスを重ねたとき）"
+"legend.title","クリックで選択、ダブルクリックで凡例設定","Click to select; double-click for legend settings","図の上の凡例の説明（マウスを重ねたとき）"
+"resize.title","ドラッグで凡例の大きさを変更","Drag to resize the legend","凡例の角のつまみの説明（マウスを重ねたとき）"

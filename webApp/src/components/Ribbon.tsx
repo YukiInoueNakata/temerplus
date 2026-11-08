@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import { saveUILanguage, type UILanguage } from '../utils/uiLanguage';
 import { useTEMStore } from '../store/store';
 import type { BoxType } from '../types';
-import { BOX_TYPE_LABELS } from '../store/defaults';
 import { pickBetweenAnchors } from '../utils/sdsgBetween';
 import { ChangelogDialog } from './ChangelogDialog';
 import changelogData from '../data/changelog.json';
@@ -67,7 +66,7 @@ export function Ribbon({
   onNew: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<RibbonTab>('home');
-  const { t } = useTranslation();
+  const { t } = useTranslation('ribbon');
   const [changelogOpen, setChangelogOpen] = useState(false);
   // 前回「更新情報」を開いてから新しい更新があれば、ヘルプタブと更新情報ボタンに「新」を付ける
   const [unseen, setUnseen] = useState(() => hasUnseen(changelogData as ChangelogEntry[], readLastSeen()));
@@ -85,8 +84,8 @@ export function Ribbon({
             className={`ribbon-tab ${activeTab === tab ? 'active' : ''}`}
             onClick={() => setActiveTab(tab)}
           >
-            {t(`ribbon.tabs.${tab}`)}
-            {tab === 'help' && unseen && <span className="ribbon-new-badge" title="新しい更新があります">新</span>}
+            {t(`translation:ribbon.tabs.${tab}`)}
+            {tab === 'help' && unseen && <span className="ribbon-new-badge" title={t('badge.new.title')}>{t('badge.new')}</span>}
           </button>
         ))}
         <div style={{ flex: 1 }} />
@@ -119,6 +118,9 @@ const SHOW_LOCALE_TOGGLE = false;
 function LocaleToggle() {
   const { i18n } = useTranslation();
   const lang: UILanguage = i18n.language === 'en' ? 'en' : 'ja';
+  // 言語の切り替えボタンは両方の言語で書く（訳さない）
+  const toggleTitle = 'Language / 言語'; // i18n-ok
+  const toggleLabel = lang === 'ja' ? '日本語 / English' : 'English / 日本語'; // i18n-ok
   return (
     <button
       className="ribbon-btn-small"
@@ -127,9 +129,9 @@ function LocaleToggle() {
         saveUILanguage(next);
         void i18n.changeLanguage(next);
       }}
-      title="Language / 言語"
+      title={toggleTitle}
     >
-      {lang === 'ja' ? '日本語 / English' : 'English / 日本語'}
+      {toggleLabel}
     </button>
   );
 }
@@ -138,23 +140,24 @@ function LayoutToggle() {
   const layout = useTEMStore((s) => s.doc.settings.layout);
   const setLayout = useTEMStore((s) => s.setLayout);
   const isHorizontal = layout === 'horizontal';
+  const { t } = useTranslation('ribbon');
   return (
-    <div className="layout-toggle" role="group" aria-label="レイアウト">
+    <div className="layout-toggle" role="group" aria-label={t('layout.group')}>
       <button
         className={`layout-toggle-btn ${isHorizontal ? 'active' : ''}`}
         onClick={() => setLayout('horizontal')}
-        title="横型レイアウト（時間軸→右）"
+        title={t('layout.horizontal.title')}
       >
         <span className="layout-icon">⇨</span>
-        <span>横型</span>
+        <span>{t('layout.horizontal')}</span>
       </button>
       <button
         className={`layout-toggle-btn ${!isHorizontal ? 'active' : ''}`}
         onClick={() => setLayout('vertical')}
-        title="縦型レイアウト（時間軸↓）"
+        title={t('layout.vertical.title')}
       >
         <span className="layout-icon">⇩</span>
-        <span>縦型</span>
+        <span>{t('layout.vertical')}</span>
       </button>
     </div>
   );
@@ -162,9 +165,10 @@ function LayoutToggle() {
 
 function SaveButton({ onSave }: { onSave: () => void }) {
   const dirty = useTEMStore((s) => s.dirty);
+  const { t } = useTranslation('ribbon');
   return (
-    <button className="ribbon-btn-primary" onClick={onSave} title={`保存 (${shortcutLabel('Ctrl+S')})`}>
-      {dirty ? '● 保存' : '保存'}
+    <button className="ribbon-btn-primary" onClick={onSave} title={t('save.title', { key: shortcutLabel('Ctrl+S') })}>
+      {dirty ? t('save.dirty') : t('save')}
     </button>
   );
 }
@@ -187,29 +191,30 @@ function FileTab({ onSave, onSaveAs, onOpen, onOpenAsNewSheets, onNew, onOpenExp
   onOpenTranscript: () => void;
   onOpenTranscriptBulkImport: () => void;
 }) {
+  const { t } = useTranslation('ribbon');
   return (
     <>
-      <RibbonGroup title="ファイル操作">
-        <RibbonButton label={`新規 (${shortcutLabel('Ctrl+N')})`} icon="📄" onClick={onNew} title="空のシートで新規作成" />
-        <RibbonButton label={`開く (${shortcutLabel('Ctrl+O')})`} icon="📂" onClick={onOpen} title="現在のシートを破棄して開く" />
-        <RibbonButton label="別シートとして開く" icon="📂+" onClick={onOpenAsNewSheets} title="現状のシートはそのまま、ファイル内のシートを追加" />
-        <RibbonButton label={`保存 (${shortcutLabel('Ctrl+S')})`} icon="💾" onClick={onSave} />
-        <RibbonButton label="名前を付けて保存" icon="💾+" onClick={onSaveAs} />
-        <RibbonButton label="リサイズ..." icon="⤡" onClick={onOpenResize} title="シート全体を用紙サイズや任意の倍率でリサイズ" />
-        <RibbonButton label="移動..." icon="✥" onClick={onOpenShiftContent} title="選択中の Box または全体を Time/Item 方向に移動" />
+      <RibbonGroup title={t('file.group.file')}>
+        <RibbonButton label={t('file.new', { key: shortcutLabel('Ctrl+N') })} icon="📄" onClick={onNew} title={t('file.new.title')} />
+        <RibbonButton label={t('file.open', { key: shortcutLabel('Ctrl+O') })} icon="📂" onClick={onOpen} title={t('file.open.title')} />
+        <RibbonButton label={t('file.openAsSheets')} icon="📂+" onClick={onOpenAsNewSheets} title={t('file.openAsSheets.title')} />
+        <RibbonButton label={t('file.save', { key: shortcutLabel('Ctrl+S') })} icon="💾" onClick={onSave} />
+        <RibbonButton label={t('file.saveAs')} icon="💾+" onClick={onSaveAs} />
+        <RibbonButton label={t('file.resize')} icon="⤡" onClick={onOpenResize} title={t('file.resize.title')} />
+        <RibbonButton label={t('file.shift')} icon="✥" onClick={onOpenShiftContent} title={t('file.shift.title')} />
       </RibbonGroup>
-      <RibbonGroup title="インポート">
-        <RibbonButton label="表から取り込み..." icon="📥" onClick={onOpenCSVImport} title="CSV / Excel から Box・Line・SD/SG・時期ラベル・逐語録・MAXQDA コード付きセグメントを取り込む（列の役割を指定できる）。PowerPoint（.pptx）で描いた TEM 図も取り込める" />
-        <RibbonButton label="原文" icon="📖" onClick={onOpenTranscript} title="インタビュー原文ビューア（取り込み / 編集 / Box とのリンク）" />
-        <RibbonButton label="原文一括" icon="📦" onClick={onOpenTranscriptBulkImport} title="複数ファイル/フォルダから原文を一括取り込み（ファイル名から協力者・回数を自動推測）" />
+      <RibbonGroup title={t('file.group.import')}>
+        <RibbonButton label={t('file.importTable')} icon="📥" onClick={onOpenCSVImport} title={t('file.importTable.title')} />
+        <RibbonButton label={t('file.transcript')} icon="📖" onClick={onOpenTranscript} title={t('file.transcript.title')} />
+        <RibbonButton label={t('file.transcriptBulk')} icon="📦" onClick={onOpenTranscriptBulkImport} title={t('file.transcriptBulk.title')} />
       </RibbonGroup>
-      <RibbonGroup title="出力">
-        <RibbonButton label="出力..." icon="📤" onClick={onOpenExport} title="PNG / SVG / PDF / PPTX 出力（設定ダイアログ）" />
-        <RibbonButton label="CSV エクスポート" icon="📑" onClick={onCSVExport} title="現在シートの Box / Line / SDSG / 時期ラベルを ZIP で CSV エクスポート" />
-        <RibbonButton label="論文レポート" icon="📝" onClick={onOpenPaperReport} title="記号体系・協力者・図・結果（全要素リスト）・用語凡例を含む .docx を生成" />
+      <RibbonGroup title={t('file.group.export')}>
+        <RibbonButton label={t('file.export')} icon="📤" onClick={onOpenExport} title={t('file.export.title')} />
+        <RibbonButton label={t('file.csvExport')} icon="📑" onClick={onCSVExport} title={t('file.csvExport.title')} />
+        <RibbonButton label={t('file.paperReport')} icon="📝" onClick={onOpenPaperReport} title={t('file.paperReport.title')} />
       </RibbonGroup>
-      <RibbonGroup title="環境">
-        <RibbonButton label="設定" icon="⚙" onClick={onOpenSettings} title="全般設定（レイアウト・フォント・凡例など）" />
+      <RibbonGroup title={t('file.group.env')}>
+        <RibbonButton label={t('file.settings')} icon="⚙" onClick={onOpenSettings} title={t('file.settings.title')} />
       </RibbonGroup>
     </>
   );
@@ -233,6 +238,7 @@ function HomeTab() {
     selection.boxIds.length + selection.lineIds.length + selection.sdsgIds.length;
   const canvasMode = useTEMStore((s) => s.view.canvasMode);
   const setCanvasMode = useTEMStore((s) => s.setCanvasMode);
+  const { t } = useTranslation('ribbon');
 
   const handleDelete = () => {
     // Delete キー（App.tsx）と同じ範囲を消す。SD/SG が消えないと挙動が食い違う
@@ -243,101 +249,101 @@ function HomeTab() {
 
   return (
     <>
-      <RibbonGroup title="モード">
+      <RibbonGroup title={t('home.group.mode')}>
         <RibbonButton
-          label={canvasMode === 'move' ? '移動 ✓' : '移動'}
+          label={`${t('home.move')}${canvasMode === 'move' ? ' ✓' : ''}`}
           icon="✋"
           onClick={() => setCanvasMode('move')}
-          title="ドラッグで画面をパン"
+          title={t('home.move.title')}
           active={canvasMode === 'move'}
         />
         <RibbonButton
-          label={canvasMode === 'pointer' ? '選択 ✓' : '選択'}
+          label={`${t('home.pointer')}${canvasMode === 'pointer' ? ' ✓' : ''}`}
           icon="➤"
           onClick={() => setCanvasMode('pointer')}
-          title="編集ロックなし・図形のクリック/ドラッグに専念（パン/範囲選択は無効）"
+          title={t('home.pointer.title')}
           active={canvasMode === 'pointer'}
         />
         <RibbonButton
-          label={canvasMode === 'select' ? '範囲選択 ✓' : '範囲選択'}
+          label={`${t('home.select')}${canvasMode === 'select' ? ' ✓' : ''}`}
           icon="⊡"
           onClick={() => setCanvasMode('select')}
-          title="ドラッグで範囲選択"
+          title={t('home.select.title')}
           active={canvasMode === 'select'}
         />
       </RibbonGroup>
-      <RibbonGroup title="基本操作">
-        <RibbonButton label={`元に戻す (${shortcutLabel('Ctrl+Z')})`} icon="↶" onClick={() => useTEMStore.temporal.getState().undo()} />
-        <RibbonButton label={`進む (${shortcutLabel('Ctrl+Y', 'Ctrl+Shift+Z')})`} icon="↷" onClick={() => useTEMStore.temporal.getState().redo()} />
+      <RibbonGroup title={t('home.group.basic')}>
+        <RibbonButton label={t('home.undo', { key: shortcutLabel('Ctrl+Z') })} icon="↶" onClick={() => useTEMStore.temporal.getState().undo()} />
+        <RibbonButton label={t('home.redo', { key: shortcutLabel('Ctrl+Y', 'Ctrl+Shift+Z') })} icon="↷" onClick={() => useTEMStore.temporal.getState().redo()} />
         <RibbonButton
-          label="コピー"
+          label={t('home.copy')}
           icon="📋"
           onClick={copyToClipboard}
           disabled={selectedCount === 0}
-          title={selectedCount > 0 ? `選択中の ${selectedCount} 要素をコピー` : '図形を選択してください'}
+          title={selectedCount > 0 ? t('home.copy.title', { count: selectedCount }) : t('home.noSelection')}
         />
         <RibbonButton
-          label="貼付"
+          label={t('home.paste')}
           icon="📥"
           onClick={() => pasteFromClipboard()}
           disabled={clipboardCount === 0}
-          title={clipboardCount > 0 ? `クリップボードの ${clipboardCount} 要素を貼り付け` : 'クリップボードが空です'}
+          title={clipboardCount > 0 ? t('home.paste.title', { count: clipboardCount }) : t('home.paste.empty')}
         />
         <RibbonButton
-          label="削除"
+          label={t('home.delete')}
           icon="🗑"
           onClick={handleDelete}
           disabled={selectedCount === 0}
-          title={selectedCount > 0 ? `選択中の ${selectedCount} 要素を削除` : '図形を選択してください'}
+          title={selectedCount > 0 ? t('home.delete.title', { count: selectedCount }) : t('home.noSelection')}
         />
       </RibbonGroup>
-      <RibbonGroup title="編集">
-        <RibbonButton label="全選択" icon="☰" onClick={() => useTEMStore.getState().selectAll()} />
+      <RibbonGroup title={t('home.group.edit')}>
+        <RibbonButton label={t('home.selectAll')} icon="☰" onClick={() => useTEMStore.getState().selectAll()} />
         <RibbonButton
-          label="複製"
+          label={t('home.duplicate')}
           icon="⎘"
           onClick={() => { copyToClipboard(); pasteFromClipboard(); }}
           disabled={selectedCount === 0}
-          title={selectedCount > 0 ? `選択中の ${selectedCount} 要素を複製` : '図形を選択してください'}
+          title={selectedCount > 0 ? t('home.duplicate.title', { count: selectedCount }) : t('home.noSelection')}
         />
         <RibbonButton
-          label="文字に合わせる"
+          label={t('home.fitBoth')}
           icon="↔↕"
           onClick={() => {
             const ids = useTEMStore.getState().selection.boxIds;
             if (ids.length === 0) {
-              alert('Box を選択してください');
+              alert(t('alert.selectBox'));
               return;
             }
             useTEMStore.getState().fitBoxesToLabel(ids, 'both');
           }}
-          title="選択 Box のサイズ（幅・高さとも）をラベルに合わせて最小化"
+          title={t('home.fitBoth.title')}
         />
         <RibbonButton
-          label="幅を文字に"
+          label={t('home.fitWidth')}
           icon="↔Aa"
           onClick={() => {
             const ids = useTEMStore.getState().selection.boxIds;
             if (ids.length === 0) {
-              alert('Box を選択してください');
+              alert(t('alert.selectBox'));
               return;
             }
             useTEMStore.getState().fitBoxesToLabel(ids, 'width');
           }}
-          title="高さは維持し、幅のみをラベルに合わせる"
+          title={t('home.fitWidth.title')}
         />
         <RibbonButton
-          label="高さを文字に"
+          label={t('home.fitHeight')}
           icon="↕Aa"
           onClick={() => {
             const ids = useTEMStore.getState().selection.boxIds;
             if (ids.length === 0) {
-              alert('Box を選択してください');
+              alert(t('alert.selectBox'));
               return;
             }
             useTEMStore.getState().fitBoxesToLabel(ids, 'height');
           }}
-          title="幅は維持し、高さのみをラベルに合わせる"
+          title={t('home.fitHeight.title')}
         />
         <SwapBoxesButton />
         <SwapBoxesFullButton />
@@ -357,10 +363,11 @@ function ArrangeTab({ onOpenOverlapCheck }: { onOpenOverlapCheck: () => void }) 
   const bringForward = useTEMStore((s) => s.bringForward);
   const sendBackward = useTEMStore((s) => s.sendBackward);
   const firstSelectedId = selection.boxIds[0] ?? selection.lineIds[0];
+  const { t } = useTranslation('ribbon');
 
   return (
     <>
-      <RibbonGroup title="整列・サイズ">
+      <RibbonGroup title={t('arrange.group.align')}>
         <AlignButton type="left" />
         <AlignButton type="center-h" />
         <AlignButton type="right" />
@@ -369,59 +376,59 @@ function ArrangeTab({ onOpenOverlapCheck }: { onOpenOverlapCheck: () => void }) 
         <AlignButton type="bottom" />
         <AlignButton type="distribute-h" />
         <RibbonButton
-          label="幅を揃える"
+          label={t('arrange.matchWidth')}
           icon="↔"
-          title="選択 Box の幅を先頭のものに揃える"
+          title={t('arrange.matchWidth.title')}
           onClick={() => {
             const ids = useTEMStore.getState().selection.boxIds;
-            if (ids.length < 2) { alert('2 つ以上の Box を選択してください'); return; }
+            if (ids.length < 2) { alert(t('alert.selectTwoOrMore')); return; }
             useTEMStore.getState().matchBoxesSize(ids, 'width');
           }}
         />
         <RibbonButton
-          label="高さを揃える"
+          label={t('arrange.matchHeight')}
           icon="↕"
-          title="選択 Box の高さを先頭のものに揃える"
+          title={t('arrange.matchHeight.title')}
           onClick={() => {
             const ids = useTEMStore.getState().selection.boxIds;
-            if (ids.length < 2) { alert('2 つ以上の Box を選択してください'); return; }
+            if (ids.length < 2) { alert(t('alert.selectTwoOrMore')); return; }
             useTEMStore.getState().matchBoxesSize(ids, 'height');
           }}
         />
         <RibbonButton
-          label="サイズを揃える"
+          label={t('arrange.matchSize')}
           icon="▭"
-          title="選択 Box の幅と高さを先頭のものに揃える"
+          title={t('arrange.matchSize.title')}
           onClick={() => {
             const ids = useTEMStore.getState().selection.boxIds;
-            if (ids.length < 2) { alert('2 つ以上の Box を選択してください'); return; }
+            if (ids.length < 2) { alert(t('alert.selectTwoOrMore')); return; }
             useTEMStore.getState().matchBoxesSize(ids, 'both');
           }}
         />
         <RibbonButton
-          label="文字サイズ揃え"
+          label={t('arrange.matchFontSize')}
           icon="Aa"
-          title="選択 Box の文字サイズを先頭のものに揃える"
+          title={t('arrange.matchFontSize.title')}
           onClick={() => {
             const ids = useTEMStore.getState().selection.boxIds;
-            if (ids.length < 2) { alert('2 つ以上の Box を選択してください'); return; }
+            if (ids.length < 2) { alert(t('alert.selectTwoOrMore')); return; }
             useTEMStore.getState().matchBoxesFontSize(ids);
           }}
         />
       </RibbonGroup>
-      <RibbonGroup title="点検">
+      <RibbonGroup title={t('arrange.group.check')}>
         <RibbonButton
-          label="重なりチェック"
+          label={t('arrange.overlap')}
           icon="⚠"
-          title="ラベル・Box・矢印がぶつかっている箇所を一覧する"
+          title={t('arrange.overlap.title')}
           onClick={onOpenOverlapCheck}
         />
       </RibbonGroup>
-      <RibbonGroup title="順序">
-        <RibbonButton label="最前面" icon="⬆⬆" onClick={() => firstSelectedId && bringToFront(firstSelectedId)} />
-        <RibbonButton label="前面" icon="⬆" onClick={() => firstSelectedId && bringForward(firstSelectedId)} />
-        <RibbonButton label="背面" icon="⬇" onClick={() => firstSelectedId && sendBackward(firstSelectedId)} />
-        <RibbonButton label="最背面" icon="⬇⬇" onClick={() => firstSelectedId && sendToBack(firstSelectedId)} />
+      <RibbonGroup title={t('arrange.group.order')}>
+        <RibbonButton label={t('arrange.toFront')} icon="⬆⬆" onClick={() => firstSelectedId && bringToFront(firstSelectedId)} />
+        <RibbonButton label={t('arrange.forward')} icon="⬆" onClick={() => firstSelectedId && bringForward(firstSelectedId)} />
+        <RibbonButton label={t('arrange.backward')} icon="⬇" onClick={() => firstSelectedId && sendBackward(firstSelectedId)} />
+        <RibbonButton label={t('arrange.toBack')} icon="⬇⬇" onClick={() => firstSelectedId && sendToBack(firstSelectedId)} />
       </RibbonGroup>
     </>
   );
@@ -430,12 +437,13 @@ function ArrangeTab({ onOpenOverlapCheck }: { onOpenOverlapCheck: () => void }) 
 function SwapBoxesButton() {
   const selection = useTEMStore((s) => s.selection);
   const swapBoxes = useTEMStore((s) => s.swapBoxes);
+  const { t } = useTranslation('ribbon');
 
   const canSwap = selection.boxIds.length === 2;
 
   const handleSwap = () => {
     if (!canSwap) {
-      alert('Box を2つ選択してください');
+      alert(t('alert.selectTwoBoxes'));
       return;
     }
     swapBoxes(selection.boxIds[0], selection.boxIds[1]);
@@ -443,7 +451,7 @@ function SwapBoxesButton() {
 
   return (
     <RibbonButton
-      label={canSwap ? '順序入替(直接)' : '順序入替(直接)*'}
+      label={`${t('home.swap')}${canSwap ? '' : '*'}`}
       icon="⇄"
       onClick={handleSwap}
     />
@@ -453,19 +461,20 @@ function SwapBoxesButton() {
 function ShiftAfterButton() {
   const selection = useTEMStore((s) => s.selection);
   const shiftBoxesAfter = useTEMStore((s) => s.shiftBoxesAfter);
+  const { t } = useTranslation('ribbon');
 
   const canShift = selection.boxIds.length === 1;
 
   const handleShift = () => {
     if (!canShift) {
-      alert('基準にする Box を 1つ選択してください');
+      alert(t('alert.selectBaseBox'));
       return;
     }
-    const input = prompt('何レベル分シフトしますか？（正=後ろへ、負=前へ）', '1');
+    const input = prompt(t('prompt.shiftLevels'), '1');
     if (input === null) return;
     const delta = Number(input);
     if (isNaN(delta) || delta === 0) {
-      alert('0以外の数値を入力してください');
+      alert(t('alert.nonZero'));
       return;
     }
     shiftBoxesAfter(selection.boxIds[0], delta);
@@ -473,7 +482,7 @@ function ShiftAfterButton() {
 
   return (
     <RibbonButton
-      label={canShift ? '以降シフト' : '以降シフト*'}
+      label={`${t('home.shiftAfter')}${canShift ? '' : '*'}`}
       icon="⇉"
       onClick={handleShift}
     />
@@ -483,12 +492,13 @@ function ShiftAfterButton() {
 function SwapBoxesFullButton() {
   const selection = useTEMStore((s) => s.selection);
   const swapBoxesFullLinks = useTEMStore((s) => s.swapBoxesFullLinks);
+  const { t } = useTranslation('ribbon');
 
   const canSwap = selection.boxIds.length === 2;
 
   const handleSwap = () => {
     if (!canSwap) {
-      alert('Box を2つ選択してください');
+      alert(t('alert.selectTwoBoxes'));
       return;
     }
     swapBoxesFullLinks(selection.boxIds[0], selection.boxIds[1]);
@@ -496,7 +506,7 @@ function SwapBoxesFullButton() {
 
   return (
     <RibbonButton
-      label={canSwap ? '順序入替(全リンク)' : '順序入替(全リンク)*'}
+      label={`${t('home.swapFull')}${canSwap ? '' : '*'}`}
       icon="⇆"
       onClick={handleSwap}
     />
@@ -507,17 +517,20 @@ function AlignButton({ type }: { type: 'left' | 'center-h' | 'right' | 'top' | '
   const selection = useTEMStore((s) => s.selection);
   const updateBox = useTEMStore((s) => s.updateBox);
   const doc = useTEMStore((s) => s.doc);
+  const { t } = useTranslation('ribbon');
 
-  const labels: Record<typeof type, { label: string; icon: string }> = {
-    'left': { label: '左揃え', icon: '⇤' },
-    'center-h': { label: '水平中央', icon: '≡' },
-    'right': { label: '右揃え', icon: '⇥' },
-    'top': { label: '上揃え', icon: '⤒' },
-    'middle': { label: '垂直中央', icon: '≣' },
-    'bottom': { label: '下揃え', icon: '⤓' },
-    'distribute-h': { label: '等間隔(横)', icon: '⇔' },
+  // 文言は ribbon.csv の align.<type>
+  const icons: Record<typeof type, string> = {
+    'left': '⇤',
+    'center-h': '≡',
+    'right': '⇥',
+    'top': '⤒',
+    'middle': '≣',
+    'bottom': '⤓',
+    'distribute-h': '⇔',
   };
-  const { label, icon } = labels[type];
+  const label = t(`align.${type}`);
+  const icon = icons[type];
 
   const handleAlign = () => {
     if (selection.boxIds.length < 2) return;
@@ -572,6 +585,7 @@ function InsertTab({ onOpenInsertBetween, onOpenPeriodLabels }: { onOpenInsertBe
   const addSDSG = useTEMStore((s) => s.addSDSG);
   const addNote = useTEMStore((s) => s.addNote);
   const boxTypes: BoxType[] = ['normal', 'annotation', 'BFP', 'EFP', 'P-EFP', 'OPP', 'other'];
+  const { t } = useTranslation('ribbon');
 
   // 選択数で自動分岐:
   //   Box 0 + Line 0 → エラー
@@ -586,7 +600,7 @@ function InsertTab({ onOpenInsertBetween, onOpenPeriodLabels }: { onOpenInsertBe
     const { boxIds, lineIds } = selection;
 
     if (boxIds.length === 0 && lineIds.length === 0) {
-      alert('Box または Line を選択してください（SD/SG は選択要素に紐づきます）');
+      alert(t('alert.selectBoxOrLine'));
       return;
     }
 
@@ -621,7 +635,7 @@ function InsertTab({ onOpenInsertBetween, onOpenPeriodLabels }: { onOpenInsertBe
   // 1 ボタンで Box 2 個 = 単線、3 個以上 = 選択順に順次接続。
   const handleSequentialArrow = (type: 'RLine' | 'XLine') => {
     if (selection.boxIds.length < 2) {
-      alert('Box を2つ以上選択してください（2 個=単線、3 個以上=選択順に接続）');
+      alert(t('alert.selectTwoOrMoreForArrow'));
       return;
     }
     addSequentialLines(selection.boxIds, type);
@@ -633,23 +647,23 @@ function InsertTab({ onOpenInsertBetween, onOpenPeriodLabels }: { onOpenInsertBe
         {boxTypes.map((type) => (
           <RibbonButton
             key={type}
-            label={BOX_TYPE_LABELS[type].ja}
+            label={t(`terms:boxType.${type}`)}
             icon={getIconForBoxType(type)}
-            onClick={() => addBox({ type, label: BOX_TYPE_LABELS[type].ja })}
+            onClick={() => addBox({ type, label: t(`terms:boxType.${type}`) })}
           />
         ))}
       </RibbonGroup>
-      <RibbonGroup title="メモ">
+      <RibbonGroup title={t('insert.group.note')}>
         <RibbonButton
-          label="メモ"
+          label={t('insert.note')}
           icon="✎"
-          title="図上に解釈やコメントを書くメモを置く（採番・凡例には出ない。Box を選択中ならその右上に置く）"
+          title={t('insert.note.title')}
           onClick={() => addNote()}
         />
         <RibbonButton
-          label="記号"
+          label={t('insert.symbol')}
           icon="★"
-          title="★・〇 などの強調の記号を置く（枠・背景なしの文字だけのメモ。Box を選択中ならその右上の角に重ねる。記号と色はプロパティで変えられる）"
+          title={t('insert.symbol.title')}
           onClick={() => {
             const st = useTEMStore.getState();
             const sh = st.doc.sheets.find((s) => s.id === st.doc.activeSheetId);
@@ -661,25 +675,25 @@ function InsertTab({ onOpenInsertBetween, onOpenPeriodLabels }: { onOpenInsertBe
           }}
         />
       </RibbonGroup>
-      <RibbonGroup title="2選択間に">
-        <RibbonButton label="間に挿入..." icon="↔+" onClick={onOpenInsertBetween} />
+      <RibbonGroup title={t('insert.group.between')}>
+        <RibbonButton label={t('insert.between')} icon="↔+" onClick={onOpenInsertBetween} />
       </RibbonGroup>
-      <RibbonGroup title="Line / 矢印">
-        <RibbonButton label="実線矢印" icon="→" onClick={() => handleSequentialArrow('RLine')} title="Box 2 個=単線 / 3 個以上=選択順に順次接続" />
-        <RibbonButton label="点線矢印" icon="⇢" onClick={() => handleSequentialArrow('XLine')} title="Box 2 個=単線 / 3 個以上=選択順に順次接続" />
+      <RibbonGroup title={t('insert.group.line')}>
+        <RibbonButton label={t('terms:line.RLine')} icon="→" onClick={() => handleSequentialArrow('RLine')} title={t('insert.arrow.title')} />
+        <RibbonButton label={t('terms:line.XLine')} icon="⇢" onClick={() => handleSequentialArrow('XLine')} title={t('insert.arrow.title')} />
       </RibbonGroup>
-      <RibbonGroup title="SD/SG 作成">
-        <RibbonButton label="SD追加" icon="▽" onClick={() => handleAddSDSG('SD')} title="Box 1個=single / 2個=between / 3個以上=Time軸両端2個でbetween" />
-        <RibbonButton label="SG追加" icon="△" onClick={() => handleAddSDSG('SG')} title="Box 1個=single / 2個=between / 3個以上=Time軸両端2個でbetween" />
+      <RibbonGroup title={t('insert.group.sdsgCreate')}>
+        <RibbonButton label={t('insert.addSD')} icon="▽" onClick={() => handleAddSDSG('SD')} title={t('insert.sdsg.title')} />
+        <RibbonButton label={t('insert.addSG')} icon="△" onClick={() => handleAddSDSG('SG')} title={t('insert.sdsg.title')} />
       </RibbonGroup>
-      <RibbonGroup title="SD/SG 配置">
+      <RibbonGroup title={t('insert.group.sdsgPlace')}>
         <RibbonButton
-          label="配置切替"
+          label={t('insert.togglePlacement')}
           icon="☰⇄"
           onClick={() => {
             const st = useTEMStore.getState();
             const ids = st.selection.sdsgIds;
-            if (ids.length === 0) { alert('SD/SG を選択してください'); return; }
+            if (ids.length === 0) { alert(t('alert.selectSDSG')); return; }
             const sheet = st.doc.sheets.find((s) => s.id === st.doc.activeSheetId);
             if (!sheet) return;
             const selected = sheet.sdsg.filter((s) => ids.includes(s.id));
@@ -699,11 +713,11 @@ function InsertTab({ onOpenInsertBetween, onOpenPeriodLabels }: { onOpenInsertBe
               st.setSDSGSpaceMode(ids, 'attached');
             }
           }}
-          title="選択中 SD/SG の配置をトグル: attached を含めば帯モードへ / 全部帯なら attached に戻す（SD→上部帯 / SG→下部帯）"
+          title={t('insert.togglePlacement.title')}
         />
       </RibbonGroup>
-      <RibbonGroup title="その他">
-        <RibbonButton label="時期ラベル..." icon="🏷" onClick={onOpenPeriodLabels} />
+      <RibbonGroup title={t('insert.group.other')}>
+        <RibbonButton label={t('insert.periodLabels')} icon="🏷" onClick={onOpenPeriodLabels} />
       </RibbonGroup>
     </>
   );
@@ -739,6 +753,9 @@ function ViewTab({ onOpenPeriodSettings, onOpenPeriodLabels: _onOpenPeriodLabels
   const toggleLeftRuler = useTEMStore((s) => s.toggleLeftRuler);
   const toggleLegend = useTEMStore((s) => s.toggleLegend);
   const requestFit = useTEMStore((s) => s.requestFit);
+  const { t } = useTranslation('ribbon');
+  // 入のときはボタンの名前の後ろに ✓ を付ける
+  const on = (label: string, active: boolean) => (active ? `${label} ✓` : label);
   const legendVisible = useTEMStore((s) => s.doc.settings.legend.alwaysVisible);
   const togglePeriodLabels = useTEMStore((s) => s.togglePeriodLabels);
   const periodLabelsVisible = useTEMStore((s) => s.doc.settings.periodLabels.alwaysVisible);
@@ -803,17 +820,17 @@ function ViewTab({ onOpenPeriodSettings, onOpenPeriodLabels: _onOpenPeriodLabels
 
   return (
     <>
-      <RibbonGroup title="表示">
-        <RibbonButton label={view.showGrid ? 'グリッド ✓' : 'グリッド'} icon="⊞" onClick={toggleGrid} active={view.showGrid} />
+      <RibbonGroup title={t('view.group.display')}>
+        <RibbonButton label={on(t('view.grid'), view.showGrid)} icon="⊞" onClick={toggleGrid} active={view.showGrid} />
         <RibbonButton
-          label={(view.showHandles ?? true) ? '接続点 ✓' : '接続点'}
+          label={on(t('view.handles'), view.showHandles ?? true)}
           icon="⦿"
           onClick={toggleHandles}
           active={view.showHandles ?? true}
-          title="Box の左右の接続点（矢印をつなぐ丸）の表示を切り替える。文字に重なるときや発表で画面共有するときに隠せる（隠しても矢印はつなげる。出力には常に出ない）"
+          title={t('view.handles.title')}
         />
-        <RibbonButton label={view.snapEnabled ? 'スナップ ✓' : 'スナップ'} icon="⊡" onClick={toggleSnap} active={view.snapEnabled} />
-        <RibbonButton label={view.showPaperGuides ? '用紙枠 ✓' : '用紙枠'} icon="▭" onClick={togglePaperGuides} active={view.showPaperGuides} />
+        <RibbonButton label={on(t('view.snap'), view.snapEnabled)} icon="⊡" onClick={toggleSnap} active={view.snapEnabled} />
+        <RibbonButton label={on(t('view.paperGuides'), view.showPaperGuides)} icon="▭" onClick={togglePaperGuides} active={view.showPaperGuides} />
         {(() => {
           const anyIdOn = view.showBoxIds || view.showSDSGIds || view.showLineIds;
           const allIdOn = view.showBoxIds && view.showSDSGIds && view.showLineIds;
@@ -824,64 +841,65 @@ function ViewTab({ onOpenPeriodSettings, onOpenPeriodLabels: _onOpenPeriodLabels
               icon="🏷"
               onClick={toggleAllIds}
               active={anyIdOn}
-              title={`Box / SDSG / Line の ID バッジ一括トグル (現状: Box=${view.showBoxIds ? 'ON' : 'OFF'}, SDSG=${view.showSDSGIds ? 'ON' : 'OFF'}, Line=${view.showLineIds ? 'ON' : 'OFF'})`}
+              title={t('view.ids.title', { box: view.showBoxIds ? 'ON' : 'OFF', sdsg: view.showSDSGIds ? 'ON' : 'OFF', line: view.showLineIds ? 'ON' : 'OFF' })}
             />
           );
         })()}
-        <RibbonButton label={view.showBoxIds ? 'Box-ID ✓' : 'Box-ID'} icon="🔖" onClick={toggleBoxIds} active={view.showBoxIds} title="Box の ID バッジ表示切替" />
-        <RibbonButton label={view.showSDSGIds ? 'SDSG-ID ✓' : 'SDSG-ID'} icon="🔖" onClick={toggleSDSGIds} active={view.showSDSGIds} title="SDSG の ID バッジ表示切替" />
-        <RibbonButton label={view.showLineIds ? 'Line-ID ✓' : 'Line-ID'} icon="🔖" onClick={toggleLineIds} active={view.showLineIds} title="Line の ID バッジ表示切替（線の中点）" />
-        <RibbonButton label={view.showTopRuler ? '上ルーラー ✓' : '上ルーラー'} icon="📏" onClick={toggleTopRuler} active={view.showTopRuler} />
-        <RibbonButton label={view.showLeftRuler ? '左ルーラー ✓' : '左ルーラー'} icon="📐" onClick={toggleLeftRuler} active={view.showLeftRuler} />
+        <RibbonButton label={view.showBoxIds ? 'Box-ID ✓' : 'Box-ID'} icon="🔖" onClick={toggleBoxIds} active={view.showBoxIds} title={t('view.boxIds.title')} />
+        <RibbonButton label={view.showSDSGIds ? 'SDSG-ID ✓' : 'SDSG-ID'} icon="🔖" onClick={toggleSDSGIds} active={view.showSDSGIds} title={t('view.sdsgIds.title')} />
+        <RibbonButton label={view.showLineIds ? 'Line-ID ✓' : 'Line-ID'} icon="🔖" onClick={toggleLineIds} active={view.showLineIds} title={t('view.lineIds.title')} />
+        <RibbonButton label={on(t('view.topRuler'), view.showTopRuler)} icon="📏" onClick={toggleTopRuler} active={view.showTopRuler} />
+        <RibbonButton label={on(t('view.leftRuler'), view.showLeftRuler)} icon="📐" onClick={toggleLeftRuler} active={view.showLeftRuler} />
         <RibbonButton
-          label={allTypeLabelsOn ? 'タイプラベル ✓' : 'タイプラベル'}
+          label={on(t('view.typeLabels'), !!allTypeLabelsOn)}
           icon="🅰"
           onClick={toggleAllTypeLabels}
-          title="Box / SDSG のタイプラベル（種別バッジ）を一括で表示・非表示"
+          title={t('view.typeLabels.title')}
           active={!!allTypeLabelsOn}
         />
         <RibbonButton
-          label={sdsgSpaceEnabled ? 'SDSG 帯 ✓' : 'SDSG 帯'}
+          label={on(t('view.sdsgBand'), sdsgSpaceEnabled)}
           icon="▤"
           onClick={toggleSDSGSpace}
-          title="SD/SG を上部(SD)帯・下部(SG)帯に配置するモードの ON/OFF（詳細は設定 > SD/SG 配置）"
+          title={t('view.sdsgBand.title')}
           active={sdsgSpaceEnabled}
         />
       </RibbonGroup>
-      <RibbonGroup title="図要素">
-        <RibbonButton label={timeArrowVisible ? '非可逆的時間 ✓' : '非可逆的時間'} icon="→" onClick={toggleTimeArrow} active={timeArrowVisible} />
-        <RibbonButton label={legendVisible ? '凡例 ✓' : '凡例'} icon="📋" onClick={toggleLegend} active={legendVisible} />
-        <RibbonButton label={periodLabelsVisible ? '時期 ✓' : '時期'} icon="🏷" onClick={togglePeriodLabels} active={periodLabelsVisible} />
-        <RibbonButton label="時期編集..." icon="📝" onClick={onOpenPeriodSettings} title="設定の時期区分タブを開く" />
+      <RibbonGroup title={t('view.group.elements')}>
+        <RibbonButton label={on(t('terms:timeArrow'), timeArrowVisible)} icon="→" onClick={toggleTimeArrow} active={timeArrowVisible} />
+        <RibbonButton label={on(t('terms:legend'), legendVisible)} icon="📋" onClick={toggleLegend} active={legendVisible} />
+        <RibbonButton label={on(t('view.periods'), periodLabelsVisible)} icon="🏷" onClick={togglePeriodLabels} active={periodLabelsVisible} />
+        <RibbonButton label={t('view.periodEdit')} icon="📝" onClick={onOpenPeriodSettings} title={t('view.periodEdit.title')} />
       </RibbonGroup>
-      <RibbonGroup title="パネル">
-        <RibbonButton label={view.dataSheetVisible ? 'データ ✓' : 'データ'} icon="🗂" onClick={toggleDataSheet} />
-        <RibbonButton label={view.propertyPanelVisible ? 'プロパティ ✓' : 'プロパティ'} icon="⚙" onClick={togglePropertyPanel} />
-        <RibbonButton label={view.commentMode ? 'コメント ✓' : 'コメント'} icon="💬" onClick={toggleCommentMode} />
+      <RibbonGroup title={t('view.group.panels')}>
+        <RibbonButton label={on(t('view.data'), view.dataSheetVisible)} icon="🗂" onClick={toggleDataSheet} />
+        <RibbonButton label={on(t('view.properties'), view.propertyPanelVisible)} icon="⚙" onClick={togglePropertyPanel} />
+        <RibbonButton label={on(t('view.comments'), view.commentMode)} icon="💬" onClick={toggleCommentMode} />
       </RibbonGroup>
-      <RibbonGroup title="フィット">
-        <RibbonButton label="全体fit" icon="🔳" onClick={() => requestFit('all')} title="時間矢印・時期ラベル・凡例を含め全体を画面に合わせる" />
-        <RibbonButton label="横fit" icon="↔" onClick={() => requestFit('width')} title="横幅に合わせる" />
-        <RibbonButton label="縦fit" icon="↕" onClick={() => requestFit('height')} title="縦幅に合わせる" />
+      <RibbonGroup title={t('view.group.fit')}>
+        <RibbonButton label={t('view.fitAll')} icon="🔳" onClick={() => requestFit('all')} title={t('view.fitAll.title')} />
+        <RibbonButton label={t('view.fitWidth')} icon="↔" onClick={() => requestFit('width')} title={t('view.fitWidth.title')} />
+        <RibbonButton label={t('view.fitHeight')} icon="↕" onClick={() => requestFit('height')} title={t('view.fitHeight.title')} />
       </RibbonGroup>
     </>
   );
 }
 
 function HelpTab({ onOpenWizard, onOpenChangelog, unseen }: { onOpenWizard?: () => void; onOpenChangelog: () => void; unseen: boolean }) {
+  const { t } = useTranslation('ribbon');
   return (
-    <RibbonGroup title="サポート">
-      <RibbonButton label="起動ウィザード" icon="🪄" onClick={onOpenWizard} title="起動時のウィザードを再表示 (新規作成 / プロジェクトを開く / デモを開く)" />
-      <RibbonButton label="ツアー" icon="🎓" disabled title="チュートリアルツアー (開発中)" />
+    <RibbonGroup title={t('help.group.support')}>
+      <RibbonButton label={t('help.wizard')} icon="🪄" onClick={onOpenWizard} title={t('help.wizard.title')} />
+      <RibbonButton label={t('help.tour')} icon="🎓" disabled title={t('help.tour.title')} />
       <RibbonButton
-        label="マニュアル"
+        label={t('help.manual')}
         icon="📘"
-        title="はじめてのガイド（画面の写真つき）を新しいタブで開く"
-        onClick={() => window.open('https://github.com/YukiInoueNakata/temerplus/blob/master/docs/getting-started.ja.md', '_blank', 'noopener')}
+        title={t('help.manual.title')}
+        onClick={() => window.open(t('help.manual.url'), '_blank', 'noopener')}
       />
-      <RibbonButton label="動画" icon="🎬" disabled title="動画リンク (開発中)" />
-      <RibbonButton label={unseen ? '更新情報（新）' : '更新情報'} icon="📰" onClick={onOpenChangelog} title="最近の更新（新機能・改善・修正）の一覧" active={unseen} />
-      <RibbonButton label="バージョン情報" icon="ℹ" onClick={() => alert('TEMer Plus v0.2.0\n著者: 中田友貴\nライセンス: PolyForm Noncommercial 1.0.0')} />
+      <RibbonButton label={t('help.video')} icon="🎬" disabled title={t('help.video.title')} />
+      <RibbonButton label={unseen ? t('help.changelog.unseen') : t('help.changelog')} icon="📰" onClick={onOpenChangelog} title={t('help.changelog.title')} active={unseen} />
+      <RibbonButton label={t('help.about')} icon="ℹ" onClick={() => alert(t('help.about.message', { version: 'v0.2.0' }))} />
     </RibbonGroup>
   );
 }

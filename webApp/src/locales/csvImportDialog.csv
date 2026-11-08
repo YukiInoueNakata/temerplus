@@ -1,0 +1,94 @@
+﻿key,ja,en,note
+title,CSV インポート,CSV import,CSV 取り込みの画面の題
+dragToMove,ドラッグで移動,Drag to move,CSV 取り込み > 題の帯の吹き出し
+entity.box,Box,Box,CSV 取り込み > 取り込む対象の選択肢
+entity.line,Line（矢印）,Line (arrow),CSV 取り込み > 取り込む対象の選択肢
+entity.sdsg,SDSG（社会的方向 / ガイド）,SDSG (social direction / guidance),CSV 取り込み > 取り込む対象の選択肢
+entity.period,時期ラベル,Period label,CSV 取り込み > 取り込む対象の選択肢
+field.box.ignore,（無視）,(Ignore),CSV 取り込み > Box の列の役割の選択肢
+field.box.label,ラベル,Label,CSV 取り込み > Box の列の役割の選択肢
+field.box.type,種別,Type,CSV 取り込み > Box の列の役割の選択肢
+field.box.timeLevel,Time Level,Time level,CSV 取り込み > Box の列の役割の選択肢
+field.box.itemLevel,Item Level,Item level,CSV 取り込み > Box の列の役割の選択肢
+field.box.id,ID,ID,CSV 取り込み > Box の列の役割の選択肢
+field.box.subLabel,サブラベル,Sublabel,CSV 取り込み > Box の列の役割の選択肢
+field.box.description,説明,Description,CSV 取り込み > Box の列の役割の選択肢
+field.box.width,幅,Width,CSV 取り込み > Box の列の役割の選択肢
+field.box.height,高さ,Height,CSV 取り込み > Box の列の役割の選択肢
+field.line.ignore,（無視）,(Ignore),CSV 取り込み > Line の列の役割の選択肢
+field.line.id,ID,ID,CSV 取り込み > Line の列の役割の選択肢
+field.line.from,From,From,CSV 取り込み > Line の列の役割の選択肢
+field.line.to,To,To,CSV 取り込み > Line の列の役割の選択肢
+field.line.type,種別 (RLine/XLine),Type (RLine/XLine),CSV 取り込み > Line の列の役割の選択肢
+field.line.shape,形状 (straight/elbow/curve),Shape (straight/elbow/curve),CSV 取り込み > Line の列の役割の選択肢
+field.line.label,ラベル,Label,CSV 取り込み > Line の列の役割の選択肢
+field.line.description,説明,Description,CSV 取り込み > Line の列の役割の選択肢
+field.sdsg.ignore,（無視）,(Ignore),CSV 取り込み > SD/SG の列の役割の選択肢
+field.sdsg.id,ID,ID,CSV 取り込み > SD/SG の列の役割の選択肢
+field.sdsg.type,種別 (SD/SG),Type (SD/SG),CSV 取り込み > SD/SG の列の役割の選択肢
+field.sdsg.label,ラベル,Label,CSV 取り込み > SD/SG の列の役割の選択肢
+field.sdsg.attachedTo,紐付け対象 (attachedTo),Attached to (attachedTo),CSV 取り込み > SD/SG の列の役割の選択肢
+field.sdsg.attachedTo2,2 つ目の対象 (attachedTo2),Second target (attachedTo2),CSV 取り込み > SD/SG の列の役割の選択肢
+field.sdsg.anchorMode,アンカー方式 (single/between),Anchor mode (single/between),CSV 取り込み > SD/SG の列の役割の選択肢
+field.sdsg.spaceMode,配置モード (attached/band-top/band-bottom),Placement mode (attached/band-top/band-bottom),CSV 取り込み > SD/SG の列の役割の選択肢
+field.sdsg.subLabel,サブラベル,Sublabel,CSV 取り込み > SD/SG の列の役割の選択肢
+field.sdsg.description,説明,Description,CSV 取り込み > SD/SG の列の役割の選択肢
+field.period.ignore,（無視）,(Ignore),CSV 取り込み > 時期ラベルの列の役割の選択肢
+field.period.id,ID,ID,CSV 取り込み > 時期ラベルの列の役割の選択肢
+field.period.position,位置 (Time Level),Position (time level),CSV 取り込み > 時期ラベルの列の役割の選択肢
+field.period.label,ラベル,Label,CSV 取り込み > 時期ラベルの列の役割の選択肢
+error.parse,CSV パースに失敗: {{message}},Could not read the CSV: {{message}},CSV 取り込み > 読み込めなかったときの注意
+error.noBoxes,インポート可能な Box がありませんでした。ラベル列を割り当てましたか？,There were no Boxes to import. Did you assign a label column?,CSV 取り込み > 取り込めなかったときの注意
+error.noLines,インポート可能な Line がありませんでした。from / to 列を割り当て、from/to の値が現在のシートの Box ID と一致する必要があります。,There were no Lines to import. Assign the from / to columns; their values must match Box IDs on the current sheet.,CSV 取り込み > 取り込めなかったときの注意
+error.noSdsg,インポート可能な SDSG がありませんでした。type と attachedTo 列が必要です。,There were no SD/SG to import. The type and attachedTo columns are required.,CSV 取り込み > 取り込めなかったときの注意
+error.noPeriods,インポート可能な時期ラベルがありませんでした。position と label 列を割り当ててください。,There were no period labels to import. Assign the position and label columns.,CSV 取り込み > 取り込めなかったときの注意
+done.boxes,{{boxes}} 件の Box、{{lines}} 件の Line をインポートしました,Imported {{boxes}} Boxes and {{lines}} Lines,CSV 取り込み > 取り込んだ後の知らせ
+done.lines,{{count}} 件の Line をインポートしました,Imported {{count}} Lines,CSV 取り込み > 取り込んだ後の知らせ
+done.sdsg,{{count}} 件の SDSG をインポートしました,Imported {{count}} SD/SG,CSV 取り込み > 取り込んだ後の知らせ
+done.periods,{{count}} 件の時期ラベルをインポートしました,Imported {{count}} period labels,CSV 取り込み > 取り込んだ後の知らせ
+done.withWarnings,インポート完了（警告 {{count}} 件）,Import finished ({{count}} warnings),CSV 取り込み > 警告があったときの知らせの見出し
+target,インポート対象,Import as,CSV 取り込み > 取り込む対象の選択のラベル
+chooseFile,CSV ファイルを選択してください。1 行目にヘッダがある場合は自動判定します。,Choose a CSV file. A header in the first row is detected automatically.,CSV 取り込み > ファイル選択の説明
+spec.heading,仕様メモ ({{target}}):,Format notes ({{target}}):,CSV 取り込み > 列の決まりの見出し
+spec.box.required,必須列: ラベル（label）,Required column: label,CSV 取り込み > Box の列の決まり
+spec.box.optional,オプション列: 種別 / Time Level / Item Level / ID / サブラベル / 説明 / 幅 / 高さ,Optional columns: type / time level / item level / ID / sublabel / description / width / height,CSV 取り込み > Box の列の決まり
+spec.box.types,種別は英名（BFP / EFP / P-EFP / OPP / annotation / 2nd-EFP）または日本語（分岐点・等至点・両極化等至点・必須通過点・潜在経験・第二等至点）,Type is an English code (BFP / EFP / P-EFP / OPP / annotation / 2nd-EFP) or a Japanese name (分岐点・等至点・両極化等至点・必須通過点・潜在経験・第二等至点),CSV 取り込み > Box の列の決まり（日本語の種別名はファイルの中で使える語なので英語版でも日本語のまま）
+spec.line.required,必須列: from（始点 Box ID）/ to（終点 Box ID）,Required columns: from (start Box ID) / to (end Box ID),CSV 取り込み > Line の列の決まり
+spec.line.optional,オプション列: ID / type (RLine/XLine) / shape (straight/elbow/curve) / label / 説明,Optional columns: ID / type (RLine/XLine) / shape (straight/elbow/curve) / label / description,CSV 取り込み > Line の列の決まり
+spec.line.before,from / to は,from / to must match a Box ID that exists on the ,CSV 取り込み > Line の列の決まり（太字の「現在のシート」の前）
+spec.line.currentSheet,現在のシート,current sheet,CSV 取り込み > Line の列の決まり（太字の部分）
+spec.line.after,に存在する Box ID と一致する必要があります,.,CSV 取り込み > Line の列の決まり（太字の「現在のシート」の後）
+spec.sdsg.required,必須列: type (SD/SG) / attachedTo（Box または Line ID）,Required columns: type (SD/SG) / attachedTo (Box or Line ID),CSV 取り込み > SD/SG の列の決まり
+spec.sdsg.optional,オプション列: ID / label / attachedTo2 / anchorMode (single/between) / spaceMode (attached/band-top/band-bottom) / subLabel / 説明,Optional columns: ID / label / attachedTo2 / anchorMode (single/between) / spaceMode (attached/band-top/band-bottom) / subLabel / description,CSV 取り込み > SD/SG の列の決まり
+spec.sdsg.between,attachedTo2 を指定すると between モードになります（明示的に single を指定すれば single）,"Giving attachedTo2 switches to between mode (unless single is set explicitly)",CSV 取り込み > SD/SG の列の決まり
+spec.period.required,必須列: position（Time Level の数値）/ label,Required columns: position (time level number) / label,CSV 取り込み > 時期ラベルの列の決まり
+spec.period.optional,オプション列: ID,Optional column: ID,CSV 取り込み > 時期ラベルの列の決まり
+hasHeader,1 行目はヘッダ,First row is a header,CSV 取り込み > チェックボックスのラベル
+delimiter,区切り文字,Delimiter,CSV 取り込み > 読み取った区切り文字のラベル
+rowCount,検出行数,Rows found,CSV 取り込み > 行数のラベル
+rowCountValue,{{total}}（ヘッダ除外: {{data}}）,"{{total}} (excluding header: {{data}})",CSV 取り込み > 行数の値
+chooseAnother,別ファイルを選ぶ,Choose another file,CSV 取り込み > ボタン
+mapping.heading,列マッピング,Column mapping,CSV 取り込み > 見出し
+mapping.column,列 #,Column #,CSV 取り込み > 列の対応の表の列名
+mapping.header,ヘッダ / 値例,Header / example value,CSV 取り込み > 列の対応の表の列名
+mapping.assign,割当,Assign to,CSV 取り込み > 列の対応の表の列名
+options.heading,配置オプション,Placement options,CSV 取り込み > 見出し
+options.defaultType,種別未指定時のデフォルト,Default type when none is given,CSV 取り込み > 設定のラベル（Box）
+options.insertMode,挿入方式,Insert mode,CSV 取り込み > 設定のラベル（Box）
+options.append,現在のシート末尾に追加（最大 Time_Level の右隣）,Append to the end of the current sheet (after the largest time level),CSV 取り込み > 挿入方式の選択肢
+options.between,指定 Box の間に挿入（以降をシフト）,Insert between chosen Boxes (shift the rest),CSV 取り込み > 挿入方式の選択肢
+options.newSheet,新規シートに作成,Create on a new sheet,CSV 取り込み > 挿入方式の選択肢
+options.after,この Box の直後に挿入,Insert right after this Box,CSV 取り込み > 設定のラベル（Box の間に挿入）
+options.none,（指定しない）,(None),CSV 取り込み > Box の選択肢
+options.before,またはこの Box の直前に挿入,Or insert right before this Box,CSV 取り込み > 設定のラベル（Box の間に挿入）
+options.gap,シフト時のギャップ (px),Gap when shifting (px),CSV 取り込み > 設定のラベル（Box の間に挿入）
+options.autoConnect,Box を順次接続,Connect Boxes in order,CSV 取り込み > 設定のラベル（Box）
+options.lineType,接続線種,Connecting line type,CSV 取り込み > 設定のラベル（Box）
+options.RLine,実線（実現径路）,Solid (realized path),CSV 取り込み > 線の種類の選択肢
+options.XLine,点線（未実現径路）,Dashed (unrealized path),CSV 取り込み > 線の種類の選択肢
+options.defaultLineType,type 未指定時のデフォルト,Default type when none is given,CSV 取り込み > 設定のラベル（Line）
+options.RLineCode,実線（RLine）,Solid (RLine),CSV 取り込み > 線の種類の選択肢（Line）
+options.XLineCode,点線（XLine）,Dashed (XLine),CSV 取り込み > 線の種類の選択肢（Line）
+preview,プレビュー（先頭 5 行）,Preview (first 5 rows),CSV 取り込み > 見出し
+cancel,キャンセル,Cancel,CSV 取り込み > ボタン
+import,インポート,Import,CSV 取り込み > ボタン

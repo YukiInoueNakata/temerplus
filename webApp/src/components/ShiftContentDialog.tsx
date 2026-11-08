@@ -7,12 +7,14 @@
 // ============================================================================
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore } from '../store/store';
 import { shortcutLabel } from '../utils/platform';
 
 type ShiftTarget = 'selected' | 'all';
 
 export function ShiftContentDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation('shiftContentDialog');
   const shiftAll = useTEMStore((s) => s.shiftActiveSheetContent);
   const shiftSelected = useTEMStore((s) => s.shiftSelectedBoxes);
   const selectedBoxIds = useTEMStore((s) => s.selection.boxIds);
@@ -31,8 +33,8 @@ export function ShiftContentDialog({ open, onClose }: { open: boolean; onClose: 
   }, [target, selectedBoxIds.length]);
 
   const isH = layout === 'horizontal';
-  const timeAxisLabel = isH ? 'Time_Level 方向（右=＋）' : 'Time_Level 方向（下=＋）';
-  const itemAxisLabel = isH ? 'Item_Level 方向（上=＋）' : 'Item_Level 方向（右=＋）';
+  const timeAxisLabel = isH ? t('axis.time.h') : t('axis.time.v');
+  const itemAxisLabel = isH ? t('axis.item.h') : t('axis.item.v');
 
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -98,20 +100,19 @@ export function ShiftContentDialog({ open, onClose }: { open: boolean; onClose: 
           className="modal-header"
           onMouseDown={onHeaderMouseDown}
           style={{ cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }}
-          title="ドラッグで移動"
+          title={t('drag')}
         >
-          <h3>移動 / 一括移動</h3>
+          <h3>{t('title')}</h3>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
         <div className="modal-body">
           <p className="hint" style={{ marginTop: 0 }}>
-            ▲▼ を押すと {step} Level 単位で即時に移動。数値を直接指定する場合は「移動」ボタンで反映。
-            {shortcutLabel('Ctrl+Z')} で取り消し可。
+            {t('hint', { step, key: shortcutLabel('Ctrl+Z') })}
           </p>
           <section className="settings-section">
             {/* 対象切替 */}
             <div className="setting-row">
-              <label>対象</label>
+              <label>{t('target')}</label>
               <div style={{ display: 'flex', gap: 10, fontSize: '0.9em' }}>
                 <label style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                   <input
@@ -123,7 +124,7 @@ export function ShiftContentDialog({ open, onClose }: { open: boolean; onClose: 
                     disabled={selectedDisabled}
                   />
                   <span style={{ color: selectedDisabled ? '#aaa' : undefined }}>
-                    選択中 Box ({selectedBoxIds.length}個)
+                    {t('target.selected', { count: selectedBoxIds.length })}
                   </span>
                 </label>
                 <label style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
@@ -134,7 +135,7 @@ export function ShiftContentDialog({ open, onClose }: { open: boolean; onClose: 
                     checked={target === 'all'}
                     onChange={() => setTarget('all')}
                   />
-                  <span>全体（時期/時間矢印/凡例除く）</span>
+                  <span>{t('target.all')}</span>
                 </label>
               </div>
             </div>
@@ -146,7 +147,7 @@ export function ShiftContentDialog({ open, onClose }: { open: boolean; onClose: 
                 <button
                   className="ribbon-btn-small"
                   onClick={() => immediateShift(-step, 0)}
-                  title={`${step} Level 前へ即時移動`}
+                  title={t('time.back', { step })}
                 >◀</button>
                 <input
                   type="number"
@@ -158,7 +159,7 @@ export function ShiftContentDialog({ open, onClose }: { open: boolean; onClose: 
                 <button
                   className="ribbon-btn-small"
                   onClick={() => immediateShift(step, 0)}
-                  title={`${step} Level 後へ即時移動`}
+                  title={t('time.forward', { step })}
                 >▶</button>
               </div>
             </div>
@@ -170,7 +171,7 @@ export function ShiftContentDialog({ open, onClose }: { open: boolean; onClose: 
                 <button
                   className="ribbon-btn-small"
                   onClick={() => immediateShift(0, step)}
-                  title={`${step} Level 上（＋）へ即時移動`}
+                  title={t('item.up', { step })}
                 >▲</button>
                 <input
                   type="number"
@@ -182,26 +183,26 @@ export function ShiftContentDialog({ open, onClose }: { open: boolean; onClose: 
                 <button
                   className="ribbon-btn-small"
                   onClick={() => immediateShift(0, -step)}
-                  title={`${step} Level 下（－）へ即時移動`}
+                  title={t('item.down', { step })}
                 >▼</button>
               </div>
             </div>
 
             <div className="setting-row" style={{ justifyContent: 'flex-start', gap: 6 }}>
               <button className="ribbon-btn-small" onClick={applyExplicit}>
-                数値で移動
+                {t('applyValues')}
               </button>
               <button
                 className="ribbon-btn-small"
                 onClick={() => { setDTime(0); setDItem(0); }}
               >
-                値をクリア
+                {t('clearValues')}
               </button>
             </div>
           </section>
         </div>
         <div className="modal-footer">
-          <button className="ribbon-btn-small" onClick={onClose}>閉じる</button>
+          <button className="ribbon-btn-small" onClick={onClose}>{t('close')}</button>
         </div>
       </div>
     </div>

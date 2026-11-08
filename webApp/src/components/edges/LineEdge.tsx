@@ -12,6 +12,7 @@
 // ============================================================================
 
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BaseEdge, getStraightPath, useReactFlow, type EdgeProps } from 'reactflow';
 import { useTEMView } from '../../context/TEMViewContext';
 import type { Line, LineShape } from '../../types';
@@ -63,6 +64,7 @@ export function LineEdge({
   style,
   selected,
 }: EdgeProps<LineEdgeData>) {
+  const { t } = useTranslation('lineEdge');
   const view = useTEMView();
   const layout = view.settings.layout;
   const isH = layout === 'horizontal';
@@ -263,7 +265,7 @@ export function LineEdge({
               onPointerUp={endDrag}
               onPointerCancel={endDrag}
             >
-              <title>cp1 をドラッグで移動</title>
+              <title>{t('cp1.title')}</title>
             </circle>
             <circle
               cx={path.points[1].x} cy={path.points[1].y} r={6}
@@ -279,7 +281,7 @@ export function LineEdge({
               onPointerUp={endDrag}
               onPointerCancel={endDrag}
             >
-              <title>cp2 をドラッグで移動</title>
+              <title>{t('cp2.title')}</title>
             </circle>
             <circle
               cx={path.points[2].x} cy={path.points[2].y} r={6}
@@ -308,7 +310,7 @@ export function LineEdge({
               onPointerUp={endBendDrag}
               onPointerCancel={endBendDrag}
             >
-              <title>L字の折れ位置をドラッグで調整（{isH ? '左右' : '上下'}方向）</title>
+              <title>{isH ? t('bend.title.h') : t('bend.title.v')}</title>
             </circle>
           </g>
         )}

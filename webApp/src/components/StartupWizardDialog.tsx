@@ -12,6 +12,7 @@
 // ============================================================================
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { shortcutLabel } from '../utils/platform';
 
 export type StartupWizardChoice =
@@ -35,6 +36,7 @@ export function StartupWizardDialog({
 }) {
   const [step, setStep] = useState<'main' | 'new-from-file'>('main');
   const [dontShowAgain, setDontShowAgain] = useState(false);
+  const { t } = useTranslation('startupWizardDialog');
 
   if (!open) return null;
 
@@ -56,38 +58,38 @@ export function StartupWizardDialog({
     <div className="modal-backdrop" onClick={dismiss} style={{ zIndex: 1300 }}>
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 820, maxWidth: '94vw' }}>
         <div className="modal-header">
-          <h3>TEMer へようこそ</h3>
-          <button onClick={dismiss} className="modal-close" title="閉じて空のシートで始める">×</button>
+          <h3>{t('title')}</h3>
+          <button onClick={dismiss} className="modal-close" title={t('close.title')}>×</button>
         </div>
         <div className="modal-body" style={{ minHeight: 360 }}>
           {step === 'main' ? (
             <>
               <p className="hint" style={{ marginTop: 0 }}>
-                何から始めますか？ 後からファイル / 原文ビューア / リボンメニューでも切り替えられます。
+                {t('main.hint')}
               </p>
               <div style={cardGrid}>
                 <Card
                   emoji="📥"
-                  title="ファイルから新規作成"
-                  desc="原文 (インタビュー逐語録) や切片 CSV/Excel を元に TEM 図を作り始める"
+                  title={t('newFromFile.title')}
+                  desc={t('newFromFile.desc')}
                   onClick={() => setStep('new-from-file')}
                 />
                 <Card
                   emoji="📂"
-                  title="プロジェクトを開く"
-                  desc={`保存済の .tem ファイルを開く (${shortcutLabel('Ctrl+O')} 相当)`}
+                  title={t('openProject.title')}
+                  desc={t('openProject.desc', { key: shortcutLabel('Ctrl+O') })}
                   onClick={() => choose({ kind: 'open-tem' })}
                 />
                 <Card
                   emoji="📄"
-                  title="空ファイルから作成"
-                  desc="空の TEM 図 (時期1 / 時期2) から始める"
+                  title={t('empty.title')}
+                  desc={t('empty.desc')}
                   onClick={() => choose({ kind: 'create-empty' })}
                 />
                 <Card
                   emoji="🎓"
-                  title="デモファイルを開く"
-                  desc="神崎・鈴木 (2021) Figure 1 を再現した作例 (32 Box / 34 Line / 4 SDSG / 4 期)"
+                  title={t('demo.title')}
+                  desc={t('demo.desc')}
                   onClick={() => choose({ kind: 'open-demo' })}
                 />
                 <Card
@@ -98,8 +100,8 @@ export function StartupWizardDialog({
                 />
                 <Card
                   emoji="🔗"
-                  title="原文連動デモを開く"
-                  desc="逐語録と TEM 図のリンク機能のデモ。Box の「原文参照」から逐語録へジャンプ (5 Box / 1 逐語録)"
+                  title={t('transcriptDemo.title')}
+                  desc={t('transcriptDemo.desc')}
                   onClick={() => choose({ kind: 'open-transcript-demo' })}
                 />
               </div>
@@ -107,30 +109,30 @@ export function StartupWizardDialog({
           ) : (
             <>
               <p className="hint" style={{ marginTop: 0 }}>
-                何を元に Box を作成しますか？
+                {t('fromFile.hint')}
               </p>
               <div style={cardGrid}>
                 <Card
                   emoji="📖"
-                  title="原文 (インタビュー) を 1 ファイル取り込み"
-                  desc=".txt / .csv / .xlsx / .docx 形式の逐語録 1 つを取り込み、原文ビューアで段落を選んで Box を作成"
+                  title={t('transcript.title')}
+                  desc={t('transcript.desc')}
                   onClick={() => choose({ kind: 'new-from-transcript' })}
                 />
                 <Card
                   emoji="📦"
-                  title="原文を複数ファイル/フォルダから一括取り込み"
-                  desc="A_第1回.docx, A_第2回.docx, B_第1回.docx... をフォルダ選択でまとめて取り込み。ファイル名から協力者・回数を自動推測"
+                  title={t('transcriptsBulk.title')}
+                  desc={t('transcriptsBulk.desc')}
                   onClick={() => choose({ kind: 'new-from-transcripts-bulk' })}
                 />
                 <Card
                   emoji="📊"
-                  title="切片 (Box) 情報の CSV/Excel から"
-                  desc="ラベル・種別・配置などを記載した CSV / Excel / テキストから Box を一括作成"
+                  title={t('csvBoxes.title')}
+                  desc={t('csvBoxes.desc')}
                   onClick={() => choose({ kind: 'new-from-csv-boxes' })}
                 />
               </div>
               <div style={{ marginTop: 16 }}>
-                <button className="ribbon-btn-small" onClick={() => setStep('main')}>← 戻る</button>
+                <button className="ribbon-btn-small" onClick={() => setStep('main')}>{t('back')}</button>
               </div>
             </>
           )}
@@ -142,10 +144,10 @@ export function StartupWizardDialog({
               checked={dontShowAgain}
               onChange={(e) => setDontShowAgain(e.target.checked)}
             />
-            次回から表示しない
+            {t('dontShowAgain')}
           </label>
           <button className="ribbon-btn-small" onClick={dismiss}>
-            閉じる
+            {t('close')}
           </button>
         </div>
       </div>

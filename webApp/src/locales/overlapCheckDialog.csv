@@ -1,0 +1,10 @@
+﻿key,ja,en,note
+"title","重なりチェック","Overlap check","重なりチェックの画面 > 見出し"
+"hint.compute","現在のシート（{{sheet}}）の要素の位置から、視覚的にぶつかっている箇所を計算します。","Finds places where elements visually collide, based on their positions in the current sheet ({{sheet}}).","重なりチェックの画面 > 説明の 1 文目（sheet はシート名）"
+"hint.click","行をクリックすると、その要素を選択して画面を寄せます。","Click a row to select the element and scroll to it.","重なりチェックの画面 > 説明の 2 文目"
+"none","重なりは見つかりませんでした。","No overlaps found.","重なりチェックの画面 > 重なりが無いとき"
+"col.kind","種類","Type","重なりチェックの画面 > 一覧の列の名前（検査の種類）"
+"col.detail","内容","Details","重なりチェックの画面 > 一覧の列の名前（重なりの説明）"
+"row.tooltip","クリックで該当箇所を選択して表示","Click to select and show this spot","重なりチェックの画面 > 一覧の行にマウスを載せたときの説明"
+"statusBar","ステータスバーに件数を常時表示","Always show the count in the status bar","重なりチェックの画面 > 下のチェックボックス"
+"close","閉じる","Close","重なりチェックの画面 > 閉じるボタン"

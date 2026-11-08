@@ -13,6 +13,7 @@
 // ============================================================================
 
 import { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import { LEVEL_PX, BOX_TYPE_LABELS } from '../store/defaults';
 import { parseTabularFile, looksLikeHeader, type TabularFile } from '../utils/tabularFile';
@@ -35,36 +36,28 @@ import type { BoxType, Transcript } from '../types';
 
 type Mode = 'box' | 'line' | 'sdsg' | 'period' | 'transcript' | 'maxqda';
 
-const MODE_LABELS: Record<Mode, { label: string; desc: string }> = {
-  box: { label: 'Box（出来事の一覧）', desc: '1 行 = 1 Box。ラベル列だけあれば取り込める' },
-  line: { label: 'Line（矢印）', desc: 'from / to の Box ID で径路を引く' },
-  sdsg: { label: 'SD / SG', desc: '紐付け先の Box ID と種別' },
-  period: { label: '時期ラベル', desc: '位置（Time Level）とラベル' },
-  transcript: { label: '逐語録', desc: '1 行 = 1 段落。話者・時刻の列は任意' },
-  maxqda: { label: 'MAXQDA コード付きセグメント', desc: '同じセグメントの行を集約し、コードを Box / SD・SG / 時期 / タグに振り分ける' },
-};
+/** 取り込み先の並び。表示名と説明は locales/importWizardDialog.csv の mode.<取り込み先>.label / .desc */
+const MODES: Mode[] = ['box', 'line', 'sdsg', 'period', 'transcript', 'maxqda'];
 
 type TranscriptRole = 'ignore' | 'text' | 'speaker' | 'timestamp';
-const TRANSCRIPT_ROLE_LABELS: Record<TranscriptRole, string> = {
-  ignore: '（無視）', text: '本文', speaker: '話者', timestamp: '時刻',
-};
+const TRANSCRIPT_ROLES: TranscriptRole[] = ['ignore', 'text', 'speaker', 'timestamp'];
 function guessTranscriptRole(header: string): TranscriptRole {
   const h = header.trim().toLowerCase();
-  if (/speaker|話者|発言者|人物|name/.test(h)) return 'speaker';
-  if (/timestamp|time|時刻|時間/.test(h)) return 'timestamp';
-  if (/text|utterance|transcript|body|発言|本文|テキスト|内容|セグメント|segment/.test(h)) return 'text';
+  if (/speaker|話者|発言者|人物|name/.test(h)) return 'speaker'; // i18n-ok 利用者のファイルの見出しと照合する語
+  if (/timestamp|time|時刻|時間/.test(h)) return 'timestamp'; // i18n-ok 利用者のファイルの見出しと照合する語
+  if (/text|utterance|transcript|body|発言|本文|テキスト|内容|セグメント|segment/.test(h)) return 'text'; // i18n-ok 利用者のファイルの見出しと照合する語
   return 'ignore';
 }
 
-type RoleLabels = Record<string, string>;
-function labelsFor(mode: Mode): RoleLabels {
+/** 取り込み先ごとの列の役割の並び。表示名は locales/importWizardDialog.csv の role.<取り込み先>.<役割> */
+function rolesFor(mode: Mode): string[] {
   switch (mode) {
-    case 'box': return FIELD_LABELS;
-    case 'line': return LINE_FIELD_LABELS;
-    case 'sdsg': return SDSG_FIELD_LABELS;
-    case 'period': return PERIOD_LABEL_FIELD_LABELS;
-    case 'transcript': return TRANSCRIPT_ROLE_LABELS;
-    case 'maxqda': return MAXQDA_ROLE_LABELS;
+    case 'box': return Object.keys(FIELD_LABELS);
+    case 'line': return Object.keys(LINE_FIELD_LABELS);
+    case 'sdsg': return Object.keys(SDSG_FIELD_LABELS);
+    case 'period': return Object.keys(PERIOD_LABEL_FIELD_LABELS);
+    case 'transcript': return TRANSCRIPT_ROLES;
+    case 'maxqda': return Object.keys(MAXQDA_ROLE_LABELS);
   }
 }
 function guessFor(mode: Mode, header: string): string {
@@ -88,6 +81,11 @@ function guessMode(header: string[]): Mode {
 }
 
 export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t, i18n } = useTranslation('importWizardDialog');
+  /** Box の種類の表示名（日本語は従来の表示名、ほかの言語は TEM の用語の表） */
+  const boxTypeLabel = (bt: string) => (i18n.language === 'ja' ? BOX_TYPE_LABELS[bt].ja : t(`terms:boxType.${bt}`));
+  /** 見出しの無い列の名前 */
+  const colName = (i: number) => t('column', { n: i + 1 });
   const doc = useTEMStore((s) => s.doc);
   const sheet = useActiveSheet();
   const importBoxes = useTEMStore((s) => s.importBoxes);
@@ -122,7 +120,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
   const [pptxFile, setPptxFile] = useState<File | null>(null);
 
   const rows = file?.sheets[sheetIdx]?.rows ?? [];
-  const header = useMemo(() => (hasHeader && rows.length > 0 ? rows[0] : rows[0]?.map((_, i) => `列${i + 1}`) ?? []), [rows, hasHeader]);
+  const header = useMemo(() => (hasHeader && rows.length > 0 ? rows[0] : rows[0]?.map((_, i) => t('column', { n: i + 1 })) ?? []), [rows, hasHeader, t]);
   const preview = useMemo(() => rows.slice(0, 6), [rows]);
 
   const recomputeMapping = (m: Mode, hdr: string[], useHeader: boolean) => {
@@ -139,7 +137,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
     try {
       const parsed = await parseTabularFile(f);
       if (parsed.sheets.length === 0 || parsed.sheets.every((s) => s.rows.length === 0)) {
-        setError('読める行がありませんでした');
+        setError(t('error.noRows'));
         return;
       }
       const firstNonEmpty = parsed.sheets.findIndex((s) => s.rows.length > 0);
@@ -147,7 +145,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
       const hdr = looksLikeHeader(r);
       const m = hdr ? guessMode(r[0]) : 'box';
       setFile(parsed); setSheetIdx(firstNonEmpty); setHasHeader(hdr); setMode(m);
-      recomputeMapping(m, hdr ? r[0] : r[0].map((_, i) => `列${i + 1}`), hdr);
+      recomputeMapping(m, hdr ? r[0] : r[0].map((_, i) => colName(i)), hdr);
       setTranscriptTitle(f.name.replace(/\.[^.]+$/, ''));
       setStep(2);
     } catch (e) {
@@ -180,7 +178,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
   const existingSdsgIds = new Set(sheet?.sdsg.map((s) => s.id) ?? []);
 
   const finish = (msg: string, warnings: string[]) => {
-    alert(warnings.length > 0 ? `${msg}\n\n警告 ${warnings.length} 件:\n${warnings.join('\n')}` : msg);
+    alert(warnings.length > 0 ? `${msg}\n\n${t('done.warnings', { count: warnings.length })}\n${warnings.join('\n')}` : msg);
     reset();
     onClose();
   };
@@ -194,7 +192,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
       try {
         apply();
       } catch (e) {
-        setError(`取り込みの途中で失敗しました: ${e instanceof Error ? e.message : String(e)}`);
+        setError(t('error.importFailed', { message: e instanceof Error ? e.message : String(e) }));
         return;
       }
       finish(msg, warnings);
@@ -228,9 +226,9 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           autoConnect, connectLineType: 'RLine',
           existingIds: toNewSheet ? new Set() : existingBoxIds, levelPx: LEVEL_PX,
         });
-        if (result.boxes.length === 0) { setError('Box を作れませんでした。「ラベル」を割り当てた列はありますか？'); return; }
+        if (result.boxes.length === 0) { setError(t('error.noBoxes')); return; }
         applyThenFinish(() => importBoxes(result.boxes, result.lines),
-          `${result.boxes.length} 件の Box、${result.lines.length} 件の Line を取り込みました`, result.errors);
+          t('done.boxes', { boxes: result.boxes.length, lines: result.lines.length }), result.errors);
         return;
       }
       if (mode === 'line') {
@@ -238,9 +236,9 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           mapping: mapping as LineCsvFieldKind[], hasHeader, defaultType: 'RLine', defaultShape: 'straight',
           existingIds: existingLineIds, validBoxIds: existingBoxIds,
         });
-        if (result.lines.length === 0) { setError('Line を作れませんでした。from / to の列と、存在する Box ID を確認してください'); return; }
+        if (result.lines.length === 0) { setError(t('error.noLines')); return; }
         importLines(result.lines);
-        finish(`${result.lines.length} 件の Line を取り込みました`, result.errors);
+        finish(t('done.lines', { count: result.lines.length }), result.errors);
         return;
       }
       if (mode === 'sdsg') {
@@ -248,9 +246,9 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           mapping: mapping as SDSGCsvFieldKind[], hasHeader,
           existingIds: existingSdsgIds, validBoxIds: existingBoxIds, validLineIds: existingLineIds,
         });
-        if (result.sdsgs.length === 0) { setError('SD/SG を作れませんでした。紐付け先の Box ID を確認してください'); return; }
+        if (result.sdsgs.length === 0) { setError(t('error.noSdsg')); return; }
         importSDSGs(result.sdsgs);
-        finish(`${result.sdsgs.length} 件の SD/SG を取り込みました`, result.errors);
+        finish(t('done.sdsg', { count: result.sdsgs.length }), result.errors);
         return;
       }
       if (mode === 'period') {
@@ -258,14 +256,14 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           mapping: mapping as PeriodLabelCsvFieldKind[], hasHeader,
           existingIds: new Set(sheet?.periodLabels.map((p) => p.id) ?? []),
         });
-        if (result.periodLabels.length === 0) { setError('時期ラベルを作れませんでした。位置とラベルの列を確認してください'); return; }
+        if (result.periodLabels.length === 0) { setError(t('error.noPeriods')); return; }
         importPeriodLabels(result.periodLabels);
-        finish(`${result.periodLabels.length} 件の時期ラベルを取り込みました`, result.errors);
+        finish(t('done.periods', { count: result.periodLabels.length }), result.errors);
         return;
       }
       if (mode === 'transcript') {
         const textColumn = mapping.indexOf('text');
-        if (textColumn < 0) { setError('「本文」の列を割り当ててください'); return; }
+        if (textColumn < 0) { setError(t('error.noTextColumn')); return; }
         const speakerColumn = mapping.indexOf('speaker');
         const timestampColumn = mapping.indexOf('timestamp');
         const data = hasHeader ? rows.slice(1) : rows;
@@ -274,13 +272,13 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           speakerColumn: speakerColumn >= 0 ? speakerColumn : undefined,
           timestampColumn: timestampColumn >= 0 ? timestampColumn : undefined,
         });
-        if (paragraphs.length === 0) { setError('段落を作れませんでした（本文が空）'); return; }
-        const t: Transcript = {
+        if (paragraphs.length === 0) { setError(t('error.noParagraphs')); return; }
+        const tr: Transcript = {
           id: genTranscriptId(), title: transcriptTitle || file.filename,
           source: file.format, importedAt: new Date().toISOString(), paragraphs,
         };
-        addTranscript(t);
-        finish(`逐語録「${t.title}」（${paragraphs.length} 段落）を取り込みました`, []);
+        addTranscript(tr);
+        finish(t('done.transcript', { title: tr.title, count: paragraphs.length }), []);
         return;
       }
       if (mode === 'maxqda' && maxqda) {
@@ -294,7 +292,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           existingSdsgIds: toNewSheet ? new Set() : existingSdsgIds,
         });
         const apply = () => {
-          result.transcripts.forEach((t) => addTranscript(t));
+          result.transcripts.forEach((tr) => addTranscript(tr));
           if (result.boxes.length > 0) importBoxes(result.boxes, []);
           if (result.sdsg.length > 0) importSDSGs(result.sdsg);
           if (result.periodLabels.length > 0) importPeriodLabels(result.periodLabels);
@@ -302,7 +300,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
         };
         applyThenFinish(
           apply,
-          `逐語録 ${result.transcripts.length} 本（${maxqda.dedupe.segments.length} 段落）、Box ${result.boxes.length}、SD/SG ${result.sdsg.length}、時期ラベル ${result.periodLabels.length} を取り込みました`,
+          t('done.maxqda', { transcripts: result.transcripts.length, paragraphs: maxqda.dedupe.segments.length, boxes: result.boxes.length, sdsg: result.sdsg.length, periods: result.periodLabels.length }),
           result.warnings,
         );
       }
@@ -316,11 +314,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
     return <PptxImportDialog open initialFile={pptxFile} onClose={() => { setPptxFile(null); reset(); onClose(); }} />;
   }
 
-  const roleLabels = labelsFor(mode);
-  const requiredHint: Record<Mode, string> = {
-    box: '必須: ラベル', line: '必須: from / to', sdsg: '必須: 紐付け先', period: '必須: 位置・ラベル',
-    transcript: '必須: 本文', maxqda: '必須: 文書名・コード・セグメント本文（開始・終了があると集約が正確。「他のコード」列があれば SD/SG のコードもそこから拾う）',
-  };
+  const roles = rolesFor(mode);
   const canNext2 = file !== null;
   const canRun = mode === 'maxqda' ? !!maxqda && maxqda.dedupe.segments.length > 0 : mapping.some((m) => m !== 'ignore');
   const lastStep = mode === 'maxqda' ? 4 : 3;
@@ -329,7 +323,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
     <div className="modal-backdrop" onClick={() => { reset(); onClose(); }} style={{ zIndex: 1250 }}>
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 860, maxWidth: '95vw' }}>
         <div className="modal-header">
-          <h3>表から取り込み（{step} / {lastStep}）</h3>
+          <h3>{t('title', { step, lastStep })}</h3>
           <button className="modal-close" onClick={() => { reset(); onClose(); }}>×</button>
         </div>
         <div className="modal-body" style={{ maxHeight: '68vh', overflowY: 'auto' }}>
@@ -338,15 +332,15 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           {/* ---------------- 1. ファイル ---------------- */}
           {step === 1 && (
             <section className="settings-section">
-              <h4>1. ファイルを選ぶ</h4>
-              <p className="hint">CSV / TSV / Excel（.xlsx / .xls）。Excel は最初の非空シートを読み、あとで切り替えられます。PowerPoint（.pptx）で描いた TEM 図も取り込めます（図形の役割を確かめる画面に進みます）。</p>
+              <h4>{t('step1.heading')}</h4>
+              <p className="hint">{t('step1.hint')}</p>
               <div
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) void handleFile(f); }}
                 onClick={() => fileInputRef.current?.click()}
                 style={{ border: '2px dashed #b0b8c8', borderRadius: 6, padding: 28, textAlign: 'center', cursor: 'pointer', background: '#fafcff' }}
               >
-                ここにファイルをドロップ、またはクリックして選択
+                {t('step1.drop')}
                 <input ref={fileInputRef} type="file" accept=".csv,.tsv,.txt,.xlsx,.xls,.xlsm,.pptx" style={{ display: 'none' }}
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleFile(f); e.target.value = ''; }} />
               </div>
@@ -356,29 +350,29 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           {/* ---------------- 2. 取り込み先とシート ---------------- */}
           {step === 2 && file && (
             <section className="settings-section">
-              <h4>2. 取り込み先を選ぶ</h4>
-              <p className="hint">{file.filename}（{rows.length} 行）。列名から「{MODE_LABELS[mode].label}」と推測しました。違えば変えてください。</p>
+              <h4>{t('step2.heading')}</h4>
+              <p className="hint">{t('step2.hint', { filename: file.filename, rows: rows.length, mode: t(`mode.${mode}.label`) })}</p>
               {file.sheets.length > 1 && (
                 <div className="setting-row">
-                  <label>シート</label>
-                  <select value={sheetIdx} onChange={(e) => { const i = Number(e.target.value); setSheetIdx(i); const r = file.sheets[i].rows; const h = looksLikeHeader(r); setHasHeader(h); recomputeMapping(mode, h ? r[0] : r[0].map((_, k) => `列${k + 1}`), h); }}>
-                    {file.sheets.map((s, i) => <option key={s.name} value={i}>{s.name}（{s.rows.length} 行）</option>)}
+                  <label>{t('step2.sheet')}</label>
+                  <select value={sheetIdx} onChange={(e) => { const i = Number(e.target.value); setSheetIdx(i); const r = file.sheets[i].rows; const h = looksLikeHeader(r); setHasHeader(h); recomputeMapping(mode, h ? r[0] : r[0].map((_, k) => colName(k)), h); }}>
+                    {file.sheets.map((s, i) => <option key={s.name} value={i}>{t('step2.sheetOption', { name: s.name, rows: s.rows.length })}</option>)}
                   </select>
                 </div>
               )}
               <div className="setting-row">
-                <label>1 行目は見出し</label>
-                <input type="checkbox" checked={hasHeader} onChange={(e) => { setHasHeader(e.target.checked); recomputeMapping(mode, e.target.checked ? rows[0] : rows[0].map((_, k) => `列${k + 1}`), e.target.checked); }} />
+                <label>{t('step2.hasHeader')}</label>
+                <input type="checkbox" checked={hasHeader} onChange={(e) => { setHasHeader(e.target.checked); recomputeMapping(mode, e.target.checked ? rows[0] : rows[0].map((_, k) => colName(k)), e.target.checked); }} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
-                {(Object.keys(MODE_LABELS) as Mode[]).map((m) => (
+                {MODES.map((m) => (
                   <label key={m} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: 8, border: `1px solid ${mode === m ? '#2684ff' : '#ddd'}`, borderRadius: 6, background: mode === m ? '#eef5ff' : '#fff', cursor: 'pointer', fontWeight: 'normal' }}>
                     <input type="radio" name="import-mode" checked={mode === m} onChange={() => { setMode(m); recomputeMapping(m, header, hasHeader); }} />
-                    <span><strong>{MODE_LABELS[m].label}</strong><br /><span style={{ fontSize: '0.85em', color: '#666' }}>{MODE_LABELS[m].desc}</span></span>
+                    <span><strong>{t(`mode.${m}.label`)}</strong><br /><span style={{ fontSize: '0.85em', color: '#666' }}>{t(`mode.${m}.desc`)}</span></span>
                   </label>
                 ))}
               </div>
-              <h5 style={{ margin: '14px 0 4px' }}>プレビュー（先頭 {preview.length} 行）</h5>
+              <h5 style={{ margin: '14px 0 4px' }}>{t('step2.preview', { count: preview.length })}</h5>
               <div style={{ overflowX: 'auto' }}>
                 <table className="data-table" style={{ fontSize: '0.8em' }}>
                   <tbody>
@@ -396,10 +390,10 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           {/* ---------------- 3. 列の割当 ---------------- */}
           {step === 3 && file && (
             <section className="settings-section">
-              <h4>3. 列の役割を決める</h4>
-              <p className="hint">{requiredHint[mode]}。見出しから推測した値が入っています。</p>
+              <h4>{t('step3.heading')}</h4>
+              <p className="hint">{t('step3.hint', { required: t(`required.${mode}`) })}</p>
               <table className="data-table" style={{ fontSize: '0.88em' }}>
-                <thead><tr><th style={{ width: 40 }}>#</th><th>列（見出し）</th><th>例</th><th style={{ width: 220 }}>役割</th></tr></thead>
+                <thead><tr><th style={{ width: 40 }}>#</th><th>{t('step3.col.header')}</th><th>{t('step3.col.example')}</th><th style={{ width: 220 }}>{t('step3.col.role')}</th></tr></thead>
                 <tbody>
                   {header.map((h, i) => (
                     <tr key={i}>
@@ -408,7 +402,7 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
                       <td style={{ color: '#666', maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(hasHeader ? rows[1] : rows[0])?.[i] ?? ''}</td>
                       <td>
                         <select value={mapping[i] ?? 'ignore'} onChange={(e) => setMapping((prev) => { const next = [...prev]; next[i] = e.target.value; return next; })} style={{ width: '100%' }}>
-                          {Object.entries(roleLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                          {roles.map((k) => <option key={k} value={k}>{t(`role.${mode}.${k}`)}</option>)}
                         </select>
                       </td>
                     </tr>
@@ -419,27 +413,27 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
               {mode === 'box' && (
                 <>
                   <div className="setting-row" style={{ marginTop: 10 }}>
-                    <label>種別列が無いときの種別</label>
+                    <label>{t('step3.defaultType')}</label>
                     <select value={defaultType} onChange={(e) => setDefaultType(e.target.value as BoxType)}>
-                      {SELECTABLE_BOX_TYPES.map((t) => <option key={t} value={t}>{BOX_TYPE_LABELS[t].ja}</option>)}
+                      {SELECTABLE_BOX_TYPES.map((bt) => <option key={bt} value={bt}>{boxTypeLabel(bt)}</option>)}
                     </select>
                   </div>
-                  <div className="setting-row"><label>順番に矢印でつなぐ</label><input type="checkbox" checked={autoConnect} onChange={(e) => setAutoConnect(e.target.checked)} /></div>
-                  <div className="setting-row"><label>新しいシートに取り込む</label><input type="checkbox" checked={toNewSheet} onChange={(e) => setToNewSheet(e.target.checked)} /></div>
+                  <div className="setting-row"><label>{t('step3.autoConnect')}</label><input type="checkbox" checked={autoConnect} onChange={(e) => setAutoConnect(e.target.checked)} /></div>
+                  <div className="setting-row"><label>{t('toNewSheet')}</label><input type="checkbox" checked={toNewSheet} onChange={(e) => setToNewSheet(e.target.checked)} /></div>
                 </>
               )}
               {mode === 'transcript' && (
                 <div className="setting-row" style={{ marginTop: 10 }}>
-                  <label>逐語録のタイトル</label>
+                  <label>{t('step3.transcriptTitle')}</label>
                   <input value={transcriptTitle} onChange={(e) => setTranscriptTitle(e.target.value)} style={{ width: 280 }} />
                 </div>
               )}
               {mode === 'maxqda' && (
                 <div className="setting-row" style={{ marginTop: 10 }}>
-                  <label>セグメントの集約キー</label>
+                  <label>{t('step3.keyMode')}</label>
                   <select value={keyMode} onChange={(e) => setKeyMode(e.target.value as DedupeKeyMode)}>
-                    <option value="range">文書グループ・文書名・開始・終了の完全一致（既定）</option>
-                    <option value="text">文書グループ・文書名・本文の一致</option>
+                    <option value="range">{t('step3.keyMode.range')}</option>
+                    <option value="text">{t('step3.keyMode.text')}</option>
                   </select>
                 </div>
               )}
@@ -449,24 +443,23 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
           {/* ---------------- 4. MAXQDA: コードの振り分け ---------------- */}
           {step === 4 && mode === 'maxqda' && maxqda && (
             <section className="settings-section">
-              <h4>4. コードをどう扱うか</h4>
+              <h4>{t('step4.heading')}</h4>
               <p className="hint">
-                {maxqda.dedupe.docNames.length} 文書・{maxqda.dedupe.segments.length} セグメント（元 {hasHeader ? rows.length - 1 : rows.length} 行）に集約しました。
-                すべてのコードは段落のタグとして残ります。Box などにするものを選んでください。
+                {t('step4.hint', { docs: maxqda.dedupe.docNames.length, segments: maxqda.dedupe.segments.length, rows: hasHeader ? rows.length - 1 : rows.length })}
               </p>
               {maxqda.dedupe.warnings.length > 0 && (
                 <p className="hint" style={{ color: '#b45309' }}>{maxqda.dedupe.warnings.join(' / ')}</p>
               )}
-              <div className="setting-row"><label>文書ごとに Item 軸を分ける</label><input type="checkbox" checked={stackDocs} onChange={(e) => setStackDocs(e.target.checked)} /></div>
+              <div className="setting-row"><label>{t('step4.stackDocs')}</label><input type="checkbox" checked={stackDocs} onChange={(e) => setStackDocs(e.target.checked)} /></div>
               <div className="setting-row">
-                <label title="1 つのセグメントに Box になるコードが 2 つ以上付いているときの置き方">同じセグメントに Box が複数</label>
+                <label title={t('step4.multiBox.tip')}>{t('step4.multiBox')}</label>
                 <select value={multiBoxMode} onChange={(e) => setMultiBoxMode(e.target.value as MultiBoxMode)}>
-                  {(Object.keys(MULTI_BOX_MODE_LABELS) as MultiBoxMode[]).map((m) => <option key={m} value={m}>{MULTI_BOX_MODE_LABELS[m]}</option>)}
+                  {(Object.keys(MULTI_BOX_MODE_LABELS) as MultiBoxMode[]).map((m) => <option key={m} value={m}>{t(`multiBox.${m}`)}</option>)}
                 </select>
               </div>
-              <div className="setting-row"><label>新しいシートに取り込む</label><input type="checkbox" checked={toNewSheet} onChange={(e) => setToNewSheet(e.target.checked)} /></div>
+              <div className="setting-row"><label>{t('toNewSheet')}</label><input type="checkbox" checked={toNewSheet} onChange={(e) => setToNewSheet(e.target.checked)} /></div>
               <table className="data-table" style={{ fontSize: '0.88em', marginTop: 8 }}>
-                <thead><tr><th>コード</th><th style={{ width: 60 }}>件数</th><th style={{ width: 60 }}>文書</th><th style={{ width: 160 }}>扱い</th><th style={{ width: 150 }}>Box の種別</th></tr></thead>
+                <thead><tr><th>{t('step4.col.code')}</th><th style={{ width: 60 }}>{t('step4.col.count')}</th><th style={{ width: 60 }}>{t('step4.col.docs')}</th><th style={{ width: 160 }}>{t('step4.col.action')}</th><th style={{ width: 150 }}>{t('step4.col.boxType')}</th></tr></thead>
                 <tbody>
                   {maxqda.codes.map((c) => {
                     const plan = effectivePlans.find((p) => p.code === c.code)!;
@@ -477,13 +470,13 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
                         <td>{c.docCount}</td>
                         <td>
                           <select value={plan.action} onChange={(e) => setPlan(c.code, { action: e.target.value as CodeAction })} style={{ width: '100%' }}>
-                            {(Object.keys(CODE_ACTION_LABELS) as CodeAction[]).map((a) => <option key={a} value={a}>{CODE_ACTION_LABELS[a]}</option>)}
+                            {(Object.keys(CODE_ACTION_LABELS) as CodeAction[]).map((a) => <option key={a} value={a}>{t(`action.${a}`)}</option>)}
                           </select>
                         </td>
                         <td>
                           {plan.action === 'box' && (
                             <select value={plan.boxType ?? 'normal'} onChange={(e) => setPlan(c.code, { boxType: e.target.value as BoxType })} style={{ width: '100%' }}>
-                              {SELECTABLE_BOX_TYPES.map((t) => <option key={t} value={t}>{BOX_TYPE_LABELS[t].ja}</option>)}
+                              {SELECTABLE_BOX_TYPES.map((bt) => <option key={bt} value={bt}>{boxTypeLabel(bt)}</option>)}
                             </select>
                           )}
                         </td>
@@ -497,13 +490,13 @@ export function ImportWizardDialog({ open, onClose }: { open: boolean; onClose: 
         </div>
         <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
           <div>
-            {step > 1 && <button className="ribbon-btn-small" onClick={() => setStep(step - 1)}>← 戻る</button>}
+            {step > 1 && <button className="ribbon-btn-small" onClick={() => setStep(step - 1)}>← {t('back')}</button>}
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            {step === 1 && <button className="ribbon-btn-small" onClick={() => { reset(); onClose(); }}>キャンセル</button>}
-            {step === 2 && <button className="ribbon-btn-primary" disabled={!canNext2} onClick={() => setStep(3)}>次へ →</button>}
-            {step === 3 && mode === 'maxqda' && <button className="ribbon-btn-primary" disabled={!maxqda || maxqda.dedupe.segments.length === 0} onClick={() => setStep(4)}>次へ →</button>}
-            {step === lastStep && step >= 3 && <button className="ribbon-btn-primary" disabled={!canRun} onClick={runImport}>取り込む</button>}
+            {step === 1 && <button className="ribbon-btn-small" onClick={() => { reset(); onClose(); }}>{t('cancel')}</button>}
+            {step === 2 && <button className="ribbon-btn-primary" disabled={!canNext2} onClick={() => setStep(3)}>{t('next')} →</button>}
+            {step === 3 && mode === 'maxqda' && <button className="ribbon-btn-primary" disabled={!maxqda || maxqda.dedupe.segments.length === 0} onClick={() => setStep(4)}>{t('next')} →</button>}
+            {step === lastStep && step >= 3 && <button className="ribbon-btn-primary" disabled={!canRun} onClick={runImport}>{t('import')}</button>}
           </div>
         </div>
       </div>

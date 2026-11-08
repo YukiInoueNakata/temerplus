@@ -1,0 +1,115 @@
+﻿key,ja,en,note
+title,インタビュー原文ビューア,Transcript viewer,逐語録の画面の題
+dragToMove,ドラッグで移動,Drag to move,逐語録の画面 > 題の帯の吹き出し
+import,＋ 原文を取り込む,+ Import transcript,逐語録の画面 > ボタン
+bulkImport,一括取り込み,Bulk import,逐語録の画面 > ボタン
+bulkImport.tip,複数ファイル/フォルダから一括取り込み (ファイル名から協力者・回数を自動推測),Import many files or a folder at once (participant and session are guessed from file names),逐語録の画面 > ボタンの吹き出し
+anonExport,匿名化エクスポート,Anonymized export,逐語録の画面 > ボタン
+anonExport.tip,人名・組織名を仮名に置換した .tem を別ファイルとして書き出す,Save a separate .tem file with names of people and organizations replaced by pseudonyms,逐語録の画面 > ボタンの吹き出し
+popout,別ウィンドウで開く,Open in a new window,逐語録の画面 > ボタンの吹き出し
+empty,まだ原文が登録されていません。,No transcripts yet.,逐語録の画面 > 逐語録が無いとき
+empty.import,原文ファイルを取り込む,Import a transcript file,逐語録の画面 > 逐語録が無いときのボタン
+empty.formats,対応形式: .txt / .csv / .xlsx / .docx,Supported formats: .txt / .csv / .xlsx / .docx,逐語録の画面 > 逐語録が無いときの説明
+list.heading,原文 (協力者別),Transcripts (by participant),逐語録の画面 > 左の一覧の見出し
+list.confirmDelete,"「{{title}}」を削除しますか？
+この原文を参照している全ての SourceRef も削除されます。","Delete ""{{title}}""?
+All source references to this transcript will also be deleted.",逐語録の画面 > 削除の確認（2 行）
+list.paragraphs,{{count}} 段落 / {{source}},{{count}} paragraphs / {{source}},逐語録の画面 > 左の一覧の小さな説明（段落の数と形式）
+session,第{{n}}回,Session {{n}},逐語録の画面 > 何回目のインタビューか
+sessionNone,(回数未指定),(no session),逐語録の画面 > 回数が無いとき
+unassigned,(未割当),(Unassigned),逐語録の画面 > 協力者が決まっていない逐語録のまとまり
+delete,削除,Delete,逐語録の画面 > 左の一覧のボタン
+resizeLeft,ドラッグで左ペインの幅を変更,Drag to resize the left pane,逐語録の画面 > 区切りの吹き出し
+resizeRight,ドラッグで右ペインの幅を変更,Drag to resize the right pane,逐語録の画面 > 区切りの吹き出し
+resize,ドラッグでサイズ変更,Drag to resize,逐語録の画面 > 右下の角の吹き出し
+search.placeholder.all,全原文を横断検索,Search all transcripts,逐語録の画面 > 検索欄（薄字）
+search.placeholder.participant,同じ協力者の全回を検索,Search all sessions of this participant,逐語録の画面 > 検索欄（薄字）
+search.placeholder.current,検索キーワード (現在の原文),Search (current transcript),逐語録の画面 > 検索欄（薄字）
+search.scope,検索範囲,Search scope,逐語録の画面 > 検索範囲の吹き出し
+search.scope.current,現在の原文,Current transcript,逐語録の画面 > 検索範囲の選択肢
+search.scope.participant,同じ協力者の全回,All sessions of this participant,逐語録の画面 > 検索範囲の選択肢
+search.scope.all,全原文を横断,All transcripts,逐語録の画面 > 検索範囲の選択肢
+search.hits,ヒット {{count}} 段落,{{count}} paragraphs found,逐語録の画面 > 検索の結果の数
+search.crossHits,ヒット {{count}} 段落（{{transcripts}} 原文）,{{count}} paragraphs found ({{transcripts}} transcripts),逐語録の画面 > 横断検索の結果の数
+search.bulkLink,一括リンク...,Link all...,逐語録の画面 > ボタン
+search.bulkLink.tip,ヒットした段落を Box に一括リンク,Link all found paragraphs to a Box,逐語録の画面 > ボタンの吹き出し
+search.crossLink.all,横断一括リンク...,Link all across transcripts...,逐語録の画面 > ボタン
+search.crossLink.participant,協力者一括リンク...,Link all for participant...,逐語録の画面 > ボタン
+search.crossLink.tip,横断ヒットを Box に一括リンク (複数原文/複数回を 1 Box にまとめる),Link all cross-search hits to a Box (gathers several transcripts / sessions into one Box),逐語録の画面 > ボタンの吹き出し
+search.onlyUnlinked,未リンクのみ,Unlinked only,逐語録の画面 > チェックボックス
+search.onlyUnlinked.tip,まだ Box にリンクされていない段落だけ表示,Show only paragraphs not yet linked to a Box,逐語録の画面 > チェックボックスの吹き出し
+selectTranscript,左ペインから原文を選択してください。,Choose a transcript in the left pane.,逐語録の画面 > 逐語録を選んでいないとき
+refs.heading,引用リンク一覧,Source references,逐語録の画面 > 右の一覧の見出し
+refs.selectParagraph,段落を選択するとここに表示,Select a paragraph to see its links here,逐語録の画面 > 右の一覧（段落を選んでいないとき）
+selection,選択範囲: {{start}}〜{{end}} 文字,Selection: characters {{start}}–{{end}},逐語録の画面 > 選んだ文字の範囲
+linkRange,この範囲を Box にリンク,Link this range to a Box,逐語録の画面 > ボタン
+onlyUnlinkedShown,未リンク段落のみ表示中: {{shown}} / {{total}} 段落,Showing unlinked paragraphs only: {{shown}} / {{total}},逐語録の画面 > 絞り込み中の表示
+paragraph.speaker,話者,Speaker,逐語録の画面 > 段落の編集の入力欄（薄字）
+paragraph.time,時刻,Time,逐語録の画面 > 段落の編集の入力欄（薄字）
+paragraph.links,{{count}} リンク,{{count}} links,逐語録の画面 > 段落に付いた原文参照の数
+paragraph.note,メモ,Note,逐語録の画面 > 段落のメモ（印とボタン）
+paragraph.noteClose,メモ閉,Close note,逐語録の画面 > 段落のボタン
+paragraph.linkWhole,段落全体をリンク,Link whole paragraph,逐語録の画面 > 段落のボタン
+paragraph.preview,プレビュー,Preview,逐語録の画面 > 段落のボタン（編集をやめる）
+paragraph.edit,編集,Edit,逐語録の画面 > 段落のボタン
+paragraph.split,ここで分割,Split here,逐語録の画面 > 段落のボタン
+paragraph.split.tip,キャレット位置でこの段落を 2 つに分割,Split this paragraph in two at the cursor,逐語録の画面 > ボタンの吹き出し
+paragraph.merge,結合,Merge,逐語録の画面 > 段落のボタン（前に ↓ が付く）
+paragraph.merge.tip,次の段落と結合,Merge with the next paragraph,逐語録の画面 > ボタンの吹き出し
+paragraph.merge.confirm,"次の段落と結合しますか？
+後段落の引用リンクは前段落に統合され、charStart/charEnd は再計算されます。","Merge with the next paragraph?
+Links on the next paragraph move to this one and charStart/charEnd are recalculated.",逐語録の画面 > 結合の確認（2 行）
+paragraph.noteHeading,段落メモ,Paragraph note,逐語録の画面 > メモの見出し
+paragraph.notePlaceholder,ここは要確認 / 後で再検討 / ...などの分析メモ,"Analysis notes, e.g. needs checking / revisit later / ...",逐語録の画面 > メモの入力欄（薄字）
+tag.remove,タグ削除,Remove tag,逐語録の画面 > タグの × の吹き出し
+tag.add,+ タグ追加,+ Add tag,逐語録の画面 > タグの入力欄（薄字）
+highlight.tip,リンク: {{links}},Links: {{links}},逐語録の画面 > 色付きの箇所の吹き出し
+refs.empty,この段落への引用はまだありません。,No links to this paragraph yet.,逐語録の画面 > 右の一覧（リンクが無いとき）
+refs.range,範囲 {{start}}〜{{end}},Range {{start}}–{{end}},逐語録の画面 > 右の一覧（文字の範囲）
+refs.unresolved,追従不能,Cannot follow,逐語録の画面 > 右の一覧（本文が変わって箇所が分からなくなったリンク）
+refs.reconnect,再接続,Reconnect,逐語録の画面 > 右の一覧のボタン
+refs.unlink,リンク解除,Unlink,逐語録の画面 > 右の一覧のボタン
+quote,「{{text}}」,"""{{text}}""",逐語録の画面 > 引用した文を囲む括弧
+link.title,原文を要素にリンク,Link transcript to an element,リンクの作成の画面の題
+link.quote,引用テキスト:,Quoted text:,リンクの作成 > ラベル
+link.tabNew,新規 Box を作成,Create a new Box,リンクの作成 > タブ
+link.tabExisting,既存要素にリンク,Link to an existing element,リンクの作成 > タブ
+link.boxType,Box 種別,Box type,リンクの作成 > ラベル
+link.boxLabel,Box ラベル,Box label,リンクの作成 > ラベル
+link.boxLabelPlaceholder,例: 卒業研究着手（空でも可、後で編集できます）,"e.g. Starting the graduation thesis (can be blank, you can edit it later)",リンクの作成 > 入力欄（薄字）
+link.hint1,description には上記引用テキストを自動貼付します。,The quoted text above is pasted into the description automatically.,リンクの作成 > 説明
+link.hint2,ラベルが空でも作成可能で、PropertyPanel から後で編集できます。,"You can create it with a blank label, and edit it later in the property panel.",リンクの作成 > 説明
+link.kind,種別,Kind,リンクの作成 > リンク先の種類のラベル
+link.target,対象,Target,リンクの作成 > リンク先のラベル
+link.choose,— 選択 —,— Choose —,リンクの作成 > リンク先の選択肢
+link.unnamed,無名,unnamed,リンクの作成 > ラベルの無い要素の表示
+link.createBox,リンクした Box を作成,Create linked Box,リンクの作成 > ボタン
+link.addLink,リンク追加,Add link,リンクの作成 > ボタン
+cancel,キャンセル,Cancel,リンクの画面 > ボタン
+bulk.title,検索ヒットを一括リンク,Link all search hits,一括リンクの画面の題
+bulk.titleCross,横断検索ヒットを一括リンク,Link all cross-search hits,一括リンクの画面の題
+bulk.count,{{count}} 件,{{count}} hits,一括リンク > 題の中の件数
+bulk.transcripts,{{count}} 原文,{{count}} transcripts,一括リンク > 題の中の逐語録の数
+bulk.boxLabelPlaceholder,例: 指導教員との出会い,e.g. Meeting the supervisor,一括リンク > 入力欄（薄字）
+bulk.hint,description には選択した全段落の本文を連結して貼付します（§番号付き）。,The text of all selected paragraphs is joined and pasted into the description (with § numbers).,一括リンク > 説明
+bulk.selectAll,全選択,Select all,一括リンク > チェックボックス
+bulk.selected,{{selected}} / {{total}} 段落を選択中,{{selected}} / {{total}} paragraphs selected,一括リンク > 選んだ数
+bulk.confirmNew,Box 作成 + {{count}} 段落をリンク,Create Box + link {{count}} paragraphs,一括リンク > ボタン
+bulk.confirmExisting,{{count}} 段落をリンク追加,Link {{count}} paragraphs,一括リンク > ボタン
+cross.noMatch,「{{keyword}}」にマッチする段落が見つかりませんでした。,"No paragraphs match ""{{keyword}}"".",逐語録の画面 > 横断検索で何も無いとき
+cross.summary,{{participants}} 協力者 / {{transcripts}} 原文に渡って {{hits}} 件のヒット。各行クリックで該当段落へジャンプします。,{{hits}} hits across {{participants}} participants / {{transcripts}} transcripts. Click a row to jump to the paragraph.,逐語録の画面 > 横断検索の結果の説明
+cross.groupCount,{{hits}} 件 / {{sessions}} 回,{{hits}} hits / {{sessions}} sessions,逐語録の画面 > 横断検索の協力者ごとの件数
+cross.hits,{{count}} 件,{{count}} hits,逐語録の画面 > 横断検索の回ごとの件数
+cross.jump,クリックで該当段落へジャンプ,Click to jump to the paragraph,逐語録の画面 > 横断検索の行の吹き出し
+reconnect.confirmDelete,このリンクを完全に削除しますか？,Delete this link permanently?,リンクの再接続 > 削除の確認
+reconnect.title,リンク再接続 ({{type}} / {{id}}),Reconnect link ({{type}} / {{id}}),リンクの再接続の画面の題
+reconnect.missing1,元の原文または段落が見つかりません（削除された可能性があります）。,The original transcript or paragraph cannot be found (it may have been deleted).,リンクの再接続 > 注意
+reconnect.missing2,リンクを削除して整理することをお勧めします。,We recommend deleting the link to tidy up.,リンクの再接続 > 注意
+reconnect.original,元の引用テキスト (スナップショット),Original quoted text (snapshot),リンクの再接続 > 見出し
+reconnect.wholeParagraphRef,（段落全体参照）,(Whole paragraph),リンクの再接続 > 段落全体を指すリンクのとき
+reconnect.current,現在の段落本文 (§{{n}}),Current paragraph text (§{{n}}),リンクの再接続 > 見出し
+reconnect.hint,下記から該当箇所をマウスドラッグで範囲選択するか、段落全体を参照に切り替えてください。,"Drag over the matching part below to select it, or switch to the whole paragraph.",リンクの再接続 > 説明
+reconnect.selection,選択範囲: {{start}}〜{{end}} 文字「{{text}}」,"Selection: characters {{start}}–{{end}} ""{{text}}""",リンクの再接続 > 選んだ範囲
+reconnect.delete,リンクを削除,Delete link,リンクの再接続 > ボタン
+reconnect.useWhole,段落全体を参照に切替,Use whole paragraph,リンクの再接続 > ボタン
+reconnect.useSelection,選択範囲で再接続,Reconnect to selection,リンクの再接続 > ボタン

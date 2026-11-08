@@ -33,3 +33,6 @@ layout.horizontal,横型,Horizontal,図の向き（時間軸が右へ）
 layout.vertical,縦型,Vertical,図の向き（時間軸が下へ）
 timeLevel,Time レベル,Time level,時間軸の上の位置
 itemLevel,Item レベル,Item level,項目軸の上の位置
+participant,協力者,Participant,研究に招いた人（HSI の考えでは「ご招待」した人。英語の TEA 文献は participants と呼び、招く動作を invite で表す）
+hsi,歴史的構造化ご招待（HSI）,Historically structured inviting (HSI),協力者の選び方。旧称 歴史的構造化サンプリング（HSS）
+promoterSign,促進的記号,Promoter sign,TLMG の用語

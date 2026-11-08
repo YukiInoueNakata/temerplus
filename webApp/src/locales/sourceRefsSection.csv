@@ -1,0 +1,25 @@
+﻿key,ja,en,note
+title,原文参照 ({{count}}),Source references ({{count}}),プロパティ > 原文参照の節の見出し（count は件数）
+title.unresolved,⚠{{count}} 追従不能,⚠{{count}} not tracked,原文参照の節の見出しの後ろに付く注意（原文の編集で位置が分からなくなった件数）
+title.unreferenced,⚠ 未引用,⚠ Not cited,原文参照の節の見出しの後ろに付く注意（逐語録があるのに引用が 0 件）
+title.coverage,協力者 {{count}},{{count}} participants,原文参照の節の見出しの後ろに付く協力者の人数
+unassigned,(未割当),(unassigned),協力者が割り当てられていない逐語録（協力者の名前の並びの中）
+warn.noRefs,原文への引用がありません,No citations from the transcript,原文参照の節の赤い注意の太字
+warn.noRefs.hint,この要素は原文ビューアで段落をリンクすると根拠を保証できます。,Link a paragraph in the transcript viewer to ground this element in the data.,原文参照の節の赤い注意の説明
+coverage.tooltip,TEM の 1/4/9/16 法則: 4 協力者以上で類型としての強度が高まる,"TEM 1/4/9/16 rule: with 4 or more participants, the pattern becomes stronger as a type",協力者の数の枠の説明（マウスを乗せると出る）
+coverage.count,協力者カバレッジ: {{count}} 名,Participant coverage: {{count}},原文参照の節の協力者の数の枠（太字）
+coverage.enough,(1/4/9/16 法則: 類型として十分),(1/4/9/16 rule: sufficient as a type),協力者の数の枠の補足（4 名以上）
+coverage.multiple,(複数協力者から支持),(supported by multiple participants),協力者の数の枠の補足（2〜3 名）
+coverage.single,(単一協力者のみ),(single participant only),協力者の数の枠の補足（1 名）
+coverage.targets,対象: {{names}},Participants: {{names}},協力者の数の枠の 2 行目（協力者の仮名の並び）
+empty,この要素に紐付く原文引用はまだありません。,No transcript citations are linked to this element yet.,原文参照の節で引用が 0 件のときの文
+session,第{{n}}回,Session {{n}},引用の一覧の逐語録の回（インタビューの何回目か）
+unknownTranscript,（原文不明）,(Unknown transcript),引用の一覧で逐語録が見つからないとき
+quote,「{{text}}」,"""{{text}}""",引用の一覧の引用文を囲むかぎ括弧
+unresolved,原文編集により位置追従に失敗しています,Could not track the position after the transcript was edited,引用の一覧の赤い注意
+jump,原文へジャンプ,Go to transcript,引用の一覧のボタン
+unlink,リンク解除,Unlink,引用の一覧のボタン
+confirm.unlink,"このリンクを解除しますか？
+（原文と要素自体は残ります）","Remove this link?
+(The transcript and the element are kept.)",リンク解除ボタンを押したときの確認の文
+openViewer,原文ビューアを開く,Open transcript viewer,原文参照の節の下のボタン

@@ -10,10 +10,12 @@
 // ============================================================================
 
 import { useState, useMemo, useEffect } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import { LEVEL_PX } from '../store/defaults';
 
 export function InsertBetweenDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation('insertBetweenDialog');
   const selection = useTEMStore((s) => s.selection);
   const sheet = useActiveSheet();
   const layout = useTEMStore((s) => s.doc.settings.layout);
@@ -80,32 +82,32 @@ export function InsertBetweenDialog({ open, onClose }: { open: boolean; onClose:
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>2選択間にBox挿入</h3>
+          <h3>{t('title')}</h3>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
         <div className="modal-body">
           {!startBox || !endBox ? (
             <div style={{ padding: 20, color: '#d33' }}>
-              ⚠ キャンバスで<strong>2つのBox</strong>を選択してください（Shift+クリック）
+              <Trans t={t} i18nKey="selectTwo" />
             </div>
           ) : (
             <>
               <section className="settings-section">
-                <h4>選択中のBox</h4>
+                <h4>{t('selected.title')}</h4>
                 <div className="setting-row">
-                  <label>開始Box (A)</label>
-                  <span><code>{startBox.id}</code> / {startBox.label}<br />現在Time_Level: <strong>{currentStartLevel}</strong></span>
+                  <label>{t('selected.start')}</label>
+                  <span><code>{startBox.id}</code> / {startBox.label}<br />{t('selected.current')} <strong>{currentStartLevel}</strong></span>
                 </div>
                 <div className="setting-row">
-                  <label>終了Box (B)</label>
-                  <span><code>{endBox.id}</code> / {endBox.label}<br />現在Time_Level: <strong>{currentEndLevel}</strong></span>
+                  <label>{t('selected.end')}</label>
+                  <span><code>{endBox.id}</code> / {endBox.label}<br />{t('selected.current')} <strong>{currentEndLevel}</strong></span>
                 </div>
               </section>
 
               <section className="settings-section">
-                <h4>挿入設定</h4>
+                <h4>{t('settings.title')}</h4>
                 <div className="setting-row">
-                  <label>挿入個数</label>
+                  <label>{t('settings.count')}</label>
                   <input
                     type="number"
                     min={1}
@@ -116,32 +118,34 @@ export function InsertBetweenDialog({ open, onClose }: { open: boolean; onClose:
                   />
                 </div>
                 <div className="setting-row">
-                  <label>モード</label>
+                  <label>{t('settings.mode')}</label>
                   <select value={mode} onChange={(e) => setMode(e.target.value as 'simple' | 'expand-shift')}>
-                    <option value="simple">単純挿入（位置変更なし）</option>
-                    <option value="expand-shift">レベル指定+以降シフト</option>
+                    <option value="simple">{t('mode.simple')}</option>
+                    <option value="expand-shift">{t('mode.expandShift')}</option>
                   </select>
                 </div>
                 <p className="hint">
-                  📌 A→B の矢印がある場合、自動的に A→C1→...→CN→B に分割されます
+                  {t('settings.splitArrow')}
                 </p>
               </section>
 
               {mode === 'simple' && (
                 <section className="settings-section">
                   <p className="hint">
-                    <strong>単純挿入</strong>:<br />
-                    開始Box ({currentStartLevel}) と終了Box ({currentEndLevel}) の間に <strong>{count}個</strong> を均等配置。<br />
-                    他のBoxの位置は変更されません。
+                    <Trans
+                      t={t}
+                      i18nKey="hint.simple"
+                      values={{ start: currentStartLevel, end: currentEndLevel, n: count }}
+                    />
                   </p>
                 </section>
               )}
 
               {mode === 'expand-shift' && (
                 <section className="settings-section">
-                  <h4>レベル差</h4>
+                  <h4>{t('delta.title')}</h4>
                   <div className="setting-row">
-                    <label>A → 最初の新Box のレベル差</label>
+                    <label>{t('delta.aToC')}</label>
                     <input
                       type="number"
                       step="0.1"
@@ -152,7 +156,7 @@ export function InsertBetweenDialog({ open, onClose }: { open: boolean; onClose:
                     />
                   </div>
                   <div className="setting-row">
-                    <label>最後の新Box → B のレベル差</label>
+                    <label>{t('delta.cToB')}</label>
                     <input
                       type="number"
                       step="0.1"
@@ -163,12 +167,18 @@ export function InsertBetweenDialog({ open, onClose }: { open: boolean; onClose:
                     />
                   </div>
                   <p className="hint">
-                    <strong>レベル指定+以降シフト</strong>:<br />
-                    A (Level {currentStartLevel}) はそのまま固定。<br />
-                    新Box は A から <strong>{deltaAtoC}</strong> レベル離れた位置から <strong>1レベル間隔</strong>で配置。<br />
-                    {count > 1 && `最後の新Boxから `}B まで <strong>{deltaCtoB}</strong> レベル。<br />
-                    → B の新Level: <strong>{previewEndLevel.toFixed(1)}</strong>（旧 {currentEndLevel}, シフト量 {shift >= 0 ? '+' : ''}{shift.toFixed(1)}）<br />
-                    B より後ろのBoxもすべて <strong>{shift >= 0 ? '+' : ''}{shift.toFixed(1)}</strong> レベルずらします。
+                    <Trans
+                      t={t}
+                      i18nKey={count > 1 ? 'hint.expandShift.multi' : 'hint.expandShift.single'}
+                      values={{
+                        start: currentStartLevel,
+                        aToC: deltaAtoC,
+                        cToB: deltaCtoB,
+                        newEnd: previewEndLevel.toFixed(1),
+                        oldEnd: currentEndLevel,
+                        shift: `${shift >= 0 ? '+' : ''}${shift.toFixed(1)}`,
+                      }}
+                    />
                   </p>
                 </section>
               )}
@@ -176,14 +186,14 @@ export function InsertBetweenDialog({ open, onClose }: { open: boolean; onClose:
           )}
         </div>
         <div className="modal-footer">
-          <button className="ribbon-btn-small" onClick={onClose}>キャンセル</button>
+          <button className="ribbon-btn-small" onClick={onClose}>{t('cancel')}</button>
           <button
             className="ribbon-btn-primary"
             onClick={handleSubmit}
             disabled={!isValid}
             style={!isValid ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
           >
-            挿入
+            {t('insert')}
           </button>
         </div>
       </div>

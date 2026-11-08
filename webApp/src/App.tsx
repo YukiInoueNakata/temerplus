@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Ribbon } from './components/Ribbon';
 import { Canvas } from './components/Canvas';
 import { DataSheet } from './components/DataSheet';
@@ -45,6 +46,7 @@ import {
 import './App.css';
 
 export default function App() {
+  const { t, i18n } = useTranslation('app');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsInitialTab, setSettingsInitialTab] = useState<string | undefined>(undefined);
   const [settingsTabNonce, setSettingsTabNonce] = useState(0);
@@ -88,7 +90,7 @@ export default function App() {
           useTEMStore.getState().loadDocument(doc);
           await clearAutoBackup();
         } catch (e) {
-          alert('デモファイルの読み込みに失敗しました: ' + (e instanceof Error ? e.message : String(e)));
+          alert(t('alert.demoLoadFailed', { message: e instanceof Error ? e.message : String(e) }));
         }
         break;
       case 'open-demo-en':
@@ -108,7 +110,7 @@ export default function App() {
           // リンク機能がすぐ分かるよう原文ビューアも開く
           setTranscriptOpen(true);
         } catch (e) {
-          alert('原文連動デモの読み込みに失敗しました: ' + (e instanceof Error ? e.message : String(e)));
+          alert(t('alert.transcriptDemoLoadFailed', { message: e instanceof Error ? e.message : String(e) }));
         }
         break;
       case 'new-from-transcript':
@@ -171,15 +173,8 @@ export default function App() {
       try {
         const backup = await loadAutoBackup();
         if (backup) {
-          const savedAt = new Date(backup.meta.savedAt).toLocaleString('ja-JP');
-          const confirmed = confirm(
-            `前回保存されていないTEM図が見つかりました。\n` +
-            `タイトル: ${backup.meta.title}\n` +
-            `自動保存日時: ${savedAt}\n\n` +
-            `復元しますか？\n` +
-            `[OK] 復元する\n` +
-            `[キャンセル] 破棄して新規作成`
-          );
+          const savedAt = new Date(backup.meta.savedAt).toLocaleString(i18n.language === 'en' ? 'en-US' : 'ja-JP');
+          const confirmed = confirm(t('confirm.restore', { title: backup.meta.title, savedAt }));
           if (confirmed) {
             useTEMStore.getState().loadDocument(backup.doc);
             restored = true;
@@ -227,13 +222,7 @@ export default function App() {
     try {
       if (localStorage.getItem(PRIVACY_WARN_KEY) === '1') return true;
     } catch { /* ignore */ }
-    const ok = confirm(
-      `この .tem ファイルにはインタビュー原文 (${doc.transcripts.length} 件) が同梱されています。\n\n` +
-      `他者と共有する場合、原文に含まれる個人情報も一緒に共有されます。\n` +
-      `共有相手・公開範囲を確認したうえで保存してください。\n\n` +
-      `OK で保存を続行します（次回以降この警告は表示されません）。\n` +
-      `キャンセルすると保存を中止します。`
-    );
+    const ok = confirm(t('confirm.transcriptPrivacy', { count: doc.transcripts.length }));
     if (ok) {
       try { localStorage.setItem(PRIVACY_WARN_KEY, '1'); } catch { /* ignore */ }
     }
@@ -269,7 +258,7 @@ export default function App() {
   const handleOpen = async () => {
     const state = useTEMStore.getState();
     if (state.dirty) {
-      const ok = confirm('未保存の変更があります。破棄して開きますか？');
+      const ok = confirm(t('confirm.discardAndOpen'));
       if (!ok) return;
     }
     try {
@@ -279,7 +268,7 @@ export default function App() {
         fileHandleRef.current = result.handle;
       }
     } catch (e) {
-      alert('ファイルの読み込みに失敗しました: ' + (e as Error).message);
+      alert(t('alert.fileLoadFailed', { message: (e as Error).message }));
     }
   };
 
@@ -292,15 +281,15 @@ export default function App() {
       const existing = useTEMStore.getState().doc.sheets.map((s) => s.name);
       const dups = result.doc.sheets.filter((s) => existing.includes(s.name));
       if (dups.length > 0) {
-        const ok = confirm(
-          `現在と同じシート名が ${dups.length} 件あります:\n${dups.map((s) => `・${s.name}`).join('\n')}\n\n` +
-          `このまま追加するとシート名が重複します（シート ID は自動でユニーク化されます）。\n続行しますか？`
-        );
+        const ok = confirm(t('confirm.duplicateSheetNames', {
+          count: dups.length,
+          names: dups.map((s) => t('sheetNameBullet', { name: s.name })).join('\n'),
+        }));
         if (!ok) return;
       }
       useTEMStore.getState().importSheetsFromDocument(result.doc);
     } catch (e) {
-      alert('ファイルの読み込みに失敗しました: ' + (e as Error).message);
+      alert(t('alert.fileLoadFailed', { message: (e as Error).message }));
     }
   };
 
@@ -308,7 +297,7 @@ export default function App() {
   const handleCSVExport = async () => {
     const state = useTEMStore.getState();
     const sheet = state.doc.sheets.find((s) => s.id === state.doc.activeSheetId);
-    if (!sheet) { alert('アクティブシートが見つかりません'); return; }
+    if (!sheet) { alert(t('alert.noActiveSheet')); return; }
     const baseName = (sheet.name || 'sheet').replace(/[\\/:*?"<>|]/g, '_');
     const files: Array<[string, string]> = [
       [`${baseName}-boxes.csv`, exportBoxesToCsv(sheet.boxes)],
@@ -335,7 +324,7 @@ export default function App() {
   const handleNew = () => {
     const state = useTEMStore.getState();
     if (state.dirty) {
-      const ok = confirm('未保存の変更があります。破棄して新規作成しますか？');
+      const ok = confirm(t('confirm.discardAndNew'));
       if (!ok) return;
     }
     state.resetDocument();
@@ -493,12 +482,12 @@ export default function App() {
         fallback={(err) => exportOpen ? (
           <div className="modal-backdrop" onClick={() => setExportOpen(false)}>
             <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 560, padding: 16 }}>
-              <h3 style={{ marginTop: 0, color: '#c00' }}>出力プレビューでエラー</h3>
-              <p style={{ fontSize: 13 }}>ダイアログの描画中にエラーが発生しました。console にスタックトレースが出ています。</p>
+              <h3 style={{ marginTop: 0, color: '#c00' }}>{t('error.exportPreview.title')}</h3>
+              <p style={{ fontSize: 13 }}>{t('error.exportPreview.body')}</p>
               <pre style={{ background: '#f8f8f8', padding: 8, fontSize: 12, whiteSpace: 'pre-wrap' }}>
                 {String(err.message)}
               </pre>
-              <button className="ribbon-btn-small" onClick={() => setExportOpen(false)}>閉じる</button>
+              <button className="ribbon-btn-small" onClick={() => setExportOpen(false)}>{t('close')}</button>
             </div>
           </div>
         ) : null}
@@ -515,12 +504,12 @@ export default function App() {
         fallback={(err) => transcriptOpen ? (
           <div className="modal-backdrop" onClick={() => setTranscriptOpen(false)}>
             <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 560, padding: 16 }}>
-              <h3 style={{ marginTop: 0, color: '#c00' }}>原文ビューアでエラー</h3>
-              <p style={{ fontSize: 13 }}>原文ビューアの描画中にエラーが発生しました。console にスタックトレースが出ています。</p>
+              <h3 style={{ marginTop: 0, color: '#c00' }}>{t('error.transcript.title')}</h3>
+              <p style={{ fontSize: 13 }}>{t('error.transcript.body')}</p>
               <pre style={{ background: '#f8f8f8', padding: 8, fontSize: 12, whiteSpace: 'pre-wrap' }}>
                 {String(err.message)}
               </pre>
-              <button className="ribbon-btn-small" onClick={() => { setTranscriptOpen(false); setTranscriptFocusBoxId(undefined); setTranscriptAutoImport(false); }}>閉じる</button>
+              <button className="ribbon-btn-small" onClick={() => { setTranscriptOpen(false); setTranscriptFocusBoxId(undefined); setTranscriptAutoImport(false); }}>{t('close')}</button>
             </div>
           </div>
         ) : null}

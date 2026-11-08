@@ -1,0 +1,7 @@
+﻿key,ja,en,note
+auto,自動（既定）,Automatic,色選びの小窓の「既定に戻す」ボタン（呼び出し側が文言を渡さないとき）
+noFill,塗りつぶしなし,No fill,色選びの小窓の「色なし」ボタン（呼び出し側が文言を渡さないとき）
+section.presets,プリセット,Presets,色選びの小窓の見出し（24 色の見本）
+section.recent,最近使った色,Recent colors,色選びの小窓の見出し
+section.custom,カスタム,Custom,色選びの小窓の見出し（#RRGGBB の入力欄）
+nativePicker,OS 標準のカラーピッカー,System color picker,色選びの小窓の右端の色ボタンの説明（マウスを乗せると出る）

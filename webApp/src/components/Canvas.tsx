@@ -6,6 +6,7 @@
 // ============================================================================
 
 import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -93,6 +94,7 @@ function CanvasInner({
   onOpenTimeArrowSettings?: () => void;
   onOpenPeriodSettings?: () => void;
 }) {
+  const { t } = useTranslation('canvas');
   const sheet = useActiveSheet();
   const updateBox = useTEMStore((s) => s.updateBox);
   const addLine = useTEMStore((s) => s.addLine);
@@ -880,7 +882,7 @@ function CanvasInner({
   }, [storeBoxIds, storeLineIds, storeSdsgIds]);
 
   if (!sheet) {
-    return <div style={{ padding: 20 }}>シートがありません</div>;
+    return <div style={{ padding: 20 }}>{t('noSheet')}</div>;
   }
 
   const isSelectMode = canvasMode === 'select';
@@ -1171,6 +1173,7 @@ function SmartGuidesOverlay({ guides }: { guides: { v: number[]; h: number[] } }
 }
 
 export function TimeArrowOverlay({ onOpenSettings }: { onOpenSettings?: () => void } = {}) {
+  const { t } = useTranslation('canvas');
   const view = useTEMView();
   const sheet = view.sheet;
   const layout = view.settings.layout;
@@ -1275,7 +1278,7 @@ export function TimeArrowOverlay({ onOpenSettings }: { onOpenSettings?: () => vo
         onMouseDown={editable ? (e) => e.stopPropagation() : undefined}
         onClick={editable ? (e) => e.stopPropagation() : undefined}
         onDoubleClick={editable ? (e) => { e.preventDefault(); e.stopPropagation(); onOpenSettings?.(); } : undefined}
-        title={editable ? 'ダブルクリックで非可逆的時間タブを開く' : undefined}
+        title={editable ? t('timeArrow.title') : undefined}
       >
         {renderVerticalAwareText(arrow.label, isVert)}
       </div>
@@ -1296,6 +1299,9 @@ function CustomControls() {
   const requestFit = useTEMStore((s) => s.requestFit);
   const canvasMode = useTEMStore((s) => s.view.canvasMode);
   const setCanvasMode = useTEMStore((s) => s.setCanvasMode);
+  const { t } = useTranslation('canvas');
+  const zoomInIcon = '＋'; // i18n-ok ボタンの記号（全角の＋・－）
+  const zoomOutIcon = '－'; // i18n-ok
 
   const btn: React.CSSProperties = {
     width: 30,
@@ -1327,24 +1333,24 @@ function CustomControls() {
         overflow: 'hidden',
       }}
     >
-      <button style={btn} title="ズームイン" onClick={() => rf.zoomIn()}>＋</button>
-      <button style={btn} title="ズームアウト" onClick={() => rf.zoomOut()}>－</button>
-      <button style={btn} title="全体フィット" onClick={() => requestFit('all')}>⛶</button>
-      <button style={btn} title="横幅フィット" onClick={() => requestFit('width')}>↔</button>
-      <button style={btn} title="縦幅フィット" onClick={() => requestFit('height')}>↕</button>
+      <button style={btn} title={t('zoomIn')} onClick={() => rf.zoomIn()}>{zoomInIcon}</button>
+      <button style={btn} title={t('zoomOut')} onClick={() => rf.zoomOut()}>{zoomOutIcon}</button>
+      <button style={btn} title={t('fitAll')} onClick={() => requestFit('all')}>⛶</button>
+      <button style={btn} title={t('fitWidth')} onClick={() => requestFit('width')}>↔</button>
+      <button style={btn} title={t('fitHeight')} onClick={() => requestFit('height')}>↕</button>
       <button
         style={canvasMode === 'move' ? activeBtn : btn}
-        title="移動モード（ドラッグで画面パン、図形編集ロック）"
+        title={t('mode.move')}
         onClick={() => setCanvasMode('move')}
       >✋</button>
       <button
         style={canvasMode === 'pointer' ? activeBtn : btn}
-        title="選択モード（図形を自由に操作）"
+        title={t('mode.pointer')}
         onClick={() => setCanvasMode('pointer')}
       >➤</button>
       <button
         style={canvasMode === 'select' ? activeBtn : btn}
-        title="範囲選択モード（ドラッグで矩形選択）"
+        title={t('mode.select')}
         onClick={() => setCanvasMode('select')}
       >⊡</button>
     </div>
@@ -1352,6 +1358,7 @@ function CustomControls() {
 }
 
 function PaperGuideOverlay() {
+  const { t } = useTranslation('canvas');
   const transform = useReactFlowStore((s) => s.transform);
   const layout = useTEMStore((s) => s.doc.settings.layout);
   const paperGuides = useTEMStore((s) => s.doc.settings.paperGuides);
@@ -1453,7 +1460,7 @@ function PaperGuideOverlay() {
         }}
       >
         <span style={{ position: 'absolute', top: -18, left: 0, fontSize: 10, color, background: '#fff', padding: '0 4px', fontWeight: 600 }}>
-          {baseKey === 'custom' ? 'カスタム' : baseKey}
+          {baseKey === 'custom' ? t('paper.custom') : baseKey}
           {pageCount > 1 && ` × ${pageCount}`}
         </span>
       </div>
@@ -1575,6 +1582,7 @@ function SDSGBandOverlay({
   // 重複計算を避け、計算結果を sdsgNodes / drag handler と共有。
   bandLayout: ReturnType<typeof computeSDSGBandLayout>;
 }) {
+  const { t } = useTranslation('canvas');
   const view = useTEMView();
   const sheet = view.sheet;
   const settings = view.settings;
@@ -1704,9 +1712,9 @@ function SDSGBandOverlay({
   return (
     <>
       {topHasSDSG && bandLayout.topBand && settings.sdsgSpace?.bands.top.showBorder &&
-        renderBand(bandLayout.topBand, isH ? '上部 (SD)' : '右側 (SD)', settings.sdsgSpace.bands.top, '#9b59b6')}
+        renderBand(bandLayout.topBand, isH ? t('band.top.h') : t('band.top.v'), settings.sdsgSpace.bands.top, '#9b59b6')}
       {bottomHasSDSG && bandLayout.bottomBand && settings.sdsgSpace?.bands.bottom.showBorder &&
-        renderBand(bandLayout.bottomBand, isH ? '下部 (SG)' : '左側 (SG)', settings.sdsgSpace.bands.bottom, '#27ae60')}
+        renderBand(bandLayout.bottomBand, isH ? t('band.bottom.h') : t('band.bottom.v'), settings.sdsgSpace.bands.bottom, '#27ae60')}
       {bandLayout.topBand && renderRowGuides('top', bandLayout.topBand)}
       {bandLayout.bottomBand && renderRowGuides('bottom', bandLayout.bottomBand)}
     </>

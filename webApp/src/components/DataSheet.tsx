@@ -4,6 +4,7 @@
 // ============================================================================
 
 import { useState, useMemo, useRef, useEffect, Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import type { BoxType } from '../types';
 import { BOX_TYPE_LABELS, LEVEL_PX } from '../store/defaults';
@@ -16,6 +17,7 @@ type SortField = 'id' | 'type' | 'label' | 'timeLevel' | 'itemLevel';
 type SortDir = 'asc' | 'desc';
 
 export function DataSheet() {
+  const { t } = useTranslation('dataSheet');
   const visible = useTEMStore((s) => s.view.dataSheetVisible);
   const toggle = useTEMStore((s) => s.toggleDataSheet);
   const width = useTEMStore((s) => s.view.dataSheetWidth);
@@ -42,9 +44,9 @@ export function DataSheet() {
 
   if (!visible) {
     return (
-      <div className="panel-collapsed left" onClick={toggle} title="データシートを表示">
+      <div className="panel-collapsed left" onClick={toggle} title={t('show')}>
         <span style={{ writingMode: 'vertical-rl', fontWeight: 600, color: '#444', letterSpacing: '0.1em' }}>
-          データシート
+          {t('title')}
         </span>
       </div>
     );
@@ -53,7 +55,7 @@ export function DataSheet() {
   return (
     <div className="data-sheet" style={{ width }}>
       <div className="panel-header">
-        <span>🗂 データシート</span>
+        <span>🗂 {t('title')}</span>
         <button className="panel-toggle" onClick={toggle}>×</button>
       </div>
       <div className="panel-body">
@@ -62,7 +64,7 @@ export function DataSheet() {
       <div
         className="panel-resizer"
         onMouseDown={(e) => { e.preventDefault(); setResizing(true); }}
-        title="幅を調整"
+        title={t('resize')}
       />
     </div>
   );
@@ -137,6 +139,7 @@ function ColHeader({ label, width, onResize, onSort, sortArrow }: {
 // ============================================================================
 
 function BoxTable() {
+  const { t, i18n } = useTranslation('dataSheet');
   const sheet = useActiveSheet();
   const updateBox = useTEMStore((s) => s.updateBox);
   const addBox = useTEMStore((s) => s.addBox);
@@ -219,10 +222,10 @@ function BoxTable() {
   };
 
   const handleIdEdit = (oldId: string) => {
-    const newId = prompt('新しいIDを入力', oldId);
+    const newId = prompt(t('box.newIdPrompt'), oldId);
     if (!newId || newId === oldId) return;
     const ok = renameBoxId(oldId, newId);
-    if (!ok) alert('IDの変更に失敗しました（重複または無効なID）');
+    if (!ok) alert(t('box.renameFailed'));
   };
 
   // Excel 複数行貼付対応: クリップボードから複数行取得 → 各行を新規Boxとして追加
@@ -255,7 +258,7 @@ function BoxTable() {
     try {
       text = await navigator.clipboard.readText();
     } catch {
-      alert('クリップボードを読み取れませんでした。ブラウザの許可を確認するか、ラベル欄に直接貼り付けてください（複数行は自動で分割されます）。');
+      alert(t('box.clipboardReadFailed'));
       return;
     }
     // Excel の複数セルはタブ区切りで来るので、1 行のセルは空白でつなぐ
@@ -264,7 +267,7 @@ function BoxTable() {
       .map((l) => l.replace(/\t+/g, ' ').trim())
       .filter((l) => l.length > 0);
     if (lines.length === 0) {
-      alert('クリップボードにテキストがありません。Excel などで行をコピーしてからお使いください。');
+      alert(t('box.clipboardEmpty'));
       return;
     }
     const anchor = afterBoxId ? sheet.boxes.find((b) => b.id === afterBoxId) : undefined;
@@ -314,14 +317,14 @@ function BoxTable() {
     <>
       <div className="table-toolbar">
         <input
-          placeholder="🔍 絞り込み"
+          placeholder={`🔍 ${t('filter')}`}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="filter-input"
         />
         {selectedBoxIds.length > 0 && (
           <span style={{ fontSize: '0.77em', color: '#2684ff', marginLeft: 4 }}>
-            選択 {selectedBoxIds.length}個
+            {t('box.selected', { count: selectedBoxIds.length })}
           </span>
         )}
         <button
@@ -329,25 +332,25 @@ function BoxTable() {
           onClick={copyToClipboard}
           disabled={selectedBoxIds.length === 0}
           title={selectedBoxIds.length > 0
-            ? `選択中の ${selectedBoxIds.length} 行をコピー（下の「挿入」ボタンで貼り付け）`
-            : '行のチェックボックスで出来事を選択してください'}
+            ? t('box.copy.tip', { count: selectedBoxIds.length })
+            : t('box.copy.tipNone')}
           style={{ marginLeft: 6 }}
-        >コピー</button>
+        >{t('box.copy')}</button>
         {clipboardBoxCount > 0 && (
           <span style={{ fontSize: '0.77em', color: '#888', marginLeft: 4 }}>
-            クリップボード {clipboardBoxCount}行
+            {t('box.clipboardCount', { count: clipboardBoxCount })}
           </span>
         )}
         <label style={{ marginLeft: 'auto', fontSize: '0.78em', color: '#666', display: 'flex', alignItems: 'center', gap: 4 }}>
-          貼付モード:
+          {t('box.pasteMode')}
           <select
             value={pasteMode}
             onChange={(e) => updatePasteMode(e.target.value as 'offset' | 'midpoint')}
             style={{ fontSize: '0.88em' }}
-            title="クリップボード挿入時の座標決定方式"
+            title={t('box.pasteMode.tip')}
           >
-            <option value="offset">+20 オフセット</option>
-            <option value="midpoint">中間配置（前後 Box の中間 Time）</option>
+            <option value="offset">{t('box.pasteMode.offset')}</option>
+            <option value="midpoint">{t('box.pasteMode.midpoint')}</option>
           </select>
         </label>
       </div>
@@ -360,12 +363,12 @@ function BoxTable() {
                   type="checkbox"
                   checked={allVisibleSelected}
                   onChange={toggleSelectAll}
-                  title="表示中の全て選択/解除"
+                  title={t('box.selectAll')}
                 />
               </th>
               <ColHeader label="ID" width={colWidths[1]} onResize={(w) => setColWidth(1, w)} onSort={() => handleSort('id')} sortArrow={arrow('id')} />
-              <ColHeader label="種別" width={colWidths[2]} onResize={(w) => setColWidth(2, w)} onSort={() => handleSort('type')} sortArrow={arrow('type')} />
-              <ColHeader label="ラベル" width={colWidths[3]} onResize={(w) => setColWidth(3, w)} onSort={() => handleSort('label')} sortArrow={arrow('label')} />
+              <ColHeader label={t('col.type')} width={colWidths[2]} onResize={(w) => setColWidth(2, w)} onSort={() => handleSort('type')} sortArrow={arrow('type')} />
+              <ColHeader label={t('col.label')} width={colWidths[3]} onResize={(w) => setColWidth(3, w)} onSort={() => handleSort('label')} sortArrow={arrow('label')} />
               <ColHeader label="Time" width={colWidths[4]} onResize={(w) => setColWidth(4, w)} onSort={() => handleSort('timeLevel')} sortArrow={arrow('timeLevel')} />
               <ColHeader label="Item" width={colWidths[5]} onResize={(w) => setColWidth(5, w)} onSort={() => handleSort('itemLevel')} sortArrow={arrow('itemLevel')} />
               <ColHeader label="" width={colWidths[6]} onResize={(w) => setColWidth(6, w)} />
@@ -393,7 +396,7 @@ function BoxTable() {
                       checked={selectedBoxIds.includes(b.id)}
                       onClick={(e) => handleSelectClick(idx, b.id, e)}
                       onChange={() => { /* handled by onClick */ }}
-                      title={`クリック: 単独選択 / ${shortcutLabel('Ctrl+')}クリック: 追加 / Shift+クリック: 範囲選択`}
+                      title={t('box.select.tip', { ctrl: shortcutLabel('Ctrl+') })}
                     />
                   </td>
                   <td>
@@ -402,17 +405,17 @@ function BoxTable() {
                       readOnly
                       onDoubleClick={() => handleIdEdit(b.id)}
                       style={{ fontFamily: 'monospace', cursor: 'pointer' }}
-                      title="ダブルクリックで変更"
+                      title={t('box.id.tip')}
                     />
                   </td>
                   <td>
                     <select
                       value={b.type}
                       onChange={(e) => changeBoxType(b.id, e.target.value as BoxType)}
-                      title="変更するとIDも自動更新"
+                      title={t('box.type.tip')}
                     >
-                      {SELECTABLE_BOX_TYPES.map((t) => (
-                        <option key={t} value={t}>{BOX_TYPE_LABELS[t].shortJa}</option>
+                      {SELECTABLE_BOX_TYPES.map((bt) => (
+                        <option key={bt} value={bt}>{i18n.language === 'ja' ? BOX_TYPE_LABELS[bt].shortJa : BOX_TYPE_LABELS[bt].en}</option>
                       ))}
                     </select>
                   </td>
@@ -422,7 +425,7 @@ function BoxTable() {
                       onChange={(e) => updateBox(b.id, { label: e.target.value })}
                       onPaste={(e) => handleLabelPaste(e, b.id)}
                       rows={1}
-                      title="Excelから複数行コピペ可"
+                      title={t('box.label.tip')}
                     />
                   </td>
                   <td>
@@ -466,10 +469,10 @@ function BoxTable() {
                         }
                       }}
                       title={clipboardBoxCount > 0
-                        ? `この下にコピーした行を挿入（${clipboardBoxCount} 行、モード: ${pasteMode === 'midpoint' ? '中間配置' : '+20オフセット'}）`
-                        : 'この下に Excel / テキストの行を挿入（OS のクリップボードを 1 行 = 1 Box として読み込みます）'}
+                        ? t('box.insertBelow.tip', { count: clipboardBoxCount, mode: pasteMode === 'midpoint' ? t('box.pasteMode.midpointShort') : t('box.pasteMode.offsetShort') })
+                        : t('box.insertBelowText.tip')}
                     >⬇</button>
-                    <button className="row-btn danger" onClick={() => removeBoxes([b.id])} title="削除">×</button>
+                    <button className="row-btn danger" onClick={() => removeBoxes([b.id])} title={t('delete')}>×</button>
                   </td>
                 </tr>
                 {idx < sortedBoxes.length - 1 && (
@@ -478,8 +481,8 @@ function BoxTable() {
                       <button
                         className="insert-between-btn"
                         onClick={() => handleInsertAfter(idx, insertCount)}
-                        title={`ここに${insertCount}個挿入`}
-                      >＋ここに{insertCount > 1 ? `${insertCount}個` : ''}挿入</button>
+                        title={t('box.insertHere.tip', { count: insertCount })}
+                      >{insertCount > 1 ? t('box.insertHereN', { count: insertCount }) : t('box.insertHere')}</button>
                     </td>
                   </tr>
                 )}
@@ -487,7 +490,7 @@ function BoxTable() {
             ))}
             {sortedBoxes.length === 0 && (
               <tr><td colSpan={7} style={{ textAlign: 'center', color: '#888', padding: 20 }}>
-                {filter ? '該当するBoxがありません' : 'Boxがありません。下の「+追加」で作成'}
+                {filter ? t('box.noMatch') : t('box.empty')}
               </td></tr>
             )}
             <InsertSlot
@@ -507,8 +510,8 @@ function BoxTable() {
         </table>
       </div>
       <div className="table-footer">
-        <button className="toolbar-btn" onClick={() => addBox()} title="末尾に新規Boxを追加">＋ 新規追加</button>
-        <span style={{ fontSize: '0.77em', color: '#666' }}>挿入個数:</span>
+        <button className="toolbar-btn" onClick={() => addBox()} title={t('box.add.tip')}>{t('box.add')}</button>
+        <span style={{ fontSize: '0.77em', color: '#666' }}>{t('box.insertCount')}</span>
         <input
           type="number"
           min={1}
@@ -516,9 +519,9 @@ function BoxTable() {
           value={insertCount}
           onChange={(e) => setInsertCount(Math.max(1, Number(e.target.value)))}
           style={{ width: 40 }}
-          title="挿入ボタンで追加する個数"
+          title={t('box.insertCount.tip')}
         />
-        <span style={{ fontSize: '0.77em', color: '#999' }}>個</span>
+        <span style={{ fontSize: '0.77em', color: '#999' }}>{t('box.insertCount.unit')}</span>
       </div>
     </>
   );
@@ -529,6 +532,7 @@ function BoxTable() {
 // ============================================================================
 
 function LineTable() {
+  const { t } = useTranslation('dataSheet');
   const sheet = useActiveSheet();
   const updateLine = useTEMStore((s) => s.updateLine);
   const removeLines = useTEMStore((s) => s.removeLines);
@@ -548,15 +552,15 @@ function LineTable() {
   return (
     <>
       <div className="table-toolbar">
-        <input placeholder="🔍 絞り込み" value={filter} onChange={(e) => setFilter(e.target.value)} className="filter-input" />
-        <span style={{ fontSize: '0.77em', color: '#666' }}>※ Lineはキャンバスで接続</span>
+        <input placeholder={`🔍 ${t('filter')}`} value={filter} onChange={(e) => setFilter(e.target.value)} className="filter-input" />
+        <span style={{ fontSize: '0.77em', color: '#666' }}>{t('line.hint')}</span>
       </div>
       <div style={{ overflow: 'auto' }}>
         <table className="data-table resizable">
           <thead>
             <tr>
               <ColHeader label="ID" width={colWidths[0]} onResize={(w) => setColWidth(0, w)} />
-              <ColHeader label="種別" width={colWidths[1]} onResize={(w) => setColWidth(1, w)} />
+              <ColHeader label={t('col.type')} width={colWidths[1]} onResize={(w) => setColWidth(1, w)} />
               <ColHeader label="From" width={colWidths[2]} onResize={(w) => setColWidth(2, w)} />
               <ColHeader label="To" width={colWidths[3]} onResize={(w) => setColWidth(3, w)} />
               <ColHeader label="" width={colWidths[4]} onResize={(w) => setColWidth(4, w)} />
@@ -568,8 +572,8 @@ function LineTable() {
                 <td><code>{l.id.slice(0, 12)}</code></td>
                 <td>
                   <select value={l.type} onChange={(e) => updateLine(l.id, { type: e.target.value as 'RLine' | 'XLine' })}>
-                    <option value="RLine">実線</option>
-                    <option value="XLine">点線</option>
+                    <option value="RLine">{t('line.RLine')}</option>
+                    <option value="XLine">{t('line.XLine')}</option>
                   </select>
                 </td>
                 <td>
@@ -587,12 +591,12 @@ function LineTable() {
                   </select>
                 </td>
                 <td>
-                  <button className="row-btn danger" onClick={() => removeLines([l.id])} title="削除">×</button>
+                  <button className="row-btn danger" onClick={() => removeLines([l.id])} title={t('delete')}>×</button>
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan={5} style={{ textAlign: 'center', color: '#888', padding: 20 }}>Lineがありません</td></tr>
+              <tr><td colSpan={5} style={{ textAlign: 'center', color: '#888', padding: 20 }}>{t('line.empty')}</td></tr>
             )}
           </tbody>
         </table>
@@ -602,6 +606,7 @@ function LineTable() {
 }
 
 function SDSGTable() {
+  const { t } = useTranslation('dataSheet');
   const sheet = useActiveSheet();
   const selection = useTEMStore((s) => s.selection);
   const addSDSG = useTEMStore((s) => s.addSDSG);
@@ -627,27 +632,27 @@ function SDSGTable() {
   };
   const addOne = (type: 'SD' | 'SG') => {
     const target = resolveAttachTarget();
-    if (!target) { alert('先に Box を 1 つ以上作成してください'); return; }
+    if (!target) { alert(t('sdsg.needBox')); return; }
     addSDSG({ type, attachedTo: target });
   };
 
   return (
     <div>
       <div style={{ display: 'flex', gap: 6, padding: '6px 10px', borderBottom: '1px solid #e0e0e0' }}>
-        <button className="ribbon-btn-small" onClick={() => addOne('SD')} disabled={sheet.boxes.length === 0}>+ SD 追加</button>
-        <button className="ribbon-btn-small" onClick={() => addOne('SG')} disabled={sheet.boxes.length === 0}>+ SG 追加</button>
+        <button className="ribbon-btn-small" onClick={() => addOne('SD')} disabled={sheet.boxes.length === 0}>{t('sdsg.addSD')}</button>
+        <button className="ribbon-btn-small" onClick={() => addOne('SG')} disabled={sheet.boxes.length === 0}>{t('sdsg.addSG')}</button>
         <span style={{ fontSize: '0.82em', color: '#888', alignSelf: 'center', marginLeft: 8 }}>
           {selection.lineIds.length > 0
-            ? `→ Line ${selection.lineIds[0]} に紐づけ`
+            ? `→ ${t('sdsg.attachLine', { id: selection.lineIds[0] })}`
             : sheet.boxes.length > 0
-              ? `→ 最後の Box ${sheet.boxes[sheet.boxes.length - 1].id} に紐づけ`
-              : '→ Box がありません'}
+              ? `→ ${t('sdsg.attachLastBox', { id: sheet.boxes[sheet.boxes.length - 1].id })}`
+              : `→ ${t('sdsg.noBox')}`}
         </span>
       </div>
       <table className="data-table">
         <thead>
           <tr>
-            <th>ID</th><th>種別</th><th>ラベル</th><th>モード</th><th>対象 1</th><th>対象 2</th><th style={{ width: 30 }}></th>
+            <th>ID</th><th>{t('col.type')}</th><th>{t('col.label')}</th><th>{t('sdsg.col.mode')}</th><th>{t('sdsg.col.target1')}</th><th>{t('sdsg.col.target2')}</th><th style={{ width: 30 }}></th>
           </tr>
         </thead>
         <tbody>
@@ -704,7 +709,7 @@ function SDSGTable() {
                 >
                   {!sheet.boxes.some((b) => b.id === s.attachedTo)
                     && !sheet.lines.some((l) => l.id === s.attachedTo) && (
-                    <option value={s.attachedTo}>（現: {s.attachedTo}）</option>
+                    <option value={s.attachedTo}>{t('sdsg.current', { id: s.attachedTo })}</option>
                   )}
                   <optgroup label="Box">
                     {sheet.boxes.map((b) => (
@@ -741,7 +746,7 @@ function SDSGTable() {
                     color: isBetween ? undefined : '#999',
                   }}
                 >
-                  <option value="">（未指定）</option>
+                  <option value="">{t('sdsg.none')}</option>
                   <optgroup label="Box">
                     {sheet.boxes.filter((b) => b.id !== s.attachedTo).map((b) => (
                       <option key={b.id} value={b.id}>Box: {b.id}</option>
@@ -775,7 +780,7 @@ function SDSGTable() {
           />
           {sheet.sdsg.length === 0 && (
             <tr><td colSpan={7} style={{ textAlign: 'center', color: '#888', padding: 20 }}>
-              SD/SG はまだありません。上のボタンから追加できます。
+              {t('sdsg.empty')}
             </td></tr>
           )}
         </tbody>
@@ -798,6 +803,7 @@ function InsertSlot(props: {
   onPasteText?: () => void;
   colSpan: number;
 }) {
+  const { t } = useTranslation('dataSheet');
   void props.kind; void props.index;
   // アプリ内クリップボードにコピーした行があればそれを、無ければテキスト挿入を使う
   const textMode = props.pasteCount === 0 && !!props.onPasteText;
@@ -826,14 +832,14 @@ function InsertSlot(props: {
           onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.background = '#e8f0ff'; }}
           onMouseLeave={(e) => { if (!disabled) e.currentTarget.style.background = '#fafcff'; }}
           title={disabled
-            ? 'クリップボードに貼り付け可能な要素がありません'
+            ? t('slot.disabled.tip')
             : textMode
-              ? 'OS のクリップボードのテキストを 1 行 = 1 Box として末尾に挿入します（Excel の複数行コピーに対応）'
-              : `ここにコピーした行を挿入（${props.pasteCount} 行）`}
+              ? t('slot.text.tip')
+              : t('slot.paste.tip', { count: props.pasteCount })}
         >
           {textMode
-            ? '＋ Excel / テキストの行をここに挿入'
-            : `＋ コピーした行をここに挿入 ${props.pasteCount > 0 ? `(${props.pasteCount} 行)` : ''}`}
+            ? t('slot.text')
+            : (props.pasteCount > 0 ? t('slot.pasteN', { count: props.pasteCount }) : t('slot.paste'))}
         </button>
       </td>
     </tr>
@@ -846,6 +852,7 @@ function RowHoverButtons(props: {
   onPaste: () => void;
   onDelete?: () => void;
 }) {
+  const { t } = useTranslation('dataSheet');
   return (
     <div className="row-hover-buttons" style={{ display: 'inline-flex', gap: 2 }}>
       <button
@@ -859,7 +866,7 @@ function RowHoverButtons(props: {
           cursor: props.canPaste ? 'pointer' : 'not-allowed',
           fontSize: 12,
         }}
-        title={props.canPaste ? `この下にクリップボードを挿入（${props.pasteCount} 行）` : 'クリップボード空'}
+        title={props.canPaste ? t('row.paste.tip', { count: props.pasteCount }) : t('row.clipboardEmpty')}
       >⬇</button>
     </div>
   );

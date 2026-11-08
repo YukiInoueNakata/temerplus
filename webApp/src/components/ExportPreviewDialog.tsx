@@ -7,6 +7,7 @@
 // ============================================================================
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore } from '../store/store';
 import {
   applyExportTransform,
@@ -41,12 +42,13 @@ import {
 type Format = 'png' | 'svg' | 'pdf' | 'pptx';
 type OutputMethod = Format | 'print';
 
-const OUTPUT_METHODS: { key: OutputMethod; label: string }[] = [
-  { key: 'png',   label: 'PNG ファイル（画像）' },
-  { key: 'svg',   label: 'SVG ファイル（ベクター画像）' },
-  { key: 'pdf',   label: 'PDF ファイル' },
-  { key: 'pptx',  label: 'PPTX ファイル（PowerPoint）' },
-  { key: 'print', label: '🖨️ プリンターで印刷' },
+// 表示名は描画のときに t(labelKey) で引く
+const OUTPUT_METHODS: { key: OutputMethod; labelKey: string }[] = [
+  { key: 'png',   labelKey: 'method.png' },
+  { key: 'svg',   labelKey: 'method.svg' },
+  { key: 'pdf',   labelKey: 'method.pdf' },
+  { key: 'pptx',  labelKey: 'method.pptx' },
+  { key: 'print', labelKey: 'method.print' },
 ];
 
 const PREVIEW_ID = 'export-preview-canvas';
@@ -58,6 +60,7 @@ export function ExportPreviewDialog({
   open: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('exportPreviewDialog');
   const doc = useTEMStore((s) => s.doc);
   const [xf, setXf] = useState<ExportTransform>(DEFAULT_EXPORT_TRANSFORM);
   const [method, setMethod] = useState<OutputMethod>('png');
@@ -127,7 +130,7 @@ export function ExportPreviewDialog({
   };
 
   const handleSavePreset = () => {
-    const name = window.prompt('プリセット名を入力してください');
+    const name = window.prompt(t('preset.prompt'));
     if (!name) return;
     try {
       const next = saveUserPreset(name, currentOptions());
@@ -141,7 +144,7 @@ export function ExportPreviewDialog({
   const handleOverwritePreset = () => {
     const cur = userPresets.find((p) => p.id === selectedPresetId);
     if (!cur) return;
-    if (!window.confirm(`「${cur.name}」を現在の設定で上書きしますか？`)) return;
+    if (!window.confirm(t('preset.confirmOverwrite', { name: cur.name }))) return;
     const next = updateUserPreset(cur.id, { options: currentOptions() });
     setUserPresets(next);
   };
@@ -149,7 +152,7 @@ export function ExportPreviewDialog({
   const handleDeletePreset = () => {
     const cur = userPresets.find((p) => p.id === selectedPresetId);
     if (!cur) return;
-    if (!window.confirm(`「${cur.name}」を削除しますか？`)) return;
+    if (!window.confirm(t('preset.confirmDelete', { name: cur.name }))) return;
     const next = deleteUserPreset(cur.id);
     setUserPresets(next);
     setSelectedPresetId('');
@@ -273,8 +276,8 @@ export function ExportPreviewDialog({
   // 図を用紙の短辺に合わせたときに何ページ分あるか（ページ数を選ぶ目安）
   const pagesNeeded = useMemo(() => {
     if (exportMode !== 'multi') return null;
-    const t = applyExportTransform(applyExportContent(doc, contentChoices), { ...xf, fitMode: 'fit-short', pageCount: 1 });
-    return pagesNeededForDoc(t.doc, { paperSize: xf.paperSize, pageCount: 1, paperMarginRatio: xf.paperMarginRatio });
+    const tr = applyExportTransform(applyExportContent(doc, contentChoices), { ...xf, fitMode: 'fit-short', pageCount: 1 });
+    return pagesNeededForDoc(tr.doc, { paperSize: xf.paperSize, pageCount: 1, paperMarginRatio: xf.paperMarginRatio });
   }, [exportMode, doc, contentChoices, xf]);
 
   // layout に応じた用紙サイズ選択肢
@@ -307,7 +310,7 @@ export function ExportPreviewDialog({
     setNotice(null);
     const ac = new AbortController();
     abortRef.current = ac;
-    setProgress({ current: 0, total: 1, label: '準備中...' });
+    setProgress({ current: 0, total: 1, label: t('progress.preparing') });
     const onProg = (p: { current: number; total: number; label: string }) => setProgress(p);
     try {
       const baseName = doc.metadata.title || 'TEMer';
@@ -342,7 +345,7 @@ export function ExportPreviewDialog({
       } else if (format === 'svg') {
         const { exportToSVGNative } = await import('../utils/exportSVGNative');
         const sheet = transformed.doc.sheets.find((s) => s.id === transformed.doc.activeSheetId);
-        if (!sheet) throw new Error('アクティブシートが見つかりません');
+        if (!sheet) throw new Error(t('error.noSheet'));
         await exportToSVGNative({
           filename: `${baseName}.svg`,
           sheet,
@@ -373,7 +376,7 @@ export function ExportPreviewDialog({
       } else if (format === 'pptx') {
         const { exportToPPTX } = await import('../utils/exportPPT');
         const sheet = transformed.doc.sheets.find((s) => s.id === transformed.doc.activeSheetId);
-        if (!sheet) throw new Error('アクティブシートが見つかりません');
+        if (!sheet) throw new Error(t('error.noSheet'));
         await exportToPPTX({
           filename: `${baseName}.pptx`,
           sheet,
@@ -391,10 +394,10 @@ export function ExportPreviewDialog({
       }
     } catch (e) {
       if (e instanceof DOMException && e.name === 'AbortError') {
-        setNotice('出力をキャンセルしました');
+        setNotice(t('notice.exportCanceled'));
       } else {
         console.error(e);
-        alert(`出力に失敗しました: ${e instanceof Error ? e.message : String(e)}`);
+        alert(t('alert.exportFailed', { message: e instanceof Error ? e.message : String(e) }));
       }
     } finally {
       setBusy(false);
@@ -411,7 +414,7 @@ export function ExportPreviewDialog({
     setNotice(null);
     const ac = new AbortController();
     abortRef.current = ac;
-    setProgress({ current: 0, total: 1, label: '準備中...' });
+    setProgress({ current: 0, total: 1, label: t('progress.preparing') });
     const onProg = (p: { current: number; total: number; label: string }) => setProgress(p);
     try {
       let multi = exportMode === 'multi' && xf.pageCount > 1 ? pageBounds : null;
@@ -439,10 +442,10 @@ export function ExportPreviewDialog({
       // 失敗・取り消しのときは、先に開いた準備中の窓を閉じる
       if (printWin && !printWin.closed) printWin.close();
       if (e instanceof DOMException && e.name === 'AbortError') {
-        setNotice('印刷準備をキャンセルしました');
+        setNotice(t('notice.printCanceled'));
       } else {
         console.error(e);
-        alert(`印刷の準備に失敗しました: ${e instanceof Error ? e.message : String(e)}`);
+        alert(t('alert.printFailed', { message: e instanceof Error ? e.message : String(e) }));
       }
     } finally {
       setBusy(false);
@@ -470,9 +473,9 @@ export function ExportPreviewDialog({
           className="modal-header"
           onMouseDown={onHeaderMouseDown}
           style={{ cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }}
-          title="ドラッグで移動"
+          title={t('drag')}
         >
-          <h3>出力プレビュー</h3>
+          <h3>{t('title')}</h3>
           <button onClick={onClose} className="modal-close" disabled={busy}>×</button>
         </div>
         {busy && progress && (
@@ -501,7 +504,7 @@ export function ExportPreviewDialog({
                 gap: 12,
               }}
             >
-              <div style={{ fontWeight: 'bold', fontSize: '0.95em' }}>出力中...</div>
+              <div style={{ fontWeight: 'bold', fontSize: '0.95em' }}>{t('progress.exporting')}</div>
               <div style={{ fontSize: '0.85em', color: '#333' }}>{progress.label}</div>
               <div style={{ fontSize: '0.8em', color: '#666' }}>
                 {progress.current} / {progress.total} ({pct}%)
@@ -527,7 +530,7 @@ export function ExportPreviewDialog({
                 <button
                   className="ribbon-btn-small"
                   onClick={cancelExport}
-                >キャンセル</button>
+                >{t('cancel')}</button>
               </div>
             </div>
           </div>
@@ -545,35 +548,35 @@ export function ExportPreviewDialog({
                 borderBottom: '1px solid #dde4f0',
               }}
             >
-              <label style={{ fontWeight: 'bold' }}>出力方式</label>
+              <label style={{ fontWeight: 'bold' }}>{t('method')}</label>
               <select
                 value={method}
                 onChange={(e) => setMethod(e.target.value as OutputMethod)}
                 style={{ flex: 1, minWidth: 0 }}
               >
                 {OUTPUT_METHODS.map((m) => (
-                  <option key={m.key} value={m.key}>{m.label}</option>
+                  <option key={m.key} value={m.key}>{t(m.labelKey)}</option>
                 ))}
               </select>
             </div>
 
             {/* プリセット */}
-            <CollapsibleSection title="プリセット" sectionKey="export-preset" defaultOpen={true}>
+            <CollapsibleSection title={t('preset.title')} sectionKey="export-preset" defaultOpen={true}>
               <div className="setting-row">
                 <select
                   value={selectedPresetId}
                   onChange={(e) => handlePresetSelect(e.target.value)}
                   style={{ flex: 1, minWidth: 0 }}
-                  title="用途別の出力設定を一発で適用"
+                  title={t('preset.select.tooltip')}
                 >
-                  <option value="">（選択してください）</option>
-                  <optgroup label="組み込み">
+                  <option value="">{t('preset.select.placeholder')}</option>
+                  <optgroup label={t('preset.builtin')}>
                     {BUILTIN_PRESETS.map((p) => (
                       <option key={p.id} value={p.id} title={p.description}>{p.name}</option>
                     ))}
                   </optgroup>
                   {userPresets.length > 0 && (
-                    <optgroup label="ユーザー">
+                    <optgroup label={t('preset.user')}>
                       {userPresets.map((p) => (
                         <option key={p.id} value={p.id} title={p.description}>{p.name}</option>
                       ))}
@@ -582,24 +585,24 @@ export function ExportPreviewDialog({
                 </select>
               </div>
               <div className="setting-row" style={{ justifyContent: 'flex-start', gap: 4, flexWrap: 'wrap' }}>
-                <button className="ribbon-btn-small" onClick={handleSavePreset} title="現在の設定を新しいプリセットとして保存">
-                  現状を保存...
+                <button className="ribbon-btn-small" onClick={handleSavePreset} title={t('preset.save.tooltip')}>
+                  {t('preset.save')}
                 </button>
                 <button
                   className="ribbon-btn-small"
                   onClick={handleOverwritePreset}
                   disabled={!isUserPresetSelected}
-                  title={isUserPresetSelected ? '選択中のプリセットを現在の設定で上書き' : 'ユーザープリセットを選択してください'}
+                  title={isUserPresetSelected ? t('preset.overwrite.tooltip') : t('preset.selectUser')}
                 >
-                  上書き
+                  {t('preset.overwrite')}
                 </button>
                 <button
                   className="ribbon-btn-small"
                   onClick={handleDeletePreset}
                   disabled={!isUserPresetSelected}
-                  title={isUserPresetSelected ? '選択中のプリセットを削除' : 'ユーザープリセットを選択してください'}
+                  title={isUserPresetSelected ? t('preset.delete.tooltip') : t('preset.selectUser')}
                 >
-                  削除
+                  {t('preset.delete')}
                 </button>
               </div>
               {selectedPresetId && (() => {
@@ -616,16 +619,16 @@ export function ExportPreviewDialog({
               <button
                 className={exportMode === 'single' ? 'settings-tab active' : 'settings-tab'}
                 onClick={() => switchMode('single')}
-              >単一印刷</button>
+              >{t('mode.single')}</button>
               <button
                 className={exportMode === 'multi' ? 'settings-tab active' : 'settings-tab'}
                 onClick={() => switchMode('multi')}
-              >複数印刷（分割）</button>
+              >{t('mode.multi')}</button>
             </div>
 
-            <CollapsibleSection title="用紙とフィット" sectionKey="export-paper-fit" defaultOpen={true}>
+            <CollapsibleSection title={t('paper.title')} sectionKey="export-paper-fit" defaultOpen={true}>
               <div className="setting-row">
-                <label>用紙サイズ</label>
+                <label>{t('paper.size')}</label>
                 <select
                   value={xf.paperSize}
                   onChange={(e) => update({ paperSize: e.target.value as PaperSizeKey })}
@@ -637,28 +640,28 @@ export function ExportPreviewDialog({
                 </select>
               </div>
               <div className="setting-row">
-                <label>フィット</label>
+                <label>{t('fit')}</label>
                 <select
                   value={xf.fitMode}
                   onChange={(e) => update({ fitMode: e.target.value as FitMode })}
                 >
-                  <option value="manual">手動（倍率指定）</option>
-                  <option value="fit-both">両方に収める</option>
-                  <option value="fit-width">横だけ収める</option>
-                  <option value="fit-height">縦だけ収める</option>
-                  <option value="fit-short">短辺だけ収める（複数印刷向け）</option>
+                  <option value="manual">{t('fit.manual')}</option>
+                  <option value="fit-both">{t('fit.both')}</option>
+                  <option value="fit-width">{t('fit.width')}</option>
+                  <option value="fit-height">{t('fit.height')}</option>
+                  <option value="fit-short">{t('fit.short')}</option>
                 </select>
               </div>
               {xf.fitMode === 'fit-short' && (
                 <p className="hint" style={{ marginTop: 0 }}>
                   {doc.settings.layout === 'horizontal'
-                    ? '横型: 縦方向（短辺）を用紙高さに合わせる。横方向はページ数で分割'
-                    : '縦型: 横方向（短辺）を用紙幅に合わせる。縦方向はページ数で分割'}
+                    ? t('fit.short.hint.h')
+                    : t('fit.short.hint.v')}
                 </p>
               )}
               {xf.fitMode === 'manual' && (
                 <div className="setting-row">
-                  <label>全体倍率</label>
+                  <label>{t('fit.globalScale')}</label>
                   <input
                     type="number"
                     step={0.05}
@@ -671,7 +674,7 @@ export function ExportPreviewDialog({
                 </div>
               )}
               <div className="setting-row">
-                <label>用紙内余白比率</label>
+                <label>{t('paper.margin')}</label>
                 <input
                   type="number"
                   step={0.01}
@@ -685,14 +688,14 @@ export function ExportPreviewDialog({
             </CollapsibleSection>
 
             {exportMode === 'multi' && (
-              <CollapsibleSection title="ページ分割（長辺方向）" sectionKey="export-page-split" defaultOpen={true}>
+              <CollapsibleSection title={t('split.title')} sectionKey="export-page-split" defaultOpen={true}>
                 <p className="hint" style={{ marginTop: 0 }}>
                   {doc.settings.layout === 'horizontal'
-                    ? '横型レイアウト: x 軸方向（横）に N 分割して出力'
-                    : '縦型レイアウト: y 軸方向（縦）に N 分割して出力'}
+                    ? t('split.hint.h')
+                    : t('split.hint.v')}
                 </p>
                 <div className="setting-row">
-                  <label>分割数</label>
+                  <label>{t('split.count')}</label>
                   <input
                     type="number"
                     min={2}
@@ -709,26 +712,28 @@ export function ExportPreviewDialog({
                 </div>
                 {pagesNeeded != null && (
                   <p className="hint" style={{ marginTop: 0 }}>
-                    用紙の{doc.settings.layout === 'horizontal' ? '高さ' : '幅'}に合わせると，この図は約 {pagesNeeded.toFixed(1)} ページ分です
+                    {doc.settings.layout === 'horizontal'
+                      ? t('split.needed.h', { pages: pagesNeeded.toFixed(1) })
+                      : t('split.needed.v', { pages: pagesNeeded.toFixed(1) })}
                     {Math.ceil(pagesNeeded) <= 1
-                      ? '（1 ページに収まります。単一印刷でも足ります）'
-                      : Math.ceil(pagesNeeded) < xf.pageCount ? `（${Math.ceil(pagesNeeded)} ページで足ります）` : ''}
-                    {pagesNeeded > xf.pageCount ? '（このページ数では図を縮めて収めます）' : ''}
+                      ? t('split.needed.fitsOne')
+                      : Math.ceil(pagesNeeded) < xf.pageCount ? t('split.needed.enough', { n: Math.ceil(pagesNeeded) }) : ''}
+                    {pagesNeeded > xf.pageCount ? t('split.needed.shrink') : ''}
                   </p>
                 )}
                 <div className="setting-row">
-                  <label>分割方式</label>
+                  <label>{t('split.method')}</label>
                   <select
                     value={xf.pageSplitMode}
                     onChange={(e) => update({ pageSplitMode: e.target.value as 'overlap' | 'duplicate' })}
                     style={{ maxWidth: 220 }}
                   >
-                    <option value="overlap">Box の間の空いた所で区切る（凡例は各ページ）</option>
-                    <option value="duplicate">SPEC方式（Box複製+続マーカー、PPTX 限定）</option>
+                    <option value="overlap">{t('split.method.gap')}</option>
+                    <option value="duplicate">{t('split.method.duplicate')}</option>
                   </select>
                 </div>
                 {xf.pageSplitMode === 'duplicate' && <div className="setting-row">
-                  <label>オーバーラップ量 (px)</label>
+                  <label>{t('split.overlap')}</label>
                   <input
                     type="number"
                     min={0}
@@ -742,7 +747,7 @@ export function ExportPreviewDialog({
                 {xf.pageSplitMode === 'duplicate' && (
                   <>
                     <div className="setting-row">
-                      <label>続マーカーを表示</label>
+                      <label>{t('split.markers')}</label>
                       <input
                         type="checkbox"
                         checked={xf.showContinuationMarkers}
@@ -751,7 +756,7 @@ export function ExportPreviewDialog({
                     </div>
                     {format !== 'pptx' && (
                       <p className="hint" style={{ color: '#b36b00' }}>
-                        ※ PPTX 以外ではオーバーラップ方式で出力されます（Box 複製・続マーカーは PPTX 限定機能）
+                        {t('split.duplicate.note')}
                       </p>
                     )}
                   </>
@@ -763,7 +768,7 @@ export function ExportPreviewDialog({
                     disabled={previewPageIndex <= 0}
                   >◀</button>
                   <span style={{ fontSize: '0.85em' }}>
-                    プレビュー: {previewPageIndex + 1} / {xf.pageCount}
+                    {t('split.previewPage', { page: previewPageIndex + 1, total: xf.pageCount })}
                   </span>
                   <button
                     className="ribbon-btn-small"
@@ -774,31 +779,31 @@ export function ExportPreviewDialog({
               </CollapsibleSection>
             )}
 
-            <CollapsibleSection title="微調整" sectionKey="export-fine-tune" defaultOpen={false}>
+            <CollapsibleSection title={t('tune.title')} sectionKey="export-fine-tune" defaultOpen={false}>
               <div className="setting-row">
-                <label>位置 X (px)</label>
+                <label>{t('tune.offsetX')}</label>
                 <input
                   type="number"
                   step={10}
                   value={xf.offsetX}
                   onChange={(e) => update({ offsetX: Number(e.target.value) })}
                   style={{ width: 80 }}
-                  title="用紙中心を基準に全要素を X 方向に平行移動"
+                  title={t('tune.offsetX.tooltip')}
                 />
               </div>
               <div className="setting-row">
-                <label>位置 Y (px)</label>
+                <label>{t('tune.offsetY')}</label>
                 <input
                   type="number"
                   step={10}
                   value={xf.offsetY}
                   onChange={(e) => update({ offsetY: Number(e.target.value) })}
                   style={{ width: 80 }}
-                  title="用紙中心を基準に全要素を Y 方向に平行移動"
+                  title={t('tune.offsetY.tooltip')}
                 />
               </div>
               <div className="setting-row">
-                <label>文字サイズ ±</label>
+                <label>{t('tune.fontDelta')}</label>
                 <input
                   type="number"
                   step={1}
@@ -808,7 +813,7 @@ export function ExportPreviewDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>文字サイズ ×</label>
+                <label>{t('tune.fontScale')}</label>
                 <input
                   type="number"
                   step={0.05}
@@ -819,7 +824,7 @@ export function ExportPreviewDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>枠線太さ ±</label>
+                <label>{t('tune.borderDelta')}</label>
                 <input
                   type="number"
                   step={0.5}
@@ -829,7 +834,7 @@ export function ExportPreviewDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>線太さ ±</label>
+                <label>{t('tune.lineDelta')}</label>
                 <input
                   type="number"
                   step={0.5}
@@ -839,7 +844,7 @@ export function ExportPreviewDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>Box間距離 横 ×</label>
+                <label>{t('tune.gapH')}</label>
                 <input
                   type="number"
                   step={0.05}
@@ -847,11 +852,11 @@ export function ExportPreviewDialog({
                   value={xf.boxGapScaleH}
                   onChange={(e) => update({ boxGapScaleH: Math.max(0.1, Number(e.target.value)), boxGapScale: undefined })}
                   style={{ width: 80 }}
-                  title="Box のサイズは維持、横方向の中心間距離のみ拡縮（矢印の長さが変わる）"
+                  title={t('tune.gapH.tooltip')}
                 />
               </div>
               <div className="setting-row">
-                <label>Box間距離 縦 ×</label>
+                <label>{t('tune.gapV')}</label>
                 <input
                   type="number"
                   step={0.05}
@@ -859,11 +864,11 @@ export function ExportPreviewDialog({
                   value={xf.boxGapScaleV}
                   onChange={(e) => update({ boxGapScaleV: Math.max(0.1, Number(e.target.value)), boxGapScale: undefined })}
                   style={{ width: 80 }}
-                  title="Box のサイズは維持、縦方向の中心間距離のみ拡縮"
+                  title={t('tune.gapV.tooltip')}
                 />
               </div>
               <div className="setting-row">
-                <label>用紙中央に自動配置</label>
+                <label>{t('tune.autoCenter')}</label>
                 <input
                   type="checkbox"
                   checked={xf.autoCenterOnPaper !== false}
@@ -871,7 +876,7 @@ export function ExportPreviewDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>タイプラベル ±</label>
+                <label>{t('tune.typeLabelDelta')}</label>
                 <input
                   type="number"
                   step={1}
@@ -881,7 +886,7 @@ export function ExportPreviewDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>サブラベル ±</label>
+                <label>{t('tune.subLabelDelta')}</label>
                 <input
                   type="number"
                   step={1}
@@ -891,7 +896,7 @@ export function ExportPreviewDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>時間矢印文字 ±</label>
+                <label>{t('tune.timeArrowDelta')}</label>
                 <input
                   type="number"
                   step={1}
@@ -901,7 +906,7 @@ export function ExportPreviewDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>凡例文字 ±</label>
+                <label>{t('tune.legendDelta')}</label>
                 <input
                   type="number"
                   step={1}
@@ -911,7 +916,7 @@ export function ExportPreviewDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>時期区分文字 ±</label>
+                <label>{t('tune.periodDelta')}</label>
                 <input
                   type="number"
                   step={1}
@@ -921,7 +926,7 @@ export function ExportPreviewDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>時期区分 線太さ ±</label>
+                <label>{t('tune.periodStrokeDelta')}</label>
                 <input
                   type="number"
                   step={0.5}
@@ -935,24 +940,24 @@ export function ExportPreviewDialog({
                   className="ribbon-btn-small"
                   onClick={() => setXf(DEFAULT_EXPORT_TRANSFORM)}
                 >
-                  リセット
+                  {t('tune.reset')}
                 </button>
               </div>
             </CollapsibleSection>
 
-            <CollapsibleSection title="出力設定" sectionKey="export-output" defaultOpen={true}>
+            <CollapsibleSection title={t('output.title')} sectionKey="export-output" defaultOpen={true}>
               <div className="setting-row">
-                <label>背景</label>
+                <label>{t('output.background')}</label>
                 <select
                   value={background}
                   onChange={(e) => setBackground(e.target.value as 'white' | 'transparent')}
                 >
-                  <option value="white">白</option>
-                  <option value="transparent">透明</option>
+                  <option value="white">{t('output.background.white')}</option>
+                  <option value="transparent">{t('output.background.transparent')}</option>
                 </select>
               </div>
               <div className="setting-row">
-                <label>グリッドを含める</label>
+                <label>{t('output.grid')}</label>
                 <input
                   type="checkbox"
                   checked={includeGrid}
@@ -960,7 +965,7 @@ export function ExportPreviewDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>用紙枠を含める</label>
+                <label>{t('output.paperGuides')}</label>
                 <input
                   type="checkbox"
                   checked={includePaperGuides}
@@ -968,7 +973,7 @@ export function ExportPreviewDialog({
                 />
               </div>
               <div className="setting-row">
-                <label>ID バッジを含める</label>
+                <label>{t('output.ids')}</label>
                 <input
                   type="checkbox"
                   checked={includeIds.any}
@@ -1006,7 +1011,7 @@ export function ExportPreviewDialog({
               )}
               {format === 'pdf' && (
                 <div className="setting-row">
-                  <label>PDF マージン (inch)</label>
+                  <label>{t('output.pdfMargin')}</label>
                   <input
                     type="number"
                     min={0}
@@ -1018,14 +1023,14 @@ export function ExportPreviewDialog({
                   />
                 </div>
               )}
-              <p className="hint">背景・グリッド・用紙枠は PPTX では無視されます</p>
+              <p className="hint">{t('output.pptxNote')}</p>
             </CollapsibleSection>
           </div>
 
           {/* 右: プレビュー */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
             <div style={{ padding: '6px 10px', borderBottom: '1px solid #e0e0e0', fontSize: '0.85em', color: '#555' }}>
-              プレビュー（ドラッグ＝位置シフト / ホイール＝全体倍率 に反映）
+              {t('preview.header')}
             </div>
             <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
               <ExportPreviewCanvas
@@ -1074,7 +1079,7 @@ export function ExportPreviewDialog({
             onClick={onClose}
             disabled={busy}
           >
-            閉じる
+            {t('close')}
           </button>
           {notice && <span style={{ color: '#b36b00', fontSize: '0.82em' }}>{notice}</span>}
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1085,17 +1090,17 @@ export function ExportPreviewDialog({
               style={{ whiteSpace: 'nowrap', padding: '6px 16px' }}
               title={
                 contentMissing.length > 0
-                  ? `出力に含めるかを選んでください: ${contentMissing.join('、')}`
+                  ? t('run.chooseFirst', { items: contentMissing.join(t('list.separator')) })
                   : method === 'print'
-                  ? 'プリンターで印刷（新規ウィンドウを開いてブラウザの印刷ダイアログを表示）'
-                  : `${method.toUpperCase()} ファイルとして保存`
+                  ? t('run.print.tooltip')
+                  : t('run.save.tooltip', { format: method.toUpperCase() })
               }
             >
               {busy
-                ? '出力中...'
+                ? t('progress.exporting')
                 : method === 'print'
-                  ? '🖨️ プリンターで印刷'
-                  : `💾 ${method.toUpperCase()} で保存`}
+                  ? t('method.print')
+                  : t('run.save', { format: method.toUpperCase() })}
             </button>
           </div>
         </div>
@@ -1119,6 +1124,7 @@ function ExportContentPanel({
   onChange: (kind: keyof ExportContentChoices, value: boolean) => void;
   disabled: boolean;
 }) {
+  const { t } = useTranslation('exportPreviewDialog');
   const missing = missingChoices(report, choices);
   const cautions = [...report.cautions, ...choiceCautions(choices)];
   return (
@@ -1127,13 +1133,13 @@ function ExportContentPanel({
       style={{ borderTop: '1px solid #ddd', padding: '8px 14px', background: missing.length ? '#fff8e1' : '#f6f8fa', fontSize: '0.85em' }}
     >
       <div style={{ fontWeight: 600, marginBottom: 4 }}>
-        出力に含める要素の確認{missing.length > 0 ? `（あと ${missing.length} 件選んでください）` : '（選択済み）'}
+        {t('content.title')}{missing.length > 0 ? t('content.remaining', { n: missing.length }) : t('content.done')}
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 20px' }}>
         {report.items.map((it) => (
           <div key={it.kind} style={{ display: 'flex', alignItems: 'center', gap: 6 }} title={it.hint}>
             <span style={{ color: choices[it.kind] === undefined ? '#b36b00' : undefined }}>
-              {it.label}{it.kind !== 'legend' ? `（${it.count} 件）` : ''}
+              {it.label}{it.kind !== 'legend' ? t('content.count', { n: it.count }) : ''}
             </span>
             {!it.cannotDraw && (
               <label style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -1144,7 +1150,7 @@ function ExportContentPanel({
                   onChange={() => onChange(it.kind, true)}
                   disabled={disabled}
                 />
-                含める
+                {t('content.include')}
               </label>
             )}
             <label style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -1155,13 +1161,13 @@ function ExportContentPanel({
                 onChange={() => onChange(it.kind, false)}
                 disabled={disabled}
               />
-              {it.cannotDraw ? '含めない（図には描けません）' : '含めない'}
+              {it.cannotDraw ? t('content.excludeCannotDraw') : t('content.exclude')}
             </label>
           </div>
         ))}
       </div>
       {cautions.map((c) => (
-        <div key={c} style={{ color: '#b36b00', marginTop: 4 }}>注意: {c}</div>
+        <div key={c} style={{ color: '#b36b00', marginTop: 4 }}>{t('content.caution', { text: c })}</div>
       ))}
     </div>
   );

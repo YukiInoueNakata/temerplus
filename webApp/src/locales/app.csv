@@ -1,0 +1,48 @@
+﻿key,ja,en,note
+"alert.demoLoadFailed","デモファイルの読み込みに失敗しました: {{message}}","Failed to load the demo file: {{message}}","警告の窓（起動ウィザードでデモを開けなかったとき）。{{message}} はエラーの内容"
+"alert.transcriptDemoLoadFailed","原文連動デモの読み込みに失敗しました: {{message}}","Failed to load the transcript demo: {{message}}","警告の窓（原文連動デモを開けなかったとき）。{{message}} はエラーの内容"
+"confirm.restore","前回保存されていないTEM図が見つかりました。
+タイトル: {{title}}
+自動保存日時: {{savedAt}}
+
+復元しますか？
+[OK] 復元する
+[キャンセル] 破棄して新規作成","An unsaved TEM diagram from your last session was found.
+Title: {{title}}
+Autosaved at: {{savedAt}}
+
+Restore it?
+[OK] Restore
+[Cancel] Discard and start new","確認の窓（起動時に自動保存が残っていたとき）。[OK]・[キャンセル] はブラウザのボタンの名前に合わせる"
+"confirm.transcriptPrivacy","この .tem ファイルにはインタビュー原文 ({{count}} 件) が同梱されています。
+
+他者と共有する場合、原文に含まれる個人情報も一緒に共有されます。
+共有相手・公開範囲を確認したうえで保存してください。
+
+OK で保存を続行します（次回以降この警告は表示されません）。
+キャンセルすると保存を中止します。","This .tem file contains interview transcripts ({{count}}).
+
+If you share it, any personal information in the transcripts is shared too.
+Check who you are sharing it with and how widely before saving.
+
+Click OK to continue saving (this warning will not be shown again).
+Click Cancel to stop saving.","確認の窓（逐語録を含むファイルを保存するとき）"
+"confirm.discardAndOpen","未保存の変更があります。破棄して開きますか？","You have unsaved changes. Discard them and open a file?","確認の窓（未保存のまま ファイル > 開く）"
+"confirm.discardAndNew","未保存の変更があります。破棄して新規作成しますか？","You have unsaved changes. Discard them and create a new file?","確認の窓（未保存のまま ファイル > 新規）"
+"alert.fileLoadFailed","ファイルの読み込みに失敗しました: {{message}}","Failed to load the file: {{message}}","警告の窓（ファイルを開けなかったとき）。{{message}} はエラーの内容"
+"confirm.duplicateSheetNames","現在と同じシート名が {{count}} 件あります:
+{{names}}
+
+このまま追加するとシート名が重複します（シート ID は自動でユニーク化されます）。
+続行しますか？","{{count}} sheets have the same names as current sheets:
+{{names}}
+
+If you add them, sheet names will be duplicated (sheet IDs are made unique automatically).
+Continue?","確認の窓（ファイル > 別シートとして開く で名前が重なるとき）。{{names}} はシート名の一覧"
+"sheetNameBullet","・{{name}}","- {{name}}","上の確認の窓のシート名の一覧の 1 行"
+"alert.noActiveSheet","アクティブシートが見つかりません","The active sheet was not found.","警告の窓（CSV エクスポートで今のシートが見つからないとき）"
+"error.exportPreview.title","出力プレビューでエラー","Error in export preview","出力の画面が壊れたときの代わりの窓の見出し"
+"error.exportPreview.body","ダイアログの描画中にエラーが発生しました。console にスタックトレースが出ています。","An error occurred while drawing the dialog. The stack trace is in the console.","出力の画面が壊れたときの代わりの窓の本文"
+"error.transcript.title","原文ビューアでエラー","Error in transcript viewer","原文ビューアが壊れたときの代わりの窓の見出し"
+"error.transcript.body","原文ビューアの描画中にエラーが発生しました。console にスタックトレースが出ています。","An error occurred while drawing the transcript viewer. The stack trace is in the console.","原文ビューアが壊れたときの代わりの窓の本文"
+"close","閉じる","Close","エラーの代わりの窓のボタン"

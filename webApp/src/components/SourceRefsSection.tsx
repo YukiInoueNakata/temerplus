@@ -6,6 +6,7 @@
 // - 「原文ビューアを開く」ボタン
 // ============================================================================
 
+import { useTranslation } from 'react-i18next';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import type { SourceRef } from '../types';
 import { CollapsibleSection } from './CollapsibleSection';
@@ -17,6 +18,7 @@ export function SourceRefsSection({
   target: { type: 'box' | 'line' | 'sdsg'; id: string };
   onOpenTranscriptViewer?: (focusBoxId?: string) => void;
 }) {
+  const { t } = useTranslation('sourceRefsSection');
   const sheet = useActiveSheet();
   const transcripts = useTEMStore((s) => s.doc.transcripts);
   const participants = useTEMStore((s) => s.doc.participants);
@@ -40,7 +42,7 @@ export function SourceRefsSection({
   const coveredParticipantIds = new Set<string>();
   let hasUnassignedSource = false;
   for (const r of refs) {
-    const tr = transcripts.find((t) => t.id === r.transcriptId);
+    const tr = transcripts.find((x) => x.id === r.transcriptId);
     if (tr?.participantId) coveredParticipantIds.add(tr.participantId);
     else if (tr) hasUnassignedSource = true;
   }
@@ -48,7 +50,7 @@ export function SourceRefsSection({
   const coverageNames = Array.from(coveredParticipantIds).map((id) => {
     const p = participants.find((x) => x.id === id);
     return p?.pseudonym ?? id;
-  }).join(', ') + (hasUnassignedSource ? (coveredParticipantIds.size > 0 ? ', (未割当)' : '(未割当)') : '');
+  }).join(', ') + (hasUnassignedSource ? (coveredParticipantIds.size > 0 ? ', ' + t('unassigned') : t('unassigned')) : '');
 
   // 未引用警告 (Box のみ。原文ありモードかつ refs=0 件)
   // Line と SDSG も警告対象としても良いが、Line は径路なので必ずしも原文不要、
@@ -58,10 +60,10 @@ export function SourceRefsSection({
   return (
     <CollapsibleSection
       title={
-        `原文参照 (${count})` +
-        (unresolved > 0 ? ` ⚠${unresolved} 追従不能` : '') +
-        (showUnreferencedWarning ? ' ⚠ 未引用' : '') +
-        (refs.length > 0 && hasTranscripts ? ` / 協力者 ${coverageCount}` : '')
+        t('title', { count }) +
+        (unresolved > 0 ? ' ' + t('title.unresolved', { count: unresolved }) : '') +
+        (showUnreferencedWarning ? ' ' + t('title.unreferenced') : '') +
+        (refs.length > 0 && hasTranscripts ? ' / ' + t('title.coverage', { count: coverageCount }) : '')
       }
       sectionKey={`source-refs:${target.type}:${target.id}`}
       defaultOpen={count > 0 || showUnreferencedWarning}
@@ -81,8 +83,8 @@ export function SourceRefsSection({
               color: '#7f1d1d',
             }}
           >
-            ⚠ <strong>原文への引用がありません</strong><br />
-            この要素は原文ビューアで段落をリンクすると根拠を保証できます。
+            ⚠ <strong>{t('warn.noRefs')}</strong><br />
+            {t('warn.noRefs.hint')}
           </div>
         )}
         {refs.length > 0 && hasTranscripts && (
@@ -95,28 +97,28 @@ export function SourceRefsSection({
               marginBottom: 6,
               fontSize: 11,
             }}
-            title="TEM の 1/4/9/16 法則: 4 協力者以上で類型としての強度が高まる"
+            title={t('coverage.tooltip')}
           >
-            👥 <strong>協力者カバレッジ: {coverageCount} 名</strong>
+            👥 <strong>{t('coverage.count', { count: coverageCount })}</strong>
             {coverageCount >= 4
-              ? ' (1/4/9/16 法則: 類型として十分)'
+              ? ' ' + t('coverage.enough')
               : coverageCount >= 2
-                ? ' (複数協力者から支持)'
-                : ' (単一協力者のみ)'}
+                ? ' ' + t('coverage.multiple')
+                : ' ' + t('coverage.single')}
             <br />
-            <span style={{ color: '#555' }}>対象: {coverageNames}</span>
+            <span style={{ color: '#555' }}>{t('coverage.targets', { names: coverageNames })}</span>
           </div>
         )}
         {refs.length === 0 ? (
           !showUnreferencedWarning && (
             <p style={{ fontSize: 12, color: '#666', margin: '4px 0' }}>
-              この要素に紐付く原文引用はまだありません。
+              {t('empty')}
             </p>
           )
         ) : (
           <ul style={{ paddingLeft: 0, listStyle: 'none', margin: 0 }}>
             {refs.map((r) => {
-              const tr = transcripts.find((t) => t.id === r.transcriptId);
+              const tr = transcripts.find((x) => x.id === r.transcriptId);
               const para = tr?.paragraphs.find((p) => p.id === r.paragraphId);
               const paraIndex = para?.index ?? -1;
               return (
@@ -137,20 +139,20 @@ export function SourceRefsSection({
                       <>
                         {tr.sessionNumber !== undefined && (
                           <span style={{ color: '#888', fontWeight: 400, marginRight: 4 }}>
-                            第{tr.sessionNumber}回
+                            {t('session', { n: tr.sessionNumber })}
                           </span>
                         )}
                         {tr.title}
                       </>
-                    ) : '（原文不明）'}
+                    ) : t('unknownTranscript')}
                     {paraIndex >= 0 && ` §${paraIndex + 1}`}
                   </div>
                   <div style={{ color: '#555', whiteSpace: 'pre-wrap', maxHeight: 60, overflow: 'auto', fontSize: 11 }}>
-                    「{(r.quoteText ?? '').slice(0, 140)}{(r.quoteText ?? '').length > 140 ? '...' : ''}」
+                    {t('quote', { text: (r.quoteText ?? '').slice(0, 140) + ((r.quoteText ?? '').length > 140 ? '...' : '') })}
                   </div>
                   {r.unresolved && (
                     <div style={{ color: '#c0392b', fontSize: 11, marginTop: 2 }}>
-                      ⚠ 原文編集により位置追従に失敗しています
+                      ⚠ {t('unresolved')}
                     </div>
                   )}
                   <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
@@ -158,17 +160,17 @@ export function SourceRefsSection({
                       style={{ fontSize: 11, padding: '2px 6px' }}
                       onClick={() => onOpenTranscriptViewer?.(target.type === 'box' ? target.id : undefined)}
                     >
-                      原文へジャンプ
+                      {t('jump')}
                     </button>
                     <button
                       style={{ fontSize: 11, padding: '2px 6px', color: '#c0392b' }}
                       onClick={() => {
-                        if (confirm('このリンクを解除しますか？\n（原文と要素自体は残ります）')) {
+                        if (confirm(t('confirm.unlink'))) {
                           removeSourceRef(target, r.id);
                         }
                       }}
                     >
-                      リンク解除
+                      {t('unlink')}
                     </button>
                   </div>
                 </li>
@@ -180,7 +182,7 @@ export function SourceRefsSection({
           style={{ fontSize: 11, padding: '4px 8px', marginTop: 4 }}
           onClick={() => onOpenTranscriptViewer?.(target.type === 'box' ? target.id : undefined)}
         >
-          原文ビューアを開く
+          {t('openViewer')}
         </button>
       </div>
     </CollapsibleSection>

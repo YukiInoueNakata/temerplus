@@ -10,10 +10,11 @@
 // ============================================================================
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import { LEVEL_PX, BOX_TYPE_LABELS } from '../store/defaults';
 import {
-  parsePptx, classifyShapes, buildFromPptx, lineEndpoints, PPTX_ROLE_LABELS, DEFAULT_PPTX_BUILD_OPTIONS,
+  parsePptx, classifyShapes, buildFromPptx, lineEndpoints, DEFAULT_PPTX_BUILD_OPTIONS,
   type PptxFile, type PptxRole, type ShapePlan, type PptxShape,
 } from '../utils/pptxImport';
 import { SELECTABLE_BOX_TYPES } from '../utils/typeDisplay';
@@ -32,6 +33,20 @@ const ROLE_COLORS: Record<PptxRole, string> = {
   ignore: '#ced4da',
 };
 
+/** 図形の役割の表示名のキー（locales/pptxImportDialog.csv。日本語は utils/pptxImport の PPTX_ROLE_LABELS と同じ） */
+const ROLE_LABEL_KEYS: Record<PptxRole, string> = {
+  box: 'role.box',
+  sd: 'role.sd',
+  sg: 'role.sg',
+  sdsgLabel: 'role.sdsgLabel',
+  subLabel: 'role.subLabel',
+  line: 'role.line',
+  period: 'role.period',
+  note: 'role.note',
+  timeArrow: 'role.timeArrow',
+  ignore: 'role.ignore',
+};
+
 const ROLE_ORDER: PptxRole[] = ['box', 'sd', 'sg', 'sdsgLabel', 'subLabel', 'line', 'period', 'note', 'timeArrow', 'ignore'];
 
 const short = (t: string, n = 28) => {
@@ -40,6 +55,9 @@ const short = (t: string, n = 28) => {
 };
 
 export function PptxImportDialog({ open, initialFile, onClose }: { open: boolean; initialFile?: File | null; onClose: () => void }) {
+  const { t, i18n } = useTranslation('pptxImportDialog');
+  /** Box の種類の表示名（日本語は従来の表示名、ほかの言語は TEM の用語の表） */
+  const boxTypeLabel = (bt: string) => (i18n.language === 'ja' ? BOX_TYPE_LABELS[bt].ja : t(`terms:boxType.${bt}`));
   const doc = useTEMStore((s) => s.doc);
   const sheet = useActiveSheet();
   const importBoxes = useTEMStore((s) => s.importBoxes);
@@ -79,7 +97,7 @@ export function PptxImportDialog({ open, initialFile, onClose }: { open: boolean
     setError(null);
     try {
       const parsed = await parsePptx(new Uint8Array(await f.arrayBuffer()), f.name);
-      if (parsed.slides.length === 0) { setError('スライドがありませんでした'); return; }
+      if (parsed.slides.length === 0) { setError(t('error.noSlides')); return; }
       // 図形がいちばん多いスライドを既定に
       let best = 0;
       parsed.slides.forEach((s, i) => { if (s.shapes.length > parsed.slides[best].shapes.length) best = i; });
@@ -99,7 +117,7 @@ export function PptxImportDialog({ open, initialFile, onClose }: { open: boolean
 
   const planBy = useMemo(() => new Map(plans.map((p) => [p.key, p])), [plans]);
   const setPlan = (key: string, patch: Partial<ShapePlan>) => {
-    setPlans((prev) => prev.map((p) => (p.key === key ? { ...p, ...patch, reason: '手で変更' } : p)));
+    setPlans((prev) => prev.map((p) => (p.key === key ? { ...p, ...patch, reason: t('reason.manual') } : p)));
   };
   const sdsgKeys = plans.filter((p) => p.role === 'sd' || p.role === 'sg').map((p) => p.key);
   const ownerKeys = plans.filter((p) => p.role === 'box' || p.role === 'sd' || p.role === 'sg').map((p) => p.key);
@@ -136,11 +154,11 @@ export function PptxImportDialog({ open, initialFile, onClose }: { open: boolean
       try {
         apply();
       } catch (e) {
-        setError(`取り込みの途中で失敗しました: ${e instanceof Error ? e.message : String(e)}`);
+        setError(t('error.importFailed', { message: e instanceof Error ? e.message : String(e) }));
         return;
       }
-      const msg = `Box ${result.boxes.length}、Line ${result.lines.length}、SD/SG ${result.sdsg.length}、時期ラベル ${result.periodLabels.length}、メモ ${result.notes.length} を取り込みました`;
-      alert(result.warnings.length > 0 ? `${msg}\n\n確認してほしいこと ${result.warnings.length} 件:\n${result.warnings.join('\n')}` : msg);
+      const msg = t('done.summary', { boxes: result.boxes.length, lines: result.lines.length, sdsg: result.sdsg.length, periods: result.periodLabels.length, notes: result.notes.length });
+      alert(result.warnings.length > 0 ? `${msg}\n\n${t('done.warnings', { count: result.warnings.length })}\n${result.warnings.join('\n')}` : msg);
       close();
     };
     if (toNewSheet) {
@@ -169,7 +187,7 @@ export function PptxImportDialog({ open, initialFile, onClose }: { open: boolean
     <div className="modal-backdrop" onClick={close} style={{ zIndex: 1250 }}>
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 1080, maxWidth: '96vw' }}>
         <div className="modal-header">
-          <h3>PowerPoint の TEM 図から取り込み（{step} / 3）</h3>
+          <h3>{t('title', { step })}</h3>
           <button className="modal-close" onClick={close}>×</button>
         </div>
         <div className="modal-body" style={{ maxHeight: '72vh', overflowY: 'auto' }}>
@@ -178,15 +196,15 @@ export function PptxImportDialog({ open, initialFile, onClose }: { open: boolean
           {/* ---------------- 1. ファイル ---------------- */}
           {step === 1 && (
             <section className="settings-section">
-              <h4>1. ファイルを選ぶ</h4>
-              <p className="hint">PowerPoint（.pptx）で描いた TEM 図。図形の見た目（枠・吹き出しの向き・矢印・文字）から Box や SD/SG を推測します。</p>
+              <h4>{t('step1.heading')}</h4>
+              <p className="hint">{t('step1.hint')}</p>
               <div
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) void handleFile(f); }}
                 onClick={() => fileInputRef.current?.click()}
                 style={{ border: '2px dashed #b0b8c8', borderRadius: 6, padding: 28, textAlign: 'center', cursor: 'pointer', background: '#fafcff' }}
               >
-                ここに .pptx をドロップ、またはクリックして選択
+                {t('step1.drop')}
                 <input ref={fileInputRef} type="file" accept=".pptx" style={{ display: 'none' }}
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleFile(f); e.target.value = ''; }} />
               </div>
@@ -196,32 +214,31 @@ export function PptxImportDialog({ open, initialFile, onClose }: { open: boolean
           {/* ---------------- 2. 図形の役割 ---------------- */}
           {step === 2 && file && slide && (
             <section className="settings-section">
-              <h4>2. 図形の役割を確かめる</h4>
+              <h4>{t('step2.heading')}</h4>
               <p className="hint">
-                {file.filename}・スライド {slide.index}（図形 {slide.shapes.length} 個）。見た目から推測した役割が入っています。
-                違うものは右の一覧で直してください。縮図の図形にマウスを乗せると一覧の行が、行に乗せると縮図の図形が強調されます。
+                {t('step2.hint', { filename: file.filename, slide: slide.index, shapes: slide.shapes.length })}
               </p>
               {file.slides.length > 1 && (
                 <div className="setting-row">
-                  <label>スライド</label>
+                  <label>{t('step2.slide')}</label>
                   <select value={slideIdx} onChange={(e) => loadSlide(file, Number(e.target.value))}>
-                    {file.slides.map((s, i) => <option key={i} value={i}>スライド {s.index}（図形 {s.shapes.length}）</option>)}
+                    {file.slides.map((s, i) => <option key={i} value={i}>{t('step2.slideOption', { index: s.index, shapes: s.shapes.length })}</option>)}
                   </select>
                 </div>
               )}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, margin: '6px 0', fontSize: '0.85em' }}>
                 {counts.map((c) => (
-                  <span key={c.role}><span style={{ display: 'inline-block', width: 10, height: 10, background: ROLE_COLORS[c.role], marginRight: 4 }} />{PPTX_ROLE_LABELS[c.role]} {c.n}</span>
+                  <span key={c.role}><span style={{ display: 'inline-block', width: 10, height: 10, background: ROLE_COLORS[c.role], marginRight: 4 }} />{t(ROLE_LABEL_KEYS[c.role])} {c.n}</span>
                 ))}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 1fr)', gap: 12 }}>
                 <SlidePreview file={file} shapes={slide.shapes} planBy={planBy} hoverKey={hoverKey} onHover={setHoverKey} />
                 <div style={{ maxHeight: '52vh', overflowY: 'auto' }}>
                   <label style={{ fontSize: '0.85em', fontWeight: 'normal' }}>
-                    <input type="checkbox" checked={showIgnored} onChange={(e) => setShowIgnored(e.target.checked)} /> 無視する図形も表示
+                    <input type="checkbox" checked={showIgnored} onChange={(e) => setShowIgnored(e.target.checked)} /> {t('step2.showIgnored')}
                   </label>
                   <table className="data-table" style={{ fontSize: '0.82em' }}>
-                    <thead><tr><th>図形</th><th style={{ width: 128 }}>役割</th><th style={{ width: 128 }}>詳細</th></tr></thead>
+                    <thead><tr><th>{t('col.shape')}</th><th style={{ width: 128 }}>{t('col.role')}</th><th style={{ width: 128 }}>{t('col.detail')}</th></tr></thead>
                     <tbody>
                       {listed.map((s) => {
                         const p = planBy.get(s.key)!;
@@ -229,43 +246,43 @@ export function PptxImportDialog({ open, initialFile, onClose }: { open: boolean
                           <tr key={s.key}
                             onMouseEnter={() => setHoverKey(s.key)} onMouseLeave={() => setHoverKey(null)}
                             style={{ background: hoverKey === s.key ? '#fff4d6' : undefined }}>
-                            <td title={`${s.text}\n（${s.geom || s.kind}・推測: ${p.reason ?? ''}）`}>
+                            <td title={`${s.text}\n${t('shape.tooltip', { kind: s.geom || s.kind, reason: p.reason ?? '' })}`}>
                               <span style={{ display: 'inline-block', width: 8, height: 8, background: ROLE_COLORS[p.role], marginRight: 4 }} />
-                              {s.text ? short(s.text) : <span style={{ color: '#888' }}>（{s.geom || s.kind}）</span>}
+                              {s.text ? short(s.text) : <span style={{ color: '#888' }}>{t('shape.noText', { kind: s.geom || s.kind })}</span>}
                             </td>
                             <td>
                               <select value={p.role} onChange={(e) => setPlan(s.key, { role: e.target.value as PptxRole })} style={{ width: '100%' }}>
-                                {ROLE_ORDER.map((r) => <option key={r} value={r}>{PPTX_ROLE_LABELS[r]}</option>)}
+                                {ROLE_ORDER.map((r) => <option key={r} value={r}>{t(ROLE_LABEL_KEYS[r])}</option>)}
                               </select>
                             </td>
                             <td>
                               {p.role === 'box' && (
                                 <select value={p.boxType ?? 'normal'} onChange={(e) => setPlan(s.key, { boxType: e.target.value as BoxType })} style={{ width: '100%' }}>
-                                  {SELECTABLE_BOX_TYPES.map((t) => <option key={t} value={t}>{BOX_TYPE_LABELS[t].ja}</option>)}
+                                  {SELECTABLE_BOX_TYPES.map((bt) => <option key={bt} value={bt}>{boxTypeLabel(bt)}</option>)}
                                 </select>
                               )}
                               {p.role === 'line' && (
                                 <select value={p.lineType ?? 'RLine'} onChange={(e) => setPlan(s.key, { lineType: e.target.value as LineType })} style={{ width: '100%' }}>
-                                  <option value="RLine">実線（実際の径路）</option>
-                                  <option value="XLine">点線（想定される径路）</option>
+                                  <option value="RLine">{t('line.RLine')}</option>
+                                  <option value="XLine">{t('line.XLine')}</option>
                                 </select>
                               )}
                               {p.role === 'subLabel' && (
                                 <select value={p.labelOf ?? ''} onChange={(e) => setPlan(s.key, { labelOf: e.target.value || undefined })} style={{ width: '100%' }}>
-                                  <option value="">（未選択）</option>
+                                  <option value="">{t('notSelected')}</option>
                                   {ownerKeys.map((k) => {
                                     const sh = slide.shapes.find((x) => x.key === k)!;
                                     const role = planBy.get(k)?.role;
-                                    return <option key={k} value={k}>{role === 'box' ? short(sh.text, 14) : `${role?.toUpperCase()}（${Math.round(sh.x)},${Math.round(sh.y)}）`}</option>;
+                                    return <option key={k} value={k}>{role === 'box' ? short(sh.text, 14) : t('owner.position', { role: role?.toUpperCase(), x: Math.round(sh.x), y: Math.round(sh.y) })}</option>;
                                   })}
                                 </select>
                               )}
                               {p.role === 'sdsgLabel' && (
                                 <select value={p.labelOf ?? ''} onChange={(e) => setPlan(s.key, { labelOf: e.target.value || undefined })} style={{ width: '100%' }}>
-                                  <option value="">（未選択）</option>
+                                  <option value="">{t('notSelected')}</option>
                                   {sdsgKeys.map((k) => {
                                     const sh = slide.shapes.find((x) => x.key === k)!;
-                                    return <option key={k} value={k}>{planBy.get(k)?.role.toUpperCase()}（{Math.round(sh.x)},{Math.round(sh.y)}）</option>;
+                                    return <option key={k} value={k}>{t('owner.position', { role: planBy.get(k)?.role.toUpperCase(), x: Math.round(sh.x), y: Math.round(sh.y) })}</option>;
                                   })}
                                 </select>
                               )}
@@ -283,45 +300,45 @@ export function PptxImportDialog({ open, initialFile, onClose }: { open: boolean
           {/* ---------------- 3. 確認 ---------------- */}
           {step === 3 && result && (
             <section className="settings-section">
-              <h4>3. 取り込む内容を確かめる</h4>
+              <h4>{t('step3.heading')}</h4>
               <p>
-                Box <strong>{result.boxes.length}</strong>・Line <strong>{result.lines.length}</strong>・
-                SD/SG <strong>{result.sdsg.length}</strong>・時期ラベル <strong>{result.periodLabels.length}</strong>・
-                メモ <strong>{result.notes.length}</strong>
+                Box <strong>{result.boxes.length}</strong>{t('sep')}Line <strong>{result.lines.length}</strong>{t('sep')}
+                SD/SG <strong>{result.sdsg.length}</strong>{t('sep')}{t('count.periodLabels')} <strong>{result.periodLabels.length}</strong>{t('sep')}
+                {t('count.notes')} <strong>{result.notes.length}</strong>
               </p>
               <div className="setting-row">
-                <label title="PowerPoint の 1pt を何 px にするか。大きいほど図が広がり、文字に余裕ができます">大きさ（1pt あたりの px）</label>
+                <label title={t('step3.scale.tip')}>{t('step3.scale')}</label>
                 <input type="number" min={0.5} max={5} step={0.25} value={scale} onChange={(e) => setScale(Math.max(0.5, Math.min(5, Number(e.target.value) || 2)))} style={{ width: 80 }} />
               </div>
               <div className="setting-row">
-                <label title="Box の中で本文より小さい文字（コード名など）を、ラベルでなく Box の説明に入れる">小さい文字は Box の説明へ</label>
+                <label title={t('step3.smallToDescription.tip')}>{t('step3.smallToDescription')}</label>
                 <input type="checkbox" checked={smallToDescription} onChange={(e) => setSmallToDescription(e.target.checked)} />
               </div>
               <div className="setting-row">
-                <label>元の文字サイズを保つ</label>
+                <label>{t('step3.keepFontSize')}</label>
                 <input type="checkbox" checked={keepFontSize} onChange={(e) => setKeepFontSize(e.target.checked)} />
               </div>
-              <div className="setting-row"><label>新しいシートに取り込む</label><input type="checkbox" checked={toNewSheet} onChange={(e) => setToNewSheet(e.target.checked)} /></div>
-              {!isH && <p className="hint" style={{ color: '#b45309' }}>いまの図は縦型です。PowerPoint の配置（横型）のまま取り込むので、取り込み後に向きを確かめてください。</p>}
+              <div className="setting-row"><label>{t('step3.toNewSheet')}</label><input type="checkbox" checked={toNewSheet} onChange={(e) => setToNewSheet(e.target.checked)} /></div>
+              {!isH && <p className="hint" style={{ color: '#b45309' }}>{t('step3.verticalWarning')}</p>}
               {result.warnings.length > 0 && (
                 <>
-                  <h5 style={{ margin: '12px 0 4px' }}>確認してほしいこと（{result.warnings.length} 件）</h5>
+                  <h5 style={{ margin: '12px 0 4px' }}>{t('step3.warnings', { count: result.warnings.length })}</h5>
                   <ul style={{ margin: 0, paddingLeft: 20, fontSize: '0.88em', color: '#8a4b08' }}>
                     {result.warnings.map((w, i) => <li key={i}>{w}</li>)}
                   </ul>
                 </>
               )}
-              <h5 style={{ margin: '12px 0 4px' }}>推定した矢印と SD/SG の紐付け</h5>
+              <h5 style={{ margin: '12px 0 4px' }}>{t('step3.links')}</h5>
               <table className="data-table" style={{ fontSize: '0.82em' }}>
                 <tbody>
                   {result.lines.map((l) => {
                     const f = result.boxes.find((b) => b.id === l.from);
-                    const t = result.boxes.find((b) => b.id === l.to);
-                    return <tr key={l.id}><td style={{ width: 70 }}>{l.id}</td><td>{short(f?.label ?? l.from, 22)} → {short(t?.label ?? l.to, 22)}</td></tr>;
+                    const toBox = result.boxes.find((b) => b.id === l.to);
+                    return <tr key={l.id}><td style={{ width: 70 }}>{l.id}</td><td>{short(f?.label ?? l.from, 22)} → {short(toBox?.label ?? l.to, 22)}</td></tr>;
                   })}
                   {result.sdsg.map((g) => {
                     const b = result.boxes.find((x) => x.id === g.attachedTo);
-                    return <tr key={g.id}><td>{g.id}</td><td>{short(g.label || '（ラベルなし）', 22)} ⇒ {short(b?.label ?? g.attachedTo, 22)}</td></tr>;
+                    return <tr key={g.id}><td>{g.id}</td><td>{short(g.label || t('noLabel'), 22)} ⇒ {short(b?.label ?? g.attachedTo, 22)}</td></tr>;
                   })}
                 </tbody>
               </table>
@@ -330,12 +347,12 @@ export function PptxImportDialog({ open, initialFile, onClose }: { open: boolean
         </div>
         <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
           <div>
-            {step > 1 && !(step === 2 && initialFile) && <button className="ribbon-btn-small" onClick={() => setStep(step - 1)}>← 戻る</button>}
+            {step > 1 && !(step === 2 && initialFile) && <button className="ribbon-btn-small" onClick={() => setStep(step - 1)}>← {t('back')}</button>}
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button className="ribbon-btn-small" onClick={close}>キャンセル</button>
-            {step === 2 && <button className="ribbon-btn-primary" disabled={!plans.some((p) => p.role === 'box')} onClick={() => setStep(3)}>次へ →</button>}
-            {step === 3 && <button className="ribbon-btn-primary" disabled={!result || result.boxes.length === 0} onClick={runImport}>取り込む</button>}
+            <button className="ribbon-btn-small" onClick={close}>{t('cancel')}</button>
+            {step === 2 && <button className="ribbon-btn-primary" disabled={!plans.some((p) => p.role === 'box')} onClick={() => setStep(3)}>{t('next')} →</button>}
+            {step === 3 && <button className="ribbon-btn-primary" disabled={!result || result.boxes.length === 0} onClick={runImport}>{t('import')}</button>}
           </div>
         </div>
       </div>

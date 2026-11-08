@@ -1,0 +1,36 @@
+﻿key,ja,en,note
+title,原文をインポート,Import a transcript,逐語録の取り込みの画面の題
+error.empty,インポートデータが空です,There is nothing to import,逐語録の取り込み > 取り込めなかったときの注意
+error.zeroParagraphs,段落が 0 件です。列マッピングを確認してください。,There are 0 paragraphs. Check the column mapping.,逐語録の取り込み > 取り込めなかったときの注意
+step1.heading,1. ファイルを選択,1. Choose a file,逐語録の取り込み > 手順 1 の見出し
+step1.formats,対応形式: .txt / .md / .csv / .tsv / .xlsx / .xls / .docx,Supported formats: .txt / .md / .csv / .tsv / .xlsx / .xls / .docx,逐語録の取り込み > 手順 1 の説明
+loading,読み込み中...,Loading...,逐語録の取り込み > ファイルを読んでいる間の表示
+step2.heading,2. シート / 列マッピング,2. Sheet / column mapping,逐語録の取り込み > 手順 2 の見出し（表形式のファイル）。ここでのシートは Excel のシート
+step2.sheet,シート,Sheet,逐語録の取り込み > Excel のシートの選択のラベル
+step2.hasHeader,先頭行をヘッダ扱い,First row is a header,逐語録の取り込み > チェックボックスのラベル
+step2.previewRows,プレビュー (先頭 5 行),Preview (first 5 rows),逐語録の取り込み > 見出し
+col.speaker,話者,Speaker,逐語録の取り込み > プレビューの列名
+col.time,時刻,Time,逐語録の取り込み > プレビューの列名
+col.text,本文,Text,逐語録の取り込み > プレビューの列名
+step2.previewParagraphs,2. プレビュー (先頭 5 段落),2. Preview (first 5 paragraphs),逐語録の取り込み > 手順 2 の見出し（文章のファイル）
+step2.totalParagraphs,合計 {{count}} 段落,{{count}} paragraphs in total,逐語録の取り込み > 段落の数
+step3.heading,3. メタデータ,3. Metadata,逐語録の取り込み > 手順 3 の見出し
+step3.title,タイトル,Title,逐語録の取り込み > 入力欄のラベル
+step3.titlePlaceholder,例: 協力者 A 第1回 (2026-04-15),"e.g. Participant A, session 1 (2026-04-15)",逐語録の取り込み > 題の入力欄（薄字）
+step3.participant,協力者,Participant,逐語録の取り込み > 入力欄のラベル
+step3.participantNone,（未指定）,(Not specified),逐語録の取り込み > 協力者の選択肢
+step3.session,インタビュー回数,Interview session,逐語録の取り込み > 入力欄のラベル
+step3.sessionPlaceholder,例: 1 (空欄=未指定),"e.g. 1 (blank = not specified)",逐語録の取り込み > 回数の入力欄（薄字）
+step3.sessionHint,同一協力者の第N回。空欄なら順序のみで管理,"Which session with the same participant. If blank, only the order is kept.",逐語録の取り込み > 回数の説明
+step3.anonymize,匿名化対象,Names to anonymize,逐語録の取り込み > 入力欄のラベル
+step3.anonymizePlaceholder,"氏名・組織名をコンマで区切って入力 (例: 山田太郎, X 大学, 田中)","Enter names and organizations separated by commas (e.g. John Smith, X University, Tanaka)",逐語録の取り込み > 匿名化する語の入力欄（薄字）
+step3.prefix,仮名 prefix,Pseudonym prefix,逐語録の取り込み > 仮名の頭につける語のラベル
+step3.anonymizeHint,取り込み時に段落本文・話者欄を一括置換します。長い名前から優先で置換 (例: 「山田太郎」が「山田」より先)。元の対応は Transcript.metadata.anonymizationMap に保存され、後で参照・追加が可能です。,"Replaces the names in paragraph text and speaker fields when importing. Longer names are replaced first (e.g. ""John Smith"" before ""Smith""). The original mapping is saved in Transcript.metadata.anonymizationMap so you can check or extend it later.",逐語録の取り込み > 匿名化の説明
+chooseAgain,ファイルを選び直す,Choose another file,逐語録の取り込み > ボタン
+import,取り込む,Import,逐語録の取り込み > ボタン
+close,閉じる,Close,逐語録の取り込み > ボタン
+column,列{{n}},Column {{n}},逐語録の取り込み > 見出しの無い列の名前
+map.text,本文 列 (必須),Text column (required),逐語録の取り込み > 列の役割のラベル
+map.speaker,話者 列 (任意),Speaker column (optional),逐語録の取り込み > 列の役割のラベル
+map.none,（なし）,(None),逐語録の取り込み > 列の選択肢
+map.timestamp,タイムスタンプ 列 (任意),Timestamp column (optional),逐語録の取り込み > 列の役割のラベル

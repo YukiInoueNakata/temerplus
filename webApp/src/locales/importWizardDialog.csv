@@ -1,0 +1,130 @@
+﻿key,ja,en,note
+title,表から取り込み（{{step}} / {{lastStep}}）,Import from table ({{step}} / {{lastStep}}),表から取り込みの画面の題
+column,列{{n}},Column {{n}},表から取り込み > 見出しの無い列の名前
+mode.box.label,Box（出来事の一覧）,Box (list of events),表から取り込み > 取り込み先の選択肢
+mode.box.desc,1 行 = 1 Box。ラベル列だけあれば取り込める,One row = one Box. A label column is all you need.,表から取り込み > 取り込み先の説明
+mode.line.label,Line（矢印）,Line (arrow),表から取り込み > 取り込み先の選択肢
+mode.line.desc,from / to の Box ID で径路を引く,Draw paths from the from / to Box IDs,表から取り込み > 取り込み先の説明
+mode.sdsg.label,SD / SG,SD / SG,表から取り込み > 取り込み先の選択肢
+mode.sdsg.desc,紐付け先の Box ID と種別,The Box ID it attaches to and its type,表から取り込み > 取り込み先の説明
+mode.period.label,時期ラベル,Period label,表から取り込み > 取り込み先の選択肢
+mode.period.desc,位置（Time Level）とラベル,Position (time level) and label,表から取り込み > 取り込み先の説明
+mode.transcript.label,逐語録,Transcript,表から取り込み > 取り込み先の選択肢
+mode.transcript.desc,1 行 = 1 段落。話者・時刻の列は任意,One row = one paragraph. Speaker and time columns are optional.,表から取り込み > 取り込み先の説明
+mode.maxqda.label,MAXQDA コード付きセグメント,MAXQDA coded segments,表から取り込み > 取り込み先の選択肢
+mode.maxqda.desc,同じセグメントの行を集約し、コードを Box / SD・SG / 時期 / タグに振り分ける,"Merges rows of the same segment and assigns codes to Box / SD, SG / period / tag",表から取り込み > 取り込み先の説明
+role.box.ignore,（無視）,(Ignore),表から取り込み > 列の役割の選択肢（Box）
+role.box.label,ラベル,Label,表から取り込み > 列の役割の選択肢（Box）
+role.box.type,種別,Type,表から取り込み > 列の役割の選択肢（Box）
+role.box.timeLevel,Time Level,Time level,表から取り込み > 列の役割の選択肢（Box）
+role.box.itemLevel,Item Level,Item level,表から取り込み > 列の役割の選択肢（Box）
+role.box.id,ID,ID,表から取り込み > 列の役割の選択肢（Box）
+role.box.subLabel,サブラベル,Sublabel,表から取り込み > 列の役割の選択肢（Box）
+role.box.description,説明,Description,表から取り込み > 列の役割の選択肢（Box）
+role.box.width,幅,Width,表から取り込み > 列の役割の選択肢（Box）
+role.box.height,高さ,Height,表から取り込み > 列の役割の選択肢（Box）
+role.line.ignore,（無視）,(Ignore),表から取り込み > 列の役割の選択肢（Line）
+role.line.id,ID,ID,表から取り込み > 列の役割の選択肢（Line）
+role.line.from,From,From,表から取り込み > 列の役割の選択肢（Line）
+role.line.to,To,To,表から取り込み > 列の役割の選択肢（Line）
+role.line.type,種別 (RLine/XLine),Type (RLine/XLine),表から取り込み > 列の役割の選択肢（Line）
+role.line.shape,形状 (straight/elbow/curve),Shape (straight/elbow/curve),表から取り込み > 列の役割の選択肢（Line）
+role.line.label,ラベル,Label,表から取り込み > 列の役割の選択肢（Line）
+role.line.description,説明,Description,表から取り込み > 列の役割の選択肢（Line）
+role.sdsg.ignore,（無視）,(Ignore),表から取り込み > 列の役割の選択肢（SD/SG）
+role.sdsg.id,ID,ID,表から取り込み > 列の役割の選択肢（SD/SG）
+role.sdsg.type,種別 (SD/SG),Type (SD/SG),表から取り込み > 列の役割の選択肢（SD/SG）
+role.sdsg.label,ラベル,Label,表から取り込み > 列の役割の選択肢（SD/SG）
+role.sdsg.attachedTo,紐付け対象 (attachedTo),Attached to (attachedTo),表から取り込み > 列の役割の選択肢（SD/SG）
+role.sdsg.attachedTo2,2 つ目の対象 (attachedTo2),Second target (attachedTo2),表から取り込み > 列の役割の選択肢（SD/SG）
+role.sdsg.anchorMode,アンカー方式 (single/between),Anchor mode (single/between),表から取り込み > 列の役割の選択肢（SD/SG）
+role.sdsg.spaceMode,配置モード (attached/band-top/band-bottom),Placement mode (attached/band-top/band-bottom),表から取り込み > 列の役割の選択肢（SD/SG）
+role.sdsg.subLabel,サブラベル,Sublabel,表から取り込み > 列の役割の選択肢（SD/SG）
+role.sdsg.description,説明,Description,表から取り込み > 列の役割の選択肢（SD/SG）
+role.period.ignore,（無視）,(Ignore),表から取り込み > 列の役割の選択肢（時期ラベル）
+role.period.id,ID,ID,表から取り込み > 列の役割の選択肢（時期ラベル）
+role.period.position,位置 (Time Level),Position (time level),表から取り込み > 列の役割の選択肢（時期ラベル）
+role.period.label,ラベル,Label,表から取り込み > 列の役割の選択肢（時期ラベル）
+role.transcript.ignore,（無視）,(Ignore),表から取り込み > 列の役割の選択肢（逐語録）
+role.transcript.text,本文,Text,表から取り込み > 列の役割の選択肢（逐語録）
+role.transcript.speaker,話者,Speaker,表から取り込み > 列の役割の選択肢（逐語録）
+role.transcript.timestamp,時刻,Time,表から取り込み > 列の役割の選択肢（逐語録）
+role.maxqda.ignore,（無視）,(Ignore),表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.docGroup,文書グループ,Document group,表から取り込み > 列の役割の選択肢（MAXQDA の列名に合わせる）
+role.maxqda.docName,文書名（逐語録）,Document name (transcript),表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.code,コード,Code,表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.start,開始,Begin,表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.end,終了,End,表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.segment,セグメント本文,Segment,表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.weight,重み,Weight score,表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.comment,コメント,Comment,表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.area,領域,Area,表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.coverage,範囲 (%),Coverage (%),表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.codedBy,コード付けした人,Coded by,表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.created,作成日,Created,表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.color,色,Color,表から取り込み > 列の役割の選択肢（MAXQDA）
+role.maxqda.otherCodes,他のコード（同じセグメントの）,Other codes (of the same segment),表から取り込み > 列の役割の選択肢（MAXQDA）
+required.box,必須: ラベル,Required: label,表から取り込み > 手順 3 の説明の前半（必須の列）
+required.line,必須: from / to,Required: from / to,表から取り込み > 手順 3 の説明の前半（必須の列）
+required.sdsg,必須: 紐付け先,Required: attached to,表から取り込み > 手順 3 の説明の前半（必須の列）
+required.period,必須: 位置・ラベル,"Required: position, label",表から取り込み > 手順 3 の説明の前半（必須の列）
+required.transcript,必須: 本文,Required: text,表から取り込み > 手順 3 の説明の前半（必須の列）
+required.maxqda,必須: 文書名・コード・セグメント本文（開始・終了があると集約が正確。「他のコード」列があれば SD/SG のコードもそこから拾う）,"Required: document name, code, segment (Begin and End make merging more accurate. If there is an ""Other codes"" column, SD/SG codes are also taken from it)",表から取り込み > 手順 3 の説明の前半（必須の列）
+error.noRows,読める行がありませんでした,No readable rows were found,表から取り込み > 読み込めなかったときの注意
+error.importFailed,取り込みの途中で失敗しました: {{message}},Import failed partway: {{message}},表から取り込み > 取り込めなかったときの注意
+error.noBoxes,Box を作れませんでした。「ラベル」を割り当てた列はありますか？,No Boxes could be created. Is there a column assigned to Label?,表から取り込み > 取り込めなかったときの注意
+error.noLines,Line を作れませんでした。from / to の列と、存在する Box ID を確認してください,No Lines could be created. Check the from / to columns and that the Box IDs exist.,表から取り込み > 取り込めなかったときの注意
+error.noSdsg,SD/SG を作れませんでした。紐付け先の Box ID を確認してください,No SD/SG could be created. Check the Box IDs they attach to.,表から取り込み > 取り込めなかったときの注意
+error.noPeriods,時期ラベルを作れませんでした。位置とラベルの列を確認してください,No period labels could be created. Check the position and label columns.,表から取り込み > 取り込めなかったときの注意
+error.noTextColumn,「本文」の列を割り当ててください,Assign a column to Text,表から取り込み > 取り込めなかったときの注意
+error.noParagraphs,段落を作れませんでした（本文が空）,No paragraphs could be created (the text is empty),表から取り込み > 取り込めなかったときの注意
+done.warnings,警告 {{count}} 件:,{{count}} warnings:,表から取り込み > 取り込んだ後の知らせ（警告の一覧の見出し）
+done.boxes,{{boxes}} 件の Box、{{lines}} 件の Line を取り込みました,Imported {{boxes}} Boxes and {{lines}} Lines,表から取り込み > 取り込んだ後の知らせ
+done.lines,{{count}} 件の Line を取り込みました,Imported {{count}} Lines,表から取り込み > 取り込んだ後の知らせ
+done.sdsg,{{count}} 件の SD/SG を取り込みました,Imported {{count}} SD/SG,表から取り込み > 取り込んだ後の知らせ
+done.periods,{{count}} 件の時期ラベルを取り込みました,Imported {{count}} period labels,表から取り込み > 取り込んだ後の知らせ
+done.transcript,逐語録「{{title}}」（{{count}} 段落）を取り込みました,"Imported the transcript ""{{title}}"" ({{count}} paragraphs)",表から取り込み > 取り込んだ後の知らせ
+done.maxqda,"逐語録 {{transcripts}} 本（{{paragraphs}} 段落）、Box {{boxes}}、SD/SG {{sdsg}}、時期ラベル {{periods}} を取り込みました","Imported {{transcripts}} transcripts ({{paragraphs}} paragraphs), {{boxes}} Boxes, {{sdsg}} SD/SG and {{periods}} period labels",表から取り込み > 取り込んだ後の知らせ（MAXQDA）
+step1.heading,1. ファイルを選ぶ,1. Choose a file,表から取り込み > 手順 1 の見出し
+step1.hint,CSV / TSV / Excel（.xlsx / .xls）。Excel は最初の非空シートを読み、あとで切り替えられます。PowerPoint（.pptx）で描いた TEM 図も取り込めます（図形の役割を確かめる画面に進みます）。,"CSV / TSV / Excel (.xlsx / .xls). For Excel, the first non-empty sheet is read; you can switch later. TEM diagrams drawn in PowerPoint (.pptx) can also be imported (you will go on to a screen for checking the role of each shape).",表から取り込み > 手順 1 の説明（ここでのシートは Excel のシート）
+step1.drop,ここにファイルをドロップ、またはクリックして選択,"Drop a file here, or click to choose one",表から取り込み > ファイルを落とす枠
+step2.heading,2. 取り込み先を選ぶ,2. Choose what to import as,表から取り込み > 手順 2 の見出し
+step2.hint,{{filename}}（{{rows}} 行）。列名から「{{mode}}」と推測しました。違えば変えてください。,"{{filename}} ({{rows}} rows). Guessed ""{{mode}}"" from the column names. Change it if that is wrong.",表から取り込み > 手順 2 の説明
+step2.sheet,シート,Sheet,表から取り込み > Excel のシートの選択のラベル
+step2.sheetOption,{{name}}（{{rows}} 行）,{{name}} ({{rows}} rows),表から取り込み > Excel のシートの選択肢
+step2.hasHeader,1 行目は見出し,First row is a header,表から取り込み > チェックボックスのラベル
+step2.preview,プレビュー（先頭 {{count}} 行）,Preview (first {{count}} rows),表から取り込み > 見出し
+step3.heading,3. 列の役割を決める,3. Set the role of each column,表から取り込み > 手順 3 の見出し
+step3.hint,{{required}}。見出しから推測した値が入っています。,{{required}}. Values guessed from the headers are filled in.,表から取り込み > 手順 3 の説明（{{required}} は required.* の文）
+step3.col.header,列（見出し）,Column (header),表から取り込み > 列の役割の表の列名
+step3.col.example,例,Example,表から取り込み > 列の役割の表の列名
+step3.col.role,役割,Role,表から取り込み > 列の役割の表の列名
+step3.defaultType,種別列が無いときの種別,Type when there is no type column,表から取り込み > 設定のラベル（Box）
+step3.autoConnect,順番に矢印でつなぐ,Connect in order with arrows,表から取り込み > 設定のラベル（Box）
+toNewSheet,新しいシートに取り込む,Import into a new sheet,表から取り込み > 設定のラベル
+step3.transcriptTitle,逐語録のタイトル,Transcript title,表から取り込み > 設定のラベル（逐語録）
+step3.keyMode,セグメントの集約キー,Segment merge key,表から取り込み > 設定のラベル（MAXQDA）
+step3.keyMode.range,文書グループ・文書名・開始・終了の完全一致（既定）,"Exact match of document group, document name, begin and end (default)",表から取り込み > 集約キーの選択肢
+step3.keyMode.text,文書グループ・文書名・本文の一致,"Match of document group, document name and segment text",表から取り込み > 集約キーの選択肢
+step4.heading,4. コードをどう扱うか,4. How to use each code,表から取り込み > 手順 4 の見出し（MAXQDA）
+step4.hint,{{docs}} 文書・{{segments}} セグメント（元 {{rows}} 行）に集約しました。すべてのコードは段落のタグとして残ります。Box などにするものを選んでください。,"Merged into {{docs}} documents and {{segments}} segments (from {{rows}} rows). All codes are kept as paragraph tags. Choose which ones to turn into Boxes and so on.",表から取り込み > 手順 4 の説明
+step4.stackDocs,文書ごとに Item 軸を分ける,Separate the item axis by document,表から取り込み > 設定のラベル（MAXQDA）
+step4.multiBox,同じセグメントに Box が複数,Several Boxes in one segment,表から取り込み > 設定のラベル（MAXQDA）
+step4.multiBox.tip,1 つのセグメントに Box になるコードが 2 つ以上付いているときの置き方,How to place them when a segment has two or more codes that become Boxes,表から取り込み > 設定の吹き出し
+multiBox.stack,同じ時期に縦に並べる（1 コード = 1 Box）,Stack at the same time (one code = one Box),表から取り込み > Box が複数のときの選択肢
+multiBox.merge,1 つの Box にまとめる（ラベルを連ねる）,Merge into one Box (join the labels),表から取り込み > Box が複数のときの選択肢
+multiBox.sequence,時期をずらして順に並べる,Place them one after another in time,表から取り込み > Box が複数のときの選択肢
+step4.col.code,コード,Code,表から取り込み > コードの表の列名
+step4.col.count,件数,Count,表から取り込み > コードの表の列名
+step4.col.docs,文書,Documents,表から取り込み > コードの表の列名
+step4.col.action,扱い,Use as,表から取り込み > コードの表の列名
+step4.col.boxType,Box の種別,Box type,表から取り込み > コードの表の列名
+action.tag,タグのみ,Tag only,表から取り込み > コードの扱いの選択肢
+action.box,Box にする,Make a Box,表から取り込み > コードの扱いの選択肢
+action.sd,SD にする,Make an SD,表から取り込み > コードの扱いの選択肢
+action.sg,SG にする,Make an SG,表から取り込み > コードの扱いの選択肢
+action.period,時期ラベルにする,Make a period label,表から取り込み > コードの扱いの選択肢
+back,戻る,Back,表から取り込み > ボタン
+cancel,キャンセル,Cancel,表から取り込み > ボタン
+next,次へ,Next,表から取り込み > ボタン
+import,取り込む,Import,表から取り込み > ボタン

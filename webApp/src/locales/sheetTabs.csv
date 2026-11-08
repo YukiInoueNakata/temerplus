@@ -1,0 +1,12 @@
+﻿key,ja,en,note
+"prompt.rename","シート名を変更","Rename sheet","入力の窓（シートのタブをダブルクリック・名前を変更）"
+"alert.lastSheet","最後のシートは削除できません","The last sheet cannot be deleted.","警告の窓（シートが 1 枚だけのときに削除）"
+"confirm.delete","このシートを削除しますか？（取り消せません）","Delete this sheet? (This cannot be undone.)","確認の窓（シートの削除）"
+"tab.title","右クリックで操作メニュー","Right-click for options","画面下のシートのタブの説明（マウスを重ねたとき）"
+"add.title","新規シート","New sheet","画面下の + ボタンの説明（マウスを重ねたとき）"
+"menu.rename","名前を変更","Rename","シートのタブの右クリックメニュー"
+"menu.duplicate","複製","Duplicate","シートのタブの右クリックメニュー"
+"menu.moveLeft","← 左へ移動","← Move left","シートのタブの右クリックメニュー"
+"menu.moveRight","→ 右へ移動","→ Move right","シートのタブの右クリックメニュー"
+"menu.delete","削除","Delete","シートのタブの右クリックメニュー"
+"menu.delete.disabled","最後のシートは削除できません","The last sheet cannot be deleted","右クリックメニューの削除の説明（使えないとき・マウスを重ねたとき）"

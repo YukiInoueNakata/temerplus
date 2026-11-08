@@ -1,0 +1,11 @@
+﻿key,ja,en,note
+prompt.size,フォントサイズ (px),Font size (px),文字の装飾ボタン「Aa」を押したときの入力の問い
+prompt.color,色 (#ff0000 など),"Color (e.g., #ff0000)",文字の装飾ボタン（色）を押したときの入力の問い
+prompt.font,フォント名,Font name,文字の装飾ボタン「Fn」を押したときの入力の問い
+bold,太字,Bold,文字の装飾ボタン「B」の説明（マウスを乗せると出る）
+italic,斜体,Italic,文字の装飾ボタン「I」の説明
+underline,下線,Underline,文字の装飾ボタン「U」の説明
+strikethrough,取消線,Strikethrough,文字の装飾ボタン「S」の説明
+size,文字サイズ,Font size,文字の装飾ボタン「Aa」の説明
+color,文字色,Font color,文字の装飾ボタン（絵の具）の説明
+font,フォント,Font,文字の装飾ボタン「Fn」の説明

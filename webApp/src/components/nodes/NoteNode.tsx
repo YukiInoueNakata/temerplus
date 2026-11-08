@@ -7,6 +7,7 @@
 // ============================================================================
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NodeResizer, useStore as useReactFlowStore, type NodeProps } from 'reactflow';
 import { useTEMStore } from '../../store/store';
 import { useTEMView } from '../../context/TEMViewContext';
@@ -41,6 +42,7 @@ export function noteVisualStyle(style: Note['style'] | undefined): React.CSSProp
 }
 
 export function NoteNode({ data, selected }: NodeProps<NoteNodeData>) {
+  const { t } = useTranslation('noteNode');
   const view = useTEMView();
   const isPreview = view.isPreview;
   const updateNote = useTEMStore((s) => s.updateNote);
@@ -122,7 +124,7 @@ export function NoteNode({ data, selected }: NodeProps<NoteNodeData>) {
           e.stopPropagation();
           setEditing(true);
         }}
-        title={isPreview ? undefined : 'メモ（ダブルクリック / Enter で編集）'}
+        title={isPreview ? undefined : t('title')}
       >
         {editing ? (
           <textarea
@@ -143,7 +145,7 @@ export function NoteNode({ data, selected }: NodeProps<NoteNodeData>) {
             }}
           />
         ) : (
-          data.text || <span style={{ color: '#999' }}>{isText ? '（記号）' : '（メモ）'}</span>
+          data.text || <span style={{ color: '#999' }}>{isText ? t('placeholder.symbol') : t('placeholder.note')}</span>
         )}
       </div>
     </>

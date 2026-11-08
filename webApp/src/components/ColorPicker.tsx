@@ -6,6 +6,7 @@
 // ============================================================================
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const RECENT_KEY = 'temer:recent-colors';
 const RECENT_MAX = 10;
@@ -81,11 +82,14 @@ export function ColorPicker({
   onChange,
   allowNone = false,
   allowDefault = true,
-  defaultLabel = '自動（既定）',
-  noneLabel = '塗りつぶしなし',
+  defaultLabel: defaultLabelProp,
+  noneLabel: noneLabelProp,
   title,
   compact = false,
 }: Props) {
+  const { t } = useTranslation('colorPicker');
+  const defaultLabel = defaultLabelProp ?? t('auto');
+  const noneLabel = noneLabelProp ?? t('noFill');
   const [open, setOpen] = useState(false);
   const [recent, setRecent] = useState<string[]>(() => loadRecent());
   const [hexInput, setHexInput] = useState(value ?? '');
@@ -124,8 +128,8 @@ export function ColorPicker({
   useEffect(() => {
     if (!open) return;
     const onDocClick = (e: MouseEvent) => {
-      const t = e.target as Node;
-      if (rootRef.current?.contains(t) || popRef.current?.contains(t)) return;
+      const target = e.target as Node;
+      if (rootRef.current?.contains(target) || popRef.current?.contains(target)) return;
       setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
@@ -254,7 +258,7 @@ export function ColorPicker({
           )}
 
           {/* プリセット 8×3 */}
-          <div style={{ fontSize: 10, color: '#666', marginBottom: 4 }}>プリセット</div>
+          <div style={{ fontSize: 10, color: '#666', marginBottom: 4 }}>{t('section.presets')}</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 20px)', gap: 3, marginBottom: 8 }}>
             {PRESET_COLORS.map((c) => (
               <button
@@ -278,7 +282,7 @@ export function ColorPicker({
           {/* 最近使った色 */}
           {recent.length > 0 && (
             <>
-              <div style={{ fontSize: 10, color: '#666', marginBottom: 4 }}>最近使った色</div>
+              <div style={{ fontSize: 10, color: '#666', marginBottom: 4 }}>{t('section.recent')}</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 20px)', gap: 3, marginBottom: 8 }}>
                 {recent.map((c) => (
                   <button
@@ -302,7 +306,7 @@ export function ColorPicker({
           )}
 
           {/* カスタム */}
-          <div style={{ fontSize: 10, color: '#666', marginBottom: 4 }}>カスタム</div>
+          <div style={{ fontSize: 10, color: '#666', marginBottom: 4 }}>{t('section.custom')}</div>
           <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
             <input
               type="text"
@@ -353,7 +357,7 @@ export function ColorPicker({
                 borderRadius: 3,
                 cursor: 'pointer',
               }}
-              title="OS 標準のカラーピッカー"
+              title={t('nativePicker')}
             />
           </div>
         </div>

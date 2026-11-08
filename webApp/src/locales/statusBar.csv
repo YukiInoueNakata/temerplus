@@ -1,0 +1,10 @@
+﻿key,ja,en,note
+"zoom","ズーム: {{value}}%","Zoom: {{value}}%","画面下の状態の行"
+"grid","グリッド: {{state}}","Grid: {{state}}","画面下の状態の行。{{state}} は ON か OFF"
+"snap","スナップ: {{state}}","Snap: {{state}}","画面下の状態の行。{{state}} は ON か OFF"
+"layout","レイアウト: {{layout}}","Layout: {{layout}}","画面下の状態の行。{{layout}} は 横型 か 縦型（terms の訳）"
+"selection","選択: {{count}}","Selected: {{count}}","画面下の状態の行（選んでいる要素の数）"
+"overlap","重なり: {{count}} 件","Overlaps: {{count}}","画面下の状態の行（重なりの数）"
+"overlap.title","クリックで重なりチェックを開く","Click to open the overlap check","重なりの数の説明（マウスを重ねたとき）"
+"unsaved","● 未保存","● Unsaved","画面下の右（保存していない変更があるとき）"
+"saved","✓ 保存済み","✓ Saved","画面下の右（保存済みのとき）"

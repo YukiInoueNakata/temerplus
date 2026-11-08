@@ -7,6 +7,7 @@
 // ============================================================================
 
 import { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore } from '../store/store';
 import {
   importTranscriptFile,
@@ -26,6 +27,7 @@ export function TranscriptImportDialog({
   onClose: () => void;
   onImported?: (transcriptId: string) => void;
 }) {
+  const { t } = useTranslation('transcriptImportDialog');
   const participants = useTEMStore((s) => s.doc.participants);
   const addTranscript = useTEMStore((s) => s.addTranscript);
 
@@ -44,7 +46,7 @@ export function TranscriptImportDialog({
   const [participantId, setParticipantId] = useState<string>('');
   const [sessionNumber, setSessionNumber] = useState<string>('');   // 文字列で保持、確定時に number へ
   const [anonymizeNames, setAnonymizeNames] = useState<string>(''); // コンマ区切りの匿名化対象
-  const [anonymizePrefix, setAnonymizePrefix] = useState<string>('協力者');
+  const [anonymizePrefix, setAnonymizePrefix] = useState<string>('協力者'); // i18n-ok 匿名化の仮名の既定値（逐語録のデータに入る）
 
   const reset = () => {
     setInitial(null);
@@ -134,14 +136,14 @@ export function TranscriptImportDialog({
           sessionNumber: sn,
         });
       } else {
-        throw new Error('インポートデータが空です');
+        throw new Error(t('error.empty'));
       }
       if (transcript.paragraphs.length === 0) {
-        throw new Error('段落が 0 件です。列マッピングを確認してください。');
+        throw new Error(t('error.zeroParagraphs'));
       }
       // 取り込み時匿名化
       if (anonymizeNames.trim()) {
-        const map = buildAnonymizationMap(anonymizeNames, anonymizePrefix.trim() || '協力者');
+        const map = buildAnonymizationMap(anonymizeNames, anonymizePrefix.trim() || '協力者'); // i18n-ok 匿名化の仮名の既定値（データ）
         transcript = anonymizeTranscript(transcript, map);
       }
       const id = addTranscript(transcript);
@@ -154,12 +156,13 @@ export function TranscriptImportDialog({
   };
 
   if (!open) return null;
+  const prefixShown = anonymizePrefix || '協力者'; // i18n-ok 匿名化の仮名の既定値（データ）
 
   return (
     <div className="modal-backdrop" onClick={() => { reset(); onClose(); }}>
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 720, maxHeight: '85vh', overflow: 'auto' }}>
         <div className="modal-header">
-          <h3>原文をインポート</h3>
+          <h3>{t('title')}</h3>
           <button onClick={() => { reset(); onClose(); }} className="modal-close">×</button>
         </div>
 
@@ -167,8 +170,8 @@ export function TranscriptImportDialog({
           {/* === Step 1: ファイル選択 === */}
           {!initial && (
             <section className="settings-section">
-              <h4>1. ファイルを選択</h4>
-              <p className="hint">対応形式: .txt / .md / .csv / .tsv / .xlsx / .xls / .docx</p>
+              <h4>{t('step1.heading')}</h4>
+              <p className="hint">{t('step1.formats')}</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -179,17 +182,17 @@ export function TranscriptImportDialog({
                 }}
                 disabled={busy}
               />
-              {busy && <p className="hint">読み込み中...</p>}
+              {busy && <p className="hint">{t('loading')}</p>}
             </section>
           )}
 
           {/* === Step 2: タブラ (csv/xlsx) の場合は列マッピング === */}
           {initial?.tabular && (
             <section className="settings-section">
-              <h4>2. シート / 列マッピング</h4>
+              <h4>{t('step2.heading')}</h4>
               {initial.tabular.sheets.length > 1 && (
                 <div className="setting-row">
-                  <label>シート</label>
+                  <label>{t('step2.sheet')}</label>
                   <select value={sheetIndex} onChange={(e) => onSheetChange(Number(e.target.value))}>
                     {initial.tabular.sheets.map((s, i) => (
                       <option key={i} value={i}>{s.name}</option>
@@ -198,7 +201,7 @@ export function TranscriptImportDialog({
                 </div>
               )}
               <div className="setting-row">
-                <label>先頭行をヘッダ扱い</label>
+                <label>{t('step2.hasHeader')}</label>
                 <input
                   type="checkbox"
                   checked={hasHeader}
@@ -215,14 +218,14 @@ export function TranscriptImportDialog({
               )}
               {tabularPreview.length > 0 && (
                 <div style={{ marginTop: 12 }}>
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>プレビュー (先頭 5 行)</div>
+                  <div style={{ fontWeight: 600, marginBottom: 4 }}>{t('step2.previewRows')}</div>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                     <thead>
                       <tr>
                         <th style={th}>#</th>
-                        <th style={th}>話者</th>
-                        <th style={th}>時刻</th>
-                        <th style={th}>本文</th>
+                        <th style={th}>{t('col.speaker')}</th>
+                        <th style={th}>{t('col.time')}</th>
+                        <th style={th}>{t('col.text')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -244,7 +247,7 @@ export function TranscriptImportDialog({
           {/* === Step 2 alt: パラグラフ型 (txt/docx) のプレビュー === */}
           {initial?.paragraphs && (
             <section className="settings-section">
-              <h4>2. プレビュー (先頭 5 段落)</h4>
+              <h4>{t('step2.previewParagraphs')}</h4>
               <ul style={{ fontSize: 12, paddingLeft: 16 }}>
                 {paragraphsPreview.map((p) => (
                   <li key={p.id} style={{ marginBottom: 4 }}>
@@ -253,73 +256,72 @@ export function TranscriptImportDialog({
                   </li>
                 ))}
               </ul>
-              <p className="hint">合計 {initial.paragraphs.length} 段落</p>
+              <p className="hint">{t('step2.totalParagraphs', { count: initial.paragraphs.length })}</p>
             </section>
           )}
 
           {/* === Step 3: メタ === */}
           {initial && (
             <section className="settings-section">
-              <h4>3. メタデータ</h4>
+              <h4>{t('step3.heading')}</h4>
               <div className="setting-row">
-                <label>タイトル</label>
+                <label>{t('step3.title')}</label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   style={{ width: 320 }}
-                  placeholder="例: 協力者 A 第1回 (2026-04-15)"
+                  placeholder={t('step3.titlePlaceholder')}
                 />
               </div>
               <div className="setting-row">
-                <label>協力者</label>
+                <label>{t('step3.participant')}</label>
                 <select value={participantId} onChange={(e) => setParticipantId(e.target.value)}>
-                  <option value="">（未指定）</option>
+                  <option value="">{t('step3.participantNone')}</option>
                   {participants.map((p) => (
                     <option key={p.id} value={p.id}>{p.pseudonym ?? p.id}</option>
                   ))}
                 </select>
               </div>
               <div className="setting-row">
-                <label>インタビュー回数</label>
+                <label>{t('step3.session')}</label>
                 <input
                   type="number"
                   min={1}
                   step={1}
                   value={sessionNumber}
                   onChange={(e) => setSessionNumber(e.target.value)}
-                  placeholder="例: 1 (空欄=未指定)"
+                  placeholder={t('step3.sessionPlaceholder')}
                   style={{ width: 120 }}
                 />
                 <span style={{ fontSize: 12, color: '#666', marginLeft: 8 }}>
-                  同一協力者の第N回。空欄なら順序のみで管理
+                  {t('step3.sessionHint')}
                 </span>
               </div>
               <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-                <label>匿名化対象</label>
+                <label>{t('step3.anonymize')}</label>
                 <div style={{ flex: 1 }}>
                   <textarea
                     value={anonymizeNames}
                     onChange={(e) => setAnonymizeNames(e.target.value)}
-                    placeholder="氏名・組織名をコンマで区切って入力 (例: 山田太郎, X 大学, 田中)"
+                    placeholder={t('step3.anonymizePlaceholder')}
                     style={{ width: '100%', minHeight: 50, fontSize: 12, fontFamily: 'inherit', resize: 'vertical' }}
                   />
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-                    <label style={{ fontSize: 11, color: '#666' }}>仮名 prefix</label>
+                    <label style={{ fontSize: 11, color: '#666' }}>{t('step3.prefix')}</label>
                     <input
                       type="text"
                       value={anonymizePrefix}
                       onChange={(e) => setAnonymizePrefix(e.target.value)}
                       style={{ width: 100, fontSize: 12 }}
-                      placeholder="協力者"
+                      placeholder="協力者" // i18n-ok 匿名化の仮名の既定値（データ）
                     />
                     <span style={{ fontSize: 11, color: '#666' }}>
-                      → [{anonymizePrefix || '協力者'}A], [{anonymizePrefix || '協力者'}B], ...
+                      → [{prefixShown}A], [{prefixShown}B], ...
                     </span>
                   </div>
                   <p className="hint" style={{ marginTop: 4 }}>
-                    取り込み時に段落本文・話者欄を一括置換します。長い名前から優先で置換 (例: 「山田太郎」が「山田」より先)。
-                    元の対応は Transcript.metadata.anonymizationMap に保存され、後で参照・追加が可能です。
+                    {t('step3.anonymizeHint')}
                   </p>
                 </div>
               </div>
@@ -333,16 +335,16 @@ export function TranscriptImportDialog({
 
         <div className="modal-footer">
           {initial && (
-            <button className="ribbon-btn-small" onClick={reset} disabled={busy}>ファイルを選び直す</button>
+            <button className="ribbon-btn-small" onClick={reset} disabled={busy}>{t('chooseAgain')}</button>
           )}
           <button
             className="ribbon-btn-primary"
             onClick={doImport}
             disabled={!initial || busy}
           >
-            取り込む
+            {t('import')}
           </button>
-          <button className="ribbon-btn-small" onClick={() => { reset(); onClose(); }} disabled={busy}>閉じる</button>
+          <button className="ribbon-btn-small" onClick={() => { reset(); onClose(); }} disabled={busy}>{t('close')}</button>
         </div>
       </div>
     </div>
@@ -376,17 +378,18 @@ function ColumnMappingEditor({
   mapping: ColumnMapping;
   onChange: (m: ColumnMapping) => void;
 }) {
+  const { t } = useTranslation('transcriptImportDialog');
   const colCount = rows.length > 0 ? Math.max(...rows.map((r) => r.length)) : 0;
   const header = hasHeader && rows.length > 0 ? rows[0] : null;
   const cols = Array.from({ length: colCount }, (_, i) => ({
     index: i,
-    name: header ? (header[i] ?? `列${i + 1}`) : `列${i + 1}`,
+    name: header ? (header[i] ?? t('column', { n: i + 1 })) : t('column', { n: i + 1 }),
   }));
 
   return (
     <>
       <div className="setting-row">
-        <label>本文 列 (必須)</label>
+        <label>{t('map.text')}</label>
         <select
           value={mapping.textColumn}
           onChange={(e) => onChange({ ...mapping, textColumn: Number(e.target.value) })}
@@ -397,7 +400,7 @@ function ColumnMappingEditor({
         </select>
       </div>
       <div className="setting-row">
-        <label>話者 列 (任意)</label>
+        <label>{t('map.speaker')}</label>
         <select
           value={mapping.speakerColumn ?? -1}
           onChange={(e) => {
@@ -405,14 +408,14 @@ function ColumnMappingEditor({
             onChange({ ...mapping, speakerColumn: v < 0 ? undefined : v });
           }}
         >
-          <option value={-1}>（なし）</option>
+          <option value={-1}>{t('map.none')}</option>
           {cols.map((c) => (
             <option key={c.index} value={c.index}>{c.name}</option>
           ))}
         </select>
       </div>
       <div className="setting-row">
-        <label>タイムスタンプ 列 (任意)</label>
+        <label>{t('map.timestamp')}</label>
         <select
           value={mapping.timestampColumn ?? -1}
           onChange={(e) => {
@@ -420,7 +423,7 @@ function ColumnMappingEditor({
             onChange({ ...mapping, timestampColumn: v < 0 ? undefined : v });
           }}
         >
-          <option value={-1}>（なし）</option>
+          <option value={-1}>{t('map.none')}</option>
           {cols.map((c) => (
             <option key={c.index} value={c.index}>{c.name}</option>
           ))}

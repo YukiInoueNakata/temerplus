@@ -8,6 +8,7 @@
 // ============================================================================
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTEMStore, useActiveSheet } from '../store/store';
 import { BOX_TYPE_LABELS } from '../store/defaults';
 import type { BoxType, Paragraph, Participant, SourceRef, Transcript } from '../types';
@@ -55,6 +56,7 @@ export function TranscriptViewer({
   focusBoxId?: string;             // 起動時にフォーカスする Box（PropertyPanel から起動時など）
   autoOpenImport?: boolean;        // 起動時に取り込みダイアログも自動 open (起動ウィザード経由)
 }) {
+  const { t } = useTranslation('transcriptViewer');
   const transcripts = useTEMStore((s) => s.doc.transcripts ?? EMPTY_TRANSCRIPTS);
   const participants = useTEMStore((s) => s.doc.participants ?? EMPTY_PARTICIPANTS);
   const splitParagraph = useTEMStore((s) => s.splitParagraph);
@@ -333,47 +335,47 @@ export function TranscriptViewer({
             className="modal-header"
             onMouseDown={onHeaderMouseDown}
             style={{ cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }}
-            title="ドラッグで移動"
+            title={t('dragToMove')}
           >
-            <h3>インタビュー原文ビューア {activeTranscript && `— ${activeTranscript.title}`}</h3>
+            <h3>{t('title')} {activeTranscript && `— ${activeTranscript.title}`}</h3>
             <div style={{ display: 'flex', gap: 6 }}>
-              <button className="ribbon-btn-small" onClick={() => setImportOpen(true)}>＋ 原文を取り込む</button>
+              <button className="ribbon-btn-small" onClick={() => setImportOpen(true)}>{t('import')}</button>
               <button
                 className="ribbon-btn-small"
                 onClick={() => setBulkImportOpen(true)}
-                title="複数ファイル/フォルダから一括取り込み (ファイル名から協力者・回数を自動推測)"
-              >📦 一括取り込み</button>
+                title={t('bulkImport.tip')}
+              >📦 {t('bulkImport')}</button>
               {transcripts.length > 0 && (
                 <button
                   className="ribbon-btn-small"
                   onClick={() => setAnonExportOpen(true)}
-                  title="人名・組織名を仮名に置換した .tem を別ファイルとして書き出す"
-                >🔒 匿名化エクスポート</button>
+                  title={t('anonExport.tip')}
+                >🔒 {t('anonExport')}</button>
               )}
-              <button className="ribbon-btn-small" onClick={popout} title="別ウィンドウで開く">⛶</button>
+              <button className="ribbon-btn-small" onClick={popout} title={t('popout')}>⛶</button>
               <button onClick={onClose} className="modal-close">×</button>
             </div>
           </div>
 
           {transcripts.length === 0 ? (
             <div className="modal-body" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
-              <p>まだ原文が登録されていません。</p>
-              <button className="ribbon-btn-primary" onClick={() => setImportOpen(true)}>原文ファイルを取り込む</button>
-              <p className="hint">対応形式: .txt / .csv / .xlsx / .docx</p>
+              <p>{t('empty')}</p>
+              <button className="ribbon-btn-primary" onClick={() => setImportOpen(true)}>{t('empty.import')}</button>
+              <p className="hint">{t('empty.formats')}</p>
             </div>
           ) : (
             <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
               {/* 左ペイン: Transcript リスト (協力者ごとにグループ化) */}
               <div style={{ width: leftPaneWidth, flexShrink: 0, borderRight: '1px solid #ddd', overflow: 'auto', padding: 8 }}>
-                <div style={{ fontWeight: 600, fontSize: 12, marginBottom: 6 }}>原文 (協力者別)</div>
+                <div style={{ fontWeight: 600, fontSize: 12, marginBottom: 6 }}>{t('list.heading')}</div>
                 <ParticipantGroupedTranscriptList
                   transcripts={transcripts}
                   participants={participants}
                   activeTranscriptId={activeTranscriptId}
                   onSelect={(id) => { setActiveTranscriptId(id); setSelectedParagraphId(null); }}
-                  onRemove={(t) => {
-                    if (confirm(`「${t.title}」を削除しますか？\nこの原文を参照している全ての SourceRef も削除されます。`)) {
-                      removeTranscript(t.id);
+                  onRemove={(tr) => {
+                    if (confirm(t('list.confirmDelete', { title: tr.title }))) {
+                      removeTranscript(tr.id);
                       setActiveTranscriptId(null);
                     }
                   }}
@@ -383,7 +385,7 @@ export function TranscriptViewer({
               {/* 左ペイン リサイザ */}
               <div
                 onMouseDown={onLeftPaneResizeStart}
-                title="ドラッグで左ペインの幅を変更"
+                title={t('resizeLeft')}
                 style={{
                   width: 5,
                   cursor: 'col-resize',
@@ -398,9 +400,9 @@ export function TranscriptViewer({
                   <input
                     type="text"
                     placeholder={
-                      searchMode === 'all' ? '全原文を横断検索' :
-                      searchMode === 'participant' ? '同じ協力者の全回を検索' :
-                      '検索キーワード (現在の原文)'
+                      searchMode === 'all' ? t('search.placeholder.all') :
+                      searchMode === 'participant' ? t('search.placeholder.participant') :
+                      t('search.placeholder.current')
                     }
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -410,21 +412,20 @@ export function TranscriptViewer({
                     value={searchMode}
                     onChange={(e) => setSearchMode(e.target.value as 'current' | 'participant' | 'all')}
                     style={{ fontSize: 12, padding: '3px 4px' }}
-                    title="検索範囲"
+                    title={t('search.scope')}
                   >
-                    <option value="current">現在の原文</option>
+                    <option value="current">{t('search.scope.current')}</option>
                     <option value="participant" disabled={!activeTranscript?.participantId}>
-                      同じ協力者の全回
+                      {t('search.scope.participant')}
                     </option>
-                    <option value="all">全原文を横断</option>
+                    <option value="all">{t('search.scope.all')}</option>
                   </select>
                   {searchMode === 'current' && searchHits && (
-                    <span style={{ fontSize: 12 }}>ヒット {searchHits.size} 段落</span>
+                    <span style={{ fontSize: 12 }}>{t('search.hits', { count: searchHits.size })}</span>
                   )}
                   {searchMode !== 'current' && crossHits && (
                     <span style={{ fontSize: 12 }}>
-                      ヒット {crossHits.length} 段落
-                      （{new Set(crossHits.map((h) => h.transcriptId)).size} 原文）
+                      {t('search.crossHits', { count: crossHits.length, transcripts: new Set(crossHits.map((h) => h.transcriptId)).size })}
                     </span>
                   )}
                   {/* 一括リンクボタン */}
@@ -437,9 +438,9 @@ export function TranscriptViewer({
                           paragraphId: pid,
                         })),
                       })}
-                      title="ヒットした段落を Box に一括リンク"
+                      title={t('search.bulkLink.tip')}
                     >
-                      一括リンク...
+                      {t('search.bulkLink')}
                     </button>
                   )}
                   {searchMode !== 'current' && crossHits && crossHits.length > 0 && (
@@ -451,18 +452,18 @@ export function TranscriptViewer({
                           paragraphId: h.paragraphId,
                         })),
                       })}
-                      title="横断ヒットを Box に一括リンク (複数原文/複数回を 1 Box にまとめる)"
+                      title={t('search.crossLink.tip')}
                     >
-                      {searchMode === 'all' ? '横断一括リンク...' : '協力者一括リンク...'}
+                      {searchMode === 'all' ? t('search.crossLink.all') : t('search.crossLink.participant')}
                     </button>
                   )}
-                  <label style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, marginLeft: 8 }} title="まだ Box にリンクされていない段落だけ表示">
+                  <label style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, marginLeft: 8 }} title={t('search.onlyUnlinked.tip')}>
                     <input
                       type="checkbox"
                       checked={onlyUnlinked}
                       onChange={(e) => setOnlyUnlinked(e.target.checked)}
                     />
-                    未リンクのみ
+                    {t('search.onlyUnlinked')}
                   </label>
                 </div>
 
@@ -502,14 +503,14 @@ export function TranscriptViewer({
                     onMergeWithNext={(pid) => mergeParagraphWithNext(activeTranscript.id, pid)}
                   />
                 ) : (
-                  <p>左ペインから原文を選択してください。</p>
+                  <p>{t('selectTranscript')}</p>
                 )}
               </div>
 
               {/* 右ペイン リサイザ */}
               <div
                 onMouseDown={onRightPaneResizeStart}
-                title="ドラッグで右ペインの幅を変更"
+                title={t('resizeRight')}
                 style={{
                   width: 5,
                   cursor: 'col-resize',
@@ -520,7 +521,7 @@ export function TranscriptViewer({
 
               {/* 右ペイン: 選択段落のリンク一覧 */}
               <div style={{ width: rightPaneWidth, flexShrink: 0, borderLeft: '1px solid #ddd', overflow: 'auto', padding: 8 }}>
-                <div style={{ fontWeight: 600, fontSize: 12, marginBottom: 6 }}>引用リンク一覧</div>
+                <div style={{ fontWeight: 600, fontSize: 12, marginBottom: 6 }}>{t('refs.heading')}</div>
                 {selectedParagraphId ? (
                   <RefListForParagraph
                     paragraphId={selectedParagraphId}
@@ -529,18 +530,18 @@ export function TranscriptViewer({
                     onReconnect={(ref, target) => setReconnectDialog({ ref, target })}
                   />
                 ) : (
-                  <p style={{ fontSize: 12, color: '#666' }}>段落を選択するとここに表示</p>
+                  <p style={{ fontSize: 12, color: '#666' }}>{t('refs.selectParagraph')}</p>
                 )}
                 {selectedParagraphId && selectedRange && (
                   <div style={{ marginTop: 12, padding: 8, background: '#fff3cd', borderRadius: 4, fontSize: 12 }}>
-                    選択範囲: {selectedRange.start}〜{selectedRange.end} 文字
+                    {t('selection', { start: selectedRange.start, end: selectedRange.end })}
                     <button
                       style={{ display: 'block', marginTop: 6, fontSize: 11 }}
                       onClick={() => {
                         const p = activeTranscript?.paragraphs.find((x) => x.id === selectedParagraphId);
                         if (p) setLinkDialog({ paragraph: p, range: selectedRange });
                       }}
-                    >この範囲を Box にリンク</button>
+                    >{t('linkRange')}</button>
                   </div>
                 )}
               </div>
@@ -549,7 +550,7 @@ export function TranscriptViewer({
           {/* 右下リサイズハンドル */}
           <div
             onMouseDown={onResizeMouseDown}
-            title="ドラッグでサイズ変更"
+            title={t('resize')}
             style={{
               position: 'absolute',
               right: 0,
@@ -692,6 +693,7 @@ function ParticipantGroupedTranscriptList({
   onSelect: (id: string) => void;
   onRemove: (t: Transcript) => void;
 }) {
+  const { t } = useTranslation('transcriptViewer');
   // participantId -> Transcript[] へグルーピング
   // - participants の順序を維持
   // - participantId 未指定 Transcript は最後に '(未割当)' として
@@ -731,13 +733,13 @@ function ParticipantGroupedTranscriptList({
         >
           {heading} ({list.length})
         </div>
-        {list.map((t) => {
-          const isActive = t.id === activeTranscriptId;
-          const sessionLabel = t.sessionNumber ? `第${t.sessionNumber}回` : '(回数未指定)';
+        {list.map((tr) => {
+          const isActive = tr.id === activeTranscriptId;
+          const sessionLabel = tr.sessionNumber ? t('session', { n: tr.sessionNumber }) : t('sessionNone');
           return (
-            <div key={t.id} style={{ marginBottom: 4 }}>
+            <div key={tr.id} style={{ marginBottom: 4 }}>
               <button
-                onClick={() => onSelect(t.id)}
+                onClick={() => onSelect(tr.id)}
                 style={{
                   width: '100%',
                   textAlign: 'left',
@@ -751,17 +753,17 @@ function ParticipantGroupedTranscriptList({
               >
                 <div style={{ fontWeight: 600 }}>
                   <span style={{ color: '#888', fontWeight: 400, marginRight: 4 }}>{sessionLabel}</span>
-                  {t.title}
+                  {tr.title}
                 </div>
                 <div style={{ color: '#666', fontSize: 11 }}>
-                  {t.paragraphs.length} 段落 / {t.source}
+                  {t('list.paragraphs', { count: tr.paragraphs.length, source: tr.source })}
                 </div>
               </button>
               {isActive && (
                 <button
-                  onClick={() => onRemove(t)}
+                  onClick={() => onRemove(tr)}
                   style={{ fontSize: 11, padding: '2px 6px', marginTop: 2, color: '#c0392b' }}
-                >削除</button>
+                >{t('delete')}</button>
               )}
             </div>
           );
@@ -775,7 +777,7 @@ function ParticipantGroupedTranscriptList({
       {participants.map((p) =>
         renderGroup(p.pseudonym ?? p.id, grouped.get(p.id) ?? [], false)
       )}
-      {renderGroup('(未割当)', grouped.get('__unassigned__') ?? [], true)}
+      {renderGroup(t('unassigned'), grouped.get('__unassigned__') ?? [], true)}
     </>
   );
 }
@@ -811,6 +813,7 @@ function ParagraphList({
   onSplit: (paragraphId: string, offset: number) => void;
   onMergeWithNext: (paragraphId: string) => void;
 }) {
+  const { t } = useTranslation('transcriptViewer');
   const visibleParagraphs = onlyUnlinked
     ? transcript.paragraphs.filter((p) => !allSourceRefs.some((x) => x.ref.paragraphId === p.id))
     : transcript.paragraphs;
@@ -818,7 +821,7 @@ function ParagraphList({
     <div>
       {onlyUnlinked && (
         <p style={{ fontSize: 12, color: '#666', margin: '0 0 8px' }}>
-          未リンク段落のみ表示中: {visibleParagraphs.length} / {transcript.paragraphs.length} 段落
+          {t('onlyUnlinkedShown', { shown: visibleParagraphs.length, total: transcript.paragraphs.length })}
         </p>
       )}
       {visibleParagraphs.map((p, i) => {
@@ -879,6 +882,7 @@ function ParagraphRow({
   onSplit: (offset: number) => void;
   onMergeWithNext: () => void;
 }) {
+  const { t } = useTranslation('transcriptViewer');
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(paragraph.text);
   const [draftOffset, setDraftOffset] = useState(0);
@@ -942,14 +946,14 @@ function ParagraphRow({
             <input
               type="text"
               defaultValue={paragraph.speaker ?? ''}
-              placeholder="話者"
+              placeholder={t('paragraph.speaker')}
               onBlur={(e) => onUpdateMeta({ speaker: e.target.value || undefined })}
               style={{ width: 80, fontSize: 11 }}
             />
             <input
               type="text"
               defaultValue={paragraph.timestamp ?? ''}
-              placeholder="時刻"
+              placeholder={t('paragraph.time')}
               onBlur={(e) => onUpdateMeta({ timestamp: e.target.value || undefined })}
               style={{ width: 80, fontSize: 11 }}
             />
@@ -961,18 +965,18 @@ function ParagraphRow({
           </>
         )}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
-          {!editing && refs.length > 0 && <span style={{ fontSize: 10, color: '#e67e22' }}>★ {refs.length} リンク</span>}
+          {!editing && refs.length > 0 && <span style={{ fontSize: 10, color: '#e67e22' }}>★ {t('paragraph.links', { count: refs.length })}</span>}
           {paragraph.note && !showNoteEditor && (
             <span style={{ fontSize: 10, color: '#8e44ad', cursor: 'pointer' }} onClick={(ev) => { ev.stopPropagation(); setShowNoteEditor(true); }} title={paragraph.note}>
-              📝 メモ
+              📝 {t('paragraph.note')}
             </span>
           )}
-          <button style={{ fontSize: 10 }} onClick={(ev) => { ev.stopPropagation(); onOpenLinkDialog(null); }}>段落全体をリンク</button>
+          <button style={{ fontSize: 10 }} onClick={(ev) => { ev.stopPropagation(); onOpenLinkDialog(null); }}>{t('paragraph.linkWhole')}</button>
           <button style={{ fontSize: 10 }} onClick={(ev) => { ev.stopPropagation(); setShowNoteEditor(!showNoteEditor); if (!showNoteEditor) setNoteDraft(paragraph.note ?? ''); }}>
-            {showNoteEditor ? 'メモ閉' : 'メモ'}
+            {showNoteEditor ? t('paragraph.noteClose') : t('paragraph.note')}
           </button>
           <button style={{ fontSize: 10 }} onClick={(ev) => { ev.stopPropagation(); setEditing(!editing); if (!editing) { setDraft(paragraph.text); setDraftOffset(0); } }}>
-            {editing ? 'プレビュー' : '編集'}
+            {editing ? t('paragraph.preview') : t('paragraph.edit')}
           </button>
           {editing && (
             <button
@@ -985,20 +989,20 @@ function ParagraphRow({
                 onSplit(draftOffset);
                 setEditing(false);
               }}
-              title="キャレット位置でこの段落を 2 つに分割"
-            >ここで分割</button>
+              title={t('paragraph.split.tip')}
+            >{t('paragraph.split')}</button>
           )}
           {!isLast && (
             <button
               style={{ fontSize: 10, color: '#1e6091' }}
               onClick={(ev) => {
                 ev.stopPropagation();
-                if (confirm('次の段落と結合しますか？\n後段落の引用リンクは前段落に統合され、charStart/charEnd は再計算されます。')) {
+                if (confirm(t('paragraph.merge.confirm'))) {
                   onMergeWithNext();
                 }
               }}
-              title="次の段落と結合"
-            >↓結合</button>
+              title={t('paragraph.merge.tip')}
+            >↓{t('paragraph.merge')}</button>
           )}
         </div>
       </div>
@@ -1009,27 +1013,27 @@ function ParagraphRow({
         allTags={allTags}
         input={tagInput}
         onInputChange={setTagInput}
-        onAdd={(t) => {
-          const trimmed = t.trim();
+        onAdd={(tag) => {
+          const trimmed = tag.trim();
           if (!trimmed) return;
           const next = Array.from(new Set([...(paragraph.tags ?? []), trimmed]));
           onUpdateMeta({ tags: next });
           setTagInput('');
         }}
-        onRemove={(t) => {
-          onUpdateMeta({ tags: (paragraph.tags ?? []).filter((x) => x !== t) });
+        onRemove={(tag) => {
+          onUpdateMeta({ tags: (paragraph.tags ?? []).filter((x) => x !== tag) });
         }}
       />
 
       {/* メモエディタ */}
       {showNoteEditor && (
         <div style={{ background: '#faf5ff', border: '1px solid #d6bcfa', borderRadius: 4, padding: 6, marginBottom: 6 }}>
-          <div style={{ fontSize: 11, color: '#6b46c1', marginBottom: 4 }}>段落メモ</div>
+          <div style={{ fontSize: 11, color: '#6b46c1', marginBottom: 4 }}>{t('paragraph.noteHeading')}</div>
           <textarea
             value={noteDraft}
             onChange={(e) => setNoteDraft(e.target.value)}
             onBlur={() => { if (noteDraft !== (paragraph.note ?? '')) onUpdateMeta({ note: noteDraft }); }}
-            placeholder="ここは要確認 / 後で再検討 / ...などの分析メモ"
+            placeholder={t('paragraph.notePlaceholder')}
             style={{ width: '100%', minHeight: 50, fontSize: 12, fontFamily: 'inherit', resize: 'vertical' }}
           />
         </div>
@@ -1040,16 +1044,16 @@ function ParagraphRow({
           value={draft}
           onChange={(e) => {
             setDraft(e.target.value);
-            const t = e.target as HTMLTextAreaElement;
-            setDraftOffset(t.selectionStart ?? 0);
+            const ta = e.target as HTMLTextAreaElement;
+            setDraftOffset(ta.selectionStart ?? 0);
           }}
           onClick={(e) => {
-            const t = e.target as HTMLTextAreaElement;
-            setDraftOffset(t.selectionStart ?? 0);
+            const ta = e.target as HTMLTextAreaElement;
+            setDraftOffset(ta.selectionStart ?? 0);
           }}
           onKeyUp={(e) => {
-            const t = e.target as HTMLTextAreaElement;
-            setDraftOffset(t.selectionStart ?? 0);
+            const ta = e.target as HTMLTextAreaElement;
+            setDraftOffset(ta.selectionStart ?? 0);
           }}
           onBlur={() => { if (draft !== paragraph.text) onUpdateText(draft); }}
           style={{ width: '100%', minHeight: 80, fontSize: 13, fontFamily: 'inherit', resize: 'vertical' }}
@@ -1084,6 +1088,7 @@ function ParagraphTagsRow({
   onAdd: (t: string) => void;
   onRemove: (t: string) => void;
 }) {
+  const { t } = useTranslation('transcriptViewer');
   const suggestions = useMemo(() => {
     if (!input.trim()) return [];
     const lower = input.toLowerCase();
@@ -1093,9 +1098,9 @@ function ParagraphTagsRow({
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 4, marginBottom: 4, fontSize: 11 }}>
       <span style={{ color: '#888' }}>🏷</span>
-      {tags.map((t) => (
+      {tags.map((tag) => (
         <span
-          key={t}
+          key={tag}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -1107,11 +1112,11 @@ function ParagraphTagsRow({
             color: '#0c4a6e',
           }}
         >
-          {t}
+          {tag}
           <button
             style={{ fontSize: 9, padding: 0, background: 'transparent', border: 'none', color: '#0369a1', cursor: 'pointer' }}
-            onClick={(ev) => { ev.stopPropagation(); onRemove(t); }}
-            title="タグ削除"
+            onClick={(ev) => { ev.stopPropagation(); onRemove(tag); }}
+            title={t('tag.remove')}
           >×</button>
         </span>
       ))}
@@ -1126,7 +1131,7 @@ function ParagraphTagsRow({
           }
         }}
         onBlur={() => { if (input.trim()) onAdd(input); }}
-        placeholder="+ タグ追加"
+        placeholder={t('tag.add')}
         list={`tag-suggest-${tags.join('-')}`}
         style={{ width: 120, fontSize: 11, padding: '1px 4px' }}
       />
@@ -1181,6 +1186,7 @@ function buildHighlightSegments(
 }
 
 function HighlightSpan({ seg }: { seg: Segment }) {
+  const { t } = useTranslation('transcriptViewer');
   if (seg.refs.length === 0) return <span>{seg.text}</span>;
   // 1 重: 単純背景塗り。複数重: 下線で重なりを表現
   const primary = seg.refs[0];
@@ -1191,7 +1197,7 @@ function HighlightSpan({ seg }: { seg: Segment }) {
   const tags = seg.refs.map((r) => r.target.id).join(',');
   return (
     <span
-      title={`リンク: ${seg.refs.map((r) => `${r.target.type}/${r.target.id} (${r.label})`).join(' / ')}`}
+      title={t('highlight.tip', { links: seg.refs.map((r) => `${r.target.type}/${r.target.id} (${r.label})`).join(' / ') })}
       style={{
         background: bg,
         textDecoration: underline,
@@ -1267,8 +1273,9 @@ function RefListForParagraph({
   onRemove: (ref: SourceRef, target: LinkTarget) => void;
   onReconnect?: (ref: SourceRef, target: LinkTarget) => void;
 }) {
+  const { t } = useTranslation('transcriptViewer');
   const refs = allSourceRefs.filter((x) => x.ref.paragraphId === paragraphId);
-  if (refs.length === 0) return <p style={{ fontSize: 12, color: '#666' }}>この段落への引用はまだありません。</p>;
+  if (refs.length === 0) return <p style={{ fontSize: 12, color: '#666' }}>{t('refs.empty')}</p>;
   return (
     <ul style={{ paddingLeft: 0, listStyle: 'none', fontSize: 12 }}>
       {refs.map((r) => (
@@ -1276,18 +1283,18 @@ function RefListForParagraph({
           <div style={{ fontWeight: 600 }}>{r.target.type.toUpperCase()} / {r.target.id}</div>
           <div style={{ color: '#666' }}>{r.label}</div>
           {r.ref.charStart !== undefined && (
-            <div style={{ color: '#888', fontSize: 11 }}>範囲 {r.ref.charStart}〜{r.ref.charEnd}</div>
+            <div style={{ color: '#888', fontSize: 11 }}>{t('refs.range', { start: r.ref.charStart, end: r.ref.charEnd })}</div>
           )}
           {r.ref.unresolved && (
-            <div style={{ color: '#c0392b', fontSize: 11 }}>⚠ 追従不能</div>
+            <div style={{ color: '#c0392b', fontSize: 11 }}>⚠ {t('refs.unresolved')}</div>
           )}
           <div style={{ marginTop: 4, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
             {r.ref.unresolved && onReconnect && (
               <button style={{ fontSize: 10, color: '#1e6091' }} onClick={() => onReconnect(r.ref, r.target)}>
-                再接続
+                {t('refs.reconnect')}
               </button>
             )}
-            <button style={{ fontSize: 10, color: '#c0392b' }} onClick={() => onRemove(r.ref, r.target)}>リンク解除</button>
+            <button style={{ fontSize: 10, color: '#c0392b' }} onClick={() => onRemove(r.ref, r.target)}>{t('refs.unlink')}</button>
           </div>
         </li>
       ))}
@@ -1313,6 +1320,7 @@ function LinkCreationDialog({
   onCreateNewBox: (boxType: BoxType, label: string) => void;
   onLinkExisting: (target: LinkTarget) => void;
 }) {
+  const { t, i18n } = useTranslation('transcriptViewer');
   const sheet = useActiveSheet();
   const [tab, setTab] = useState<'new' | 'existing'>('new');
   const [boxType, setBoxType] = useState<BoxType>('normal');
@@ -1333,13 +1341,13 @@ function LinkCreationDialog({
     <div className="modal-backdrop" onClick={onClose} style={{ zIndex: 1100 }}>
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 480 }}>
         <div className="modal-header">
-          <h3>原文を要素にリンク</h3>
+          <h3>{t('link.title')}</h3>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
         <div className="modal-body">
           <div style={{ background: '#f5f5f5', padding: 8, borderRadius: 4, fontSize: 12, marginBottom: 12, maxHeight: 100, overflow: 'auto' }}>
-            <div style={{ color: '#666', marginBottom: 2 }}>引用テキスト:</div>
-            「{quoteText.slice(0, 200)}{quoteText.length > 200 ? '...' : ''}」
+            <div style={{ color: '#666', marginBottom: 2 }}>{t('link.quote')}</div>
+            {t('quote', { text: quoteText.slice(0, 200) + (quoteText.length > 200 ? '...' : '') })}
           </div>
 
           <div style={{ display: 'flex', gap: 4, marginBottom: 12 }}>
@@ -1347,39 +1355,39 @@ function LinkCreationDialog({
               onClick={() => setTab('new')}
               style={{ flex: 1, padding: 6, background: tab === 'new' ? '#4a90e2' : '#f5f5f5', color: tab === 'new' ? 'white' : '#333', border: 'none', borderRadius: 4 }}
             >
-              新規 Box を作成
+              {t('link.tabNew')}
             </button>
             <button
               onClick={() => setTab('existing')}
               style={{ flex: 1, padding: 6, background: tab === 'existing' ? '#4a90e2' : '#f5f5f5', color: tab === 'existing' ? 'white' : '#333', border: 'none', borderRadius: 4 }}
             >
-              既存要素にリンク
+              {t('link.tabExisting')}
             </button>
           </div>
 
           {tab === 'new' && (
             <div>
               <div className="setting-row">
-                <label>Box 種別</label>
+                <label>{t('link.boxType')}</label>
                 <select value={boxType} onChange={(e) => setBoxType(e.target.value as BoxType)}>
-                  {(['normal', 'OPP', 'BFP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'annotation', 'other'] as BoxType[]).map((t) => (
-                    <option key={t} value={t}>{BOX_TYPE_LABELS[t]?.ja ?? t}</option>
+                  {(['normal', 'OPP', 'BFP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'annotation', 'other'] as BoxType[]).map((bt) => (
+                    <option key={bt} value={bt}>{i18n.language === 'ja' ? (BOX_TYPE_LABELS[bt]?.ja ?? bt) : t(`terms:boxType.${bt}`)}</option>
                   ))}
                 </select>
               </div>
               <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-                <label>Box ラベル</label>
+                <label>{t('link.boxLabel')}</label>
                 <textarea
                   value={boxLabel}
                   onChange={(e) => setBoxLabel(e.target.value)}
-                  placeholder="例: 卒業研究着手（空でも可、後で編集できます）"
+                  placeholder={t('link.boxLabelPlaceholder')}
                   style={{ width: 320, minHeight: 40, resize: 'vertical', fontFamily: 'inherit' }}
                   autoFocus
                 />
               </div>
               <p className="hint">
-                description には上記引用テキストを自動貼付します。<br />
-                ラベルが空でも作成可能で、PropertyPanel から後で編集できます。
+                {t('link.hint1')}<br />
+                {t('link.hint2')}
               </p>
             </div>
           )}
@@ -1387,7 +1395,7 @@ function LinkCreationDialog({
           {tab === 'existing' && (
             <div>
               <div className="setting-row">
-                <label>種別</label>
+                <label>{t('link.kind')}</label>
                 <select value={targetKind} onChange={(e) => { setTargetKind(e.target.value as 'box' | 'line' | 'sdsg'); setTargetId(''); }}>
                   <option value="box">Box</option>
                   <option value="line">Line</option>
@@ -1395,11 +1403,11 @@ function LinkCreationDialog({
                 </select>
               </div>
               <div className="setting-row">
-                <label>対象</label>
+                <label>{t('link.target')}</label>
                 <select value={targetId} onChange={(e) => setTargetId(e.target.value)} style={{ minWidth: 240 }}>
-                  <option value="">— 選択 —</option>
+                  <option value="">{t('link.choose')}</option>
                   {options.map((o) => (
-                    <option key={o.id} value={o.id}>{o.id} ({o.label || '無名'})</option>
+                    <option key={o.id} value={o.id}>{o.id} ({o.label || t('link.unnamed')})</option>
                   ))}
                 </select>
               </div>
@@ -1407,13 +1415,13 @@ function LinkCreationDialog({
           )}
         </div>
         <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <button className="ribbon-btn-small" onClick={onClose}>キャンセル</button>
+          <button className="ribbon-btn-small" onClick={onClose}>{t('cancel')}</button>
           {tab === 'new' ? (
             <button
               className="ribbon-btn-primary"
               onClick={() => onCreateNewBox(boxType, boxLabel.trim())}
             >
-              リンクした Box を作成
+              {t('link.createBox')}
             </button>
           ) : (
             <button
@@ -1421,7 +1429,7 @@ function LinkCreationDialog({
               disabled={!targetId}
               onClick={() => onLinkExisting({ type: targetKind, id: targetId })}
             >
-              リンク追加
+              {t('link.addLink')}
             </button>
           )}
         </div>
@@ -1452,6 +1460,7 @@ function BulkLinkDialog({
     mode: BulkLinkMode,
   ) => void;
 }) {
+  const { t, i18n } = useTranslation('transcriptViewer');
   const sheet = useActiveSheet();
   // 候補段落 (Transcript+Paragraph 解決済み、Transcript 順 → 段落 index 順)
   const candidates = useMemo(() => {
@@ -1520,8 +1529,8 @@ function BulkLinkDialog({
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 720, maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
         <div className="modal-header">
           <h3>
-            {isCross ? '横断検索ヒットを一括リンク' : '検索ヒットを一括リンク'} ({candidates.length} 件
-            {isCross && ` / ${new Set(candidates.map((c) => c.transcript.id)).size} 原文`})
+            {isCross ? t('bulk.titleCross') : t('bulk.title')} ({t('bulk.count', { count: candidates.length })}
+            {isCross && ` / ${t('bulk.transcripts', { count: new Set(candidates.map((c) => c.transcript.id)).size })}`})
           </h3>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
@@ -1530,35 +1539,35 @@ function BulkLinkDialog({
             <button
               onClick={() => setTab('new')}
               style={{ flex: 1, padding: 6, background: tab === 'new' ? '#4a90e2' : '#f5f5f5', color: tab === 'new' ? 'white' : '#333', border: 'none', borderRadius: 4 }}
-            >新規 Box を作成</button>
+            >{t('link.tabNew')}</button>
             <button
               onClick={() => setTab('existing')}
               style={{ flex: 1, padding: 6, background: tab === 'existing' ? '#4a90e2' : '#f5f5f5', color: tab === 'existing' ? 'white' : '#333', border: 'none', borderRadius: 4 }}
-            >既存要素にリンク</button>
+            >{t('link.tabExisting')}</button>
           </div>
 
           {tab === 'new' && (
             <>
               <div className="setting-row">
-                <label>Box 種別</label>
+                <label>{t('link.boxType')}</label>
                 <select value={boxType} onChange={(e) => setBoxType(e.target.value as BoxType)}>
-                  {(['normal', 'OPP', 'BFP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'annotation', 'other'] as BoxType[]).map((t) => (
-                    <option key={t} value={t}>{BOX_TYPE_LABELS[t]?.ja ?? t}</option>
+                  {(['normal', 'OPP', 'BFP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'annotation', 'other'] as BoxType[]).map((bt) => (
+                    <option key={bt} value={bt}>{i18n.language === 'ja' ? (BOX_TYPE_LABELS[bt]?.ja ?? bt) : t(`terms:boxType.${bt}`)}</option>
                   ))}
                 </select>
               </div>
               <div className="setting-row" style={{ alignItems: 'flex-start' }}>
-                <label>Box ラベル</label>
+                <label>{t('link.boxLabel')}</label>
                 <input
                   type="text"
                   value={boxLabel}
                   onChange={(e) => setBoxLabel(e.target.value)}
-                  placeholder="例: 指導教員との出会い"
+                  placeholder={t('bulk.boxLabelPlaceholder')}
                   style={{ flex: 1, padding: '4px 8px' }}
                 />
               </div>
               <p className="hint">
-                description には選択した全段落の本文を連結して貼付します（§番号付き）。
+                {t('bulk.hint')}
               </p>
             </>
           )}
@@ -1566,7 +1575,7 @@ function BulkLinkDialog({
           {tab === 'existing' && (
             <>
               <div className="setting-row">
-                <label>種別</label>
+                <label>{t('link.kind')}</label>
                 <select value={targetKind} onChange={(e) => { setTargetKind(e.target.value as 'box' | 'line' | 'sdsg'); setTargetId(''); }}>
                   <option value="box">Box</option>
                   <option value="line">Line</option>
@@ -1574,11 +1583,11 @@ function BulkLinkDialog({
                 </select>
               </div>
               <div className="setting-row">
-                <label>対象</label>
+                <label>{t('link.target')}</label>
                 <select value={targetId} onChange={(e) => setTargetId(e.target.value)} style={{ minWidth: 240 }}>
-                  <option value="">— 選択 —</option>
+                  <option value="">{t('link.choose')}</option>
                   {options.map((o) => (
-                    <option key={o.id} value={o.id}>{o.id} ({o.label || '無名'})</option>
+                    <option key={o.id} value={o.id}>{o.id} ({o.label || t('link.unnamed')})</option>
                   ))}
                 </select>
               </div>
@@ -1588,10 +1597,10 @@ function BulkLinkDialog({
           <div style={{ borderTop: '1px solid #eee', marginTop: 12, paddingTop: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <label style={{ fontWeight: 600, fontSize: 13 }}>
-                <input type="checkbox" checked={allSelected} onChange={toggleAll} /> 全選択
+                <input type="checkbox" checked={allSelected} onChange={toggleAll} /> {t('bulk.selectAll')}
               </label>
               <span style={{ fontSize: 12, color: '#666' }}>
-                {selected.size} / {candidates.length} 段落を選択中
+                {t('bulk.selected', { selected: selected.size, total: candidates.length })}
               </span>
             </div>
             <ul style={{ listStyle: 'none', paddingLeft: 0, fontSize: 12, maxHeight: 280, overflow: 'auto' }}>
@@ -1621,13 +1630,13 @@ function BulkLinkDialog({
           </div>
         </div>
         <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <button className="ribbon-btn-small" onClick={onClose}>キャンセル</button>
+          <button className="ribbon-btn-small" onClick={onClose}>{t('cancel')}</button>
           <button
             className="ribbon-btn-primary"
             disabled={!canConfirm}
             onClick={onConfirmClick}
           >
-            {tab === 'new' ? `Box 作成 + ${selected.size} 段落をリンク` : `${selected.size} 段落をリンク追加`}
+            {tab === 'new' ? t('bulk.confirmNew', { count: selected.size }) : t('bulk.confirmExisting', { count: selected.size })}
           </button>
         </div>
       </div>
@@ -1661,10 +1670,11 @@ function CrossSearchResults({
   participants: Participant[];
   onJump: (transcriptId: string, paragraphId: string) => void;
 }) {
+  const { t } = useTranslation('transcriptViewer');
   if (hits.length === 0) {
     return (
       <div style={{ color: '#666', padding: 20, textAlign: 'center' }}>
-        「{keyword}」にマッチする段落が見つかりませんでした。
+        {t('cross.noMatch', { keyword })}
       </div>
     );
   }
@@ -1675,7 +1685,7 @@ function CrossSearchResults({
   type ParticipantGroup = { participantId: string | null; label: string; sessions: SessionGroup[] };
   const participantOrder = new Map(participants.map((p, i) => [p.id, i]));
   const participantLabel = (id?: string) => {
-    if (!id) return '(未割当)';
+    if (!id) return t('unassigned');
     const p = participants.find((x) => x.id === id);
     return p?.pseudonym ?? id;
   };
@@ -1721,7 +1731,7 @@ function CrossSearchResults({
   return (
     <div>
       <p style={{ fontSize: 12, color: '#666', margin: '0 0 12px' }}>
-        {groups.length} 協力者 / {totalTranscripts} 原文に渡って {hits.length} 件のヒット。各行クリックで該当段落へジャンプします。
+        {t('cross.summary', { participants: groups.length, transcripts: totalTranscripts, hits: hits.length })}
       </p>
       {groups.map((g) => (
         <div key={g.participantId ?? '__unassigned__'} style={{ marginBottom: 18 }}>
@@ -1734,12 +1744,12 @@ function CrossSearchResults({
               paddingBottom: 2,
             }}
           >
-            {g.label} ({g.sessions.reduce((acc, s) => acc + s.hits.length, 0)} 件 / {g.sessions.length} 回)
+            {g.label} ({t('cross.groupCount', { hits: g.sessions.reduce((acc, s) => acc + s.hits.length, 0), sessions: g.sessions.length })})
           </h4>
           {g.sessions.map((s) => (
             <div key={s.transcriptId} style={{ marginBottom: 10, marginLeft: 8 }}>
               <h5 style={{ margin: '4px 0 2px', fontSize: 12, color: '#444' }}>
-                {s.sessionNumber ? `第${s.sessionNumber}回 — ` : ''}{s.title} ({s.hits.length} 件)
+                {s.sessionNumber ? `${t('session', { n: s.sessionNumber })} — ` : ''}{s.title} ({t('cross.hits', { count: s.hits.length })})
               </h5>
               <ul style={{ listStyle: 'none', paddingLeft: 8, margin: 0 }}>
                 {s.hits.map((h) => (
@@ -1753,7 +1763,7 @@ function CrossSearchResults({
                       fontSize: 12,
                       lineHeight: 1.4,
                     }}
-                    title="クリックで該当段落へジャンプ"
+                    title={t('cross.jump')}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#f0f7ff'; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                   >
@@ -1822,6 +1832,7 @@ function ReconnectDialog({
   target: LinkTarget;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('transcriptViewer');
   const transcripts = useTEMStore((s) => s.doc.transcripts);
   const updateSourceRef = useTEMStore((s) => s.updateSourceRef);
   const removeSourceRef = useTEMStore((s) => s.removeSourceRef);
@@ -1877,7 +1888,7 @@ function ReconnectDialog({
   };
 
   const onDeleteRef = () => {
-    if (confirm('このリンクを完全に削除しますか？')) {
+    if (confirm(t('reconnect.confirmDelete'))) {
       removeSourceRef(target, srcRef.id);
       onClose();
     }
@@ -1887,29 +1898,29 @@ function ReconnectDialog({
     <div className="modal-backdrop" onClick={onClose} style={{ zIndex: 1100 }}>
       <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 720, maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
         <div className="modal-header">
-          <h3>リンク再接続 ({target.type.toUpperCase()} / {target.id})</h3>
+          <h3>{t('reconnect.title', { type: target.type.toUpperCase(), id: target.id })}</h3>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
         <div className="modal-body" style={{ flex: 1, overflow: 'auto' }}>
           {!transcript || !paragraph ? (
             <p style={{ color: '#c0392b' }}>
-              元の原文または段落が見つかりません（削除された可能性があります）。<br />
-              リンクを削除して整理することをお勧めします。
+              {t('reconnect.missing1')}<br />
+              {t('reconnect.missing2')}
             </p>
           ) : (
             <>
               <section style={{ marginBottom: 16 }}>
-                <h4 style={{ marginTop: 0 }}>元の引用テキスト (スナップショット)</h4>
+                <h4 style={{ marginTop: 0 }}>{t('reconnect.original')}</h4>
                 <div style={{ background: '#fff3cd', padding: 8, borderRadius: 4, fontSize: 13, whiteSpace: 'pre-wrap' }}>
                   {srcRef.quoteText
-                    ? `「${srcRef.quoteText}」`
-                    : '（段落全体参照）'}
+                    ? t('quote', { text: srcRef.quoteText })
+                    : t('reconnect.wholeParagraphRef')}
                 </div>
               </section>
               <section style={{ marginBottom: 16 }}>
-                <h4>現在の段落本文 (§{paragraph.index + 1})</h4>
+                <h4>{t('reconnect.current', { n: paragraph.index + 1 })}</h4>
                 <p className="hint" style={{ marginTop: 0 }}>
-                  下記から該当箇所をマウスドラッグで範囲選択するか、段落全体を参照に切り替えてください。
+                  {t('reconnect.hint')}
                 </p>
                 <div
                   id="reconnect-paragraph-body"
@@ -1931,7 +1942,7 @@ function ReconnectDialog({
                 </div>
                 {selectedRange && (
                   <div style={{ marginTop: 8, padding: 6, background: '#e8f5e9', borderRadius: 3, fontSize: 12 }}>
-                    選択範囲: {selectedRange.start}〜{selectedRange.end} 文字「{paragraph.text.slice(selectedRange.start, selectedRange.end).slice(0, 80)}」
+                    {t('reconnect.selection', { start: selectedRange.start, end: selectedRange.end, text: paragraph.text.slice(selectedRange.start, selectedRange.end).slice(0, 80) })}
                   </div>
                 )}
               </section>
@@ -1939,14 +1950,14 @@ function ReconnectDialog({
           )}
         </div>
         <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-          <button className="ribbon-btn-small" onClick={onClose}>キャンセル</button>
+          <button className="ribbon-btn-small" onClick={onClose}>{t('cancel')}</button>
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="ribbon-btn-small" style={{ color: '#c0392b' }} onClick={onDeleteRef}>
-              リンクを削除
+              {t('reconnect.delete')}
             </button>
             {paragraph && (
               <button className="ribbon-btn-small" onClick={onApplyWholeParagraph}>
-                段落全体を参照に切替
+                {t('reconnect.useWhole')}
               </button>
             )}
             <button
@@ -1954,7 +1965,7 @@ function ReconnectDialog({
               disabled={!selectedRange}
               onClick={onApplyRange}
             >
-              選択範囲で再接続
+              {t('reconnect.useSelection')}
             </button>
           </div>
         </div>

@@ -1,0 +1,4 @@
+﻿key,ja,en,note
+"title","メモ（ダブルクリック / Enter で編集）","Note (double-click or press Enter to edit)","図の上のメモの説明（マウスを重ねたとき）"
+"placeholder.symbol","（記号）","(symbol)","図の上の記号のメモ（文字が空のとき・薄い字）"
+"placeholder.note","（メモ）","(note)","図の上のメモ（文字が空のとき・薄い字）"

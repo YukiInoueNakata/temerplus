@@ -170,7 +170,7 @@ The software is archived on Zenodo: https://doi.org/10.5281/zenodo.24051875 (all
   author  = {Nakata, Yuki Inoue},
   title   = {TEMer Plus: A Drawing Tool for Trajectory Equifinality Modeling (TEM)},
   year    = {2026},
-  version = {0.2.0},
+  version = {0.2.1},
   doi     = {10.5281/zenodo.24051875},
   url     = {https://github.com/YukiInoueNakata/temerplus}
 }

@@ -16,7 +16,7 @@ The screenshots show the English interface. To switch the interface language, us
 - [6. Export a report for a paper (Word)](#6-export-a-report-for-a-paper-word)
 - [7. Troubleshooting](#7-troubleshooting)
 
-<!-- Screenshots: Chromium, English interface (2026-11-08, v0.2.0; taken with webApp/scripts/guide-shots/shoot.py). The steps are the same on a Mac (read Ctrl as ⌘). -->
+<!-- Screenshots: Chromium, English interface (2026-11-08, v0.2.1; taken with webApp/scripts/guide-shots/shoot.py). The steps are the same on a Mac (read Ctrl as ⌘). -->
 
 ## 1. Open the app
 

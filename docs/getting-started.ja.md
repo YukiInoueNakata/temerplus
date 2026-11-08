@@ -14,7 +14,7 @@ TEMer Plus は，TEA（複線径路等至性アプローチ）で用いる **複
 - [6. 論文用のレポート（Word）にする](#6-論文用のレポートwordにする)
 - [7. 困ったとき](#7-困ったとき)
 
-<!-- 画像は Chromium・日本語の画面で撮影（2026-11-08・v0.2.0．webApp/scripts/guide-shots/shoot.py）．Mac でも操作は同じ（Ctrl を ⌘ に読み替える） -->
+<!-- 画像は Chromium・日本語の画面で撮影（2026-11-08・v0.2.1．webApp/scripts/guide-shots/shoot.py）．Mac でも操作は同じ（Ctrl を ⌘ に読み替える） -->
 
 ## 1. 開く
 

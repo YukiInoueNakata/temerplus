@@ -423,7 +423,7 @@ function useCommands(callbacks: CommandPaletteCallbacks): Command[] {
 
       // === Help ===
       { id: 'help.about', label: t('cmd.help.about'), keywords: 'about version バージョン', category: 'help', // i18n-ok 検索用の語（日本語で引けるように残す）
-        run: () => alert(t('about.message', { version: 'v0.2.0' })) },
+        run: () => alert(t('about.message', { version: 'v0.2.1' })) },
     ];
 
     return cmds;

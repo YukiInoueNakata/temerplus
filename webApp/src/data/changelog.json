@@ -1,5 +1,11 @@
 [
   {
+    "date": "2026-11-10",
+    "items": [
+      {"kind":"改善","title":"点線の径路だけでつながる Box に注意を出す","detail":"通常の Box に点線の径路しかつながっていないとき、Box の右上に「!」を出し、プロパティで「潜在経験にする」を選べます。潜在経験の Box に実線の径路がつながっているときは「通常にする」を勧めます。「このままにする」で以後は出しません。「!」は出力には写りません。","en":{"title":"Notice for Boxes connected only by dashed paths","detail":"When a Normal Box is connected only by dashed paths, a \"!\" appears at its top right, and Properties offers \"Make it a latent experience\". A latent experience connected by a solid path is offered \"Make it Normal\". \"Keep as is\" hides the notice for that Box. The \"!\" never appears in exports."}}
+    ]
+  },
+  {
     "date": "2026-11-08",
     "items": [
       {"kind":"改善","title":"Mac ではショートカットを ⌘ で表示","detail":"ボタンやコマンドパレットのショートカットを、Mac では「⌘Z」「⇧⌘S」のように表示します。やり直しは Mac では ⇧⌘Z です。","en":{"title":"Shortcuts shown with ⌘ on Mac","detail":"On a Mac, shortcuts on buttons and in the command palette are shown as ⌘Z, ⇧⌘S and so on. Redo is ⇧⌘Z on a Mac."}},

@@ -81,10 +81,10 @@ https://yukiinouenakata.github.io/temerplus/
 
    ![2 つの Box を選ぶ](images/getting-started/app-16-select-two.png)
 
-8. 「実線矢印」を押します（まだ実現していない径路は「点線矢印」）．
+8. 「実線径路」を押します（実現しなかった径路は「点線径路」）．
    Box を 3 つ以上選ぶと，選んだ順につながります．
 
-   ![実線矢印](images/getting-started/app-17-arrow-button.png)
+   ![実線径路](images/getting-started/app-17-arrow-button.png)
 
 9. 2 つの Box が矢印でつながります．
 

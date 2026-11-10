@@ -112,7 +112,7 @@ home.duplicate.title_one,選択中の {{count}} 要素を複製,Duplicate {{coun
 "insert.group.between","2選択間に","Between two","リボン > 挿入 のまとまりの名前"
 "insert.between","間に挿入...","Insert between...","リボン > 挿入 のボタン（選んだ 2 つの Box の間に Box を入れる）"
 "insert.group.line","Line / 矢印","Line / arrow","リボン > 挿入 のまとまりの名前"
-"insert.arrow.title","Box 2 個=単線 / 3 個以上=選択順に順次接続","2 Boxes = one line / 3 or more = connected in selection order","実線矢印・点線矢印ボタンの説明（マウスを重ねたとき）"
+"insert.arrow.title","Box 2 個=単線 / 3 個以上=選択順に順次接続","2 Boxes = one line / 3 or more = connected in selection order","実線径路・点線径路ボタンの説明（マウスを重ねたとき）"
 "alert.selectTwoOrMoreForArrow","Box を2つ以上選択してください（2 個=単線、3 個以上=選択順に接続）","Select two or more Boxes (2 = one line, 3 or more = connected in selection order).","警告の窓（矢印の追加）"
 "insert.group.sdsgCreate","SD/SG 作成","Add SD/SG","リボン > 挿入 のまとまりの名前"
 "insert.addSD","SD追加","Add SD","リボン > 挿入 のボタン"

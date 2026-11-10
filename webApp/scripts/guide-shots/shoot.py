@@ -36,7 +36,7 @@ L = {
     "ja": {
         "demo": "デモファイルを開く", "empty": "空ファイルから作成",
         "tab_file": "ファイル", "tab_insert": "挿入", "tab_help": "ヘルプ",
-        "normal": "通常", "opp": "必須通過点", "rline": "実線矢印", "save": "保存",
+        "normal": "通常", "opp": "必須通過点", "rline": "実線径路", "save": "保存",
         "export": "出力...", "include": "含める", "content_title": "出力に含める要素の確認", "report": "論文レポート",
         "report_export_tab": "出力", "generate": "レポートを生成...",
         "wizard": "起動ウィザード", "changelog": "更新情報",
@@ -185,7 +185,7 @@ def run(lang: str, url: str) -> None:
             p.keyboard.down("Shift"); p.locator(f'.react-flow__node[data-id="{id2}"]').click(); p.keyboard.up("Shift")
             p.wait_for_timeout(500)
             s.shot("app-16-select-two", [s.box(f'.react-flow__node[data-id="{id1}"]'), s.box(f'.react-flow__node[data-id="{id2}"]')])
-            step = "17 実線矢印"
+            step = "17 実線径路"
             s.shot("app-17-arrow-button", [s.box(s.btn(t["rline"]))])
             step = "18 矢印でつながった"
             s.btn(t["rline"]).click(); p.wait_for_timeout(500)

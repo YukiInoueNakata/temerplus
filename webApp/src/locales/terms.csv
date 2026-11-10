@@ -1,7 +1,7 @@
 ﻿key,ja,en,note
 app.name,TEMer Plus,TEMer Plus,アプリの名前（訳さない）
 tem,複線径路等至性モデリング（TEM）,Trajectory Equifinality Modeling (TEM),方法の名前（旧称 複線径路等至性モデル・Trajectory Equifinality Model。モデリングに改称。安田・サトウ編著『TEAによる対人援助プロセスと分岐の記述』表1-2）
-tea,複線径路等至アプローチ（TEA）,Trajectory Equifinality Approach (TEA),方法の名前
+tea,複線径路等至性アプローチ（TEA）,Trajectory Equifinality Approach (TEA),方法の名前
 boxType.normal,通常,Normal,Box の種類（通常の経験・出来事）
 boxType.normal.long,通常の経験,Experience,Box の種類の説明
 boxType.annotation,潜在経験,Latent experience,Box の種類（想定された未実現の経験）
@@ -12,8 +12,8 @@ boxType.OPP,必須通過点,Obligatory passage point,Box の種類。略号 OPP
 boxType.2nd-EFP,セカンド等至点,Second equifinality point,Box の種類。略号 2nd EFP。安田・サトウ編著（2022）表1-2 の表記（旧 第 2 等至点・第二等至点）
 boxType.P-2nd-EFP,両極化したセカンド等至点,Polarized second equifinality point,Box の種類。略号 P-2nd EFP
 boxType.other,その他,Other,Box の種類
-line.RLine,実線矢印,Solid path,実現した径路の矢印
-line.XLine,点線矢印,Dashed path,実現しなかった（想定された）径路の矢印
+line.RLine,実線径路,Solid path,実現した径路の矢印（凡例と同じ名前にそろえた。旧 実線矢印。2026-11-10 ユーザー決定）
+line.XLine,点線径路,Dashed path,実現しなかった（想定された）径路の矢印（旧 点線矢印）
 path.realized,実現した径路,Realized path,径路の種類
 path.unrealized,実現しなかった径路,Unrealized path,径路の種類
 SD,社会的方向づけ（SD）,Social direction (SD),径路を妨げる力。略号 SD

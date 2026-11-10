@@ -41,6 +41,8 @@ describe('英語の用語名を種別として受ける', () => {
     expect(mapLineType('Solid arrow')).toBe('RLine');
     expect(mapLineType('Dashed arrow')).toBe('XLine');
     expect(mapLineType('点線矢印')).toBe('XLine');
+    expect(mapLineType('実線径路')).toBe('RLine'); // 2026-11-10 から画面の名前
+    expect(mapLineType('点線径路')).toBe('XLine');
   });
 
   it('MAXQDA のコード名（英語）から種別と扱いを推測する（長い語が先に当たる）', () => {

@@ -238,3 +238,5 @@ To place them the other way, turn on the option to remove the combination restri
 "box.pathType.latentOnSolid.badge","潜在経験なのに実線の径路がつながっています。実現した経験なら、種別を「通常」にします（選ぶとプロパティで直せます）","A latent experience connected by a solid path. If the experience was realized, make its type Normal (select the Box to fix it in Properties)","図の上の Box の右上の「!」の説明（マウスを重ねたとき）"
 "box.pathType.ignore","このままにする","Keep as is","上の注意のボタン（この Box については以後知らせない）"
 "box.pathType.ignore.title","この Box については、以後この注意を出しません","Do not show this notice for this Box again","「このままにする」の説明（マウスを重ねたとき）"
+"legend.autoPlacement","時間の矢印の右下に自動で置く","Place automatically below the time arrow (right-aligned)","プロパティ > 凡例 のチェック（入のとき、図が変わるたびに凡例を置き直す）"
+"legend.autoPlacement.title","凡例の右端を時間の矢印の右端にそろえて、矢印の下に置きます。行の数は矢印の長さに収まる最も少ない数にします。凡例をドラッグしたり位置や行の数を入れたりすると、自動の置き方は切れます","Places the legend below the time arrow with its right edge aligned to the arrow's end, using as few rows as fit within the arrow's length. Dragging the legend or entering its position or rows turns this off","上のチェックの説明（マウスを重ねたとき）"

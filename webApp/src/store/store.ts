@@ -54,6 +54,7 @@ import { hydrateDocument } from '../utils/hydrate';
 import { transcriptRank, textPosition, compareTextPosition, boxTextPosition, type TextPosition } from '../utils/textOrder';
 import { computeLegendItems, computeLegendColumns } from '../utils/legend';
 import { estimateLegendSize } from '../utils/fitBounds';
+import { computeAutoLegend, legendMatches } from '../utils/legendPlacement';
 
 interface DocumentState {
   doc: TEMDocument;
@@ -2913,6 +2914,28 @@ export function endHistoryGesture(): void {
 export const useActiveSheet = (): Sheet | undefined => {
   return useTEMStore((s) => s.doc.sheets.find((sh) => sh.id === s.doc.activeSheetId));
 };
+
+// 凡例の置き方が自動（legend.placement === 'auto'）なら、図が変わるたびに時間の矢印の右下へ置き直す（2026-11-10）。
+// 位置を読む箇所（画面・全体フィット・出力）が多いので、計算した位置を doc に書き込む。この書き込みは「元に戻す」の
+// 記録に残さない（元に戻すと前の図と前の位置が一緒に戻り、置き直しても同じ位置になる）
+export function syncAutoLegend(): void {
+  const d = useTEMStore.getState().doc;
+  const sheet = d.sheets.find((sh) => sh.id === d.activeSheetId) ?? d.sheets[0];
+  if (!sheet || !d.settings.legend) return;
+  const patch = computeAutoLegend(sheet, d.settings);
+  if (!patch || legendMatches(d.settings.legend, patch)) return;
+  const inGesture = isHistoryGestureActive();   // ドラッグ中は記録が止まっているので、止め直さない
+  const temporal = useTEMStore.temporal.getState();
+  if (!inGesture) temporal.pause();
+  try {
+    useTEMStore.setState((s) => ({
+      doc: { ...s.doc, settings: { ...s.doc.settings, legend: { ...s.doc.settings.legend, ...patch } } },
+    }));
+  } finally {
+    if (!inGesture) temporal.resume();
+  }
+}
+useTEMStore.subscribe((s, prev) => { if (s.doc !== prev.doc) syncAutoLegend(); });
 
 // Undo/redo helpers (zundo provides these on temporal)
 export const useUndo = () => useTEMStore.temporal.getState().undo;

@@ -331,7 +331,8 @@ export function createDefaultSettings(locale: Locale = currentUILocale()): Proje
     ...DEFAULT_SETTINGS,
     locale,
     timeArrow: { ...DEFAULT_SETTINGS.timeArrow, label: i18n.t('terms:timeArrow', { lng: locale }) },
-    legend: { ...DEFAULT_SETTINGS.legend, title: i18n.t('terms:legend', { lng: locale }) },
+    // 新しい図の凡例は自動で時間の矢印の右下に置く（既存の図は placement が無いので手動のまま。2026-11-10）
+    legend: { ...DEFAULT_SETTINGS.legend, title: i18n.t('terms:legend', { lng: locale }), placement: 'auto' },
   };
 }
 

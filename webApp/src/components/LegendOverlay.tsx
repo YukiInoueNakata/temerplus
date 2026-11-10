@@ -44,6 +44,7 @@ export function LegendOverlay({ onOpenSettings }: { onOpenSettings?: () => void 
             legend: {
               ...state.doc.settings.legend,
               position: { x: newX, y: newY },
+              placement: 'manual',   // 動かしたら自動の置き直しをやめる（2026-11-10）
             },
           },
         },

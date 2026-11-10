@@ -109,9 +109,12 @@ function LegendProperties({ onOpenSettings }: { onOpenSettings?: () => void }) {
   const lg = doc.settings.legend;
   const layout = doc.settings.layout;
   const updateLegend = (patch: Partial<typeof lg>) => {
+    // 列・行の数を自分で決めたら、自動の置き方（行の数も決める）をやめる
+    const layoutKeys = ['columns', 'columnsHorizontal', 'columnsVertical', 'rowsHorizontal', 'rowsVertical', 'layoutModeHorizontal', 'layoutModeVertical'];
+    const toManual = Object.keys(patch).some((k) => layoutKeys.includes(k));
     useTEMStore.setState((state) => ({
       doc: produce(state.doc, (d) => {
-        d.settings.legend = { ...d.settings.legend, ...patch };
+        d.settings.legend = { ...d.settings.legend, ...patch, ...(toManual ? { placement: 'manual' as const } : {}) };
       }),
       dirty: true,
     }));
@@ -120,6 +123,7 @@ function LegendProperties({ onOpenSettings }: { onOpenSettings?: () => void }) {
     useTEMStore.setState((state) => ({
       doc: produce(state.doc, (d) => {
         d.settings.legend.position = { ...d.settings.legend.position, [which]: v };
+        d.settings.legend.placement = 'manual';
       }),
       dirty: true,
     }));
@@ -138,6 +142,15 @@ function LegendProperties({ onOpenSettings }: { onOpenSettings?: () => void }) {
       <p className="hint" style={{ marginTop: 0, fontSize: '0.82em' }}>
         {t('legend.hint')}
       </p>
+      <div className="prop-row">
+        <label title={t('legend.autoPlacement.title')}>{t('legend.autoPlacement')}</label>
+        <input
+          type="checkbox"
+          checked={lg.placement === 'auto'}
+          title={t('legend.autoPlacement.title')}
+          onChange={(e) => updateLegend({ placement: e.target.checked ? 'auto' : 'manual' })}
+        />
+      </div>
       <div className="prop-row">
         <label>{t('legend.includeInExport')}</label>
         <input

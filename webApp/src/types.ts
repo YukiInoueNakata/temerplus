@@ -581,6 +581,12 @@ export interface LegendSettings {
   alwaysVisible: boolean;             // 編集中も表示（エクスポートは別制御）
   includeInExport: boolean;           // エクスポート時に含める
   position: { x: number; y: number }; // 世界座標、ドラッグで移動可
+  /**
+   * 置き方。'auto' は時間の矢印の右下（右端を矢印の右端にそろえ、矢印の長さに収まる最も少ない行数）に、
+   * 図が変わるたびに置き直す（utils/legendPlacement.ts）。未指定・'manual' は position のまま。
+   * 新しい図は 'auto'（createDefaultSettings）、ドラッグや位置の入力で 'manual' になる（2026-11-10）
+   */
+  placement?: 'auto' | 'manual';
   includeBoxes: boolean;
   includeLines: boolean;
   includeSDSG: boolean;

@@ -43,7 +43,7 @@ box.insertCount.tip,挿入ボタンで追加する個数,How many to add with th
 box.insertCount.unit,個,items,データシート > 一度に挿入する数の単位
 line.hint,※ Lineはキャンバスで接続,Connect Lines on the canvas,データシート > Line の表の説明
 line.RLine,実線,Solid,データシート > 線の種類の選択肢
-line.XLine,点線,Dashed,データシート > 線の種類の選択肢
+line.XLine,点線,Dotted,データシート > 線の種類の選択肢
 line.empty,Lineがありません,No Lines yet,データシート > Line が無いとき
 sdsg.needBox,先に Box を 1 つ以上作成してください,Create at least one Box first,データシート > SD/SG を足せないときの注意
 sdsg.addSD,+ SD 追加,+ Add SD,データシート > ボタン

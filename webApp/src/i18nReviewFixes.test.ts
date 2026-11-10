@@ -98,8 +98,8 @@ describe('SG の呼び名（社会的助勢）と TEM の英語名（Modeling）
 describe('凡例と用語の表の英語（Irreversible Time・Solid path）', () => {
   it('用語の表は凡例と同じ英語', () => {
     expect(i18n.t('terms:timeArrow', { lng: 'en' })).toBe('Irreversible Time');
-    expect(i18n.t('terms:line.RLine', { lng: 'en' })).toBe('Solid path');
-    expect(i18n.t('terms:line.XLine', { lng: 'en' })).toBe('Dashed path');
+    expect(i18n.t('terms:line.RLine', { lng: 'en' })).toBe('Solid-line trajectory');
+    expect(i18n.t('terms:line.XLine', { lng: 'en' })).toBe('Dotted-line trajectory');
   });
   it('前の既定 Irreversible time の図も、図の言語を日本語にすると非可逆的時間に替わる', () => {
     useTEMStore.getState().setLocale('en');
@@ -108,6 +108,8 @@ describe('凡例と用語の表の英語（Irreversible Time・Solid path）', (
     expect(useTEMStore.getState().doc.settings.timeArrow.label).toBe('非可逆的時間');
   });
   it('取り込みは新旧どちらの英語も線として読む', () => {
+    expect(mapLineType('Solid-line trajectory')).toBe('RLine');
+    expect(mapLineType('Dotted-line trajectory')).toBe('XLine');
     expect(mapLineType('Solid path')).toBe('RLine');
     expect(mapLineType('Dashed path')).toBe('XLine');
     expect(mapLineType('Solid arrow')).toBe('RLine');

@@ -47,8 +47,8 @@ describe('computeLegendItems の locale 切替', () => {
     expect(byKey['EFP'].label).toBe('EFP');
     expect(byKey['EFP'].description).toBe('Equifinality Point');
     expect(byKey['OPP'].label).toBe('OPP');
-    expect(byKey['RLine'].label).toBe('Solid path');
-    expect(byKey['XLine'].description).toBe('Imagined (unrealized) path');
+    expect(byKey['RLine'].label).toBe('Solid-line trajectory');
+    expect(byKey['XLine'].description).toBe('Imagined (unrealized) trajectory');
     expect(byKey['SD'].description).toContain('Social Direction');
     expect(byKey['SG'].description).toContain('Social Guidance');
     expect(byKey['timeArrow'].label).toBe('Irreversible Time');

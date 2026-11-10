@@ -76,10 +76,10 @@ const NON_BOX_TEXT = {
     timeArrow: { label: '非可逆的時間', description: '時間軸の方向' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   },
   en: {
-    RLine:     { label: 'Solid path',        description: 'Realized path' },
-    XLine:     { label: 'Dashed path',       description: 'Imagined (unrealized) path' },
-    SD:        { label: 'SD',                description: 'Social Direction (force obstructing the path)' },
-    SG:        { label: 'SG',                description: 'Social Guidance (force supporting the path)' },
+    RLine:     { label: 'Solid-line trajectory',  description: 'Realized trajectory' },
+    XLine:     { label: 'Dotted-line trajectory', description: 'Imagined (unrealized) trajectory' },
+    SD:        { label: 'SD',                description: 'Social Direction (force obstructing the trajectory)' },
+    SG:        { label: 'SG',                description: 'Social Guidance (force supporting the trajectory)' },
     timeArrow: { label: 'Irreversible Time', description: 'Direction of the time axis' },
   },
 } as const;

@@ -40,7 +40,7 @@ using TEA/TEM, including those who are new to drawing TEM diagrams.
 
 - **TEM elements** — box types (normal experience, latent experience, bifurcation point,
   equifinality point, polarized equifinality point, obligatory passage point, second
-  equifinality point, others), solid and dashed paths, SD/SG (attached to a box or an
+  equifinality point, others), solid-line and dotted-line trajectories, SD/SG (attached to a box or an
   arrow, between boxes, or in bands), period labels, the irreversible-time arrow, and an
   automatic legend; horizontal and vertical layouts; several diagrams (sheets) per file.
 - **Editing** — a data sheet for table-style editing, alignment and spacing tools,

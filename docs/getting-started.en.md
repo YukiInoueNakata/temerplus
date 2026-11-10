@@ -84,7 +84,7 @@ Saving works a little differently depending on the browser (see [4. Save](#4-sav
 
    ![Select two boxes](images/getting-started/app-16-select-two-en.png)
 
-8. Click "Solid path". For a path that was not realized, use "Dashed path".
+8. Click "Solid-line trajectory". For a trajectory that was not realized, use "Dotted-line trajectory".
    If you select three or more boxes, they are connected in the order you selected them.
 
    ![Solid arrow](images/getting-started/app-17-arrow-button-en.png)

@@ -12,15 +12,15 @@ boxType.OPP,必須通過点,Obligatory passage point,Box の種類。略号 OPP
 boxType.2nd-EFP,セカンド等至点,Second equifinality point,Box の種類。略号 2nd EFP。安田・サトウ編著（2022）表1-2 の表記（旧 第 2 等至点・第二等至点）
 boxType.P-2nd-EFP,両極化したセカンド等至点,Polarized second equifinality point,Box の種類。略号 P-2nd EFP
 boxType.other,その他,Other,Box の種類
-line.RLine,実線径路,Solid path,実現した径路の矢印（凡例と同じ名前にそろえた。旧 実線矢印。2026-11-10 ユーザー決定）
-line.XLine,点線径路,Dashed path,実現しなかった（想定された）径路の矢印（旧 点線矢印）
+line.RLine,実線径路,Solid-line trajectory,実現した径路の矢印（凡例と同じ名前にそろえた。旧 実線矢印。2026-11-10 ユーザー決定。英語は用語集（2025）p. 7 の径路＝trajectory に合わせた（旧 Solid path））
+line.XLine,点線径路,Dotted-line trajectory,実現しなかった（想定された）径路の矢印（旧 点線矢印。英語の旧 Dashed path）
 path.realized,実現した径路,Realized path,径路の種類
 path.unrealized,実現しなかった径路,Unrealized path,径路の種類
 SD,社会的方向づけ（SD）,Social direction (SD),径路を妨げる力。略号 SD
 SG,社会的助勢（SG）,Social guidance (SG),径路を後押しする力。略号 SG。旧称 社会的ガイド・社会的ガイダンス（安田・サトウ編著『TEAによる対人援助プロセスと分岐の記述』表1-2）
 timeArrow,非可逆的時間,Irreversible Time,時間軸の矢印（英語は概念の名前として大文字。凡例と同じ。旧既定 Irreversible time）
-period,時期区分,Period,時期の区切り
-periodLabel,時期ラベル,Period label,時期区分の名前
+period,時期区分,Time division,時期の区切り（英語は用語集（2025）p. 24．画面の短い表示は Period のまま）
+periodLabel,時期ラベル,Time division label,時期区分の名前
 legend,凡例,Legend,図の記号の説明
 sheet,シート,Sheet,1 つのファイルの中の 1 枚の図
 box,Box,Box,図の箱（訳さない）

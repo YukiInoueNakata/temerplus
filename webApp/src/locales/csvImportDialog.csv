@@ -87,11 +87,11 @@ options.before,またはこの Box の直前に挿入,Or insert right before thi
 options.gap,シフト時のギャップ (px),Gap when shifting (px),CSV 取り込み > 設定のラベル（Box の間に挿入）
 options.autoConnect,Box を順次接続,Connect Boxes in order,CSV 取り込み > 設定のラベル（Box）
 options.lineType,接続線種,Connecting line type,CSV 取り込み > 設定のラベル（Box）
-options.RLine,実線径路（実現した径路）,Solid (realized path),CSV 取り込み > 線の種類の選択肢
-options.XLine,点線径路（実現しなかった径路）,Dashed (unrealized path),CSV 取り込み > 線の種類の選択肢
+options.RLine,実線径路（実現した径路）,Solid (realized trajectory),CSV 取り込み > 線の種類の選択肢
+options.XLine,点線径路（実現しなかった径路）,Dotted (unrealized trajectory),CSV 取り込み > 線の種類の選択肢
 options.defaultLineType,type 未指定時のデフォルト,Default type when none is given,CSV 取り込み > 設定のラベル（Line）
 options.RLineCode,実線（RLine）,Solid (RLine),CSV 取り込み > 線の種類の選択肢（Line）
-options.XLineCode,点線（XLine）,Dashed (XLine),CSV 取り込み > 線の種類の選択肢（Line）
+options.XLineCode,点線（XLine）,Dotted (XLine),CSV 取り込み > 線の種類の選択肢（Line）
 preview,プレビュー（先頭 5 行）,Preview (first 5 rows),CSV 取り込み > 見出し
 cancel,キャンセル,Cancel,CSV 取り込み > ボタン
 import,インポート,Import,CSV 取り込み > ボタン

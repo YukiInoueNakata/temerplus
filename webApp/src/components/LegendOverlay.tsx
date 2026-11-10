@@ -425,15 +425,26 @@ function LegendSampleIcon({
   const w = width * zoom;
   const h = height * zoom;
 
+  // 二重線の見本は、内側の枠と外側の線（outline）の 2 本で描く。CSS の double は倍率を掛けた太さが 3px 未満になると
+  // 一本の線に潰れ、等至点の見本が必須通過点（太い一重）と同じに見えていた（2026-11-10 論文の図2 で見つかった）
+  const doubleFrame = (lineW: number) => {
+    const lw = Math.max(1, lineW * zoom);
+    const gap = Math.max(1.5, 1.5 * zoom);
+    const inset = lw + gap;
+    return (
+      <div style={{ width: w, height: h, flexShrink: 0, boxSizing: 'border-box', padding: inset }}>
+        <div style={{ width: '100%', height: '100%', boxSizing: 'border-box', border: `${lw}px solid #222`, outline: `${lw}px solid #222`, outlineOffset: `${gap}px`, background: '#fff' }} />
+      </div>
+    );
+  };
+
   if (item.category === 'box') {
     // テーマで線種を指定していれば、図の Box と同じ線で描く（簡素化方式など）
     const draw = legendBorderDraw(item.key, settings);
     if (draw.kind === 'single') {
       return <div style={{ width: w, height: h, border: `${Math.min(draw.width, 2.5) * zoom}px ${draw.style} #222`, background: '#fff', flexShrink: 0 }} />;
     }
-    if (draw.kind === 'double') {
-      return <div style={{ width: w, height: h, border: `${Math.max(3, draw.width) * zoom}px double #222`, background: '#fff', flexShrink: 0 }} />;
-    }
+    if (draw.kind === 'double') return doubleFrame(Math.max(3, draw.width) / 3);
     const isPEfp = item.key === 'P-EFP' || item.key === 'P-2nd-EFP';
     if (isPEfp) {
       return (
@@ -453,6 +464,7 @@ function LegendSampleIcon({
       );
     }
     const spec = BOX_RENDER_SPECS[item.key] ?? BOX_RENDER_SPECS.normal;
+    if (spec.borderStyle === 'double') return doubleFrame(spec.borderWidth / 3);
     return (
       <div
         style={{

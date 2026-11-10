@@ -19,17 +19,17 @@ async function reportText(opts: Partial<PaperReportOptions>, locale: 'ja' | 'en'
 }
 
 describe('結果の節のラベルの括弧と順', () => {
-  it('既定は今までどおり（〈…〉・記号が先）', async () => {
+  it('既定は日本語【…】（調べで最も多かった）・記号が先', async () => {
     const ps = await reportText({});
-    expect(ps.some((p) => p.includes('BFP1 〈同僚の演奏会を聴きに行く〉'))).toBe(true);
-    expect(ps.some((p) => p.includes('ラベルは〈…〉で括って示す'))).toBe(true);
+    expect(ps.some((p) => p.includes('BFP1 【同僚の演奏会を聴きに行く】'))).toBe(true);
+    expect(ps.some((p) => p.includes('ラベルは【…】で括って示す'))).toBe(true);
   });
 
-  it('【】・ラベルが先にすると「【…】（BFP1）」と書き、説明の文も【…】になる', async () => {
-    const ps = await reportText({ labelStyle: { box: '【】', order: 'label-first' } });
-    expect(ps.some((p) => p.includes('【同僚の演奏会を聴きに行く】（BFP1）'))).toBe(true);
-    expect(ps.some((p) => p.includes('ラベルは【…】で括って示す'))).toBe(true);
-    expect(ps.some((p) => p.includes('〈同僚の演奏会を聴きに行く〉'))).toBe(false);
+  it('〈〉・ラベルが先にすると「〈…〉（BFP1）」と書き、説明の文も〈…〉になる', async () => {
+    const ps = await reportText({ labelStyle: { box: '〈〉', order: 'label-first' } });
+    expect(ps.some((p) => p.includes('〈同僚の演奏会を聴きに行く〉（BFP1）'))).toBe(true);
+    expect(ps.some((p) => p.includes('ラベルは〈…〉で括って示す'))).toBe(true);
+    expect(ps.some((p) => p.includes('【同僚の演奏会を聴きに行く】'))).toBe(false);
   });
 
   it('SD・SG だけ別の括弧にすると、その旨の文を足し、SD/SG の行だけその括弧になる', async () => {
@@ -43,5 +43,12 @@ describe('結果の節のラベルの括弧と順', () => {
   it('英語の図でラベルが先なら「⟨…⟩ (BFP1)」の形', async () => {
     const ps = await reportText({ labelStyle: { order: 'label-first' } }, 'en');
     expect(ps.some((p) => /⟨[^⟩]+⟩ \(BFP1\)/.test(p))).toBe(true);
+  });
+});
+
+describe('同じ括弧なら SD・SG の文を足さない', () => {
+  it('Box に【】を選び SD・SG は自動（日本語【】）', async () => {
+    const ps = await reportText({ labelStyle: { box: '【】', sdsg: 'auto' } });
+    expect(ps.some((p) => p.includes('（SD）と社会的助勢（SG）のラベルは'))).toBe(false);
   });
 });

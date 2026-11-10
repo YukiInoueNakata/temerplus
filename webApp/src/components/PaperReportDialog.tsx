@@ -63,7 +63,7 @@ function bracketOption(b: LabelBracket): string {
 }
 
 function exampleLabel(b: LabelBracket, order: LabelOrder): string {
-  const [o, c] = b === 'auto' ? ['〈', '〉'] : [b[0], b[1]];
+  const [o, c] = b === 'auto' ? ['【', '】'] : [b[0], b[1]];
   return order === 'id-first' ? `BFP1${o}…${c}` : `${o}…${c}（BFP1）`;
 }
 

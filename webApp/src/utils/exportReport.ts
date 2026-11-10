@@ -484,7 +484,7 @@ function buildResultsSection(
   out.push(para(t('exportReport:results.intro')));
   out.push(para(t('exportReport:results.listing', { bracket: wrapLabel(t, '…', 'box') })));
   // SD・SG を Box と別の括弧で括るときは、そのことも書く
-  if ((t.labelStyle?.sdsg ?? 'auto') !== (t.labelStyle?.box ?? 'auto')) {
+  if (wrapLabel(t, '…', 'sdsg') !== wrapLabel(t, '…', 'box')) {   // 選択肢の名前でなく、実際の括弧で比べる
     out.push(para(t('exportReport:results.listing.sdsg', { bracket: wrapLabel(t, '…', 'sdsg') })));
   }
   if (includeRefs && doc.transcripts.length > 0) {

@@ -1,6 +1,6 @@
 ﻿key,ja,en,note
 "bullet","・","• ","Word の論文用レポート > 箇条の行頭の記号（英語は記号と空白）"
-"label.wrap","〈{{label}}〉","⟨{{label}}⟩","Word の論文用レポート > 事象・経験のラベルを括る括弧（label はラベル）"
+"label.wrap","【{{label}}】","⟨{{label}}⟩","Word の論文用レポート > 事象・経験のラベルを括る括弧（label はラベル）。日本語は TEM 論文 68 本でいちばん多かった【】（2026-11-10 ユーザー決定．以前は〈〉）"
 "noLabel","（ラベル未設定）","(no label)","Word の論文用レポート > 結果 > ラベルが空の要素"
 "title.default","TEM 図報告","TEM diagram report","Word の論文用レポート > 題（図の題が空のとき）"
 "notEntered","（未入力）","(not entered)","Word の論文用レポート > 未入力の節（確認画面で「（未入力）と書いて含める」を選んだとき。画面の paperReportDialog の confirm.missing.mark と合わせる）"

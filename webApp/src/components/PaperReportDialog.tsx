@@ -80,13 +80,27 @@ export function PaperReportDialog({
   const [dragging, setDragging] = useState(false);
   const dragStart = useRef({ mouseX: 0, mouseY: 0, dlgX: 0, dlgY: 0 });
   const [busy, setBusy] = useState(false);
-  const [includeDiagram, setIncludeDiagram] = useState(true);
-  const [includeSourceRefs, setIncludeSourceRefs] = useState(true);
-  const [sourceRefStyle, setSourceRefStyle] = useState<'bracket' | 'apa'>('bracket');
-  // 結果の節でラベルを括る括弧と書く順（2026-11-10。TEM 論文 68 本の調べで主に使われていたものを選べる）
-  const [labelBox, setLabelBox] = useState<LabelBracket>('auto');
-  const [labelSdsg, setLabelSdsg] = useState<LabelBracket>('auto');
-  const [labelOrder, setLabelOrder] = useState<LabelOrder>('id-first');
+  // 出力タブの設定は図のファイル（metadata.reportOptions）に残す（2026-11-10。以前は画面を閉じると元に戻った）
+  const ro = useTEMStore((s) => s.doc.metadata.reportOptions) ?? {};
+  const includeDiagram = ro.includeDiagram !== false;
+  const includeSourceRefs = ro.includeSourceRefs !== false;
+  const sourceRefStyle = ro.sourceRefStyle ?? 'bracket';
+  // 結果の節でラベルを括る括弧と書く順（TEM 論文 68 本の調べで主に使われていたものを選べる）
+  const labelBox: LabelBracket = ro.labelStyle?.box ?? 'auto';
+  const labelSdsg: LabelBracket = ro.labelStyle?.sdsg ?? 'auto';
+  const labelOrder: LabelOrder = ro.labelStyle?.order ?? 'id-first';
+  const setReportOption = (patch: Partial<NonNullable<typeof ro>>) => {
+    useTEMStore.setState((state) => ({
+      doc: produce(state.doc, (d) => { d.metadata.reportOptions = { ...(d.metadata.reportOptions ?? {}), ...patch }; }),
+      dirty: true,
+    }));
+  };
+  const setIncludeDiagram = (v: boolean) => setReportOption({ includeDiagram: v });
+  const setIncludeSourceRefs = (v: boolean) => setReportOption({ includeSourceRefs: v });
+  const setSourceRefStyle = (v: 'bracket' | 'apa') => setReportOption({ sourceRefStyle: v });
+  const setLabelBox = (v: LabelBracket) => setReportOption({ labelStyle: { ...(ro.labelStyle ?? {}), box: v } });
+  const setLabelSdsg = (v: LabelBracket) => setReportOption({ labelStyle: { ...(ro.labelStyle ?? {}), sdsg: v } });
+  const setLabelOrder = (v: LabelOrder) => setReportOption({ labelStyle: { ...(ro.labelStyle ?? {}), order: v } });
   // 出力前の確認画面
   const [confirming, setConfirming] = useState(false);
   const [omitMissing, setOmitMissing] = useState(true);

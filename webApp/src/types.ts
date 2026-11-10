@@ -820,6 +820,12 @@ export interface TEMDocument {
     /** 図中の記号（★・〇 など文字だけのメモの先頭の記号）の意味。論文用レポートの Block 1 に書く */
     symbolMeanings?: Record<string, string>;
     reportNotes?: string;
+    /**
+     * 論文用レポートの出力タブの設定（図を含めるか・原文の引用・引用の書き方・ラベルの括弧と順）。
+     * 論文ごとに決めるので図のファイルに残す（2026-11-10。以前は画面を閉じると元に戻った）。
+     * 出力前の確認画面の選択（メモ・コメント・未入力の扱い）は毎回選び直すので、ここには入れない
+     */
+    reportOptions?: ReportOptionsMeta;
   };
   history: HistoryEntry[];             // 最新50件
   resources?: Resources;
@@ -866,4 +872,12 @@ export interface ViewState {
   canvasMode: CanvasMode;
   dataSheetWidth: number;
   propertyPanelWidth: number;
+}
+
+/** 論文用レポートの出力タブの設定（metadata.reportOptions） */
+export interface ReportOptionsMeta {
+  includeDiagram?: boolean;
+  includeSourceRefs?: boolean;
+  sourceRefStyle?: 'bracket' | 'apa';
+  labelStyle?: Partial<import('./utils/labelStyle').LabelStyle>;
 }

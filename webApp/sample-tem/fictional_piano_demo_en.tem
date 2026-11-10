@@ -12,9 +12,9 @@
           "type": "normal",
           "label": "Takes piano lessons as a child",
           "x": 120,
-          "y": -28,
+          "y": -39.5,
           "width": 120,
-          "height": 56,
+          "height": 79,
           "textOrientation": "horizontal"
         },
         {
@@ -22,9 +22,9 @@
           "type": "normal",
           "label": "Stops lessons for entrance exams",
           "x": 270,
-          "y": -28,
+          "y": -39.5,
           "width": 120,
-          "height": 56,
+          "height": 79,
           "textOrientation": "horizontal"
         },
         {
@@ -32,9 +32,9 @@
           "type": "OPP",
           "label": "Starts work and lives alone",
           "x": 420,
-          "y": -28,
+          "y": -29,
           "width": 120,
-          "height": 56,
+          "height": 58,
           "textOrientation": "horizontal"
         },
         {
@@ -42,9 +42,9 @@
           "type": "BFP",
           "label": "Goes to a colleague's concert",
           "x": 570,
-          "y": -28,
+          "y": -39.5,
           "width": 120,
-          "height": 56,
+          "height": 79,
           "textOrientation": "horizontal"
         },
         {
@@ -52,9 +52,9 @@
           "type": "normal",
           "label": "Buys a digital piano",
           "x": 720,
-          "y": -138,
+          "y": -139,
           "width": 120,
-          "height": 56,
+          "height": 58,
           "textOrientation": "horizontal"
         },
         {
@@ -72,9 +72,9 @@
           "type": "normal",
           "label": "Starts an adult piano class",
           "x": 870,
-          "y": -138,
+          "y": -139,
           "width": 120,
-          "height": 56,
+          "height": 58,
           "textOrientation": "horizontal"
         },
         {
@@ -82,9 +82,9 @@
           "type": "BFP",
           "label": "Invited to the class recital",
           "x": 1020,
-          "y": -138,
+          "y": -139,
           "width": 120,
-          "height": 56,
+          "height": 58,
           "textOrientation": "horizontal"
         },
         {
@@ -92,9 +92,9 @@
           "type": "normal",
           "label": "Decides to play in the recital",
           "x": 1170,
-          "y": -248,
+          "y": -249,
           "width": 120,
-          "height": 56,
+          "height": 58,
           "textOrientation": "horizontal"
         },
         {
@@ -102,9 +102,9 @@
           "type": "annotation",
           "label": "Stays in the audience",
           "x": 1170,
-          "y": -28,
+          "y": -29,
           "width": 120,
-          "height": 56,
+          "height": 58,
           "textOrientation": "horizontal"
         },
         {
@@ -112,9 +112,9 @@
           "type": "EFP",
           "label": "Keeps playing the piano at own pace",
           "x": 1350,
-          "y": -256,
+          "y": -259,
           "width": 120,
-          "height": 73,
+          "height": 79,
           "textOrientation": "horizontal"
         },
         {
@@ -122,9 +122,9 @@
           "type": "P-EFP",
           "label": "Gives up the piano",
           "x": 1350,
-          "y": 104,
+          "y": 103,
           "width": 120,
-          "height": 56,
+          "height": 58,
           "textOrientation": "horizontal"
         }
       ],

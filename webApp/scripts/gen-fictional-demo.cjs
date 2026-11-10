@@ -1,5 +1,7 @@
 // 架空の例「社会人がピアノを再開する」のデモの図（.tem）を日英で作る（2026-11-10）
 //   node scripts/gen-fictional-demo.cjs   （webApp で）→ sample-tem/fictional_piano_demo.tem・fictional_piano_demo_en.tem
+//   作り直したら、続けて uv run scripts/settle-demo-sizes.py sample-tem/fictional_piano_demo*.tem で Box の大きさを
+//   アプリの自動調整に合わせる（合わないと、開いた直後に自動調整が直して「未保存」になる。2026-11-10 英語のデモで起きた）
 // - 人物・出来事はすべて作り話で、実在の事例や他の論文の図に基づかない（以前のデモは神崎・鈴木 2021 の図の再現で、
 //   論文の図に他の論文の図を載せることになるため替えた。2026-11-10 ユーザー「架空の例をデモにしよう」）
 // - EFP・P-EFP・BFP・OPP・潜在経験・SD・SG・時期ラベル・実線と点線の径路がひととおり出る

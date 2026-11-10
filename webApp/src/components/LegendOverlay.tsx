@@ -466,7 +466,7 @@ function LegendSampleIcon({
       );
     }
     const spec = BOX_RENDER_SPECS[item.key] ?? BOX_RENDER_SPECS.normal;
-    if (spec.borderStyle === 'double') return doubleFrame(spec.borderWidth / 3);
+    if (spec.borderStyle === 'double') return doubleFrame(spec.borderWidth / 3, radius);
     return (
       <div
         style={{

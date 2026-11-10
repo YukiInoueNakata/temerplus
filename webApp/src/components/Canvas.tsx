@@ -174,12 +174,16 @@ function CanvasInner({
       // 図を開いたとき: 全体を等倍まで（小さな図を拡大しない）。React Flow の最初の画面合わせ（fitView。Box などの
       // 図形だけを見る）が後から走るので、少し遅らせて上書きする
       const timer = window.setTimeout(() => {
+        // 開いた直後の Box の大きさの自動調整・凡例の置き直しの後の図で計算し直す（2026-11-10 レビュー）
+        const st = useTEMStore.getState();
+        const sh = st.doc.sheets.find((x) => x.id === st.doc.activeSheetId);
+        const bb = (sh && computeContentBounds(sh, st.doc.settings.layout, st.doc.settings)) ?? bounds;
         const zoom = Math.max(0.1, Math.min(1,
-          (rfWidth - padding * 2) / Math.max(1, bounds.width),
-          (rfHeight - padding * 2) / Math.max(1, bounds.height)));
+          (rfWidth - padding * 2) / Math.max(1, bb.width),
+          (rfHeight - padding * 2) / Math.max(1, bb.height)));
         rf.setViewport({
-          x: rfWidth / 2 - (bounds.x + bounds.width / 2) * zoom,
-          y: rfHeight / 2 - (bounds.y + bounds.height / 2) * zoom,
+          x: rfWidth / 2 - (bb.x + bb.width / 2) * zoom,
+          y: rfHeight / 2 - (bb.y + bb.height / 2) * zoom,
           zoom,
         });
       }, 150);

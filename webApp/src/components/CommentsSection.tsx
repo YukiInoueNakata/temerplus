@@ -73,6 +73,8 @@ function CommentItem({ c }: { c: Comment }) {
             placeholder={t('replyPlaceholder')}
             onChange={(e) => setReply(e.target.value)}
             onKeyDown={(e) => {
+              // 日本語の変換を確定する Enter では送らない（2026-11-10 レビュー）
+              if (e.nativeEvent.isComposing || e.keyCode === 229) return;
               if (e.key === 'Enter' && reply.trim()) { st().addCommentReply(c.id, reply.trim(), loadAuthor() || undefined); setReply(''); }
             }}
             style={{ flex: 1, minWidth: 0 }}
@@ -131,7 +133,7 @@ export function CommentsSection({ targetId }: { targetId: string }) {
         value={text}
         placeholder={t('placeholder')}
         onChange={(e) => setText(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); add(); } }}
+        onKeyDown={(e) => { if (e.nativeEvent.isComposing || e.keyCode === 229) return; if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); add(); } }}
         rows={2}
         style={{ width: '100%', boxSizing: 'border-box', marginTop: 6 }}
       />

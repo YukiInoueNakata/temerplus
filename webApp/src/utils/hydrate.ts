@@ -58,6 +58,13 @@ export function hydrateDocument(doc: TEMDocument): TEMDocument {
       comments: Array.isArray(sh.comments) ? sh.comments : [],
       periodLabels: Array.isArray(sh.periodLabels) ? sh.periodLabels : [],
     })),
+    // metadata の無い .tem（他の道具で作ったもの）も読めるように補う（2026-11-10 レビュー）
+    metadata: {
+      ...(raw.metadata ?? {}),
+      title: raw.metadata?.title ?? '',
+      createdAt: raw.metadata?.createdAt ?? new Date().toISOString(),
+      modifiedAt: raw.metadata?.modifiedAt ?? new Date().toISOString(),
+    },
     participants: Array.isArray(raw.participants) ? raw.participants : [],
     transcripts: Array.isArray(raw.transcripts) ? raw.transcripts : [],
   };

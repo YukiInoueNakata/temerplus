@@ -98,7 +98,8 @@ export interface PasteAtOptions {
 
 interface Actions {
   // Document-level
-  loadDocument: (doc: TEMDocument) => void;
+  /** opts.fit（既定 true）: 開いた図の全体を画面に合わせる。別窓の同期（popoutSync）は false */
+  loadDocument: (doc: TEMDocument, opts?: { fit?: boolean }) => void;
   importSheetsFromDocument: (src: TEMDocument) => void;  // 他ドキュメントのシートを現ドキュメントに追加
   resetDocument: () => void;
   markSaved: () => void;
@@ -450,7 +451,7 @@ export const useTEMStore = create<Store>()(
       clipboardVersion: 0,
 
       // --- Document-level ---
-      loadDocument: (doc) => {
+      loadDocument: (doc, opts) => {
         // 旧フォーマットの .tem ファイルで不足している settings 項目を defaults で補完
         const hydrated = hydrateDocument(doc);
         set((s) => ({
@@ -459,8 +460,8 @@ export const useTEMStore = create<Store>()(
           selection: { sheetId: hydrated.activeSheetId, boxIds: [], lineIds: [], sdsgIds: [], noteIds: [] },
           // 開いた図の全体（凡例などを含む）を画面に合わせる。React Flow の最初の画面合わせは Box などの図形だけを
           // 見るので、凡例が画面の外に出ることがあった（2026-11-10 架空の例のデモで見つかった）
-          fitMode: 'initial',
-          fitCounter: s.fitCounter + 1,
+          // 別窓の同期で図が届くたびには合わせない（編集のたびに相手の窓の拡大・位置が戻っていた。2026-11-10 レビュー）
+          ...(opts?.fit === false ? {} : { fitMode: 'initial' as const, fitCounter: s.fitCounter + 1 }),
         }));
       },
       importSheetsFromDocument: (src) => {
@@ -2068,6 +2069,7 @@ export const useTEMStore = create<Store>()(
                 // 元Lineを削除
                 const idx = sheet.lines.indexOf(origLine);
                 if (idx >= 0) sheet.lines.splice(idx, 1);
+                const firstNewIdx = sheet.lines.length;   // この後に足す最初の Line（元の Line のコメントを付け替える）
                 // チェーン構築
                 const chain = isForward
                   ? [startId, ...newBoxIds, endId]
@@ -2083,6 +2085,9 @@ export const useTEMStore = create<Store>()(
                     style,
                   });
                 }
+                // 元の Line に付いていたコメントは、分けた最初の Line に付け替える（宙に浮いていた。2026-11-10 レビュー）
+                const firstNew = sheet.lines[firstNewIdx];
+                if (firstNew) (sheet.comments ?? []).forEach((c) => { if (c.targetId === origLine.id) c.targetId = firstNew.id; });
               });
               insertedRef.ids = newBoxIds;
             }),

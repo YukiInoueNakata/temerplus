@@ -62,9 +62,12 @@ function bracketOption(b: LabelBracket): string {
   return `${b[0]}…${b[1]}` + (n !== undefined ? i18n.t('paperReportDialog:export.labelBracket.count', { n }) : '');
 }
 
-function exampleLabel(b: LabelBracket, order: LabelOrder): string {
-  const [o, c] = b === 'auto' ? ['【', '】'] : [b[0], b[1]];
-  return order === 'id-first' ? `BFP1${o}…${c}` : `${o}…${c}（BFP1）`;
+/** 書く順の選択肢に添える例。図の言語で「自動」の括弧と丸括弧を変える（英語は “…” (BFP1)） */
+function exampleLabel(b: LabelBracket, order: LabelOrder, locale: string): string {
+  const ja = locale.startsWith('ja');
+  const [o, c] = b === 'auto' ? (ja ? ['【', '】'] : ['“', '”']) : [b[0], b[1]];
+  if (order === 'id-first') return `BFP1${o}…${c}`;
+  return ja ? `${o}…${c}（BFP1）` : `${o}…${c} (BFP1)`;
 }
 
 export function PaperReportDialog({
@@ -81,7 +84,8 @@ export function PaperReportDialog({
   const dragStart = useRef({ mouseX: 0, mouseY: 0, dlgX: 0, dlgY: 0 });
   const [busy, setBusy] = useState(false);
   // 出力タブの設定は図のファイル（metadata.reportOptions）に残す（2026-11-10。以前は画面を閉じると元に戻った）
-  const ro = useTEMStore((s) => s.doc.metadata.reportOptions) ?? {};
+  const ro = useTEMStore((s) => s.doc.metadata?.reportOptions) ?? {};
+  const figLocale = useTEMStore((s) => s.doc.settings.locale) ?? 'ja';
   const includeDiagram = ro.includeDiagram !== false;
   const includeSourceRefs = ro.includeSourceRefs !== false;
   const sourceRefStyle = ro.sourceRefStyle ?? 'bracket';
@@ -89,11 +93,18 @@ export function PaperReportDialog({
   const labelBox: LabelBracket = ro.labelStyle?.box ?? 'auto';
   const labelSdsg: LabelBracket = ro.labelStyle?.sdsg ?? 'auto';
   const labelOrder: LabelOrder = ro.labelStyle?.order ?? 'id-first';
+  // 出力の設定は「元に戻す」の記録に入れない（閉じた後の Ctrl+Z で図の代わりに設定が戻っていた。2026-11-10 レビュー）
   const setReportOption = (patch: Partial<NonNullable<typeof ro>>) => {
-    useTEMStore.setState((state) => ({
-      doc: produce(state.doc, (d) => { d.metadata.reportOptions = { ...(d.metadata.reportOptions ?? {}), ...patch }; }),
-      dirty: true,
-    }));
+    const temporal = useTEMStore.temporal.getState();
+    temporal.pause();
+    try {
+      useTEMStore.setState((state) => ({
+        doc: produce(state.doc, (d) => { d.metadata.reportOptions = { ...(d.metadata.reportOptions ?? {}), ...patch }; }),
+        dirty: true,
+      }));
+    } finally {
+      temporal.resume();
+    }
   };
   const setIncludeDiagram = (v: boolean) => setReportOption({ includeDiagram: v });
   const setIncludeSourceRefs = (v: boolean) => setReportOption({ includeSourceRefs: v });
@@ -261,8 +272,8 @@ export function PaperReportDialog({
               <div className="setting-row">
                 <label>{t('export.labelOrder')}</label>
                 <select value={labelOrder} onChange={(e) => setLabelOrder(e.target.value as LabelOrder)}>
-                  <option value="id-first">{t('export.labelOrder.idFirst', { example: exampleLabel(labelBox, 'id-first') })}</option>
-                  <option value="label-first">{t('export.labelOrder.labelFirst', { example: exampleLabel(labelBox, 'label-first') })}</option>
+                  <option value="id-first">{t('export.labelOrder.idFirst', { example: exampleLabel(labelBox, 'id-first', figLocale) })}</option>
+                  <option value="label-first">{t('export.labelOrder.labelFirst', { example: exampleLabel(labelBox, 'label-first', figLocale) })}</option>
                 </select>
               </div>
               <p className="hint" style={{ marginTop: 0 }}>{t('export.labelBracket.survey')}</p>

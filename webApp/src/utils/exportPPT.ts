@@ -1859,7 +1859,7 @@ function drawLegendIcon(
     const dashType = spec.borderStyle === 'dashed' ? 'dash' : spec.borderStyle === 'dotted' ? 'sysDot' : 'solid';
     if (item.key === 'EFP' || item.key === '2nd-EFP') {
       // 二重線: 外枠 + 内枠の 2 矩形重ね描き
-      slide.addShape(pres.ShapeType.rect, {
+      slide.addShape(sampleShape, {
         x: t.toX(x),
         y: t.toY(y),
         w: t.toLen(w),
@@ -1868,7 +1868,7 @@ function drawLegendIcon(
         line: { color: '222222', width: 1 },
       });
       const ins = 2;
-      slide.addShape(pres.ShapeType.rect, {
+      slide.addShape(sampleShape, {
         x: t.toX(x + ins),
         y: t.toY(y + ins),
         w: t.toLen(Math.max(1, w - ins * 2)),
@@ -1878,7 +1878,7 @@ function drawLegendIcon(
       });
       return;
     }
-    slide.addShape(pres.ShapeType.rect, {
+    slide.addShape(sampleShape, {
       x: t.toX(x),
       y: t.toY(y),
       w: t.toLen(w),

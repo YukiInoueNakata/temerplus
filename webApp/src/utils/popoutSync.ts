@@ -18,7 +18,7 @@ const CHANNEL_NAME = 'temer-popout-sync';
 
 type DocSlice = {
   doc: TEMDocument;
-  loadDocument: (doc: TEMDocument) => void;
+  loadDocument: (doc: TEMDocument, opts?: { fit?: boolean }) => void;
 };
 
 interface SyncMessage {
@@ -47,7 +47,7 @@ export function initPopoutSync<S extends DocSlice>(store: StoreApi<S>): PopoutSy
     if (msg.senderId === WINDOW_ID) return;
     isApplyingRemote = true;
     try {
-      store.getState().loadDocument(msg.doc);
+      store.getState().loadDocument(msg.doc, { fit: false });
     } finally {
       // 適用フラグはマイクロタスク後に解除して、適用に伴う subscribe コールバックが
       // 再ブロードキャストするのを防ぐ

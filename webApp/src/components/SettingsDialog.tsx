@@ -1893,9 +1893,12 @@ export function LegendSettingsSection() {
   const lg = doc.settings.legend;
 
   const update = (patch: Partial<LegendSettings>) => {
+    // 列・行の数や位置を自分で決めたら、自動の置き方（位置と行の数を決める）をやめる（2026-11-10 レビュー）
+    const manualKeys = ['position', 'columns', 'columnsHorizontal', 'columnsVertical', 'rowsHorizontal', 'rowsVertical', 'layoutModeHorizontal', 'layoutModeVertical'];
+    const toManual = Object.keys(patch).some((k) => manualKeys.includes(k)) && patch.placement === undefined;
     useTEMStore.setState((state) => ({
       doc: produce(state.doc, (d) => {
-        d.settings.legend = { ...d.settings.legend, ...patch };
+        d.settings.legend = { ...d.settings.legend, ...patch, ...(toManual ? { placement: 'manual' as const } : {}) };
       }),
     }));
   };

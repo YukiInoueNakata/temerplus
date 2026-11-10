@@ -49,6 +49,13 @@ export function textSizesOnPaper(doc: TEMDocument, pageScale = 1): TextSize[] {
   }
   for (const g of sheet.sdsg ?? []) {
     if (g.label?.trim()) out.push({ kind: 'sdsg', id: g.id, label: g.label, pt: (g.style?.fontSize ?? 11) * k });
+    // 種別ラベル（SD・SG の文字）とサブラベルも数える（2026-11-10 レビュー。以前は本文だけで、小さな種別ラベルを見逃した）
+    if (g.typeLabelFontSize != null && s.typeLabelVisibility?.[g.type] !== false) {
+      out.push({ kind: 'typeLabel', id: g.id, label: g.type, pt: g.typeLabelFontSize * k });
+    }
+    if (g.subLabel?.trim() && g.subLabelFontSize != null) {
+      out.push({ kind: 'subLabel', id: g.id, label: g.subLabel, pt: g.subLabelFontSize * k });
+    }
   }
   for (const n of sheet.notes ?? []) {
     if (n.text?.trim()) out.push({ kind: 'note', id: n.id, label: n.text, pt: (n.fontSize ?? Math.min(def, 13)) * k });
@@ -59,7 +66,8 @@ export function textSizesOnPaper(doc: TEMDocument, pageScale = 1): TextSize[] {
   if ((sheet.periodLabels ?? []).length > 0 && s.periodLabels?.fontSize) {
     out.push({ kind: 'periodLabel', pt: s.periodLabels.fontSize * k });
   }
-  if (s.legend && s.legend.includeInExport !== false && s.legend.alwaysVisible !== false
+  // 凡例は、出力のどれかに出るなら数える（PNG・PDF は alwaysVisible、PPTX・SVG は includeInExport で描く。2026-11-10 レビュー）
+  if (s.legend && (s.legend.includeInExport !== false || s.legend.alwaysVisible !== false)
     && computeLegendItems(sheet, s.legend, s.locale).length > 0) {
     out.push({ kind: 'legend', pt: s.legend.fontSize * k });
   }

@@ -6,6 +6,7 @@
 // ============================================================================
 
 import { useEffect, useRef, useState } from 'react';
+import i18n from '../i18n';
 import { Trans, useTranslation } from 'react-i18next';
 import { sentenceGap } from '../utils/sentenceGap';
 import { useTEMStore } from '../store/store';
@@ -20,6 +21,7 @@ import {
   type VisualConventionKey,
 } from '../utils/visualConventions';
 import { produce } from 'immer';
+import { LABEL_BRACKETS, type LabelBracket, type LabelOrder } from '../utils/labelStyle';
 import {
   computeReportStatus,
   missingReportChoices,
@@ -50,6 +52,21 @@ const TABS: { key: Tab; labelKey: string }[] = [
   { key: 'export', labelKey: 'tab.export' },
 ];
 
+// TEM 論文 68 本で、記号の付いた要素を主に括っていた括弧の論文の数（docs/surveys/2026-11-10_box-notation。
+// 「」以外で 10 回以上使った括弧のうちいちばん多いもの。「」は記号つきで使った論文と「」だけの論文の合計）
+const BRACKET_SURVEY: Partial<Record<LabelBracket, number>> = { '【】': 25, '〈〉': 17, '「」': 17, '［］': 3, '“”': 3, '『』': 2, '《》': 1, '＜＞': 0 };
+
+function bracketOption(b: LabelBracket): string {
+  if (b === 'auto') return i18n.t('paperReportDialog:export.labelBracket.auto');
+  const n = BRACKET_SURVEY[b];
+  return `${b[0]}…${b[1]}` + (n !== undefined ? i18n.t('paperReportDialog:export.labelBracket.count', { n }) : '');
+}
+
+function exampleLabel(b: LabelBracket, order: LabelOrder): string {
+  const [o, c] = b === 'auto' ? ['〈', '〉'] : [b[0], b[1]];
+  return order === 'id-first' ? `BFP1${o}…${c}` : `${o}…${c}（BFP1）`;
+}
+
 export function PaperReportDialog({
   open,
   onClose,
@@ -66,6 +83,10 @@ export function PaperReportDialog({
   const [includeDiagram, setIncludeDiagram] = useState(true);
   const [includeSourceRefs, setIncludeSourceRefs] = useState(true);
   const [sourceRefStyle, setSourceRefStyle] = useState<'bracket' | 'apa'>('bracket');
+  // 結果の節でラベルを括る括弧と書く順（2026-11-10。TEM 論文 68 本の調べで主に使われていたものを選べる）
+  const [labelBox, setLabelBox] = useState<LabelBracket>('auto');
+  const [labelSdsg, setLabelSdsg] = useState<LabelBracket>('auto');
+  const [labelOrder, setLabelOrder] = useState<LabelOrder>('id-first');
   // 出力前の確認画面
   const [confirming, setConfirming] = useState(false);
   const [omitMissing, setOmitMissing] = useState(true);
@@ -138,6 +159,7 @@ export function PaperReportDialog({
         includeDiagram,
         includeSourceRefs,
         sourceRefStyle,
+        labelStyle: { box: labelBox, sdsg: labelSdsg, order: labelOrder },
         omitMissing,
         content,
       });
@@ -209,6 +231,27 @@ export function PaperReportDialog({
                   onChange={(e) => setIncludeSourceRefs(e.target.checked)}
                 />
               </div>
+              {/* 結果の節のラベルの括弧と書く順 */}
+              <div className="setting-row">
+                <label title={t('export.labelBracket.title')}>{t('export.labelBracket.box')}</label>
+                <select value={labelBox} onChange={(e) => setLabelBox(e.target.value as LabelBracket)}>
+                  {LABEL_BRACKETS.map((b) => <option key={b} value={b}>{bracketOption(b)}</option>)}
+                </select>
+              </div>
+              <div className="setting-row">
+                <label title={t('export.labelBracket.title')}>{t('export.labelBracket.sdsg')}</label>
+                <select value={labelSdsg} onChange={(e) => setLabelSdsg(e.target.value as LabelBracket)}>
+                  {LABEL_BRACKETS.map((b) => <option key={b} value={b}>{bracketOption(b)}</option>)}
+                </select>
+              </div>
+              <div className="setting-row">
+                <label>{t('export.labelOrder')}</label>
+                <select value={labelOrder} onChange={(e) => setLabelOrder(e.target.value as LabelOrder)}>
+                  <option value="id-first">{t('export.labelOrder.idFirst', { example: exampleLabel(labelBox, 'id-first') })}</option>
+                  <option value="label-first">{t('export.labelOrder.labelFirst', { example: exampleLabel(labelBox, 'label-first') })}</option>
+                </select>
+              </div>
+              <p className="hint" style={{ marginTop: 0 }}>{t('export.labelBracket.survey')}</p>
               {includeSourceRefs && (
                 <div className="setting-row">
                   <label>{t('export.sourceRefStyle')}</label>

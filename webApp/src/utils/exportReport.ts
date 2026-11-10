@@ -37,6 +37,7 @@ import type {
   Transcript,
   VisualConventionEntry,
 } from '../types';
+import { DEFAULT_LABEL_STYLE, type LabelStyle } from './labelStyle';
 
 export interface PaperReportOptions {
   filename?: string;
@@ -57,22 +58,47 @@ export interface PaperReportOptions {
   omitMissing?: boolean;
   /** 図にあるメモ・記号・コメントをどう載せるか（出力前の確認画面で選ぶ）。未指定はメモ＝「載せる」にしたものだけ */
   content?: ReportContentChoices;
+  /**
+   * 結果の節で、図の要素のラベルを括る括弧と書く順（2026-11-10 ユーザー要望。TEM 論文 68 本の調べ
+   * docs/surveys/2026-11-10_box-notation）。未指定は今までどおり（日本語〈…〉・英語⟨…⟩、ID が先）
+   */
+  labelStyle?: Partial<LabelStyle>;
 }
+
+export { LABEL_BRACKETS, DEFAULT_LABEL_STYLE, type LabelBracket, type LabelOrder, type LabelStyle } from './labelStyle';
 
 // ----------------------------------------------------------------------------
 // 小さなヘルパ
 // ----------------------------------------------------------------------------
 
 /** 図の言語で引く翻訳（buildPaperReportParagraphs で作って各ヘルパに渡す）。キーは 'exportReport:<key>' */
-type Tr = (key: string, opts?: Record<string, unknown>) => string;
+type Tr = ((key: string, opts?: Record<string, unknown>) => string) & { labelStyle?: LabelStyle; lng?: string };
 
-function makeTr(lng: string): Tr {
-  return (key, opts) => i18n.t(key, { ...opts, lng });
+function makeTr(lng: string, labelStyle?: Partial<LabelStyle>): Tr {
+  const f = ((key: string, opts?: Record<string, unknown>) => i18n.t(key, { ...opts, lng })) as Tr;
+  f.labelStyle = { ...DEFAULT_LABEL_STYLE, ...(labelStyle ?? {}) };
+  f.lng = lng;
+  return f;
 }
 
-/** 事象・経験のラベルを括る（日本語は〈…〉） */
-function wrapLabel(t: Tr, label: string): string {
-  return t('exportReport:label.wrap', { label });
+/** 事象・経験のラベルを括る（既定は日本語〈…〉・英語⟨…⟩。labelStyle で括弧を選べる） */
+function wrapLabel(t: Tr, label: string, kind: 'box' | 'sdsg' = 'box'): string {
+  const b = (kind === 'sdsg' ? t.labelStyle?.sdsg : t.labelStyle?.box) ?? 'auto';
+  if (b === 'auto') return t('exportReport:label.wrap', { label });
+  return `${b[0]}${label}${b[1]}`;
+}
+
+/**
+ * ID（記号）とラベルを並べる。'id-first' は「BFP1 〈…〉」（spaced）／「BFP1〈…〉」、
+ * 'label-first' は「〈…〉（BFP1）」（英語は「⟨…⟩ (BFP1)」）
+ */
+function idLabel(t: Tr, id: string, label: string, kind: 'box' | 'sdsg', o: { sub?: string; spaced?: boolean } = {}): string {
+  const w = wrapLabel(t, label, kind);
+  const sub = o.sub ?? '';
+  if (t.labelStyle?.order === 'label-first') {
+    return (t.lng ?? 'ja').startsWith('ja') ? `${w}（${id}${sub}）` : `${w} (${id}${sub})`;
+  }
+  return o.spaced ? `${id}${sub} ${w}` : `${id}${w}`;
 }
 
 function heading(text: string, level: typeof HeadingLevel[keyof typeof HeadingLevel]): Paragraph {
@@ -233,7 +259,7 @@ function formatBoxesByType(
     // この見出しが併記種別側なら、主種別を添える
     const asSecondary = b.type !== type
       ? t('exportReport:box.asSecondary', { type: boxTypeHeading(t, b.type) }) : '';
-    out.push(bullet(t, `${b.id}${sub} ${wrapLabel(t, lab)}${custom}${asSecondary}${descSuffix(t, omit, b.description, b.noDescriptionNeeded)}${refSfx}`));
+    out.push(bullet(t, `${idLabel(t, b.id, lab, 'box', { sub, spaced: true })}${custom}${asSecondary}${descSuffix(t, omit, b.description, b.noDescriptionNeeded)}${refSfx}`));
   });
   out.push(para(''));
   return out;
@@ -263,7 +289,7 @@ function formatLines(
     const b = boxes.find((x) => x.id === id);
     if (!b) return id;
     const txt = (b.label && b.label.trim()) ? b.label.trim() : t('exportReport:noLabel');
-    return `${b.id}${wrapLabel(t, txt)}`;
+    return idLabel(t, b.id, txt, 'box');
   };
 
   const groups: Array<{ type: Line['type']; items: Line[] }> = [
@@ -310,7 +336,7 @@ function formatSdsg(
         const b = boxes.find((x) => x.id === id);
         if (!b) return id;
         const txt = (b.label && b.label.trim()) ? b.label.trim() : t('exportReport:noLabel');
-        return `${b.id}${wrapLabel(t, txt)}`;
+        return idLabel(t, b.id, txt, 'box');
       } else {
         const l = lines.find((x) => x.id === id);
         if (!l) return id;
@@ -333,7 +359,7 @@ function formatSdsg(
       const lab = (s.label && s.label.trim()) ? s.label.trim() : t('exportReport:noLabel');
       const sub = s.subLabel && s.subLabel.trim() ? ` [${s.subLabel.trim()}]` : '';
       const refSfx = includeRefs ? sourceRefSuffix(t, s.sourceRefs, transcripts, participantsLookup, style) : '';
-      out.push(bullet(t, `${s.id}${sub} ${wrapLabel(t, lab)}${t('exportReport:sdsg.target', { target: attachedLabel(s) })}${descSuffix(t, omit, s.description, s.noDescriptionNeeded)}${refSfx}`));
+      out.push(bullet(t, `${idLabel(t, s.id, lab, 'sdsg', { sub, spaced: true })}${t('exportReport:sdsg.target', { target: attachedLabel(s) })}${descSuffix(t, omit, s.description, s.noDescriptionNeeded)}${refSfx}`));
     });
     out.push(para(''));
   }
@@ -399,7 +425,7 @@ function buildSheetResults(
     out.push(heading(t('exportReport:heading.comments'), HeadingLevel.HEADING_3));
     const nameOf = (id: string) => {
       const b = sheet.boxes.find((x) => x.id === id);
-      if (b) return `${b.id}${wrapLabel(t, (b.label ?? '').trim() || t('exportReport:noLabel'))}`;
+      if (b) return idLabel(t, b.id, (b.label ?? '').trim() || t('exportReport:noLabel'), 'box');
       return id;
     };
     const oneLine = (s: string) => s.trim().replace(/\s*\n\s*/g, ' ');
@@ -456,7 +482,11 @@ function buildResultsSection(
 
   // テンプレート文（編集前提のドラフト）
   out.push(para(t('exportReport:results.intro')));
-  out.push(para(t('exportReport:results.listing')));
+  out.push(para(t('exportReport:results.listing', { bracket: wrapLabel(t, '…', 'box') })));
+  // SD・SG を Box と別の括弧で括るときは、そのことも書く
+  if ((t.labelStyle?.sdsg ?? 'auto') !== (t.labelStyle?.box ?? 'auto')) {
+    out.push(para(t('exportReport:results.listing.sdsg', { bracket: wrapLabel(t, '…', 'sdsg') })));
+  }
   if (includeRefs && doc.transcripts.length > 0) {
     if (style === 'apa') {
       out.push(para(t('exportReport:results.refs.apa')));
@@ -485,7 +515,7 @@ export async function buildPaperReportParagraphs(
   const children: Paragraph[] = [];
   // 本文は図の言語（凡例と同じ doc.settings.locale）。画面の言語ではない
   const lng = doc.settings.locale ?? 'ja';
-  const t = makeTr(lng);
+  const t = makeTr(lng, opts.labelStyle);
 
   // タイトル
   children.push(new Paragraph({

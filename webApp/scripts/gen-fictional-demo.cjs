@@ -70,7 +70,7 @@ function build(lang) {
   }));
   const tallest = (id) => boxes.find((b) => b.id === id).height / 2;
   const sdsg = SDSG.map(([id, type, lj, le, at]) => ({
-    id, type, label: ja ? lj : le, attachedTo: at,
+    id, type, label: ja ? lj : le, attachedTo: at, attachedType: 'box',
     itemOffset: (type === 'SD' ? -1 : 1) * (tallest(at) + 70), timeOffset: 0,
     width: ja ? 100 : 130, height: 50,
   }));

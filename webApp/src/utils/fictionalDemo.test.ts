@@ -31,7 +31,7 @@ for (const [lang, raw] of [['ja', jaRaw], ['en', enRaw]] as const) {
     it('Line の両端は図の中の Box', () => {
       const ids = new Set(sh.boxes.map((b) => b.id));
       for (const l of sh.lines) { expect(ids.has(l.from)).toBe(true); expect(ids.has(l.to)).toBe(true); }
-      for (const g of sh.sdsg) expect(ids.has(g.attachedTo as string)).toBe(true);
+      for (const g of sh.sdsg) { expect(g.attachedType).toBe('box'); expect(ids.has(g.attachedTo as string)).toBe(true); }
     });
   });
 }

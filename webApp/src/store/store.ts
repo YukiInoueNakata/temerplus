@@ -194,6 +194,10 @@ interface Actions {
   addComment: (targetId: string, text: string, author?: string) => string;
   resolveComment: (id: string) => void;
   removeComment: (id: string) => void;
+  /** 解決済みにする・未解決に戻す（2026-11-10） */
+  setCommentResolved: (id: string, resolved: boolean) => void;
+  addCommentReply: (commentId: string, text: string, author?: string) => string;
+  removeCommentReply: (commentId: string, replyId: string) => void;
 
   // Period label
   addPeriodLabel: (label: string, position: number) => string;
@@ -1007,6 +1011,7 @@ export const useTEMStore = create<Store>()(
                 s.anchorMode = 'single';
               }
             });
+            pruneOrphanComments(sheet);
           }),
           dirty: true,
         }));
@@ -1024,6 +1029,7 @@ export const useTEMStore = create<Store>()(
                 s.anchorMode = 'single';
               }
             });
+            pruneOrphanComments(sheet);
           }),
           dirty: true,
         }));
@@ -1191,6 +1197,7 @@ export const useTEMStore = create<Store>()(
         set((state) => ({
           doc: mutateActiveSheet(state.doc, (sheet) => {
             sheet.lines = sheet.lines.filter((l) => l.id !== id);
+            pruneOrphanComments(sheet);
           }),
           dirty: true,
         }));
@@ -1200,6 +1207,7 @@ export const useTEMStore = create<Store>()(
         set((state) => ({
           doc: mutateActiveSheet(state.doc, (sheet) => {
             sheet.lines = sheet.lines.filter((l) => !set_.has(l.id));
+            pruneOrphanComments(sheet);
           }),
           dirty: true,
         }));
@@ -1355,6 +1363,7 @@ export const useTEMStore = create<Store>()(
         set((state) => ({
           doc: mutateActiveSheet(state.doc, (sheet) => {
             sheet.sdsg = sheet.sdsg.filter((s) => s.id !== id);
+            pruneOrphanComments(sheet);
           }),
           dirty: true,
         }));
@@ -1454,6 +1463,36 @@ export const useTEMStore = create<Store>()(
         set((state) => ({
           doc: mutateActiveSheet(state.doc, (sheet) => {
             sheet.comments = sheet.comments.filter((c) => c.id !== id);
+          }),
+          dirty: true,
+        }));
+      },
+      setCommentResolved: (id, resolved) => {
+        set((state) => ({
+          doc: mutateActiveSheet(state.doc, (sheet) => {
+            const c = sheet.comments.find((x) => x.id === id);
+            if (c) c.resolved = resolved;
+          }),
+          dirty: true,
+        }));
+      },
+      addCommentReply: (commentId, text, author) => {
+        const id = genCommentId();
+        set((state) => ({
+          doc: mutateActiveSheet(state.doc, (sheet) => {
+            const c = sheet.comments.find((x) => x.id === commentId);
+            if (!c) return;
+            c.replies = [...(c.replies ?? []), { id, text, author, createdAt: new Date().toISOString() }];
+          }),
+          dirty: true,
+        }));
+        return id;
+      },
+      removeCommentReply: (commentId, replyId) => {
+        set((state) => ({
+          doc: mutateActiveSheet(state.doc, (sheet) => {
+            const c = sheet.comments.find((x) => x.id === commentId);
+            if (c) c.replies = (c.replies ?? []).filter((r) => r.id !== replyId);
           }),
           dirty: true,
         }));
@@ -2919,6 +2958,12 @@ export function endHistoryGesture(): void {
 export const useActiveSheet = (): Sheet | undefined => {
   return useTEMStore((s) => s.doc.sheets.find((sh) => sh.id === s.doc.activeSheetId));
 };
+
+/** 消えた Box・径路・SD/SG に付いていたコメントを消す（2026-11-10。以前は宙に浮いて残った） */
+function pruneOrphanComments(sheet: Sheet): void {
+  const ids = new Set<string>([...sheet.boxes.map((b) => b.id), ...sheet.lines.map((l) => l.id), ...sheet.sdsg.map((g) => g.id)]);
+  sheet.comments = (sheet.comments ?? []).filter((c) => ids.has(c.targetId));
+}
 
 // 凡例の置き方が自動（legend.placement === 'auto'）なら、図が変わるたびに時間の矢印の右下へ置き直す（2026-11-10）。
 // 位置を読む箇所（画面・全体フィット・出力）が多いので、計算した位置を doc に書き込む。この書き込みは「元に戻す」の

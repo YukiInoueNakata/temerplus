@@ -83,6 +83,7 @@ export function buildFilter(opts: ExportOptions) {
     if (el.classList?.contains('react-flow__resize-control')) return false;
     // 径路の線種と種別の食い違いの「!」（編集の画面だけの注意）
     if (el.classList?.contains(PATH_TYPE_BADGE_CLASS)) return false;
+    if (el.classList?.contains('temer-comment-badge')) return false;   // コメントの印（CommentsSection の COMMENT_BADGE_CLASS）
     if (!opts.includeControls) {
       if (el.classList?.contains('react-flow__controls')) return false;
       if (el.classList?.contains('react-flow__minimap')) return false;

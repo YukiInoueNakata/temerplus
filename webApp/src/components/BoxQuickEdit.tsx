@@ -11,6 +11,7 @@ import { useTEMStore } from '../store/store';
 import { BOX_TYPE_LABELS, LEVEL_PX } from '../store/defaults';
 import { SELECTABLE_BOX_TYPES } from '../utils/typeDisplay';
 import type { BoxType } from '../types';
+import { FOCUS_COMMENT_EVENT } from './CommentsSection';
 
 export function changeSelectedBoxesType(type: BoxType): void {
   // まとめて 1 回で変える（「元に戻す」1 回で戻る）。ID の付け替えと選択の付け替えもする
@@ -90,6 +91,12 @@ export function BoxContextMenu({ x, y, onClose }: { x: number; y: number; onClos
       {item(t('menu.itemDown', { arrow: arrows.down }), () => moveSelectionItemLevel(-1), { hint: layout === 'horizontal' ? 'Shift+↓' : 'Shift+←' })}
       <div className="box-context-menu-sep" />
       {selected.length === 1 && item(t('menu.edit'), () => useTEMStore.getState().requestEditNode(selected[0]), { hint: 'Enter' })}
+      {selected.length === 1 && item(t('comments:menu'), () => {
+        // プロパティパネルのコメントの入力欄に移る（パネルが畳まれていれば開く）
+        const st = useTEMStore.getState();
+        if (!st.view.propertyPanelVisible) st.togglePropertyPanel();
+        window.setTimeout(() => window.dispatchEvent(new Event(FOCUS_COMMENT_EVENT)), 50);
+      })}
       {item(t('menu.delete'), () => useTEMStore.getState().removeBoxes([...selected]), { hint: 'Delete', danger: true })}
     </div>
   );

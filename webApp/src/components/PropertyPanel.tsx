@@ -23,6 +23,7 @@ import { RichTextToolbar } from './RichTextToolbar';
 import { produce } from 'immer';
 import { ColorPicker } from './ColorPicker';
 import { CollapsibleSection } from './CollapsibleSection';
+import { CommentsSection, CommentList } from './CommentsSection';
 import { pathTypeIssueFor, suggestedTypeFor, type PathTypeIssue } from '../utils/pathTypeCheck';
 import { SourceRefsSection } from './SourceRefsSection';
 
@@ -76,6 +77,8 @@ export function PropertyPanel({ onOpenLegendSettings, onOpenTranscriptViewer }: 
   const selectedSDSGs = sheet.sdsg.filter((s) => selection.sdsgIds.includes(s.id));
   const selectedNotes = (sheet.notes ?? []).filter((n) => selection.noteIds.includes(n.id));
   const hasSelection = selectedBoxes.length > 0 || selectedLines.length > 0 || selectedSDSGs.length > 0 || selectedNotes.length > 0;
+  const targets = [...selectedBoxes.map((b) => b.id), ...selectedLines.map((l) => l.id), ...selectedSDSGs.map((g) => g.id)];
+  const singleTarget = targets.length === 1 && selectedNotes.length === 0 ? targets[0] : null;
 
   return (
     <div className="property-panel" style={{ width }}>
@@ -95,6 +98,9 @@ export function PropertyPanel({ onOpenLegendSettings, onOpenTranscriptViewer }: 
         {selectedLines.length > 0 && <LineProperties lines={selectedLines} onOpenTranscriptViewer={onOpenTranscriptViewer} />}
         {selectedSDSGs.length > 0 && <SDSGProperties sdsgs={selectedSDSGs} onOpenTranscriptViewer={onOpenTranscriptViewer} />}
         {selectedNotes.length > 0 && <NoteProperties notes={selectedNotes} />}
+        {/* コメント: 要素を 1 つだけ選んでいるとき（2026-11-10） */}
+        {singleTarget && <CommentsSection targetId={singleTarget} />}
+        {!hasSelection && !selection.legendSelected && <CommentList />}
       </div>
     </div>
   );

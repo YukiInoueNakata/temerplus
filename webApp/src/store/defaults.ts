@@ -188,7 +188,7 @@ export const DEFAULT_VIEW_STATE: ViewState = {
   dataSheetVisible: false,
   propertyPanelVisible: true,
   snapEnabled: readSnapEnabled(),
-  commentMode: false,
+  commentMode: true,   // コメントの印を出す（リボン「表示 > コメント」で隠せる。2026-11-10）
   canvasMode: 'move',
   dataSheetWidth: 360,
   propertyPanelWidth: 300,

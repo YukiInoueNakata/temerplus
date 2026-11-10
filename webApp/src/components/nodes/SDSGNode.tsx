@@ -13,6 +13,7 @@ import { renderVerticalAwareText } from '../../utils/verticalText';
 import { sdsgPentagonPoints, sdsgSubLabelShift, SDSG_TYPE_TAG_LINE_HEIGHT } from '../../utils/sdsgShape';
 import { useTEMView } from '../../context/TEMViewContext';
 import { useTEMStore, beginHistoryGesture, endHistoryGesture } from '../../store/store';
+import { CommentBadge, unresolvedCount } from '../CommentsSection';
 
 export interface SDSGNodeData extends Pick<
   SDSG,
@@ -307,6 +308,7 @@ export function SDSGNode({ data, selected, id: nodeId }: NodeProps<SDSGNodeData>
         setEditing(true);
       }}
     >
+      <CommentBadge count={!isPreview && view.view.commentMode ? unresolvedCount(view.sheet, data.id) : 0} />
       <NodeResizer
         isVisible={!!selected && !editing && !resizeDisabled}
         minWidth={20}

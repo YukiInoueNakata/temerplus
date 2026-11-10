@@ -1,0 +1,24 @@
+﻿key,ja,en,note
+title,コメント,Comments,プロパティ > 選んだ要素のコメントの見出し
+listTitle,このシートのコメント,Comments on this sheet,プロパティ > 何も選んでいないときのコメントの一覧の見出し
+noOpen,未解決のコメントはありません,No open comments,上の一覧に未解決のコメントが無いとき
+placeholder,コメントを書く（Ctrl+Enter で付ける）,Write a comment (Ctrl+Enter to add),コメントの入力欄
+authorPlaceholder,名前（任意）,Name (optional),コメントを書いた人の名前の欄
+authorTitle,このブラウザに残し、次のコメントにも使います,Remembered in this browser and used for your next comments,名前の欄の説明（マウスを重ねたとき）
+add,付ける,Add,コメントを付けるボタン
+addTitle,選んだ要素にコメントを付けます,Add a comment to the selected element,付けるボタンの説明
+reply,返信,Reply,返信のボタン
+replyPlaceholder,返信を書く（Enter で送る）,Write a reply (Enter to send),返信の入力欄
+resolve,解決にする,Resolve,コメントを解決済みにするボタン
+reopen,未解決に戻す,Reopen,解決済みのコメントを未解決に戻すボタン
+delete,削除,Delete,コメントを消すボタン
+deleteReply,削除,Delete,返信を消すボタン
+resolved,解決済み,resolved,解決済みの印（日付の後ろ）
+showResolved,解決済みを表示（{{count}} 件）,Show resolved ({{count}}),解決済みのコメントを表示するボタン
+showResolved_one,解決済みを表示（{{count}} 件）,Show resolved ({{count}}),件数が 1 のときの英語の形
+hideResolved,解決済みを隠す,Hide resolved,解決済みのコメントを隠すボタン
+replies,返信 {{count}} 件,{{count}} replies,一覧の返信の数
+replies_one,返信 {{count}} 件,{{count}} reply,件数が 1 のときの英語の形
+jump,押すとその要素を選びます,Click to select the element,一覧の項目の説明（マウスを重ねたとき）
+badge,未解決のコメント {{count}} 件（選ぶとプロパティで読めます）,{{count}} open comment(s) (select to read them in Properties),図の上のコメントの印の説明（マウスを重ねたとき）
+menu,コメントを付ける,Add comment,Box の右クリックのメニュー

@@ -22,6 +22,7 @@ import { useTEMView } from '../../context/TEMViewContext';
 import { useTEMStore, beginHistoryGesture, endHistoryGesture } from '../../store/store';
 import { useTranslation } from 'react-i18next';
 import { pathTypeIssueFor, PATH_TYPE_BADGE_CLASS } from '../../utils/pathTypeCheck';
+import { CommentBadge, unresolvedCount } from '../CommentsSection';
 
 export interface BoxNodeData extends Pick<
   Box,
@@ -458,8 +459,12 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
   // 径路の線種と種別の食い違い（点線だけでつながる通常の Box など）。右上に「!」を出す（編集の画面だけ。出力には出さない）
   const pathIssue = !isPreview && boxForPreset && sheet ? pathTypeIssueFor(boxForPreset, sheet.lines) : null;
 
+  // 未解決のコメントの印（リボン「表示 > コメント」で出す・隠す。出力には出さない）
+  const commentCount = !isPreview && view.view.commentMode ? unresolvedCount(sheet, data.id) : 0;
+
   return (
     <div style={{ position: 'relative' }}>
+      <CommentBadge count={commentCount} />
       {pathIssue && (
         <div className={PATH_TYPE_BADGE_CLASS} title={t(`box.pathType.${pathIssue}.badge`)}
           style={{ position: 'absolute', top: -9, right: -9, zIndex: 5, width: 18, height: 18, borderRadius: '50%',

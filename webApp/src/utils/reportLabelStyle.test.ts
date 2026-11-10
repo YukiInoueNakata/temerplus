@@ -40,9 +40,10 @@ describe('結果の節のラベルの括弧と順', () => {
     expect(ps.some((p) => p.includes('《残業の多い職場》') && p.includes('〈同僚の演奏会を聴きに行く〉'))).toBe(true);
   });
 
-  it('英語の図でラベルが先なら「⟨…⟩ (BFP1)」の形', async () => {
+  it('英語の図の既定は二重引用符で、ラベルが先なら「“…” (BFP1)」の形', async () => {
     const ps = await reportText({ labelStyle: { order: 'label-first' } }, 'en');
-    expect(ps.some((p) => /⟨[^⟩]+⟩ \(BFP1\)/.test(p))).toBe(true);
+    expect(ps.some((p) => /“[^”]+” \(BFP1\)/.test(p))).toBe(true);
+    expect(ps.some((p) => p.includes('⟨'))).toBe(false);
   });
 });
 

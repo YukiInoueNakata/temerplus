@@ -1,0 +1,321 @@
+{
+  "version": "0.3",
+  "sheets": [
+    {
+      "id": "Sheet1",
+      "name": "Participant A (fictional)",
+      "type": "individual",
+      "order": 0,
+      "boxes": [
+        {
+          "id": "Item0",
+          "type": "normal",
+          "label": "Takes piano lessons as a child",
+          "x": 120,
+          "y": -28,
+          "width": 120,
+          "height": 56,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "Item1",
+          "type": "normal",
+          "label": "Stops lessons for entrance exams",
+          "x": 270,
+          "y": -28,
+          "width": 120,
+          "height": 56,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "OPP1",
+          "type": "OPP",
+          "label": "Starts work and lives alone",
+          "x": 420,
+          "y": -28,
+          "width": 120,
+          "height": 56,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "BFP1",
+          "type": "BFP",
+          "label": "Goes to a colleague's concert",
+          "x": 570,
+          "y": -28,
+          "width": 120,
+          "height": 56,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "Item2",
+          "type": "normal",
+          "label": "Buys a digital piano",
+          "x": 720,
+          "y": -138,
+          "width": 120,
+          "height": 56,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "Latent1",
+          "type": "annotation",
+          "label": "Puts it off, citing a busy schedule",
+          "x": 720,
+          "y": 96,
+          "width": 120,
+          "height": 73,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "Item4",
+          "type": "normal",
+          "label": "Starts an adult piano class",
+          "x": 870,
+          "y": -138,
+          "width": 120,
+          "height": 56,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "BFP2",
+          "type": "BFP",
+          "label": "Invited to the class recital",
+          "x": 1020,
+          "y": -138,
+          "width": 120,
+          "height": 56,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "Item5",
+          "type": "normal",
+          "label": "Decides to play in the recital",
+          "x": 1170,
+          "y": -248,
+          "width": 120,
+          "height": 56,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "Latent2",
+          "type": "annotation",
+          "label": "Stays in the audience",
+          "x": 1170,
+          "y": -28,
+          "width": 120,
+          "height": 56,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "EFP1",
+          "type": "EFP",
+          "label": "Keeps playing the piano at own pace",
+          "x": 1350,
+          "y": -256,
+          "width": 120,
+          "height": 73,
+          "textOrientation": "horizontal"
+        },
+        {
+          "id": "P_EFP1",
+          "type": "P-EFP",
+          "label": "Gives up the piano",
+          "x": 1350,
+          "y": 104,
+          "width": 120,
+          "height": 56,
+          "textOrientation": "horizontal"
+        }
+      ],
+      "lines": [
+        {
+          "id": "RL_Item0_Item1",
+          "type": "RLine",
+          "from": "Item0",
+          "to": "Item1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_Item1_OPP1",
+          "type": "RLine",
+          "from": "Item1",
+          "to": "OPP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_OPP1_BFP1",
+          "type": "RLine",
+          "from": "OPP1",
+          "to": "BFP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_BFP1_Item2",
+          "type": "RLine",
+          "from": "BFP1",
+          "to": "Item2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "XL_BFP1_Latent1",
+          "type": "XLine",
+          "from": "BFP1",
+          "to": "Latent1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_Item2_Item4",
+          "type": "RLine",
+          "from": "Item2",
+          "to": "Item4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "XL_Latent1_P_EFP1",
+          "type": "XLine",
+          "from": "Latent1",
+          "to": "P_EFP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_Item4_BFP2",
+          "type": "RLine",
+          "from": "Item4",
+          "to": "BFP2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_BFP2_Item5",
+          "type": "RLine",
+          "from": "BFP2",
+          "to": "Item5",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "XL_BFP2_Latent2",
+          "type": "XLine",
+          "from": "BFP2",
+          "to": "Latent2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_Item5_EFP1",
+          "type": "RLine",
+          "from": "Item5",
+          "to": "EFP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "XL_Latent2_P_EFP1",
+          "type": "XLine",
+          "from": "Latent2",
+          "to": "P_EFP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        }
+      ],
+      "sdsg": [
+        {
+          "id": "SD1",
+          "type": "SD",
+          "label": "Long overtime at work",
+          "attachedTo": "BFP1",
+          "itemOffset": -98,
+          "timeOffset": 0,
+          "width": 130,
+          "height": 50
+        },
+        {
+          "id": "SD2",
+          "type": "SD",
+          "label": "Nervous about playing in public",
+          "attachedTo": "BFP2",
+          "itemOffset": -98,
+          "timeOffset": 0,
+          "width": 130,
+          "height": 50
+        },
+        {
+          "id": "SG1",
+          "type": "SG",
+          "label": "Colleague's encouragement",
+          "attachedTo": "BFP1",
+          "itemOffset": 98,
+          "timeOffset": 0,
+          "width": 130,
+          "height": 50
+        },
+        {
+          "id": "SG2",
+          "type": "SG",
+          "label": "Teacher's support",
+          "attachedTo": "BFP2",
+          "itemOffset": 98,
+          "timeOffset": 0,
+          "width": 130,
+          "height": 50
+        }
+      ],
+      "notes": [],
+      "comments": [],
+      "periodLabels": [
+        {
+          "id": "P_1",
+          "position": 1,
+          "label": "Period 1: Interruption"
+        },
+        {
+          "id": "P_2",
+          "position": 3.5,
+          "label": "Period 2: Seeking to resume"
+        },
+        {
+          "id": "P_3",
+          "position": 6.5,
+          "label": "Period 3: Continuing"
+        }
+      ]
+    }
+  ],
+  "activeSheetId": "Sheet1",
+  "participants": [
+    {
+      "id": "Part_A",
+      "pseudonym": "Participant A (fictional)"
+    }
+  ],
+  "settings": {
+    "layout": "horizontal",
+    "locale": "en",
+    "timeArrow": {
+      "label": "Irreversible Time"
+    },
+    "legend": {
+      "title": "Legend",
+      "placement": "auto",
+      "position": {
+        "x": 0,
+        "y": 400
+      }
+    }
+  },
+  "metadata": {
+    "title": "Fictional example: Returning to the piano",
+    "author": "",
+    "createdAt": "2026-11-10T00:00:00.000Z",
+    "modifiedAt": "2026-11-10T00:00:00.000Z"
+  },
+  "history": []
+}

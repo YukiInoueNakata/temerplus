@@ -39,7 +39,7 @@ https://yukiinouenakata.github.io/temerplus/
 
    ![デモファイルを開く](images/getting-started/app-01-wizard-demo.png)
 
-2. 論文の図（神崎・鈴木，2021）を再現したデモが開きます．画面の各部の名前は次のとおりです．
+2. 架空の例「ピアノの再開」のデモが開きます（人物も出来事も作り話です）．画面の各部の名前は次のとおりです．
 
    ![画面の各部](images/getting-started/app-02-overview.png)
 

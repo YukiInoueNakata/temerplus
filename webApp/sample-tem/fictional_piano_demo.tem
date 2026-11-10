@@ -1,0 +1,321 @@
+{
+  "version": "0.3",
+  "sheets": [
+    {
+      "id": "Sheet1",
+      "name": "協力者A（架空）",
+      "type": "individual",
+      "order": 0,
+      "boxes": [
+        {
+          "id": "Item0",
+          "type": "normal",
+          "label": "子どもの頃にピアノを習う",
+          "x": 92,
+          "y": -102,
+          "width": 60,
+          "height": 204,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "Item1",
+          "type": "normal",
+          "label": "受験を機にレッスンをやめる",
+          "x": 184,
+          "y": -109,
+          "width": 60,
+          "height": 218,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "OPP1",
+          "type": "OPP",
+          "label": "就職して一人暮らしを始める",
+          "x": 276,
+          "y": -109,
+          "width": 60,
+          "height": 218,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "BFP1",
+          "type": "BFP",
+          "label": "同僚の演奏会を聴きに行く",
+          "x": 368,
+          "y": -102,
+          "width": 60,
+          "height": 204,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "Item2",
+          "type": "normal",
+          "label": "電子ピアノを買う",
+          "x": 460,
+          "y": -184,
+          "width": 60,
+          "height": 148,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "Latent1",
+          "type": "annotation",
+          "label": "忙しさを理由に見送る",
+          "x": 460,
+          "y": 44,
+          "width": 60,
+          "height": 176,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "Item4",
+          "type": "normal",
+          "label": "大人向けの教室に通い始める",
+          "x": 552,
+          "y": -219,
+          "width": 60,
+          "height": 218,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "BFP2",
+          "type": "BFP",
+          "label": "教室の発表会に誘われる",
+          "x": 644,
+          "y": -205,
+          "width": 60,
+          "height": 190,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "Item5",
+          "type": "normal",
+          "label": "発表会に出ると決める",
+          "x": 736,
+          "y": -308,
+          "width": 60,
+          "height": 176,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "Latent2",
+          "type": "annotation",
+          "label": "聴く側にとどまる",
+          "x": 736,
+          "y": -74,
+          "width": 60,
+          "height": 148,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "EFP1",
+          "type": "EFP",
+          "label": "自分のペースでピアノを続ける",
+          "x": 846,
+          "y": -336,
+          "width": 60,
+          "height": 232,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "P_EFP1",
+          "type": "P-EFP",
+          "label": "ピアノから離れる",
+          "x": 846,
+          "y": 58,
+          "width": 60,
+          "height": 148,
+          "textOrientation": "vertical"
+        }
+      ],
+      "lines": [
+        {
+          "id": "RL_Item0_Item1",
+          "type": "RLine",
+          "from": "Item0",
+          "to": "Item1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_Item1_OPP1",
+          "type": "RLine",
+          "from": "Item1",
+          "to": "OPP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_OPP1_BFP1",
+          "type": "RLine",
+          "from": "OPP1",
+          "to": "BFP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_BFP1_Item2",
+          "type": "RLine",
+          "from": "BFP1",
+          "to": "Item2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "XL_BFP1_Latent1",
+          "type": "XLine",
+          "from": "BFP1",
+          "to": "Latent1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_Item2_Item4",
+          "type": "RLine",
+          "from": "Item2",
+          "to": "Item4",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "XL_Latent1_P_EFP1",
+          "type": "XLine",
+          "from": "Latent1",
+          "to": "P_EFP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_Item4_BFP2",
+          "type": "RLine",
+          "from": "Item4",
+          "to": "BFP2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_BFP2_Item5",
+          "type": "RLine",
+          "from": "BFP2",
+          "to": "Item5",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "XL_BFP2_Latent2",
+          "type": "XLine",
+          "from": "BFP2",
+          "to": "Latent2",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "RL_Item5_EFP1",
+          "type": "RLine",
+          "from": "Item5",
+          "to": "EFP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        },
+        {
+          "id": "XL_Latent2_P_EFP1",
+          "type": "XLine",
+          "from": "Latent2",
+          "to": "P_EFP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight"
+        }
+      ],
+      "sdsg": [
+        {
+          "id": "SD1",
+          "type": "SD",
+          "label": "残業の多い職場",
+          "attachedTo": "BFP1",
+          "itemOffset": -172,
+          "timeOffset": 0,
+          "width": 100,
+          "height": 50
+        },
+        {
+          "id": "SD2",
+          "type": "SD",
+          "label": "人前で弾く不安",
+          "attachedTo": "BFP2",
+          "itemOffset": -165,
+          "timeOffset": 0,
+          "width": 100,
+          "height": 50
+        },
+        {
+          "id": "SG1",
+          "type": "SG",
+          "label": "同僚のすすめ",
+          "attachedTo": "BFP1",
+          "itemOffset": 172,
+          "timeOffset": 0,
+          "width": 100,
+          "height": 50
+        },
+        {
+          "id": "SG2",
+          "type": "SG",
+          "label": "講師の励まし",
+          "attachedTo": "BFP2",
+          "itemOffset": 165,
+          "timeOffset": 0,
+          "width": 100,
+          "height": 50
+        }
+      ],
+      "notes": [],
+      "comments": [],
+      "periodLabels": [
+        {
+          "id": "P_1",
+          "position": 1,
+          "label": "第1期: 中断"
+        },
+        {
+          "id": "P_2",
+          "position": 3.5,
+          "label": "第2期: 再開の模索"
+        },
+        {
+          "id": "P_3",
+          "position": 6.5,
+          "label": "第3期: 続ける"
+        }
+      ]
+    }
+  ],
+  "activeSheetId": "Sheet1",
+  "participants": [
+    {
+      "id": "Part_A",
+      "pseudonym": "協力者A（架空）"
+    }
+  ],
+  "settings": {
+    "layout": "horizontal",
+    "locale": "ja",
+    "timeArrow": {
+      "label": "非可逆的時間"
+    },
+    "legend": {
+      "title": "凡例",
+      "placement": "auto",
+      "position": {
+        "x": 0,
+        "y": 400
+      }
+    }
+  },
+  "metadata": {
+    "title": "架空の例: ピアノの再開",
+    "author": "",
+    "createdAt": "2026-11-10T00:00:00.000Z",
+    "modifiedAt": "2026-11-10T00:00:00.000Z"
+  },
+  "history": []
+}

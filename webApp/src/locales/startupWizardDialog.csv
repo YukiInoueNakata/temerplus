@@ -9,7 +9,7 @@
 "empty.title","空ファイルから作成","Start from an empty file","起動ウィザードのカードの題"
 "empty.desc","空の TEM 図 (時期1 / 時期2) から始める","Start with an empty TEM diagram (Period 1 / Period 2)","起動ウィザードのカードの説明"
 "demo.title","デモファイルを開く","Open demo file","起動ウィザードのカードの題（日本語のデモ）"
-"demo.desc","神崎・鈴木 (2021) Figure 1 を再現した作例 (32 Box / 34 Line / 4 SDSG / 4 期)","Sample reproducing Figure 1 of Kanzaki & Suzuki (2021), in Japanese (32 Boxes / 34 Lines / 4 SD/SG / 4 periods)","起動ウィザードのカードの説明"
+"demo.desc","架空の例「ピアノの再開」(12 Box / 12 径路 / SD・SG 4 / 3 期)","Fictional example 'Returning to the piano', in Japanese (12 Boxes / 12 paths / 4 SD/SG / 3 periods)","起動ウィザードのカードの説明"
 "transcriptDemo.title","原文連動デモを開く","Open transcript demo","起動ウィザードのカードの題"
 "transcriptDemo.desc","逐語録と TEM 図のリンク機能のデモ。Box の「原文参照」から逐語録へジャンプ (5 Box / 1 逐語録)","Demo of links between transcripts and the TEM diagram. Jump from a Box's source reference to the transcript (5 Boxes / 1 transcript)","起動ウィザードのカードの説明"
 "fromFile.hint","何を元に Box を作成しますか？","What do you want to create Boxes from?","起動ウィザード > ファイルから新規作成 の画面の案内"

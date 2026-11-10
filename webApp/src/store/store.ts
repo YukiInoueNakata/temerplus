@@ -60,7 +60,8 @@ interface DocumentState {
   doc: TEMDocument;
 }
 
-export type FitMode = 'all' | 'width' | 'height';
+// 'initial' は図を開いたときの画面合わせ（凡例・時間の矢印・時期ラベルを含めた全体、倍率は 1 まで。2026-11-10）
+export type FitMode = 'all' | 'width' | 'height' | 'initial';
 
 interface UIState {
   view: ViewState;
@@ -448,11 +449,15 @@ export const useTEMStore = create<Store>()(
       loadDocument: (doc) => {
         // 旧フォーマットの .tem ファイルで不足している settings 項目を defaults で補完
         const hydrated = hydrateDocument(doc);
-        set({
+        set((s) => ({
           doc: hydrated,
           dirty: false,
           selection: { sheetId: hydrated.activeSheetId, boxIds: [], lineIds: [], sdsgIds: [], noteIds: [] },
-        });
+          // 開いた図の全体（凡例などを含む）を画面に合わせる。React Flow の最初の画面合わせは Box などの図形だけを
+          // 見るので、凡例が画面の外に出ることがあった（2026-11-10 架空の例のデモで見つかった）
+          fitMode: 'initial',
+          fitCounter: s.fitCounter + 1,
+        }));
       },
       importSheetsFromDocument: (src) => {
         set((state) => {

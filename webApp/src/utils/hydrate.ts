@@ -47,6 +47,17 @@ export function hydrateDocument(doc: TEMDocument): TEMDocument {
     ...doc,
     version: (doc.version as string) === '0.3' ? '0.4' : doc.version,
     settings: hydrateSettings(doc.settings ?? {}),
+    // シートの配列（メモ notes など）も補う。無いと NoteLeaderOverlay などが落ちて白画面になる
+    // （2026-11-10 notes の無い .tem をデモにして起きた。古い .tem・他の道具で作った .tem も同じ）
+    sheets: (Array.isArray(raw.sheets) ? raw.sheets : []).map((sh) => ({
+      ...sh,
+      boxes: Array.isArray(sh.boxes) ? sh.boxes : [],
+      lines: Array.isArray(sh.lines) ? sh.lines : [],
+      sdsg: Array.isArray(sh.sdsg) ? sh.sdsg : [],
+      notes: Array.isArray(sh.notes) ? sh.notes : [],
+      comments: Array.isArray(sh.comments) ? sh.comments : [],
+      periodLabels: Array.isArray(sh.periodLabels) ? sh.periodLabels : [],
+    })),
     participants: Array.isArray(raw.participants) ? raw.participants : [],
     transcripts: Array.isArray(raw.transcripts) ? raw.transcripts : [],
   };

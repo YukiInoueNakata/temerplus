@@ -42,7 +42,7 @@ Saving works a little differently depending on the browser (see [4. Save](#4-sav
 
    ![Open the demo file](images/getting-started/app-01-wizard-demo-en.png)
 
-2. A demo that reproduces a published figure (Kanzaki & Suzuki, 2021) opens. The parts of the screen are:
+2. A demo of a fictional example, "Returning to the piano", opens (the person and events are made up). The parts of the screen are:
 
    ![Parts of the screen](images/getting-started/app-02-overview-en.png)
 

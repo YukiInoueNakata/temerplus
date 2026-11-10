@@ -24,8 +24,10 @@ import { StartupWizardDialog, type StartupWizardChoice } from './components/Star
 import { initPopoutSync, getPopoutQueryParam } from './utils/popoutSync';
 // デモファイル (神崎・鈴木 2021 Figure 1 詳細再現) を raw 文字列として import
 // Vite の ?raw クエリでバンドルに埋め込み
-import demoTemRaw from '../sample-tem/kanzaki2021_figure1.tem?raw';
-import demoTemEnRaw from '../sample-tem/kanzaki2021_figure1_en.tem?raw';
+// デモは架空の例「ピアノの再開」（scripts/gen-fictional-demo.cjs で作る）。以前は神崎・鈴木（2021）の図の再現で、
+// 他の論文の図を載せることになるため替えた（2026-11-10 ユーザー決定）。神崎の図はテストの材料として sample-tem に残す
+import demoTemRaw from '../sample-tem/fictional_piano_demo.tem?raw';
+import demoTemEnRaw from '../sample-tem/fictional_piano_demo_en.tem?raw';
 // 原文連動デモ (Phase 4: 逐語録 ↔ Box リンク)
 import transcriptDemoRaw from '../sample-tem/transcript_demo.tem?raw';
 import { useTEMStore } from './store/store';

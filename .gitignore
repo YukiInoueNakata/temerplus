@@ -85,3 +85,6 @@ webApp/*.tem
 
 # 研究データ等の非公開サンプル（git 管理外・OneDrive のみ）
 test-assets/private/
+
+# 撮影のスクリプトが失敗したときに残す画像（公開しない）
+docs/images/getting-started/_failed-*.png

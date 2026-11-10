@@ -170,6 +170,21 @@ function CanvasInner({
     const bounds = computeContentBounds(sheet, layout, settings);
     if (!bounds) return;
     const padding = 40;
+    if (fitMode === 'initial') {
+      // 図を開いたとき: 全体を等倍まで（小さな図を拡大しない）。React Flow の最初の画面合わせ（fitView。Box などの
+      // 図形だけを見る）が後から走るので、少し遅らせて上書きする
+      const timer = window.setTimeout(() => {
+        const zoom = Math.max(0.1, Math.min(1,
+          (rfWidth - padding * 2) / Math.max(1, bounds.width),
+          (rfHeight - padding * 2) / Math.max(1, bounds.height)));
+        rf.setViewport({
+          x: rfWidth / 2 - (bounds.x + bounds.width / 2) * zoom,
+          y: rfHeight / 2 - (bounds.y + bounds.height / 2) * zoom,
+          zoom,
+        });
+      }, 150);
+      return () => window.clearTimeout(timer);
+    }
     if (fitMode === 'all') {
       rf.fitBounds(
         { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height },

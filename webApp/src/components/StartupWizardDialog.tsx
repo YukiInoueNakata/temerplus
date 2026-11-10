@@ -98,7 +98,7 @@ export function StartupWizardDialog({
                 <Card
                   emoji="🌐"
                   title="Open English demo"
-                  desc="English version of the Kanzaki & Suzuki (2021) Figure 1 sample (32 boxes / 34 lines / 4 SD-SG / 4 periods)"
+                  desc="Fictional example 'Returning to the piano' in English (12 boxes / 12 paths / 4 SD-SG / 3 periods)"
                   onClick={() => choose({ kind: 'open-demo-en' })}
                 />
                 <Card

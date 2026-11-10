@@ -8,6 +8,7 @@ import JSZip from 'jszip';
 import type { PageBounds } from './pageSplit';
 import { checkAborted, type ProgressCallback } from './exportProgress';
 import i18n from '../i18n';
+import { PATH_TYPE_BADGE_CLASS } from './pathTypeCheck';
 
 export interface ExportOptions {
   includeRulers?: boolean;       // 既定 false
@@ -80,6 +81,8 @@ export function buildFilter(opts: ExportOptions) {
     // 以前は除いておらず、出力した画像に丸が写り込んでいた（2026-10-05 利用者の PNG で確認）
     if (el.classList?.contains('react-flow__handle')) return false;
     if (el.classList?.contains('react-flow__resize-control')) return false;
+    // 径路の線種と種別の食い違いの「!」（編集の画面だけの注意）
+    if (el.classList?.contains(PATH_TYPE_BADGE_CLASS)) return false;
     if (!opts.includeControls) {
       if (el.classList?.contains('react-flow__controls')) return false;
       if (el.classList?.contains('react-flow__minimap')) return false;

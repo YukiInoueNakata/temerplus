@@ -20,6 +20,8 @@ import { renderRichText } from '../../utils/richText';
 import { computeAutoFitSize, computeFitFontSize } from '../../utils/boxFit';
 import { useTEMView } from '../../context/TEMViewContext';
 import { useTEMStore, beginHistoryGesture, endHistoryGesture } from '../../store/store';
+import { useTranslation } from 'react-i18next';
+import { pathTypeIssueFor, PATH_TYPE_BADGE_CLASS } from '../../utils/pathTypeCheck';
 
 export interface BoxNodeData extends Pick<
   Box,
@@ -37,6 +39,7 @@ export interface BoxNodeData extends Pick<
 
 export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) {
   const view = useTEMView();
+  const { t } = useTranslation('propertyPanel');
   const showBoxIds = view.view.showBoxIds;
   const layout = view.settings.layout;
   const typeLabelVisibility = view.settings.typeLabelVisibility;
@@ -452,8 +455,17 @@ export function BoxNode({ data, selected, id: nodeId }: NodeProps<BoxNodeData>) 
     endHistoryGesture();
   };
 
+  // 径路の線種と種別の食い違い（点線だけでつながる通常の Box など）。右上に「!」を出す（編集の画面だけ。出力には出さない）
+  const pathIssue = !isPreview && boxForPreset && sheet ? pathTypeIssueFor(boxForPreset, sheet.lines) : null;
+
   return (
     <div style={{ position: 'relative' }}>
+      {pathIssue && (
+        <div className={PATH_TYPE_BADGE_CLASS} title={t(`box.pathType.${pathIssue}.badge`)}
+          style={{ position: 'absolute', top: -9, right: -9, zIndex: 5, width: 18, height: 18, borderRadius: '50%',
+            background: '#f0a500', color: '#fff', fontSize: 12, fontWeight: 700, lineHeight: '18px', textAlign: 'center',
+            border: '1px solid #fff', boxShadow: '0 0 0 1px #c98a00', cursor: 'help' }}>!</div>
+      )}
       {/* 選んだ Box の上の小さなツールバー（種別・Item レベル）。複数を選んでいるときは最後に選んだ 1 つの上だけ。
           種別の文字（BFP-1 など）に重ならないよう少し離す。2026-11-08 ユーザー要望 */}
       {!isPreview && (

@@ -23,6 +23,7 @@ import { RichTextToolbar } from './RichTextToolbar';
 import { produce } from 'immer';
 import { ColorPicker } from './ColorPicker';
 import { CollapsibleSection } from './CollapsibleSection';
+import { pathTypeIssueFor, suggestedTypeFor, type PathTypeIssue } from '../utils/pathTypeCheck';
 import { SourceRefsSection } from './SourceRefsSection';
 
 interface PropertyPanelProps {
@@ -299,6 +300,41 @@ function LabelWithToolbar({ box, updateBox }: {
 type PropTab = 'basic' | 'label' | 'idLabel' | 'subLabel' | 'autoFit';
 type LineTab = 'basic' | 'endpoint' | 'info';
 
+/**
+ * 径路の線種と種別の食い違いの注意（2026-11-10 ユーザー要望）。点線だけでつながる通常の Box には「潜在経験にする」、
+ * 実線がつながる潜在経験には「通常にする」を出す。「このままにする」で以後は知らせない（utils/pathTypeCheck.ts）
+ */
+function PathTypeNotice({ boxes }: { boxes: Box[] }) {
+  const { t } = useTranslation('propertyPanel');
+  const sheet = useActiveSheet();
+  if (!sheet) return null;
+  const groups = new Map<PathTypeIssue, string[]>();
+  for (const b of boxes) {
+    const issue = pathTypeIssueFor(b, sheet.lines);
+    if (issue) groups.set(issue, [...(groups.get(issue) ?? []), b.id]);
+  }
+  if (groups.size === 0) return null;
+  return (
+    <>
+      {[...groups.entries()].map(([issue, ids]) => (
+        <div key={issue} className="path-type-notice" role="status"
+          style={{ background: '#fff8e1', border: '1px solid #f0c36d', borderRadius: 4, padding: '6px 8px', margin: '0 0 8px', fontSize: '0.92em', lineHeight: 1.5 }}>
+          <div>{t(`box.pathType.${issue}`, { count: ids.length })}</div>
+          <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+            <button className="style-btn" onClick={() => useTEMStore.getState().changeBoxTypes(ids, suggestedTypeFor(issue))}>
+              {t(`box.pathType.${issue}.fix`)}
+            </button>
+            <button className="style-btn" title={t('box.pathType.ignore.title')}
+              onClick={() => useTEMStore.getState().updateBoxes(ids, { pathTypeCheckIgnored: true })}>
+              {t('box.pathType.ignore')}
+            </button>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
 function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpenTranscriptViewer?: (focusBoxId?: string) => void }) {
   const { t, i18n } = useTranslation('propertyPanel');
   // Box の種類の名前: 日本語の画面は従来どおり BOX_TYPE_LABELS、それ以外は用語の表（terms）から引く
@@ -366,6 +402,7 @@ function BoxProperties({ boxes, onOpenTranscriptViewer }: { boxes: Box[]; onOpen
   return (
     <div className="prop-section">
       <h4>Box {isMulti && <span className="multi-badge">{t('common.count', { count: boxes.length })}</span>}</h4>
+      <PathTypeNotice boxes={boxes} />
 
       <div className="settings-tabs" style={{ marginBottom: 8, padding: 0 }}>
         <button className={tab === 'basic' ? 'settings-tab active' : 'settings-tab'} onClick={() => setTab('basic')}>{t('tab.basic')}</button>

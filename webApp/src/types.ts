@@ -91,6 +91,8 @@ export interface Box {
   typeCategory?: string;               // 類型用
   description?: string;                // 論文用詳細説明
   noDescriptionNeeded?: boolean;       // 説明不要フラグ
+  /** 径路の線種と種別の食い違い（点線だけでつながる通常の Box など）を知らせない。「このままにする」で立つ（utils/pathTypeCheck.ts） */
+  pathTypeCheckIgnored?: boolean;
   zIndex?: number;                     // 重なり順
   sourceRefs?: SourceRef[];            // 原文（Transcript）への参照リンク（多対多、Phase 4）
   /** この Box を作った原文の切片の ID（TranscriptSegment.id）。切片の一覧で種別などを変えると、この Box にも反映される。

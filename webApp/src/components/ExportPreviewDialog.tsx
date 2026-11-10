@@ -16,6 +16,7 @@ import {
   type FitMode,
 } from '../utils/exportTransform';
 import { getPaperPx, getPaperSizeOptionsForLayout, type PaperSizeKey } from '../utils/paperSizes';
+import { readabilitySummary, MIN_READABLE_PT } from '../utils/readability';
 import { ExportPreviewCanvas } from './ExportPreviewCanvas';
 import { CollapsibleSection } from './CollapsibleSection';
 import type { ExportOptions } from '../utils/exportImage';
@@ -74,6 +75,8 @@ export function ExportPreviewDialog({
   const [background, setBackground] = useState<'white' | 'transparent'>('white');
   const [includeGrid, setIncludeGrid] = useState(false);
   const [includePaperGuides, setIncludePaperGuides] = useState(false);
+  // プレビューをグレースケールで見る（モノクロ印刷で見分けられるか。出力には効かない。2026-11-10）
+  const [grayscalePreview, setGrayscalePreview] = useState(false);
   const [includeIds, setIncludeIds] = useState<{ any: boolean; box: boolean; sdsg: boolean; line: boolean }>(
     { any: false, box: false, sdsg: false, line: false },
   );
@@ -289,6 +292,15 @@ export function ExportPreviewDialog({
     () => getPaperSizeOptionsForLayout(doc.settings.layout),
     [doc.settings.layout],
   );
+
+  // 紙面での文字の大きさ（pt）の点検。用紙に収めた後の図から見積もる（カタログTEA 第 2 章の留意点: 7 pt 未満は読みにくい）。
+  // 複数ページで、1 ページに描く範囲が用紙より広いときは、その分だけ縮むので倍率を掛ける
+  const readability = useMemo(() => {
+    const paper = getPaperPx(xf.paperSize);
+    const p0 = exportMode === 'multi' ? pageBounds[0] : undefined;
+    const pageScale = p0 ? Math.min(1, paper.width / Math.max(1, p0.width), paper.height / Math.max(1, p0.height)) : 1;
+    return readabilitySummary(transformed.doc, pageScale);
+  }, [transformed.doc, xf.paperSize, exportMode, pageBounds]);
 
   if (!open) return null;
 
@@ -1033,7 +1045,24 @@ export function ExportPreviewDialog({
             <div style={{ padding: '6px 10px', borderBottom: '1px solid #e0e0e0', fontSize: '0.85em', color: '#555' }}>
               {t('preview.header')}
             </div>
-            <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
+            {/* 紙面での読みやすさ（最小の文字の pt・7 pt 未満の警告・グレースケール） */}
+            <div className="export-readability" role="status"
+              style={{ padding: '4px 10px', borderBottom: '1px solid #e0e0e0', fontSize: '0.85em', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap',
+                background: readability.tooSmall.length > 0 ? '#fff4e5' : undefined, color: readability.tooSmall.length > 0 ? '#8a4b00' : '#555' }}>
+              {readability.smallest && (
+                <span title={t('readability.title')}>
+                  {t('readability.min', { pt: readability.smallest.pt.toFixed(1), what: t(`readability.kind.${readability.smallest.kind}`) })}
+                  {readability.tooSmall.length > 0
+                    ? <> — <strong>{t('readability.warn', { count: readability.tooSmall.length, min: MIN_READABLE_PT })}</strong></>
+                    : <> — {t('readability.ok', { min: MIN_READABLE_PT })}</>}
+                </span>
+              )}
+              <label style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginLeft: 'auto', cursor: 'pointer' }} title={t('readability.grayscale.title')}>
+                <input type="checkbox" checked={grayscalePreview} onChange={(e) => setGrayscalePreview(e.target.checked)} />
+                {t('readability.grayscale')}
+              </label>
+            </div>
+            <div style={{ flex: 1, minHeight: 0, position: 'relative', filter: grayscalePreview ? 'grayscale(1)' : undefined }}>
               <ExportPreviewCanvas
                 doc={transformed.doc}
                 elementId={PREVIEW_ID}

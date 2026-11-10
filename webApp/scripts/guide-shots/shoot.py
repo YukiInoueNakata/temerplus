@@ -5,7 +5,7 @@
 """
 はじめてのガイド（docs/getting-started.*.md）と README の画面の写真を撮り直す。
 
-  cd webApp && npx vite --port 5288 --strictPort        # 別の窓で開発サーバーを起動しておく
+  cd webApp && npx vite --port 5288 --strictPort --open false   # 別の窓で開発サーバーを起動しておく（--open false: vite.config の open: true のままだと、起動のたびにユーザーのブラウザにタブが増える）
   uv run scripts/guide-shots/shoot.py [--lang ja|en|both] [--url http://localhost:5288/]
 
 - 自分専用の Chromium（画面を出さない）を、何も保存していない状態から起動して、ガイドの手順どおりに操作して撮る

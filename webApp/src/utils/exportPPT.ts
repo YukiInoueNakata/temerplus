@@ -47,7 +47,7 @@ import {
   computeAngleEndpoints,
   clampAngleDeg,
 } from './lineDirection';
-import { resolveBoxVisuals, resolveBoxBorderDraw, doubleStrokeWidth, legendBorderDraw } from './boxPreset';
+import { resolveBoxVisuals, resolveBoxBorderDraw, doubleStrokeWidth, legendBorderDraw, legendSampleShape } from './boxPreset';
 import {
   computeLinePath,
   applyLinePathMargins,
@@ -1813,17 +1813,19 @@ function drawLegendIcon(
   if (item.category === 'box') {
     // テーマで線種を指定していれば、図の Box と同じ線で描く
     const draw = legendBorderDraw(item.key, settings);
+    // テーマが楕円を指定していれば楕円で描く（画面の凡例と同じ。2026-11-10）
+    const sampleShape = legendSampleShape(item.key, settings) === 'ellipse' ? pres.ShapeType.ellipse : pres.ShapeType.rect;
     if (draw.kind !== 'factory') {
       const dashed = draw.kind === 'double-dashed' || (draw.kind === 'single' && draw.style !== 'solid');
       const dashType = !dashed ? undefined : draw.kind === 'single' && draw.style === 'dotted' ? 'sysDot' as const : 'dash' as const;
       const lw = draw.kind === 'double' ? doubleStrokeWidth(draw.width) : Math.min(draw.width, 2.5);
-      slide.addShape(pres.ShapeType.rect, {
+      slide.addShape(sampleShape, {
         x: t.toX(x), y: t.toY(y), w: t.toLen(w), h: t.toLen(h),
         fill: { color: 'FFFFFF' }, line: { color: '222222', width: lw, dashType },
       });
       if (draw.kind !== 'single') {
         const inset = 2;
-        slide.addShape(pres.ShapeType.rect, {
+        slide.addShape(sampleShape, {
           x: t.toX(x + inset), y: t.toY(y + inset),
           w: t.toLen(Math.max(1, w - inset * 2)), h: t.toLen(Math.max(1, h - inset * 2)),
           fill: { color: 'FFFFFF', transparency: 100 }, line: { color: '222222', width: lw, dashType },

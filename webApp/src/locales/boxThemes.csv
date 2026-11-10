@@ -7,6 +7,8 @@
 "colorful.description","各 Box タイプを鮮やかな色で塗り分け。発表時の視認性重視。","Vivid colors for each box type. Easy to see in presentations.","設定 > Box のテーマ > 組み込みテーマの説明"
 "simplified.name","簡素化方式（線種は実在性だけ・種別はラベル）","Simplified (line style shows observation only, type shown by label)","設定 > Box のテーマ > 組み込みテーマの名前（記号の簡素化方式）"
 "simplified.description","実線＝観察された、点線＝観察されなかった。EFP・OPP などの種別は線種でなく種別ラベルで示す。論文用レポートの記号体系の宣言にそのまま書き出す。","Solid = observed, dashed = not observed. Types such as EFP and OPP are shown by type labels, not by line style. Written as is into the notation declaration of the paper report.","設定 > Box のテーマ > 組み込みテーマの説明"
+"catalogFig21.name","カタログTEA 図 2-1 の例（OPP は楕円・BFP は二重線）","Catalog TEA Fig. 2-1 style (OPP as ellipse, BFP double line)","設定 > Box のテーマ > 組み込みテーマの名前（安田ほか編『カタログTEA』2023 第 2 章 図 2-1 の描き分け）"
+"catalogFig21.description","カタログTEA（2023）第 2 章 図 2-1 の描き分け。OPP は楕円、BFP は二重線の四角、EFP は太い実線、P-EFP は太い点線、ありえた経験は細い点線。書籍では決まりではなく「変えるとよい」という勧め。第 10 章の描き分け（実現した EFP は二重線、ありえた EFP は点線の二重の四角）は既定のモノクロとほぼ同じ。","The style of Fig. 2-1 in Catalog TEA (2023, ch. 2): OPP as an ellipse, BFP as a double-line rectangle, EFP with a thick solid line, P-EFP with a thick dashed line, possible experiences with a thin dashed line. The book recommends varying line styles but does not prescribe them. The style of ch. 10 (realized EFP double line, possible EFP dashed double rectangle) is close to the default Monochrome.","設定 > Box のテーマ > 組み込みテーマの説明"
 "paperBold.name","論文向け（太枠モノクロ）","Papers (bold monochrome)","設定 > Box のテーマ > 組み込みテーマの名前"
 "paperBold.description","モノクロ + 太枠で印刷時の視認性を確保。","Monochrome with bold borders for legibility in print.","設定 > Box のテーマ > 組み込みテーマの説明"
 "user.defaultName","テーマ {{n}}","Theme {{n}}","設定 > Box のテーマ > 名前を空にして保存したときの名前（n は番号）"

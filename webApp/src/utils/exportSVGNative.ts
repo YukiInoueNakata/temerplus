@@ -45,7 +45,7 @@ import {
   computeAngleEndpoints,
   clampAngleDeg,
 } from './lineDirection';
-import { resolveBoxVisuals, resolveBoxBorderDraw, doubleStrokeWidth, legendBorderDraw } from './boxPreset';
+import { resolveBoxVisuals, resolveBoxBorderDraw, doubleStrokeWidth, legendBorderDraw, legendSampleShape } from './boxPreset';
 import {
   computeLinePath,
   applyLinePathMargins,
@@ -1824,14 +1824,18 @@ function drawLegendIcon(
   if (item.category === 'box') {
     // テーマで線種を指定していれば、図の Box と同じ線で描く
     const draw = legendBorderDraw(item.key, settings);
+    // テーマが楕円を指定していれば楕円で描く（画面の凡例と同じ。2026-11-10）
+    const ellipse = legendSampleShape(item.key, settings) === 'ellipse';
+    const shape = (sx: number, sy: number, sw: number, sh: number, o: { fill: string; stroke: string; strokeWidth: number; strokeDasharray?: string }) => (
+      ellipse ? b.ellipse(sx + sw / 2, sy + sh / 2, sw / 2, sh / 2, o) : b.rect(sx, sy, sw, sh, o));
     if (draw.kind !== 'factory') {
       const dash = draw.kind === 'double-dashed' || (draw.kind === 'single' && draw.style === 'dashed') ? '4 2'
         : draw.kind === 'single' && draw.style === 'dotted' ? '2 2' : undefined;
       const lw = draw.kind === 'double' ? doubleStrokeWidth(draw.width) : Math.min(draw.width, 2.5);
-      b.rect(X, Y, W, H, { fill: '#ffffff', stroke: '#222', strokeWidth: lw, strokeDasharray: dash });
+      shape(X, Y, W, H, { fill: '#ffffff', stroke: '#222', strokeWidth: lw, strokeDasharray: dash });
       if (draw.kind !== 'single') {
         const inset = 2;
-        b.rect(X + inset, Y + inset, Math.max(1, W - inset * 2), Math.max(1, H - inset * 2), {
+        shape(X + inset, Y + inset, Math.max(1, W - inset * 2), Math.max(1, H - inset * 2), {
           fill: 'none', stroke: '#222', strokeWidth: lw, strokeDasharray: dash,
         });
       }
@@ -1856,7 +1860,7 @@ function drawLegendIcon(
       });
       return;
     }
-    b.rect(X, Y, W, H, { fill: '#ffffff', stroke: '#222', strokeWidth: spec.borderWidth, strokeDasharray: dashArr });
+    shape(X, Y, W, H, { fill: '#ffffff', stroke: '#222', strokeWidth: spec.borderWidth, strokeDasharray: dashArr });
   } else if (item.category === 'line') {
     const dashArr = item.key === 'XLine' ? '5 3' : undefined;
     b.line(X, Y + H / 2, X + W, Y + H / 2, { stroke: '#222', strokeWidth: 1.5, strokeDasharray: dashArr });

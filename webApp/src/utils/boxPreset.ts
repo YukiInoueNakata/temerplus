@@ -108,6 +108,16 @@ export function legendBorderDraw(key: string, settings: ProjectSettings | undefi
 }
 
 /**
+ * 凡例の見本の形。テーマ（boxTypePresets）が楕円を指定していれば楕円（カタログTEA 図 2-1 の例の OPP など。2026-11-10）。
+ * 以前は凡例が常に四角で、図の楕円の OPP と食い違った
+ */
+export function legendSampleShape(key: string, settings: ProjectSettings | undefined): 'rect' | 'ellipse' {
+  if (!settings) return 'rect';
+  const type = (key.startsWith('other:') ? 'other' : key) as BoxType;
+  return getBoxPreset(type, settings).shape ?? BOX_RENDER_SPECS[type]?.defaultShape ?? 'rect';
+}
+
+/**
  * 二重線を 2 本の線で描くときの 1 本の太さ（CSS の double と同じく、指定の太さの 3 分の 1。最低 1）。
  * 以前は PPTX・SVG で太さ 1 に決め打ちしており、テーマで太くしても細いままだった（レビュー #7）
  */

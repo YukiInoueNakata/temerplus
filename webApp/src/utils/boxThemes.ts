@@ -91,6 +91,27 @@ export const BUILTIN_THEMES: BoxStyleTheme[] = [
     },
   },
   {
+    // カタログTEA（安田ほか編, 2023）第 2 章 図 2-1「TEM 図の基本構成例」の描き分け（2026-11-10 ユーザー決定）:
+    // OPP は楕円、BFP は二重線の四角、EFP・2nd EFP は太い実線の四角、P-EFP・P-2nd EFP は太い点線の四角（一重）、
+    // ありえた経験（潜在経験）は細い点線、通常の Box は細い実線。書籍は「変更するとよい」という勧めで決まりではない。
+    // 第 10 章（安田）の描き分け（実現した EFP は二重線、ありえた EFP は点線の二重の四角）は既定のモノクロとほぼ同じ
+    id: 'theme-catalog-tea-fig2-1',
+    get name() { return i18n.t('boxThemes:catalogFig21.name'); },
+    get description() { return i18n.t('boxThemes:catalogFig21.description'); },
+    builtin: true,
+    presets: {
+      normal:      { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.0, borderStyle: 'solid' },
+      other:       { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.0, borderStyle: 'solid' },
+      OPP:         { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.0, borderStyle: 'solid', shape: 'ellipse' },
+      BFP:         { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 3.0, borderStyle: 'double' },
+      EFP:         { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 2.0, borderStyle: 'solid' },
+      '2nd-EFP':   { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 2.0, borderStyle: 'solid' },
+      'P-EFP':     { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 2.0, borderStyle: 'dashed', singleLine: true },
+      'P-2nd-EFP': { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 2.0, borderStyle: 'dashed', singleLine: true },
+      annotation:  { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.0, borderStyle: 'dashed' },
+    },
+  },
+  {
     id: 'theme-paper-bold',
     get name() { return i18n.t('boxThemes:paperBold.name'); },
     get description() { return i18n.t('boxThemes:paperBold.description'); },

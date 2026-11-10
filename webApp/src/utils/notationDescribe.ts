@@ -9,7 +9,7 @@
 import i18n from '../i18n';
 import type { Box, BoxType, ProjectSettings, TEMDocument, TypeLabelVisibilityKey } from '../types';
 import { BOX_RENDER_SPECS } from '../store/defaults';
-import { resolveBoxBorderDraw } from './boxPreset';
+import { resolveBoxBorderDraw, legendSampleShape } from './boxPreset';
 import { boxHasType } from './typeDisplay';
 
 /** Box の種別の名前（図の言語） */
@@ -85,7 +85,12 @@ export function describeNotation(doc: TEMDocument): NotationDescription | null {
     return w ? i18n.t(`notationDescribe:weight.${w}`, { lng, stroke }) : stroke;
   };
   const named = strokes.map((s) => ({ type: s.type, stroke: s.stroke, name: nameOf(s) }));
-  const lines = named.map((n) => t('notationDescribe:line', { type: boxTypeName(n.type, lng), stroke: n.name }));
+  // テーマが楕円を指定した種別は「細い実線の楕円」のように形も書く（カタログTEA 図 2-1 の例の OPP。2026-11-10）。
+  // 線種の意味の判定（下の realityOnly）には形を入れない
+  const lines = named.map((n) => t('notationDescribe:line', {
+    type: boxTypeName(n.type, lng),
+    stroke: legendSampleShape(n.type, settings) === 'ellipse' ? t('notationDescribe:shape.ellipse', { stroke: n.name }) : n.name,
+  }));
   for (const x of secondaryOnly) {
     const visible = allBoxes.some((b) => b.secondaryType === x && labelShown(b));
     lines.push(visible

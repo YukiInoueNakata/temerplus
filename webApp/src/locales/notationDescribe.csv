@@ -16,6 +16,7 @@
 "weight.thick","太い{{stroke}}","thick {{stroke}}","Word の論文用レポート > 記号体系の宣言 > 枠の線の太さ（stroke は線の種類。いちばん多い太さより太い）"
 "weight.slightlyThick","やや太い{{stroke}}","slightly thick {{stroke}}","同上（少し太い）"
 "weight.thin","細い{{stroke}}","thin {{stroke}}","同上（細い）"
+"shape.ellipse","{{stroke}}の楕円","{{stroke}} ellipse","Word の論文用レポート > 記号体系の宣言 > 楕円の枠（stroke は線の種類と太さ。例: 細い実線の楕円）"
 "line","{{type}}: {{stroke}}","{{type}}: {{stroke}}","Word の論文用レポート > 記号体系の宣言 > 各要素の線種の 1 行（type は種別名・stroke は線）"
 "line.secondaryLabelOnly","{{type}}: 併記の種別ラベルだけで示す（枠は主の種別の線）","{{type}}: shown only by the secondary type label (the border uses the line of the primary type)","Word の論文用レポート > 記号体系の宣言 > 併記にしか使っていない種別の行"
 "line.secondaryHidden","{{type}}: 図には示していない（通常の経験・潜在経験の Box への併記で，種別ラベルが出ないため）","{{type}}: not shown in the diagram (it is a secondary type on Experience or Latent experience Boxes, which show no type label)","Word の論文用レポート > 記号体系の宣言 > 図に現れない併記の種別の行"

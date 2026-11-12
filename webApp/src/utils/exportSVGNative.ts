@@ -789,10 +789,10 @@ function renderBox(
       break;
     }
     case 'annotation':
-      drawShape(x, y, w, h, 1, '2 2', fill);
+      drawShape(x, y, w, h, BOX_RENDER_SPECS.annotation.borderWidth, '2 2', fill);
       break;
     case 'BFP':
-      drawShape(x, y, w, h, 2, undefined, fill);
+      drawShape(x, y, w, h, BOX_RENDER_SPECS.BFP.borderWidth, undefined, fill);
       break;
     default:
       drawShape(x, y, w, h, 1.5, undefined, fill);

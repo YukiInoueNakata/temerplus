@@ -468,6 +468,7 @@ export default function App() {
   return (
     <div className="app" style={{ fontSize: uiFontSize }}>
       <Ribbon
+        onOpenCommandPalette={() => setPaletteOpen(true)}
         onOpenSettings={() => openSettings()}
         onOpenInsertBetween={() => setInsertBetweenOpen(true)}
         onOpenPeriodLabels={() => setPeriodLabelsOpen(true)}

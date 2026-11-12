@@ -444,17 +444,19 @@ export interface BoxRenderSpec {
 }
 
 export const BOX_RENDER_SPECS: Record<string, BoxRenderSpec> = {
-  // 文献標準準拠（Arakawa 2012、Kawai 2016 など）
+  // 文献標準準拠（Arakawa 2012、Kawai 2016 など）。線種で種別を分ける。
+  // 太さは 1 本線を 1.5、OPP と二重線（EFP・P-EFP とセカンド）を 3.0 にそろえた（2026-11-12 ユーザー決定・v0.2.3）。
+  // 以前は BFP 2.0・P-EFP 2.5・潜在経験 1.0 と 5 段階に分かれていた。二重線の 3.0 は 2 本の合計（CSS の double は 3px 未満だと 1 本になる）
   normal:       { borderStyle: 'solid',  borderWidth: 1.5, defaultShape: 'rect' },
   other:        { borderStyle: 'solid',  borderWidth: 1.5, defaultShape: 'rect' },  // その他: 見た目は通常と同じ
-  BFP:          { borderStyle: 'solid',  borderWidth: 2.0, defaultShape: 'rect' },  // 通常より少し太い
+  BFP:          { borderStyle: 'solid',  borderWidth: 1.5, defaultShape: 'rect' },
   EFP:          { borderStyle: 'double', borderWidth: 3.0, defaultShape: 'rect' },
   // P-EFP: 二重+点線（CSS単体では表現不可なので BoxNode で2重枠を特別描画）
-  'P-EFP':      { borderStyle: 'dashed', borderWidth: 2.5, defaultShape: 'rect' },
+  'P-EFP':      { borderStyle: 'dashed', borderWidth: 3.0, defaultShape: 'rect' },
   OPP:          { borderStyle: 'solid',  borderWidth: 3.0, defaultShape: 'rect' },
-  annotation:   { borderStyle: 'dashed', borderWidth: 1.0, defaultShape: 'rect' },  // 潜在経験: 細めの点線
+  annotation:   { borderStyle: 'dashed', borderWidth: 1.5, defaultShape: 'rect' },  // 潜在的な行為: 点線
   '2nd-EFP':    { borderStyle: 'double', borderWidth: 3.0, defaultShape: 'rect' },
-  'P-2nd-EFP':  { borderStyle: 'dashed', borderWidth: 2.5, defaultShape: 'rect' },
+  'P-2nd-EFP':  { borderStyle: 'dashed', borderWidth: 3.0, defaultShape: 'rect' },
 };
 
 export const BOX_TYPE_LABELS: Record<string, { ja: string; en: string; shortJa?: string }> = {

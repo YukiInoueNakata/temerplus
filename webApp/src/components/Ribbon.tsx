@@ -39,6 +39,7 @@ export function Ribbon({
   onOpenTranscript,
   onOpenTranscriptBulkImport,
   onOpenWizard,
+  onOpenCommandPalette,
   onSave,
   onSaveAs,
   onOpen,
@@ -59,6 +60,7 @@ export function Ribbon({
   onOpenTranscript: () => void;
   onOpenTranscriptBulkImport: () => void;
   onOpenWizard?: () => void;
+  onOpenCommandPalette?: () => void;
   onSave: () => void;
   onSaveAs: () => void;
   onOpen: () => void;
@@ -89,6 +91,13 @@ export function Ribbon({
           </button>
         ))}
         <div style={{ flex: 1 }} />
+        {onOpenCommandPalette && (
+          // ショートカット（Ctrl+K）を知らない人も開けるように、縦型・横型の左に置く（2026-11-12 ユーザー指示）
+          <button className="palette-open-btn" onClick={onOpenCommandPalette} title={t('palette.title', { key: shortcutLabel('Ctrl+K') })}>
+            <span className="layout-icon" aria-hidden="true">⌕</span>
+            <span>{t('palette')}</span>
+          </button>
+        )}
         <LayoutToggle />
         {SHOW_LOCALE_TOGGLE && <LanguageSwitch />}
         <SaveButton onSave={onSave} />

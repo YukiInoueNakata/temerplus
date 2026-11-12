@@ -1,6 +1,8 @@
 ﻿key,ja,en,note
 "badge.new","新","New","リボン > ヘルプ タブ名の横の印（新しい更新があるとき）"
 "badge.new.title","新しい更新があります","New updates available","「新」の印の説明（マウスを重ねたとき）"
+"palette","コマンド","Commands","リボン右上のボタン（縦型・横型の左）。コマンドパレットを開く"
+"palette.title","コマンドパレットを開く ({{key}})。機能を名前で探して実行できます","Open the command palette ({{key}}). Find and run any command by name","コマンドパレットのボタンの説明（マウスを重ねたとき）。{{key}} はショートカット"
 "layout.group","レイアウト","Layout","リボン右上の 横型／縦型 切り替えのまとまりの名前（読み上げ用）"
 "layout.horizontal","横型","Horizontal","リボン右上のボタン（図の向き）"
 "layout.horizontal.title","横型レイアウト（時間軸→右）","Horizontal layout (time flows right)","横型ボタンの説明（マウスを重ねたとき）"

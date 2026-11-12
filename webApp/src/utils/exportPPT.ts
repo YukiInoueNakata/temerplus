@@ -633,14 +633,14 @@ function renderBox(
       slide.addShape(shapeType, {
         x, y, w, h,
         fill,
-        line: { color: borderColor, width: 1.0, dashType: 'sysDot' },
+        line: { color: borderColor, width: BOX_RENDER_SPECS.annotation.borderWidth, dashType: 'sysDot' },
       });
       break;
     case 'BFP':
       slide.addShape(shapeType, {
         x, y, w, h,
         fill,
-        line: { color: borderColor, width: 2.0 },
+        line: { color: borderColor, width: BOX_RENDER_SPECS.BFP.borderWidth },
       });
       break;
     default:

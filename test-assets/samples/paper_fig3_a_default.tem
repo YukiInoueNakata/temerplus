@@ -1,0 +1,388 @@
+{
+  "version": "0.4",
+  "sheets": [
+    {
+      "id": "Sheet_mwdmlegc_f322o",
+      "name": "Sheet 1",
+      "type": "individual",
+      "order": 0,
+      "boxes": [
+        {
+          "id": "Item1",
+          "type": "normal",
+          "label": "経験1",
+          "x": 0,
+          "y": 0,
+          "width": 50,
+          "height": 110,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "OPP1",
+          "type": "OPP",
+          "label": "経験2",
+          "x": 130,
+          "y": 0,
+          "width": 50,
+          "height": 110,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "BFP1",
+          "type": "BFP",
+          "label": "経験3",
+          "x": 260,
+          "y": 0,
+          "width": 50,
+          "height": 110,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "Item2",
+          "type": "normal",
+          "label": "経験4",
+          "x": 390,
+          "y": -150,
+          "width": 50,
+          "height": 110,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "EFP1",
+          "type": "EFP",
+          "label": "経験5",
+          "x": 520,
+          "y": -150,
+          "width": 50,
+          "height": 110,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "Latent1",
+          "type": "annotation",
+          "label": "経験4'",
+          "x": 390,
+          "y": 150,
+          "width": 50,
+          "height": 110,
+          "textOrientation": "vertical"
+        },
+        {
+          "id": "P_EFP1",
+          "type": "P-EFP",
+          "label": "経験5'",
+          "x": 520,
+          "y": 150,
+          "width": 50,
+          "height": 110,
+          "textOrientation": "vertical"
+        }
+      ],
+      "lines": [
+        {
+          "id": "RL_1",
+          "type": "RLine",
+          "from": "Item1",
+          "to": "OPP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "style": {
+            "color": "#222",
+            "strokeWidth": 1.5
+          },
+          "startOffsetTime": 0,
+          "startOffsetItem": 0,
+          "endOffsetTime": 0,
+          "endOffsetItem": 0,
+          "startMargin": 0,
+          "endMargin": 0,
+          "angleMode": false,
+          "angleDeg": 0,
+          "elbowBendRatio": 0.5,
+          "curveIntensity": 0.5
+        },
+        {
+          "id": "RL_2",
+          "type": "RLine",
+          "from": "OPP1",
+          "to": "BFP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "style": {
+            "color": "#222",
+            "strokeWidth": 1.5
+          },
+          "startOffsetTime": 0,
+          "startOffsetItem": 0,
+          "endOffsetTime": 0,
+          "endOffsetItem": 0,
+          "startMargin": 0,
+          "endMargin": 0,
+          "angleMode": false,
+          "angleDeg": 0,
+          "elbowBendRatio": 0.5,
+          "curveIntensity": 0.5
+        },
+        {
+          "id": "RL_3",
+          "type": "RLine",
+          "from": "BFP1",
+          "to": "Item2",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "style": {
+            "color": "#222",
+            "strokeWidth": 1.5
+          },
+          "startOffsetTime": 0,
+          "startOffsetItem": 0,
+          "endOffsetTime": 0,
+          "endOffsetItem": 0,
+          "startMargin": 0,
+          "endMargin": 0,
+          "angleMode": false,
+          "angleDeg": 0,
+          "elbowBendRatio": 0.5,
+          "curveIntensity": 0.5
+        },
+        {
+          "id": "RL_4",
+          "type": "RLine",
+          "from": "Item2",
+          "to": "EFP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "style": {
+            "color": "#222",
+            "strokeWidth": 1.5
+          },
+          "startOffsetTime": 0,
+          "startOffsetItem": 0,
+          "endOffsetTime": 0,
+          "endOffsetItem": 0,
+          "startMargin": 0,
+          "endMargin": 0,
+          "angleMode": false,
+          "angleDeg": 0,
+          "elbowBendRatio": 0.5,
+          "curveIntensity": 0.5
+        },
+        {
+          "id": "XL_1",
+          "type": "XLine",
+          "from": "BFP1",
+          "to": "Latent1",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "style": {
+            "color": "#222",
+            "strokeWidth": 1.5
+          },
+          "startOffsetTime": 0,
+          "startOffsetItem": 0,
+          "endOffsetTime": 0,
+          "endOffsetItem": 0,
+          "startMargin": 0,
+          "endMargin": 0,
+          "angleMode": false,
+          "angleDeg": 0,
+          "elbowBendRatio": 0.5,
+          "curveIntensity": 0.5
+        },
+        {
+          "id": "XL_2",
+          "type": "XLine",
+          "from": "Latent1",
+          "to": "P_EFP1",
+          "connectionMode": "center-to-center",
+          "shape": "straight",
+          "style": {
+            "color": "#222",
+            "strokeWidth": 1.5
+          },
+          "startOffsetTime": 0,
+          "startOffsetItem": 0,
+          "endOffsetTime": 0,
+          "endOffsetItem": 0,
+          "startMargin": 0,
+          "endMargin": 0,
+          "angleMode": false,
+          "angleDeg": 0,
+          "elbowBendRatio": 0.5,
+          "curveIntensity": 0.5
+        }
+      ],
+      "sdsg": [],
+      "notes": [],
+      "comments": [],
+      "periodLabels": []
+    }
+  ],
+  "activeSheetId": "Sheet_mwdmlegc_f322o",
+  "participants": [],
+  "settings": {
+    "layout": "horizontal",
+    "locale": "ja",
+    "gridSize": 10,
+    "snap": {
+      "alignGuides": true,
+      "distanceSnap": true,
+      "distancePx": 20,
+      "gridSnap": false,
+      "gridPx": 10
+    },
+    "showLegend": true,
+    "legendPosition": "right",
+    "timelineLabel": {
+      "ja": "非可逆的時間",
+      "en": "Irreversible Time"
+    },
+    "timelineAutoInsert": true,
+    "defaultFont": "system-ui",
+    "defaultFontSize": 13,
+    "defaultBoxSize": {
+      "width": 60,
+      "height": 100
+    },
+    "defaultAutoFitText": false,
+    "defaultAutoFitBox": false,
+    "defaultAutoFitBoxMode": "width-fixed",
+    "paperGuides": [
+      {
+        "enabled": false,
+        "size": "A4-landscape",
+        "baseSize": "A4",
+        "color": "#000000",
+        "pageCount": 2,
+        "maskOutside": true
+      }
+    ],
+    "uiFontSize": 13,
+    "ribbonFontSize": 12,
+    "levelStep": 0.5,
+    "timeArrow": {
+      "autoInsert": true,
+      "alwaysVisible": true,
+      "timeStartExtension": -0.5,
+      "timeEndExtension": 0.5,
+      "itemReference": "min",
+      "itemOffset": 0,
+      "label": "非可逆的時間",
+      "strokeWidth": 2.5,
+      "fontSize": 14,
+      "labelSideHorizontal": "bottom",
+      "labelSideVertical": "left",
+      "labelBold": false,
+      "labelItalic": false,
+      "labelUnderline": false,
+      "labelOffset": 4,
+      "labelAlignHorizontal": "center",
+      "labelAlignVertical": "center"
+    },
+    "legend": {
+      "autoGenerate": true,
+      "alwaysVisible": false,
+      "includeInExport": false,
+      "position": {
+        "x": 4,
+        "y": 327
+      },
+      "includeBoxes": true,
+      "includeLines": true,
+      "includeSDSG": true,
+      "includeTimeArrow": false,
+      "title": "凡例",
+      "fontSize": 11,
+      "minWidth": 200,
+      "showDescriptions": false,
+      "columns": 1,
+      "columnsHorizontal": 1,
+      "columnsVertical": 1,
+      "showTitle": true,
+      "titleBold": true,
+      "titleItalic": false,
+      "titleUnderline": false,
+      "titleAlign": "left",
+      "titlePosition": "top",
+      "titleWritingMode": "horizontal",
+      "titleVerticalAlign": "top",
+      "backgroundStyle": "white",
+      "borderWidth": 1,
+      "borderColor": "#999",
+      "sampleWidth": 32,
+      "sampleHeight": 18,
+      "titleSeparatorVisible": true,
+      "titleSeparatorColor": "#dddddd",
+      "itemOverrides": {},
+      "placement": "auto",
+      "layoutModeHorizontal": "rows",
+      "rowsHorizontal": 2
+    },
+    "periodLabels": {
+      "alwaysVisible": true,
+      "includeInExport": true,
+      "itemReference": "max",
+      "itemOffset": 0,
+      "fontSize": 13,
+      "showDividers": true,
+      "dividerStrokeWidth": 1,
+      "bandStyle": "band",
+      "labelSideHorizontal": "top",
+      "labelSideVertical": "right"
+    },
+    "typeLabelVisibility": {
+      "BFP": true,
+      "EFP": true,
+      "P-EFP": true,
+      "OPP": true,
+      "2nd-EFP": true,
+      "P-2nd-EFP": true,
+      "SD": true,
+      "SG": true
+    },
+    "sdsgSpace": {
+      "enabled": false,
+      "bands": {
+        "top": {
+          "enabled": true,
+          "heightMode": "auto",
+          "heightLevel": 1.5,
+          "reference": "boxes",
+          "offsetLevel": 0.2,
+          "showBorder": true,
+          "borderColor": "#9b59b6",
+          "fillStyle": "tinted",
+          "labelPosition": "top-left",
+          "shrinkToFitRow": false,
+          "autoExpandHeight": false
+        },
+        "bottom": {
+          "enabled": true,
+          "heightMode": "auto",
+          "heightLevel": 1.5,
+          "reference": "boxes",
+          "offsetLevel": 0.2,
+          "showBorder": true,
+          "borderColor": "#27ae60",
+          "fillStyle": "tinted",
+          "labelPosition": "top-left",
+          "shrinkToFitRow": false,
+          "autoExpandHeight": false
+        }
+      },
+      "autoPlaceSD": "top",
+      "autoPlaceSG": "bottom",
+      "allowMismatchedPlacement": false,
+      "autoArrange": true,
+      "autoFlipDirectionInBand": false
+    },
+    "boxTypePresets": {}
+  },
+  "metadata": {
+    "title": "paper_fig3_notation",
+    "createdAt": "2026-11-12T14:10:55.212Z",
+    "modifiedAt": "2026-11-12T14:10:56.209Z"
+  },
+  "history": [],
+  "transcripts": []
+}

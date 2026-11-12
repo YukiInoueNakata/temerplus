@@ -5,7 +5,7 @@
 // - JSON エクスポート / インポート（単一 or 配列）
 // ============================================================================
 
-import type { BoxType, BoxTypePreset } from '../types';
+import type { BoxType, BoxTypePreset, LineShape, TEMDocument } from '../types';
 import i18n from '../i18n';
 
 export type BoxTypePresetMap = Partial<Record<BoxType, BoxTypePreset>>;
@@ -16,6 +16,22 @@ export interface BoxStyleTheme {
   description?: string;
   builtin?: boolean;
   presets: BoxTypePresetMap;
+  /**
+   * このテーマで原則にする径路の線の形。当てると新しい線の既定になり、今ある線もこの形に直す。
+   * 簡素化方式は線の角度に意味を持たせないのでカギ線（2026-11-12 ユーザー決定）
+   */
+  lineShape?: LineShape;
+}
+
+/**
+ * テーマを図に当てる（設定画面の「適用」）。Box の様式を置き換え、テーマに lineShape があれば
+ * 線の既定の形と、すべてのシートの今ある線の形をそれに直す。immer の draft にも素のオブジェクトにも使える
+ */
+export function applyThemeToDoc(d: TEMDocument, theme: Pick<BoxStyleTheme, 'presets' | 'lineShape'>): void {
+  d.settings.boxTypePresets = JSON.parse(JSON.stringify(theme.presets));
+  if (!theme.lineShape) return;
+  d.settings.lineDefaults = { ...(d.settings.lineDefaults ?? {}), shape: theme.lineShape };
+  for (const sh of d.sheets) for (const l of sh.lines) l.shape = theme.lineShape;
 }
 
 // 組み込みテーマ ----------------------------------------------------------------
@@ -78,6 +94,8 @@ export const BUILTIN_THEMES: BoxStyleTheme[] = [
     get name() { return i18n.t('boxThemes:simplified.name'); },
     get description() { return i18n.t('boxThemes:simplified.description'); },
     builtin: true,
+    // 線の角度・向きに意味を持たせない表記なので、径路は原則カギ線（2026-11-12 ユーザー指示）
+    lineShape: 'elbow',
     presets: {
       normal:      { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
       other:       { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },

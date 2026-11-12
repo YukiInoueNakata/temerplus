@@ -40,6 +40,7 @@ import {
   deleteUserTheme,
   themeToJsonString,
   parseThemesFromJson,
+  applyThemeToDoc,
   type BoxStyleTheme,
 } from '../utils/boxThemes';
 
@@ -786,12 +787,10 @@ function BoxStyleSection() {
     }));
   };
 
-  // テーマを設定全体に適用（boxTypePresets を置換）
+  // テーマを設定全体に適用（boxTypePresets を置換。簡素化方式は線もカギ線に直す）
   const applyTheme = (theme: BoxStyleTheme) => {
     useTEMStore.setState((state) => ({
-      doc: produce(state.doc, (d) => {
-        d.settings.boxTypePresets = JSON.parse(JSON.stringify(theme.presets));
-      }),
+      doc: produce(state.doc, (d) => { applyThemeToDoc(d, theme); }),
       dirty: true,
     }));
   };

@@ -112,6 +112,9 @@ export function describeNotation(doc: TEMDocument): NotationDescription | null {
     const unobsPart = unobserved.length > 0 ? t('notationDescribe:meaning.unobservedPart', { stroke: unobserved[0].name }) : '';
     sentences.push(t('notationDescribe:meaning.realityOnly', { observed: observed[0].name, unobserved: unobsPart }));
     sentences.push(t('notationDescribe:meaning.typesByLabel'));
+    // 径路がすべてカギ線なら、線の角度にも意味を持たせないと書く（簡素化方式の原則。2026-11-12）
+    const allLines = doc.sheets.flatMap((s) => s.lines);
+    if (allLines.length > 0 && allLines.every((l) => l.shape === 'elbow')) sentences.push(t('notationDescribe:meaning.noAngle'));
     const hidden = types.filter((x) => x !== 'normal' && x !== 'annotation' && x !== 'other'
       && settings.typeLabelVisibility?.[x as TypeLabelVisibilityKey] === false);
     if (hidden.length > 0) {

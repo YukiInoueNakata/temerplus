@@ -96,3 +96,32 @@ describe('論文用レポートの Block 1 は今の図の線種から書く', (
     expect(describeNotation(d)!.meaning).toContain('必須通過点（OPP）の種別ラベルは表示していない');
   });
 });
+
+// 簡素化方式は線の角度に意味を持たせない表記。当てると径路を原則カギ線にする（2026-11-12 ユーザー指示）
+describe('簡素化方式のテーマと径路のカギ線', () => {
+  it('当てると線の既定と今ある線がカギ線になり、記号体系の文に角度に意味を持たせないと書く', async () => {
+    const { applyThemeToDoc } = await import('./boxThemes');
+    const d = doc(false);
+    expect(active(d).lines.length).toBeGreaterThan(0);
+    applyThemeToDoc(d, simplified);
+    expect(d.settings.lineDefaults?.shape).toBe('elbow');
+    for (const sh of d.sheets) for (const l of sh.lines) expect(l.shape).toBe('elbow');
+    const n = describeNotation(d)!;
+    expect(n.realityOnly).toBe(true);
+    expect(n.meaning).toContain('角度');
+  });
+  it('線を 1 本でも直線に戻したら、角度の文は書かない', async () => {
+    const { applyThemeToDoc } = await import('./boxThemes');
+    const d = doc(false);
+    applyThemeToDoc(d, simplified);
+    active(d).lines[0].shape = 'straight';
+    expect(describeNotation(d)!.meaning).not.toContain('角度');
+  });
+  it('線の形を持たないテーマ（モノクロなど）は線を変えない', async () => {
+    const { applyThemeToDoc } = await import('./boxThemes');
+    const d = doc(false);
+    const before = active(d).lines.map((l) => l.shape);
+    applyThemeToDoc(d, BUILTIN_THEMES.find((t) => t.id === 'theme-monochrome')!);
+    expect(active(d).lines.map((l) => l.shape)).toEqual(before);
+  });
+});

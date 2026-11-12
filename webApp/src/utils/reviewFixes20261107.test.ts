@@ -126,7 +126,8 @@ describe('#8 論文用レポートを同時に 2 つ作っても、未入力の�
     const [omit, keep] = await Promise.all([text(d, true), text(d, false)]);
     expect(omit).not.toContain('説明未記入');
     expect(keep).toContain('説明未記入');
-  });
+  // Word を 2 つ同時に組むので重い。CI（GitHub Actions）で 5.4 秒かかり既定の 5 秒を超えて落ちた（2026-11-13）ので 30 秒にする
+  }, 30_000);
 });
 
 describe('#4 凡例を含めると選んだら、凡例も入れて用紙に収める', () => {

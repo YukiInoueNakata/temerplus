@@ -146,7 +146,7 @@ npm run build      # webApp/dist/ に静的なファイルを書き出す
 
 このソフトウェアを使った場合は引用してください。機械で読める引用の情報は
 [`CITATION.cff`](./CITATION.cff) にあります（GitHub の「Cite this repository」からも使えます）。
-Zenodo に保存しています: https://doi.org/10.5281/zenodo.24051875 （すべての版。最新の v0.2.1 は https://doi.org/10.5281/zenodo.24053062 ）
+Zenodo に保存しています: https://doi.org/10.5281/zenodo.24051875 （すべての版。最新の v0.2.2 は https://doi.org/10.5281/zenodo.24149871 ）
 
 ```bibtex
 @software{nakata_temer_plus,

@@ -163,7 +163,7 @@ Bibliographic details were checked against CiNii, J-STAGE, Crossref, and the pub
 
 If you use this software, please cite it. Machine-readable metadata is in
 [`CITATION.cff`](./CITATION.cff) (also available through GitHub's "Cite this repository").
-The software is archived on Zenodo: https://doi.org/10.5281/zenodo.24051875 (all versions; the latest, v0.2.1, is https://doi.org/10.5281/zenodo.24053062 ).
+The software is archived on Zenodo: https://doi.org/10.5281/zenodo.24051875 (all versions; the latest, v0.2.2, is https://doi.org/10.5281/zenodo.24149871 ).
 
 ```bibtex
 @software{nakata_temer_plus,

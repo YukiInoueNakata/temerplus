@@ -38,7 +38,7 @@ using TEA/TEM, including those who are new to drawing TEM diagrams.
 
 ## Features
 
-- **TEM elements** — box types (normal experience, latent experience, bifurcation point,
+- **TEM elements** — box types (action, potential action, bifurcation point,
   equifinality point, polarized equifinality point, obligatory passage point, second
   equifinality point, others), solid-line and dotted-line trajectories, SD/SG (attached to a box or an
   arrow, between boxes, or in bands), period labels, the irreversible-time arrow, and an

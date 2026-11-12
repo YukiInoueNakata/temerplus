@@ -61,7 +61,11 @@ export const TYPE_DICT: Record<string, BoxType> = {
   '両極化等至点': 'P-EFP', // i18n-ok 利用者のファイルの値と照合
   '両極化': 'P-EFP', // i18n-ok 利用者のファイルの値と照合
   '必須通過点': 'OPP', // i18n-ok 利用者のファイルの値と照合
-  '潜在経験': 'annotation', // i18n-ok 利用者のファイルの値と照合
+  '潜在経験': 'annotation', // i18n-ok 利用者のファイルの値と照合（旧称。2026-11-12 まで）
+  // 2026-11-12 からの表記（通常→行為、潜在経験→潜在的な行為）。旧称も上に残す
+  '行為': 'normal', // i18n-ok 利用者のファイルの値と照合
+  '潜在的な行為': 'annotation', // i18n-ok 利用者のファイルの値と照合
+  '潜在的行為': 'annotation', // i18n-ok 利用者のファイルの値と照合
   '想定': 'annotation', // i18n-ok 利用者のファイルの値と照合
   '第二等至点': '2nd-EFP', // i18n-ok 利用者のファイルの値と照合
   '両極化第二等至点': 'P-2nd-EFP', // i18n-ok 利用者のファイルの値と照合する
@@ -81,6 +85,8 @@ export const TYPE_DICT: Record<string, BoxType> = {
   'bifurcation point': 'BFP',
   'obligatory passage point': 'OPP',
   'latent experience': 'annotation',
+  'potential action': 'annotation',
+  'unrealized action': 'annotation',
 };
 
 export function mapBoxType(raw: string): BoxType {

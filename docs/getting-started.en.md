@@ -59,9 +59,9 @@ Saving works a little differently depending on the browser (see [4. Save](#4-sav
 
    ![Create from an empty file](images/getting-started/app-10-wizard-empty-en.png)
 
-2. Open the "Insert" tab and click "Normal".
+2. Open the "Insert" tab and click "Action" (the picture still shows its former name, "Normal").
 
-   ![Normal on the Insert tab](images/getting-started/app-11-insert-normal-en.png)
+   ![Action on the Insert tab](images/getting-started/app-11-insert-normal-en.png)
 
 3. A box is added to the diagram.
 
@@ -76,7 +76,7 @@ Saving works a little differently depending on the browser (see [4. Save](#4-sav
 
    ![Text typed](images/getting-started/app-14-typed-en.png)
 
-6. In the same way, add boxes of other types, such as "Obligatory passage point" (OPP). Each type (normal, bifurcation point, equifinality point, polarized equifinality point, obligatory passage point and so on) has its own border.
+6. In the same way, add boxes of other types, such as "Obligatory passage point" (OPP). Each type (action, bifurcation point, equifinality point, polarized equifinality point, obligatory passage point and so on) has its own border.
 
    ![Add an obligatory passage point](images/getting-started/app-15-insert-opp-en.png)
 

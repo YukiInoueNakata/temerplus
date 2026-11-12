@@ -56,9 +56,9 @@ https://yukiinouenakata.github.io/temerplus/
 
    ![空ファイルから作成](images/getting-started/app-10-wizard-empty.png)
 
-2. 「挿入」タブを開き，「通常」を押します．
+2. 「挿入」タブを開き，「行為」を押します（画像は前の名前の「通常」のままです）．
 
-   ![挿入タブの「通常」](images/getting-started/app-11-insert-normal.png)
+   ![挿入タブの「行為」](images/getting-started/app-11-insert-normal.png)
 
 3. 図に Box が 1 つ増えます．
 
@@ -73,7 +73,7 @@ https://yukiinouenakata.github.io/temerplus/
 
    ![文字を書き込んだ](images/getting-started/app-14-typed.png)
 
-6. 同じように，「必須通過点」などの種類の Box を足します．種類（通常・分岐点・等至点・両極化した等至点・必須通過点など）ごとに，枠の線が変わります．
+6. 同じように，「必須通過点」などの種類の Box を足します．種類（行為・分岐点・等至点・両極化した等至点・必須通過点など）ごとに，枠の線が変わります．
 
    ![必須通過点を足す](images/getting-started/app-15-insert-opp.png)
 

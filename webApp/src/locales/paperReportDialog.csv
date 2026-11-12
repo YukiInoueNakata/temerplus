@@ -28,7 +28,7 @@
 "export.hint.intro",".docx（Word 形式）として出力します。レポートには以下が含まれます:","Exports a .docx (Word) file. The report contains:","論文用レポートの画面 > 出力タブ > 説明の 1 行目"
 "export.hint.methods","・記号体系 / 協力者 / インタビュー / 表記方針（方法相当）","- Notation / participants / interview / notation policy (the method section)","論文用レポートの画面 > 出力タブ > 説明の箇条"
 "export.hint.diagram","・TEM 図（任意・PNG 埋込）","- TEM diagram (optional, embedded as PNG)","論文用レポートの画面 > 出力タブ > 説明の箇条"
-"export.hint.results","・<b>結果</b>: 時期区分・OPP・BFP・EFP・P-EFP・2nd EFP・P-2nd EFP・通常 Box・注釈・径路（実線/点線）・SD・SG を漏れなくリスト化","- <b>Results</b>: a complete list of periods, OPP, BFP, EFP, P-EFP, 2nd EFP, P-2nd EFP, normal Boxes, annotations, paths (solid/dashed), SD and SG","論文用レポートの画面 > 出力タブ > 説明の箇条（<b> のタグは残す）"
+"export.hint.results","・<b>結果</b>: 時期区分・OPP・BFP・EFP・P-EFP・2nd EFP・P-2nd EFP・行為・潜在的な行為・径路（実線/点線）・SD・SG を漏れなくリスト化","- <b>Results</b>: a complete list of periods, OPP, BFP, EFP, P-EFP, 2nd EFP, P-2nd EFP, actions, potential actions, trajectories (solid/dotted), SD and SG","論文用レポートの画面 > 出力タブ > 説明の箇条（<b> のタグは残す）"
 "export.hint.glossary","・用語凡例","- Glossary of terms","論文用レポートの画面 > 出力タブ > 説明の箇条"
 "export.hint.description","各要素の「説明」フィールド（PropertyPanel から編集可）が記入されていればそのまま挿入されます。","If an element has a Description (editable in the property panel), it is inserted as is.","論文用レポートの画面 > 出力タブ > 説明"
 "export.hint.confirm","出力の前に確認画面で、入力状況・図にあるメモや記号を載せるか・未入力の項目の扱いを選びます。"," Before exporting, a check screen shows what has been filled in and lets you choose whether to include the notes and symbols in the diagram and how to handle items not filled in.","論文用レポートの画面 > 出力タブ > 説明（前の文の直後に続く。英語は先頭に空白）"

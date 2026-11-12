@@ -458,13 +458,13 @@ export const BOX_RENDER_SPECS: Record<string, BoxRenderSpec> = {
 };
 
 export const BOX_TYPE_LABELS: Record<string, { ja: string; en: string; shortJa?: string }> = {
-  normal:      { ja: '通常',               en: 'Normal', shortJa: '通常' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  normal:      { ja: '行為',               en: 'Action', shortJa: '行為' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   other:       { ja: 'その他',             en: 'Other',  shortJa: 'その他' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   BFP:         { ja: '分岐点',             en: 'BFP',    shortJa: 'BFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   EFP:         { ja: '等至点',             en: 'EFP',    shortJa: 'EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   'P-EFP':     { ja: '両極化した等至点',       en: 'P-EFP',  shortJa: 'P-EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   OPP:         { ja: '必須通過点',         en: 'OPP',    shortJa: 'OPP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
-  annotation:  { ja: '潜在経験',           en: 'Latent', shortJa: '潜在' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
+  annotation:  { ja: '潜在的な行為',       en: 'Potential action', shortJa: '潜在' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   '2nd-EFP':   { ja: 'セカンド等至点',         en: '2nd EFP', shortJa: '2nd EFP' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
   'P-2nd-EFP': { ja: '両極化したセカンド等至点',   en: 'P-2nd EFP', shortJa: 'P-2nd' }, // i18n-ok 日本語の側の値（英語は en・用語は terms）
 };

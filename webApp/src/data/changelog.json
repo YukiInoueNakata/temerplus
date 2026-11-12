@@ -1,5 +1,11 @@
 [
   {
+    "date": "2026-11-12",
+    "items": [
+      {"kind":"改善","title":"Box の種別「通常」を「行為」に、「潜在経験」を「潜在的な行為」に改める","detail":"TEA の研究者の指摘を受けて、実現した経験を表す Box を「行為」、実現しなかったがありえた経験を表す点線の Box を「潜在的な行為」と呼ぶようにしました（英語は Action・Potential action）。画面・凡例・論文用レポートの名前が変わります。前に作ったファイルはそのまま開け、種別も変わりません。CSV や MAXQDA の取り込みでは前の名前（通常・潜在経験）も読めます。文字が前の名前のままの Box は、種別を変えると新しい種別の名前に替わります。","en":{"title":"Box types renamed: Action and Potential action","detail":"Following advice from TEA researchers, the Box for realized experience is now called Action (formerly Normal), and the dotted Box for unrealized but possible experience is called Potential action (formerly Latent experience). The names change in the screens, the legend and the paper report. Existing files open unchanged and keep their types. CSV and MAXQDA imports still accept the former names."}}
+    ]
+  },
+  {
     "date": "2026-11-10",
     "items": [
       {"kind":"改善","title":"点線の径路だけでつながる Box に注意を出す","detail":"通常の Box に点線の径路しかつながっていないとき、Box の右上に「!」を出し、プロパティで「潜在経験にする」を選べます。潜在経験の Box に実線の径路がつながっているときは「通常にする」を勧めます。「このままにする」で以後は出しません。「!」は出力には写りません。","en":{"title":"Notice for Boxes connected only by dashed paths","detail":"When a Normal Box is connected only by dashed paths, a \"!\" appears at its top right, and Properties offers \"Make it a latent experience\". A latent experience connected by a solid path is offered \"Make it Normal\". \"Keep as is\" hides the notice for that Box. The \"!\" never appears in exports."}},

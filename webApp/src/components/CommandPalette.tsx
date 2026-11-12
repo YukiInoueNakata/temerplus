@@ -273,7 +273,7 @@ function useCommands(callbacks: CommandPaletteCallbacks): Command[] {
       ...(['normal', 'BFP', 'OPP', 'EFP', 'P-EFP', '2nd-EFP', 'P-2nd-EFP', 'annotation', 'other'] as BoxType[]).map((type): Command => ({
         id: `insert.box.${type}`,
         label: t('cmd.insert.box', { type }),
-        keywords: `insert box add ${type} ${type === 'normal' ? '通常' : ''}`, // i18n-ok 検索用の語（日本語で引けるように残す）
+        keywords: `insert box add ${type} ${type === 'normal' ? '行為 通常 action normal' : type === 'annotation' ? '潜在的な行為 潜在経験 potential latent' : ''}`, // i18n-ok 検索用の語（旧称の 通常・潜在経験 でも引けるように残す）
         category: 'insert',
         run: () => store().addBox({ type }),
       })),

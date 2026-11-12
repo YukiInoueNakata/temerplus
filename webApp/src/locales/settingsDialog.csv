@@ -112,14 +112,14 @@ snap.gridPx.hint,グリッド表示の点間隔とスナップ吸着距離を兼
 snap.alignGuides,整列ガイド,Alignment guides,設定 > スナップ の見出し
 snap.alignGuides.show,他 Box と整列時にガイド線を表示,Show guide lines when aligned with other Boxes,設定 > スナップ の項目名
 snap.distancePx,距離スナップ（px）,Distance snap (px),設定 > スナップ の項目名
-boxTypeLabel.normal,normal（通常）,normal (Normal),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.normal,normal（行為）,normal (Action),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.BFP,BFP（分岐点）,BFP (Bifurcation point),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.EFP,EFP（等至点）,EFP (Equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.P-EFP,P-EFP（両極化した等至点）,P-EFP (Polarized equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.OPP,OPP（必須通過点）,OPP (Obligatory passage point),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.2nd-EFP,2nd-EFP（セカンド等至点）,2nd-EFP (Second equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.P-2nd-EFP,P-2nd-EFP（両極化したセカンド等至点）,P-2nd-EFP (Polarized second equifinality point),設定 > タイプラベル と Box スタイル のBox の種類の名前
-boxTypeLabel.annotation,annotation（潜在経験）,annotation (Latent experience),設定 > タイプラベル と Box スタイル のBox の種類の名前
+boxTypeLabel.annotation,annotation（潜在的な行為）,annotation (Potential action),設定 > タイプラベル と Box スタイル のBox の種類の名前
 boxTypeLabel.SD,SD（社会的方向づけ）,SD (Social direction),設定 > タイプラベル と Box スタイル の種類の名前
 boxTypeLabel.SG,SG（社会的助勢）,SG (Social guidance),設定 > タイプラベル と Box スタイル の種類の名前
 typeLabel.title,タイプラベル（種別バッジ）表示,Type label (type badge) visibility,設定 > タイプラベル の見出し

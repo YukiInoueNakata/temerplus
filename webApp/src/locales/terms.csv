@@ -2,9 +2,9 @@
 app.name,TEMer Plus,TEMer Plus,アプリの名前（訳さない）
 tem,複線径路等至性モデリング（TEM）,Trajectory Equifinality Modeling (TEM),方法の名前（旧称 複線径路等至性モデル・Trajectory Equifinality Model。モデリングに改称。安田・サトウ編著『TEAによる対人援助プロセスと分岐の記述』表1-2）
 tea,複線径路等至性アプローチ（TEA）,Trajectory Equifinality Approach (TEA),方法の名前
-boxType.normal,通常,Normal,Box の種類（通常の経験・出来事）
-boxType.normal.long,通常の経験,Experience,Box の種類の説明
-boxType.annotation,潜在経験,Latent experience,Box の種類（想定された未実現の経験）
+boxType.normal,行為,Action,Box の種類（実現した行為・経験。旧称 通常。2026-11-12 安田裕子氏の指摘で改称）
+boxType.normal.long,行為,Action,Box の種類の説明
+boxType.annotation,潜在的な行為,Potential action,Box の種類（実現しなかったが、ありえた行為。旧称 潜在経験。2026-11-12 改称）
 boxType.BFP,分岐点,Bifurcation point,Box の種類。略号 BFP
 boxType.EFP,等至点,Equifinality point,Box の種類。略号 EFP
 boxType.P-EFP,両極化した等至点,Polarized equifinality point,Box の種類。略号 P-EFP

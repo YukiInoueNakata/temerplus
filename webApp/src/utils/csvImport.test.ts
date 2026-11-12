@@ -62,6 +62,16 @@ describe('mapBoxType: 種別マッピング', () => {
     expect(mapBoxType('必須通過点')).toBe('OPP');
     expect(mapBoxType('潜在経験')).toBe('annotation');
   });
+  it('2026-11-12 の新しい名前（行為・潜在的な行為）と旧称（通常・潜在経験）のどちらも読む', () => {
+    expect(mapBoxType('行為')).toBe('normal');
+    expect(mapBoxType('通常')).toBe('normal');
+    expect(mapBoxType('潜在的な行為')).toBe('annotation');
+    expect(mapBoxType('潜在経験')).toBe('annotation');
+    expect(mapBoxType('Action')).toBe('normal');
+    expect(mapBoxType('Normal')).toBe('normal');
+    expect(mapBoxType('Potential action')).toBe('annotation');
+    expect(mapBoxType('Latent experience')).toBe('annotation');
+  });
   it('不明は normal', () => {
     expect(mapBoxType('xxx')).toBe('normal');
     expect(mapBoxType('')).toBe('normal');

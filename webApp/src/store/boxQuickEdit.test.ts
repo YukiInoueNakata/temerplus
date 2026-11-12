@@ -43,13 +43,16 @@ describe('moveSelectionItemLevel（浮かぶツールバー・右クリック）
 describe('changeSelectedBoxesType（数字のキー・右クリック・浮かぶツールバー）', () => {
   it('選んでいる Box をまとめて変え、既定の名前のままの文字は新しい種別の名前に替える', () => {
     const st = useTEMStore.getState();
-    const a = st.addBox({ type: 'normal', label: '通常' });
+    const a = st.addBox({ type: 'normal', label: '行為' });
     const b = st.addBox({ type: 'normal', label: '大学に入る' });
-    useTEMStore.getState().setSelection([a, b], [], []);
+    // 前の版の既定の名前（旧称）のままの Box も替える（2026-11-12 通常→行為、潜在経験→潜在的な行為）
+    const c = st.addBox({ type: 'normal', label: '通常' });
+    const d = st.addBox({ type: 'annotation', label: '潜在経験' });
+    useTEMStore.getState().setSelection([a, b, c, d], [], []);
     changeSelectedBoxesType('BFP');
     const boxes = sheet().boxes;
     expect(boxes.every((x) => x.type === 'BFP')).toBe(true);
-    expect(boxes.map((x) => x.label).sort()).toEqual(['分岐点', '大学に入る'].sort());
+    expect(boxes.map((x) => x.label).sort()).toEqual(['分岐点', '分岐点', '分岐点', '大学に入る'].sort());
     // 選択も新しい ID に付け替わっている
     expect(useTEMStore.getState().selection.boxIds.every((id) => id.startsWith('BFP'))).toBe(true);
   });

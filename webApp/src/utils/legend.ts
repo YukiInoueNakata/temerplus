@@ -42,12 +42,12 @@ export interface LegendItem {
 }
 
 const BOX_DESCRIPTIONS: Record<BoxType, string> = {
-  'normal':     '経験・出来事', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  'normal':     '行為（実現した行為・経験）', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'BFP':        '分岐点 (Bifurcation Point)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'EFP':        '等至点 (Equifinality Point)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'P-EFP':      '両極化した等至点 (Polarized EFP)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'OPP':        '必須通過点 (Obligatory Passage Point)', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
-  'annotation': '潜在経験 / 想定された未実現経験', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  'annotation': '潜在的な行為（実現しなかった行為）', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   '2nd-EFP':    'セカンド等至点', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'P-2nd-EFP':  '両極化したセカンド等至点', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
   'other':      'その他', // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
@@ -55,12 +55,12 @@ const BOX_DESCRIPTIONS: Record<BoxType, string> = {
 
 // 英語ロケール時の説明文（ラベル自体は BOX_TYPE_LABELS.en を使う）
 const BOX_DESCRIPTIONS_EN: Record<BoxType, string> = {
-  'normal':     'Experience / event',
+  'normal':     'Action (realized action or experience)',
   'BFP':        'Bifurcation Point',
   'EFP':        'Equifinality Point',
   'P-EFP':      'Polarized Equifinality Point',
   'OPP':        'Obligatory Passage Point',
-  'annotation': 'Latent / imagined unrealized experience',
+  'annotation': 'Potential action (unrealized action)',
   '2nd-EFP':    'Second Equifinality Point',
   'P-2nd-EFP':  'Polarized Second Equifinality Point',
   'other':      'Other',

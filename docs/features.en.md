@@ -28,7 +28,7 @@ Names in parentheses are the ribbon tabs and buttons where each feature lives.
 
 ## TEM diagram elements
 
-- **Box types**: experience, latent experience, bifurcation point (BFP), equifinality point (EFP), polarized equifinality point (P-EFP), obligatory passage point (OPP), second equifinality point (2nd EFP), polarized second equifinality point (P-2nd EFP), and other (Insert > Box).
+- **Box types**: action, potential action (renamed from Normal and Latent experience on 2026-11-12), bifurcation point (BFP), equifinality point (EFP), polarized equifinality point (P-EFP), obligatory passage point (OPP), second equifinality point (2nd EFP), polarized second equifinality point (P-2nd EFP), and other (Insert > Box).
 - **Paths (lines)**: solid arrows for realized paths and dashed arrows for unrealized paths. Selected Boxes can be connected in order (Insert > Line / arrow). Lines can be straight or curved.
 - **SD and SG**: social direction (SD) and social guidance (SG). They can be attached to a Box or an arrow, placed between two Boxes, or collected in bands above and below the diagram (Insert > Add SD/SG, SD/SG placement).
 - **Period labels**: period boundaries and names (Insert > Period labels).

@@ -10,7 +10,7 @@ role.ignore,（無視）,(Ignore),PowerPoint の取り込み > 図形の役割�
 reason.sep,・,"; ",PowerPoint の取り込み > 推測の理由を 2 つ以上つなぐ区切り
 reason.typeprefix,本文の先頭の種別名,Type name at the start of the text,PowerPoint の取り込み > 図形の役割を推測した理由（Box の種別）
 reason.double,二重線,Double outline,PowerPoint の取り込み > 推測の理由（Box の種別を等至点に）
-reason.dotted,点線（潜在経験として）,Dotted outline (as latent experience),PowerPoint の取り込み > 推測の理由（Box の種別）
+reason.dotted,点線（潜在的な行為として）,Dotted outline (as potential action),PowerPoint の取り込み > 推測の理由（Box の種別）
 reason.longarrow,横に長い矢印,Long horizontal arrow,PowerPoint の取り込み > 推測の理由（時間の矢印）
 reason.longarrowline,横に長い矢印線（両端に Box が無い）,Long horizontal arrow line (no Box at either end),PowerPoint の取り込み > 推測の理由（時間の矢印）
 reason.temername,TEMer の出力（図形の名前）,TEMer output (shape name),PowerPoint の取り込み > 推測の理由（SD/SG）

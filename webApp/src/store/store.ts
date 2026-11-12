@@ -395,6 +395,13 @@ const mutateSheet = (doc: TEMDocument, sheetId: string, mutator: (sheet: Sheet) 
     draft.metadata.modifiedAt = new Date().toISOString();
   });
 
+// 種別の旧称（2026-11-12 に 通常→行為、潜在経験→潜在的な行為 と改めた）。前の版で作った Box の文字が
+// 旧称のままなら、既定の名前として扱い、種別を変えたときに新しい名前に替える
+const FORMER_BOX_TYPE_NAMES: Partial<Record<BoxType, string[]>> = {
+  normal: ['通常', 'Normal'], // i18n-ok 前の版の既定の名前と照合
+  annotation: ['潜在経験', 'Latent experience'], // i18n-ok 前の版の既定の名前と照合
+};
+
 // Box の種別を変える（下書きのシートの中だけ）。ID を新しい種別の接頭辞で振り直し、そのシートの中の参照
 // （矢印・SD/SG・コメント・メモの引き出し線）を付け替える。文字が前の種別の既定の名前のままなら新しい名前に替える
 function applyBoxTypeChange(sh: Sheet, boxId: string, newType: BoxType, lng: string): string | null {
@@ -404,7 +411,8 @@ function applyBoxTypeChange(sh: Sheet, boxId: string, newType: BoxType, lng: str
   const newId = genBoxIdByType(newType, sh.boxes.filter((b) => b.id !== boxId).map((b) => b.id));
   box.type = newType;
   box.id = newId;
-  if (box.label === i18n.t(`terms:boxType.${oldType}`, { lng })) box.label = i18n.t(`terms:boxType.${newType}`, { lng });
+  const oldNames = [i18n.t(`terms:boxType.${oldType}`, { lng }), ...(FORMER_BOX_TYPE_NAMES[oldType] ?? [])];
+  if (oldNames.includes(box.label)) box.label = i18n.t(`terms:boxType.${newType}`, { lng });
   sh.lines.forEach((l) => { if (l.from === boxId) l.from = newId; if (l.to === boxId) l.to = newId; });
   sh.sdsg.forEach((sg) => { if (sg.attachedTo === boxId) sg.attachedTo = newId; if (sg.attachedTo2 === boxId) sg.attachedTo2 = newId; });
   sh.comments.forEach((c) => { if (c.targetId === boxId) c.targetId = newId; });

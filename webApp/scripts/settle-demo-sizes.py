@@ -5,7 +5,7 @@
 """
 同梱のデモ（.tem）の Box の大きさを、アプリの自動調整（既定は幅を固定して高さを文字に合わせる）が落ち着いた値に書き戻す（2026-11-10）。
 
-  cd webApp && npx vite --port 5288 --strictPort --open false     # 別の窓で開発サーバー（--open false でブラウザを開かない）
+  cd webApp && npx vite --port 5288 --strictPort --no-open     # 別の窓で開発サーバー（--no-open でブラウザを開かない．--open false は /false を開いてしまう）
   uv run scripts/settle-demo-sizes.py sample-tem/fictional_piano_demo.tem sample-tem/fictional_piano_demo_en.tem
 
 なぜ: スクリプトで見積もった高さがアプリの文字の測り方と合わないと、デモを開いた直後に自動調整が Box を直し、

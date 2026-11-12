@@ -9,6 +9,9 @@ export default defineConfig({
   base: process.env.VITE_BASE_PATH || '/',
   server: {
     port: 5173,
-    open: true,
+    // 端末から人が起動したときだけブラウザを開く。Claude の自動の確認・撮影（端末の無い背後での起動）で
+    // ユーザーの Chrome にタブが増え続けたため（2026-11-12）。なお CLI の `--open false` は「false」という道を
+    // 開いてしまうので使わない（開かないなら `--no-open`）
+    open: Boolean(process.stdout.isTTY),
   },
 });

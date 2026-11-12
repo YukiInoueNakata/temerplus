@@ -2,7 +2,7 @@
   "version": "0.4",
   "sheets": [
     {
-      "id": "Sheet_mwdo6qnh_qv9ho",
+      "id": "Sheet_mwdo8u2n_72rlm",
       "name": "Sheet 1",
       "type": "individual",
       "order": 0,
@@ -218,7 +218,7 @@
       "periodLabels": []
     }
   ],
-  "activeSheetId": "Sheet_mwdo6qnh_qv9ho",
+  "activeSheetId": "Sheet_mwdo8u2n_72rlm",
   "participants": [],
   "settings": {
     "layout": "horizontal",
@@ -284,7 +284,7 @@
       "alwaysVisible": true,
       "includeInExport": true,
       "position": {
-        "x": 4,
+        "x": -50,
         "y": 327
       },
       "includeBoxes": true,
@@ -314,7 +314,7 @@
       "titleSeparatorVisible": true,
       "titleSeparatorColor": "#dddddd",
       "itemOverrides": {},
-      "placement": "auto",
+      "placement": "manual",
       "layoutModeHorizontal": "rows",
       "rowsHorizontal": 2,
       "realityOnly": false
@@ -381,8 +381,8 @@
   },
   "metadata": {
     "title": "paper_fig3_notation",
-    "createdAt": "2026-11-12T14:55:30.414Z",
-    "modifiedAt": "2026-11-12T14:55:31.393Z"
+    "createdAt": "2026-11-12T14:57:08.159Z",
+    "modifiedAt": "2026-11-12T14:57:09.124Z"
   },
   "history": [],
   "transcripts": []

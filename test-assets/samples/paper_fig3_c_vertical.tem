@@ -2,7 +2,7 @@
   "version": "0.4",
   "sheets": [
     {
-      "id": "Sheet_mwdo6qnh_qv9ho",
+      "id": "Sheet_mwdo8u2n_72rlm",
       "name": "Sheet 1",
       "type": "individual",
       "order": 0,
@@ -218,7 +218,7 @@
       "periodLabels": []
     }
   ],
-  "activeSheetId": "Sheet_mwdo6qnh_qv9ho",
+  "activeSheetId": "Sheet_mwdo8u2n_72rlm",
   "participants": [],
   "settings": {
     "layout": "vertical",
@@ -452,8 +452,8 @@
   },
   "metadata": {
     "title": "paper_fig3_notation",
-    "createdAt": "2026-11-12T14:55:30.414Z",
-    "modifiedAt": "2026-11-12T14:55:35.212Z"
+    "createdAt": "2026-11-12T14:57:08.159Z",
+    "modifiedAt": "2026-11-12T14:57:12.992Z"
   },
   "history": [],
   "transcripts": []

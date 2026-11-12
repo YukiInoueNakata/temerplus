@@ -33,7 +33,7 @@ Names in parentheses are the ribbon tabs and buttons where each feature lives.
 - **SD and SG**: social direction (SD) and social guidance (SG). They can be attached to a Box or an arrow, placed between two Boxes, or collected in bands above and below the diagram (Insert > Add SD/SG, SD/SG placement).
 - **Period labels**: period boundaries and names (Insert > Period labels).
 - **Irreversible Time**: the time arrow is drawn automatically outside the diagram, placed so that it does not overlap SD/SG or their labels.
-- **Legend**: built automatically from the symbols used in the diagram. In a new diagram it is placed automatically below the time arrow, right-aligned and wide (moving it switches to manual). Items, number of columns, font size, and frame can be changed.
+- **Legend**: built automatically from the symbols used in the diagram. In a new diagram it is placed automatically below the time arrow and wide; in horizontal diagrams its left edge is aligned with the start of the arrow (moving it switches to manual). Items, number of columns, font size, and frame can be changed.
 - **Notes and symbols**: notes placed on the diagram and symbols with leader lines (Insert > Notes).
 - **Labels**: Boxes and SD/SG can have a type label (BFP-1 and so on) and a sublabel (a short note). Box text can be styled with bold, underline, color, and so on.
 - **Sheets**: one file can hold several diagrams (sheets), for example one per participant and an integrated diagram.

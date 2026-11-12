@@ -1,5 +1,11 @@
 [
   {
+    "date": "2026-11-13",
+    "items": [
+      {"kind":"改善","title":"横型の図の凡例を、時間の矢印の下に左寄せで置く","detail":"凡例を自動で置くとき、横型の図では、これまで右端を時間の矢印の右端にそろえていました。これを、左端を矢印の始まりにそろえる形に変えました。縦型の図はこれまでどおり左寄せです。凡例を動かして位置を手で決めた図は動きません。","en":{"title":"Legend left-aligned below the time arrow in horizontal diagrams","detail":"When the legend is placed automatically in a horizontal diagram, its left edge is now aligned with the start of the time arrow (it was right-aligned before). Vertical diagrams stay left-aligned. Legends placed by hand do not move."}}
+    ]
+  },
+  {
     "date": "2026-11-12",
     "items": [
       {"kind":"改善","title":"簡素化方式の凡例を「実現した」「実現しなかった」の 2 項目にする","detail":"簡素化方式のテーマを当てると、凡例が Box と径路をまとめた 2 項目（実線＝実現した行為・径路、点線＝実現しなかった行為・径路）になります。線種が実在性だけを表すので、種別ごとの凡例は要らないためです。ほかのテーマを当てるか「すべて自動に戻す」で元の凡例に戻ります。設定の「凡例」でも切り替えられます。","en":{"title":"Simplified legend with two items","detail":"Applying the simplified theme turns the legend into two items that cover both Boxes and trajectories: solid = realized action or trajectory, dotted = unrealized action or trajectory. Applying another theme or resetting all brings back the usual legend. It can also be switched in the Legend settings."}},

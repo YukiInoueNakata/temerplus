@@ -21,7 +21,7 @@ const drawRow = (n: number, types: string[] = []) => {
 };
 
 describe('凡例の自動の置き方', () => {
-  it('新しい図は自動で、凡例は時間の矢印の下・右端を矢印の右端にそろえる', () => {
+  it('新しい図は自動で、凡例は時間の矢印の下・左端を矢印の始まりにそろえる（2026-11-13 に右寄せから変えた）', () => {
     expect(doc().settings.legend.placement).toBe('auto');
     drawRow(8, ['normal', 'BFP', 'OPP', 'normal', 'normal', 'normal', 'normal', 'EFP']);
     const s = doc().settings;
@@ -29,7 +29,9 @@ describe('凡例の自動の置き方', () => {
     const items = computeLegendItems(sheet(), s.legend, s.locale);
     const size = estimateLegendSize(s.legend, items, computeLegendColumns(s.legend, 'horizontal', items.length));
     expect(s.legend.layoutModeHorizontal).toBe('rows');
-    expect(Math.abs(s.legend.position.x + size.w - Math.max(a.startX, a.endX))).toBeLessThanOrEqual(1);
+    expect(Math.abs(s.legend.position.x - Math.min(a.startX, a.endX))).toBeLessThanOrEqual(1);
+    // 幅は矢印の長さに収まる
+    expect(size.w).toBeLessThanOrEqual(Math.abs(a.endX - a.startX) + 1);
     expect(s.legend.position.y).toBeGreaterThan(Math.max(a.startY, a.endY));
   });
 
@@ -51,8 +53,9 @@ describe('凡例の自動の置き方', () => {
     const ids = drawRow(6, ['normal', 'BFP']);
     const before = { ...doc().settings.legend.position };
     const pastBefore = useTEMStore.temporal.getState().pastStates.length;
-    useTEMStore.getState().updateBox(ids[5], { x: 1500 });
-    expect(doc().settings.legend.position.x).toBeGreaterThan(before.x);
+    // 左寄せなので、いちばん左の Box を左へ動かすと矢印の始まりとともに凡例も左へ動く
+    useTEMStore.getState().updateBox(ids[0], { x: -600 });
+    expect(doc().settings.legend.position.x).toBeLessThan(before.x);
     expect(useTEMStore.temporal.getState().pastStates.length).toBe(pastBefore + 1);
     useTEMStore.temporal.getState().undo();
     expect(doc().settings.legend.position).toEqual(before);

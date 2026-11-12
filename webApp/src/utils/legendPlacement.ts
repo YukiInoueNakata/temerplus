@@ -1,6 +1,7 @@
 // ============================================================================
 // 凡例の自動の置き方（2026-11-10 ユーザー「凡例は基本 非可逆的時間の右下で、横型なら 1 行のことが多い」）
-// - 横型: 時間の矢印（と「非可逆的時間」の文字）の下に、凡例の右端を矢印の右端にそろえて置く。
+// - 横型: 時間の矢印（と「非可逆的時間」の文字）の下に、凡例の左端を矢印の始まりにそろえて置く
+//         （2026-11-13 ユーザー決定で右寄せから左寄せに変えた。論文の図 3 で左寄せにしたのを既定にした）。
 //         行の数は、凡例の幅が矢印の長さに収まる最も少ない数（1 行で収まれば 1 行）
 // - 縦型: 時間の矢印の下の端の下に、左端を矢印の文字の側にそろえて置く。行の数は図の幅に収まる最も少ない数
 // 位置と行の数を返すだけで、書き込みは store（syncAutoLegend）が行う
@@ -44,12 +45,12 @@ export function computeAutoLegend(sheet: Sheet, settings: ProjectSettings): Auto
   if (settings.layout === 'horizontal') {
     const left = Math.min(a.startX, a.endX);
     const right = Math.max(a.startX, a.endX);
-    const { rows, size } = fit('horizontal', right - left);
+    const { rows } = fit('horizontal', right - left);
     const below = settings.timeArrow.labelSideHorizontal === 'top'
       ? Math.max(a.startY, a.endY) + a.strokeWidth
       : a.labelY + a.fontSize;
     return {
-      position: { x: Math.round(Math.max(left, right - size.w)), y: Math.round(below + AUTO_LEGEND_GAP) },
+      position: { x: Math.round(left), y: Math.round(below + AUTO_LEGEND_GAP) },
       layoutModeHorizontal: 'rows',
       rowsHorizontal: rows,
     };

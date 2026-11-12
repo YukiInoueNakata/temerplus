@@ -59,6 +59,8 @@ webApp/*.tsbuildinfo
 !/README.ja.md
 # 商用ライセンスの案内（料金の表を外した版・2026-11-08 公開）
 !/COMMERCIAL.md
+# 組み立て済みのファイル（release/web）の説明（2026-11-13 公開）
+!/release/README.md
 # LICENSE はテキストファイルなので影響なし
 
 # docs/（調査資料・文献PDF・画像・マニュアルすべてローカル保持・非公開）
@@ -68,6 +70,8 @@ docs/*
 !docs/getting-started.en.md
 !docs/features.ja.md
 !docs/features.en.md
+!docs/build-from-archive.ja.md
+!docs/build-from-archive.en.md
 !docs/images/
 docs/images/*
 !docs/images/screenshot.png

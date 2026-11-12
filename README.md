@@ -92,6 +92,8 @@ npm test           # unit tests (Vitest)
 npm run build      # static files in webApp/dist/
 ```
 
+Even if GitHub becomes unavailable, TEMer Plus can be run from the zip of any version archived on Zenodo. From v0.2.6 the prebuilt files (`release/web/`) are included, so it runs as static files without Node.js. See [docs/build-from-archive.en.md](docs/build-from-archive.en.md) (日本語: [docs/build-from-archive.ja.md](docs/build-from-archive.ja.md)).
+
 ## Notes & limitations
 
 - PPTX export reproduces positions, text and shapes approximately; PowerPoint wraps text
@@ -170,7 +172,7 @@ The software is archived on Zenodo: https://doi.org/10.5281/zenodo.24051875 (all
   author  = {Nakata, Yuki Inoue},
   title   = {TEMer Plus: A Drawing Tool for Trajectory Equifinality Modeling (TEM)},
   year    = {2026},
-  version = {0.2.5},
+  version = {0.2.6},
   doi     = {10.5281/zenodo.24051875},
   url     = {https://github.com/YukiInoueNakata/temerplus}
 }

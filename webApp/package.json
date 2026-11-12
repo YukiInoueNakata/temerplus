@@ -2,14 +2,18 @@
   "name": "temer-plus",
   "displayName": "TEMer Plus",
   "private": true,
-  "version": "0.2.5",
+  "version": "0.2.6",
   "type": "module",
   "description": "TEM (Trajectory Equifinality Model) diagram editor for researchers",
   "author": "Yuki Tomotaka Nakata",
   "license": "SEE LICENSE IN ../LICENSE",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "build:archive": "tsc --noEmit && vite build --base ./ --outDir ../release/web --emptyOutDir",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",

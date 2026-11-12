@@ -2,6 +2,7 @@
   {
     "date": "2026-11-13",
     "items": [
+      {"kind":"改善","title":"組み立て済みのファイルを同梱し、Zenodo の写しだけで動かす手順を書く","detail":"GitHub が使えなくなっても TEMer Plus を動かせるように、組み立て済みのファイル一式（release/web）を各版に入れ、Zenodo に保存される zip に含めるようにしました。Node.js が無くても、静的なファイルとして配れば手元や別のサーバーで動きます。手順は docs/build-from-archive.ja.md（英語版あり）にまとめ、README から辿れます。ソースから組み立てる手順と、依存のパッケージが取れなくなったときの備えも書きました。","en":{"title":"Prebuilt files included; guide to running from the Zenodo archive","detail":"So that TEMer Plus can still run if GitHub becomes unavailable, every version now includes the prebuilt files (release/web), which are part of the zip archived on Zenodo. Served as static files, they run on your computer or another server without Node.js. The steps are in docs/build-from-archive.en.md (with a Japanese version), linked from the README, together with how to build from source and what to do if the dependencies can no longer be downloaded."}},
       {"kind":"改善","title":"横型の図の凡例を、時間の矢印の下に左寄せで置く","detail":"凡例を自動で置くとき、横型の図では、これまで右端を時間の矢印の右端にそろえていました。これを、左端を矢印の始まりにそろえる形に変えました。縦型の図はこれまでどおり左寄せです。凡例を動かして位置を手で決めた図は動きません。","en":{"title":"Legend left-aligned below the time arrow in horizontal diagrams","detail":"When the legend is placed automatically in a horizontal diagram, its left edge is now aligned with the start of the time arrow (it was right-aligned before). Vertical diagrams stay left-aligned. Legends placed by hand do not move."}}
     ]
   },

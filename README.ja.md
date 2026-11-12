@@ -78,6 +78,8 @@ npm test           # 単体テスト（Vitest）
 npm run build      # webApp/dist/ に静的なファイルを書き出す
 ```
 
+GitHub が使えなくなっても、Zenodo に保存した各版の zip から動かせます。v0.2.6 からは組み立て済みのファイル（`release/web/`）も入っていて、Node.js が無くても静的なファイルとして配れば動きます。手順は [docs/build-from-archive.ja.md](docs/build-from-archive.ja.md) にまとめています（English: [docs/build-from-archive.en.md](docs/build-from-archive.en.md)）。
+
 ## 注意と制約
 
 - 画面は日本語と英語を切り替えられます（右上の「日本語 / English」）。
@@ -153,7 +155,7 @@ Zenodo に保存しています: https://doi.org/10.5281/zenodo.24051875 （す�
   author  = {Nakata, Yuki Inoue},
   title   = {TEMer Plus: A Drawing Tool for Trajectory Equifinality Modeling (TEM)},
   year    = {2026},
-  version = {0.2.5},
+  version = {0.2.6},
   doi     = {10.5281/zenodo.24051875},
   url     = {https://github.com/YukiInoueNakata/temerplus}
 }
@@ -164,6 +166,7 @@ Zenodo に保存しています: https://doi.org/10.5281/zenodo.24051875 （す�
 
 ### 2026年11月13日
 
+- **改善** 組み立て済みのファイルを同梱し、Zenodo の写しだけで動かす手順を書く: GitHub が使えなくなっても TEMer Plus を動かせるように、組み立て済みのファイル一式（release/web）を各版に入れ、Zenodo に保存される zip に含めるようにしました。Node.js が無くても、静的なファイルとして配れば手元や別のサーバーで動きます。手順は docs/build-from-archive.ja.md（英語版あり）にまとめ、README から辿れます。ソースから組み立てる手順と、依存のパッケージが取れなくなったときの備えも書きました。
 - **改善** 横型の図の凡例を、時間の矢印の下に左寄せで置く: 凡例を自動で置くとき、横型の図では、これまで右端を時間の矢印の右端にそろえていました。これを、左端を矢印の始まりにそろえる形に変えました。縦型の図はこれまでどおり左寄せです。凡例を動かして位置を手で決めた図は動きません。
 
 ### 2026年11月12日

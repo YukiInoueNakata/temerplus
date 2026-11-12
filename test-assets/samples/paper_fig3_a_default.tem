@@ -2,7 +2,7 @@
   "version": "0.4",
   "sheets": [
     {
-      "id": "Sheet_mwdnkk6r_atumt",
+      "id": "Sheet_mwdo6qnh_qv9ho",
       "name": "Sheet 1",
       "type": "individual",
       "order": 0,
@@ -60,7 +60,7 @@
         {
           "id": "Latent1",
           "type": "annotation",
-          "label": "′行為4",
+          "label": "行為4b",
           "x": 390,
           "y": 150,
           "width": 50,
@@ -70,7 +70,7 @@
         {
           "id": "P_EFP1",
           "type": "P-EFP",
-          "label": "′行為5",
+          "label": "行為5b",
           "x": 520,
           "y": 150,
           "width": 50,
@@ -218,7 +218,7 @@
       "periodLabels": []
     }
   ],
-  "activeSheetId": "Sheet_mwdnkk6r_atumt",
+  "activeSheetId": "Sheet_mwdo6qnh_qv9ho",
   "participants": [],
   "settings": {
     "layout": "horizontal",
@@ -381,8 +381,8 @@
   },
   "metadata": {
     "title": "paper_fig3_notation",
-    "createdAt": "2026-11-12T14:38:15.604Z",
-    "modifiedAt": "2026-11-12T14:38:15.608Z"
+    "createdAt": "2026-11-12T14:55:30.414Z",
+    "modifiedAt": "2026-11-12T14:55:31.393Z"
   },
   "history": [],
   "transcripts": []

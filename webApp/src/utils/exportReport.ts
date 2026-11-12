@@ -551,6 +551,7 @@ export async function buildPaperReportParagraphs(
     section(t('exportReport:section.notation'));
     if (ns) {
       // 「準拠」ではなく「参照」と書く（荒川ら 2012 は自らの手順を標準ではないとしている。論文 Block 1）
+      // 値 'Arakawa2012' は「TEMerPlus の既定の表記」を指す。保存したファイルとの互換のため名前は変えない（2026-11-12）
       children.push(para(
         ns.base === 'Arakawa2012'
           ? t('exportReport:notation.arakawa')

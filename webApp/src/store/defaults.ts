@@ -444,7 +444,8 @@ export interface BoxRenderSpec {
 }
 
 export const BOX_RENDER_SPECS: Record<string, BoxRenderSpec> = {
-  // 文献標準準拠（Arakawa 2012、Kawai 2016 など）。線種で種別を分ける。
+  // TEMerPlus の既定の表記。実線と点線の使い分けは Arakawa 2012 を参照し、種別ごとの線種（EFP の二重線・OPP の太線など）は
+  // 本ツールが定めたもの（2026-11-12 ユーザー決定で呼び方を直した。以前は「文献標準準拠」と書いていた）。
   // 太さは 1 本線を 1.5、OPP と二重線（EFP・P-EFP とセカンド）を 3.0 にそろえた（2026-11-12 ユーザー決定・v0.2.3）。
   // 以前は BFP 2.0・P-EFP 2.5・潜在経験 1.0 と 5 段階に分かれていた。二重線の 3.0 は 2 本の合計（CSS の double は 3px 未満だと 1 本になる）
   normal:       { borderStyle: 'solid',  borderWidth: 1.5, defaultShape: 'rect' },

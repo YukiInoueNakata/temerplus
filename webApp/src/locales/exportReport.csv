@@ -11,7 +11,7 @@
 "section.diagram","TEM 図","TEM diagram","Word の論文用レポート > 節の見出し（図を埋め込む節）"
 "section.results","結果","Results","Word の論文用レポート > 節の見出し"
 "section.glossary","用語凡例（図中略語の説明）","Glossary (abbreviations used in the diagram)","Word の論文用レポート > 節の見出し"
-"notation.arakawa","本図の記号は，荒川・安田・サトウ（2012）を参照した TEMerPlus の既定の表記による。","The symbols in this diagram follow the default notation of TEMerPlus, which draws on Arakawa, Yasuda and Sato (2012).","Word の論文用レポート > 記号体系の宣言（基準が既定のとき。「準拠」ではなく「参照」と書く）"
+"notation.arakawa","本図の記号は TEMerPlus の既定の表記による。実線と点線の使い分けは荒川・安田・サトウ（2012）を参照し，要素の種別を表す線種は本ツールが定めたものである。","The symbols in this diagram follow the default notation of TEMerPlus. The use of solid and dotted lines draws on Arakawa, Yasuda and Sato (2012); the line styles that mark element types were defined by this tool.","Word の論文用レポート > 記号体系の宣言（基準が既定のとき。荒川ら 2012 が定めるのは実線と点線の使い分けだけで，種別ごとの線種は TEMerPlus の独自。2026-11-12 ユーザー決定）"
 "notation.custom","本図は独自の記号体系を用いる（下記参照）。","This diagram uses its own notation (see below).","Word の論文用レポート > 記号体系の宣言（基準が独自のとき）"
 "notation.other","その他の記号体系を用いる（下記参照）。","This diagram uses another notation (see below).","Word の論文用レポート > 記号体系の宣言（基準がその他のとき）"
 "notation.lines","各要素の枠の線種は次のとおりである。","The border line styles of the elements are as follows.","Word の論文用レポート > 記号体系の宣言 > 線種の一覧の前の文"

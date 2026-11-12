@@ -148,7 +148,7 @@ GitHub が使えなくなっても、Zenodo に保存した各版の zip から�
 
 このソフトウェアを使った場合は引用してください。機械で読める引用の情報は
 [`CITATION.cff`](./CITATION.cff) にあります（GitHub の「Cite this repository」からも使えます）。
-Zenodo に保存しています: https://doi.org/10.5281/zenodo.24051875 （すべての版。最新の v0.2.5 は https://doi.org/10.5281/zenodo.24165405 ）
+Zenodo に保存しています: https://doi.org/10.5281/zenodo.24051875 （すべての版。最新の v0.2.6 は https://doi.org/10.5281/zenodo.24168298 ）
 
 ```bibtex
 @software{nakata_temer_plus,

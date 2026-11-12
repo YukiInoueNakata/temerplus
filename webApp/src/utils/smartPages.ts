@@ -3,7 +3,7 @@ import type { TEMDocument } from '../types';
 import { collectSDSGRects } from './elementRects';
 import { computeTimeArrow } from './timeArrow';
 import { computePeriodLabels } from './periodLabels';
-import { computeLegendItems, computeLegendColumns } from './legend';
+import { computeLegendItems, computeLegendColumns, legendLabelCellPx } from './legend';
 import { estimateLegendSize } from './fitBounds';
 import { computeSmartPageBounds, estimatePagesNeeded, type PageBounds } from './pageSplit';
 import { getPaperPx, type PaperSizeKey } from './paperSizes';
@@ -67,7 +67,7 @@ export function computeSmartPagesForDoc(doc: TEMDocument, opts: SmartPagesOption
       const showTitle = lg.showTitle !== false;
       const rows = Math.ceil(items.length / cols);
       const rowH = Math.max(fs * (lg.showDescriptions ? 2 : 1) * 1.4 + 4, (lg.sampleHeight ?? 18) + 4);
-      const gridW = cols * ((lg.sampleWidth ?? 32) + 16 + Math.max(100, fs * 10)) + (cols - 1) * 12;
+      const gridW = cols * ((lg.sampleWidth ?? 32) + 16 + legendLabelCellPx(items.map((it) => it.label), fs)) + (cols - 1) * 12;
       const gridH = rows * rowH + (rows - 1) * 4;
       const titleTop = (lg.titlePosition ?? 'top') === 'top';
       const svgW = titleTop ? gridW + 20 : gridW + 20 + (showTitle ? Math.max(60, tfs * 6) + 12 : 0);

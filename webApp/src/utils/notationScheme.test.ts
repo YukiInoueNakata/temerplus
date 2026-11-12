@@ -125,3 +125,61 @@ describe('簡素化方式のテーマと径路のカギ線', () => {
     expect(active(d).lines.map((l) => l.shape)).toEqual(before);
   });
 });
+
+// 簡素化方式の凡例は Box と径路をまとめて実線・点線の 2 項目（2026-11-12 ユーザー指示）
+describe('簡素化方式の凡例', () => {
+  it('テーマを当てると 2 項目になり、径路の項目は出さない', async () => {
+    const { applyThemeToDoc } = await import('./boxThemes');
+    const { computeLegendItems } = await import('./legend');
+    const d = doc(false);
+    // 実現しなかった側（潜在的な行為の Box と点線の径路）も置く
+    const sh = active(d);
+    sh.boxes.push({ ...sh.boxes[0], id: 'U1', type: 'annotation', secondaryType: undefined, label: 'u' });
+    sh.lines.push({ ...sh.lines[0], id: 'XL_u', type: 'XLine', to: 'U1' });
+    const before = computeLegendItems(active(d), d.settings.legend, 'ja');
+    expect(before.length).toBeGreaterThan(2);
+    applyThemeToDoc(d, simplified);
+    expect(d.settings.legend.realityOnly).toBe(true);
+    const items = computeLegendItems(active(d), d.settings.legend, 'ja').filter((i) => i.category !== 'sdsg' && i.category !== 'timeArrow');
+    expect(items.map((i) => i.key)).toEqual(['normal', 'annotation']);
+    expect(items[0].label).toBe('実現した行為・径路');
+    expect(items[1].label).toBe('実現しなかった行為・径路');
+    expect(computeLegendItems(active(d), d.settings.legend, 'en')[0].label).toBe('Realized action or trajectory');
+  });
+  it('ほかのテーマを当てると元の凡例に戻る', async () => {
+    const { applyThemeToDoc } = await import('./boxThemes');
+    const { computeLegendItems } = await import('./legend');
+    const d = doc(false);
+    applyThemeToDoc(d, simplified);
+    applyThemeToDoc(d, BUILTIN_THEMES.find((t) => t.id === 'theme-monochrome')!);
+    expect(d.settings.legend.realityOnly).toBe(false);
+    expect(computeLegendItems(active(d), d.settings.legend, 'ja').some((i) => i.key === 'RLine')).toBe(true);
+  });
+});
+
+// SVG の Box の文字は、横書きなら上下の中央、縦書きなら左右の中央に置く（2026-11-12 論文の図 3 で指摘）
+describe('SVG の Box の文字の中央揃え', () => {
+  const textOf = (d: TEMDocument, orient: 'horizontal' | 'vertical') => {
+    const sh = active(d);
+    const box: Box = { ...sh.boxes[0], id: 'T1', type: 'normal', secondaryType: undefined, x: 100, y: 100, width: orient === 'vertical' ? 60 : 160, height: orient === 'vertical' ? 160 : 60, label: '行為', textOrientation: orient, style: { ...(sh.boxes[0].style ?? {}), fontSize: 20, verticalAlign: 'middle', textAlign: 'center' } };
+    const sheet = { ...sh, boxes: [box], lines: [], sdsg: [], notes: [], periodLabels: [] };
+    const settings = { ...d.settings, legend: { ...d.settings.legend, includeInExport: false }, timeArrow: { ...d.settings.timeArrow, autoInsert: false } };
+    const [svg] = buildSVGDocuments({ sheet, settings, paperSize: 'A4-landscape', scale: false, offset: 0 });
+    const rect = [...svg.matchAll(/<rect x="([\d.-]+)" y="([\d.-]+)" width="([\d.]+)" height="([\d.]+)"[^>]*stroke="#(?:222|000000)"/g)].map((m) => m.slice(1).map(Number))[0];
+    const texts = [...svg.matchAll(/<text x="([\d.-]+)" y="([\d.-]+)" [^>]*font-size="([\d.]+)"[^>]*>(行|為|行為)<\/text>/g)].map((m) => ({ x: Number(m[1]), y: Number(m[2]), fs: Number(m[3]) }));
+    return { rect, texts };
+  };
+  it('横書きは字の本体の中心が Box の上下の中央に来る', () => {
+    const { rect, texts } = textOf(doc(false), 'horizontal');
+    const [, ry, , rh] = rect;
+    const t0 = texts[0];
+    // ベースラインから 0.38em 上が和文の字の本体の中心
+    expect(Math.abs((t0.y - t0.fs * 0.38) - (ry + rh / 2))).toBeLessThan(t0.fs * 0.1);
+  });
+  it('縦書き 1 列は字の列が Box の左右の中央に来る', () => {
+    const { rect, texts } = textOf(doc(false), 'vertical');
+    const [rx, , rw] = rect;
+    expect(texts.length).toBe(2);
+    for (const tx of texts) expect(Math.abs(tx.x - (rx + rw / 2))).toBeLessThan(0.5);
+  });
+});

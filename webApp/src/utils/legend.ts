@@ -32,6 +32,16 @@ export function computeLegendColumns(
   return Math.max(1, Math.floor(cols));
 }
 
+/**
+ * 凡例の 1 項目のラベルの欄の幅（px）。10 字ぶん（最小 100）を下限に、いちばん長いラベルが収まる幅にする。
+ * 以前は 10 字ぶんの決め打ちで、簡素化方式の「実現しなかった行為・径路」（12 字）が SVG・PPTX で枠からはみ出した（2026-11-12）。
+ * 1 字の幅は画面の見積もり（fitBounds.estimateLegendSize）と同じ 1.05em
+ */
+export function legendLabelCellPx(labels: string[], fontSize: number): number {
+  const maxLen = Math.max(0, ...labels.map((l) => Array.from(l).length));
+  return Math.max(100, fontSize * 10, maxLen * fontSize * 1.05);
+}
+
 export type LegendCategory = 'box' | 'line' | 'sdsg' | 'timeArrow';
 
 export interface LegendItem {
@@ -84,6 +94,18 @@ const NON_BOX_TEXT = {
   },
 } as const;
 
+// 簡素化方式の凡例の 2 項目
+const REALITY_TEXT = {
+  ja: {
+    observed:   { label: '実現した行為・径路',     description: '実線の Box と径路（データの中で確かめられた）' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+    unobserved: { label: '実現しなかった行為・径路', description: '点線の Box と径路（データの中では実現しなかった）' }, // i18n-ok 凡例の日本語の側の値（英語は en の側・locale で切り替え済み）
+  },
+  en: {
+    observed:   { label: 'Realized action or trajectory',   description: 'Solid Boxes and trajectories (confirmed in the data)' },
+    unobserved: { label: 'Unrealized action or trajectory', description: 'Dotted Boxes and trajectories (not realized in the data)' },
+  },
+} as const;
+
 export function computeLegendItems(
   sheet: Sheet,
   settings: LegendSettings,
@@ -93,7 +115,18 @@ export function computeLegendItems(
   const isEn = locale === 'en';
   const txt = isEn ? NON_BOX_TEXT.en : NON_BOX_TEXT.ja;
 
-  if (settings.includeBoxes) {
+  // 簡素化方式: 線種は実在性だけを表すので、Box と径路をまとめて実線・点線の 2 項目にする（2026-11-12 ユーザー指示）。
+  // 見本は種別「行為」「潜在的な行為」の枠をテーマどおりに描く（キーをその種別にしてある）
+  const realityOnly = settings.realityOnly === true && settings.includeBoxes;
+  if (realityOnly) {
+    const UNOBSERVED: BoxType[] = ['annotation', 'P-EFP', 'P-2nd-EFP'];
+    const hasObserved = sheet.boxes.some((b) => !UNOBSERVED.includes(b.type)) || sheet.lines.some((l) => l.type === 'RLine');
+    const hasUnobserved = sheet.boxes.some((b) => UNOBSERVED.includes(b.type)) || sheet.lines.some((l) => l.type === 'XLine');
+    if (hasObserved) items.push({ category: 'box', key: 'normal', ...(isEn ? REALITY_TEXT.en.observed : REALITY_TEXT.ja.observed) });
+    if (hasUnobserved) items.push({ category: 'box', key: 'annotation', ...(isEn ? REALITY_TEXT.en.unobserved : REALITY_TEXT.ja.unobserved) });
+  }
+
+  if (settings.includeBoxes && !realityOnly) {
     // 主種別に加え、併記種別も使用中として数える
     const usedTypes = new Set<BoxType>();
     sheet.boxes.forEach((b) => {
@@ -130,7 +163,7 @@ export function computeLegendItems(
     });
   }
 
-  if (settings.includeLines) {
+  if (settings.includeLines && !realityOnly) {
     const usedTypes = new Set(sheet.lines.map((l) => l.type));
     if (usedTypes.has('RLine')) {
       items.push({ category: 'line', key: 'RLine', ...txt.RLine });

@@ -589,6 +589,11 @@ export interface LegendSettings {
   placement?: 'auto' | 'manual';
   includeBoxes: boolean;
   includeLines: boolean;
+  /**
+   * 簡素化方式の凡例。Box と径路をまとめて「実線＝実現した行為・径路」「点線＝実現しなかった行為・径路」の 2 項目にする。
+   * 簡素化方式のテーマを当てると true、ほかのテーマ・すべて自動に戻すで外れる（2026-11-12 ユーザー指示）
+   */
+  realityOnly?: boolean;
   includeSDSG: boolean;
   includeTimeArrow: boolean;
   title: string;

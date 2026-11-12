@@ -29,7 +29,7 @@ import {
   computeBandRowAssignments,
   computeSDSGBandPosition,
 } from './sdsgSpaceLayout';
-import { computeLegendItems, computeLegendColumns, type LegendItem } from './legend';
+import { computeLegendItems, computeLegendColumns, legendLabelCellPx, type LegendItem } from './legend';
 import { needsVerticalRotation } from './verticalText';
 import { collectSDSGRects } from './elementRects';
 import { collectInfluenceSegments } from './sdsgInfluence';
@@ -455,11 +455,12 @@ class SVGBuilder {
       const colPitch = lineHeight;
       const totalColsW = lines.length * colPitch;
 
-      // 列の x 軸開始（右から左へ）
+      // 列の x 軸開始（右から左へ）。各列は行送りの幅（colPitch）の真ん中に字を置く。
+      // 以前は字の幅の半分で合わせており、1 列でも列が Box の左右の中央から右へずれた（2026-11-12 論文の図 3 で指摘）
       let rightColX: number;
-      if (alignH === 'left') rightColX = x + padX + totalColsW - opts.fontSize / 2;
-      else if (alignH === 'right') rightColX = x + w - padX - opts.fontSize / 2;
-      else rightColX = x + w / 2 + totalColsW / 2 - opts.fontSize / 2;
+      if (alignH === 'left') rightColX = x + padX + totalColsW - colPitch / 2;
+      else if (alignH === 'right') rightColX = x + w - padX - colPitch / 2;
+      else rightColX = x + w / 2 + totalColsW / 2 - colPitch / 2;
 
       // 列の y 軸開始
       let topY: number;
@@ -522,13 +523,15 @@ class SVGBuilder {
       return;
     }
 
-    // 横書き: baseline は dominant-baseline='middle' で中央、各行の y を計算
-    let topY: number;
+    // 横書き: 行のまとまり（行送り × 行数）を上・中央・下に置き、各行の字を行送りの真ん中に置く。
+    // 以前は 1 行目のベースラインを中央付近に置いており、字の本体が Box の上下の中央より上に寄った
+    // （2026-11-12 論文の図 3 で指摘）。ベースラインは字の上端から 0.88em（和文の字の本体の中心が行の中央に来る位置）
+    let blockTop: number;
     switch (alignV) {
-      case 'top': topY = y + padY + opts.fontSize; break;
-      case 'bottom': topY = y + h - padY - blockLen + opts.fontSize; break;
+      case 'top': blockTop = y + padY; break;
+      case 'bottom': blockTop = y + h - padY - blockLen; break;
       case 'middle':
-      default: topY = y + h / 2 - blockLen / 2 + opts.fontSize;
+      default: blockTop = y + h / 2 - blockLen / 2;
     }
     // text-anchor 基準 X
     const tx = alignH === 'left'
@@ -537,7 +540,7 @@ class SVGBuilder {
         ? x + w - padX
         : x + w / 2;
     lines.forEach((ln, i) => {
-      const ly = topY + i * lineHeight - opts.fontSize * 0.25; // baseline 補正
+      const ly = blockTop + i * lineHeight + (lineHeight - opts.fontSize) / 2 + opts.fontSize * 0.88;
       this.parts.push(
         `<text x="${fmt(tx)}" y="${fmt(ly)}" fill="${escapeAttr(color)}" font-size="${fmt(opts.fontSize)}" text-anchor="${anchor}"${style}>${escapeText(ln)}</text>`,
       );
@@ -1676,7 +1679,7 @@ function drawLegend(
   });
 
   const rowHpx = Math.max(baseFS * (showDesc ? 2 : 1) * 1.4 + 4, sampleH + 4);
-  const cellLabelMinPx = Math.max(100, baseFS * 10);
+  const cellLabelMinPx = legendLabelCellPx(items.map((it) => lg.itemOverrides?.[`${it.category}:${it.key}`]?.label ?? it.label), baseFS);
   const cellW = iconColMinPx + 8 + cellLabelMinPx;
   const gridW = cols * cellW + (cols - 1) * cellGap;
   const gridH = rows * rowHpx + (rows - 1) * rowGap;

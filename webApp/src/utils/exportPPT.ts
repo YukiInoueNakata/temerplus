@@ -32,7 +32,7 @@ import {
   computeBandRowAssignments,
   computeSDSGBandPosition,
 } from './sdsgSpaceLayout';
-import { computeLegendItems, computeLegendColumns, type LegendItem } from './legend';
+import { computeLegendItems, computeLegendColumns, legendLabelCellPx, type LegendItem } from './legend';
 import { collectSDSGRects } from './elementRects';
 import { collectInfluenceSegments } from './sdsgInfluence';
 import { computeContentBounds } from './fitBounds';
@@ -1657,7 +1657,7 @@ function drawLegend(
 
   // 行高（1行〜2行）
   const rowHpx = Math.max(baseFS * (showDesc ? 2 : 1) * 1.4 + 4, sampleH + 4);
-  const cellLabelMinPx = Math.max(100, baseFS * 10);
+  const cellLabelMinPx = legendLabelCellPx(items.map((it) => lg.itemOverrides?.[`${it.category}:${it.key}`]?.label ?? it.label), baseFS);
   const cellW = iconColMinPx + 8 + cellLabelMinPx;
   const gridW = cols * cellW + (cols - 1) * cellGap;
   const gridH = rows * rowHpx + (rows - 1) * rowGap;

@@ -21,14 +21,17 @@ export interface BoxStyleTheme {
    * 簡素化方式は線の角度に意味を持たせないのでカギ線（2026-11-12 ユーザー決定）
    */
   lineShape?: LineShape;
+  /** 凡例を簡素化方式の 2 項目（実線＝実現した／点線＝実現しなかった）にする（2026-11-12） */
+  legendRealityOnly?: boolean;
 }
 
 /**
  * テーマを図に当てる（設定画面の「適用」）。Box の様式を置き換え、テーマに lineShape があれば
  * 線の既定の形と、すべてのシートの今ある線の形をそれに直す。immer の draft にも素のオブジェクトにも使える
  */
-export function applyThemeToDoc(d: TEMDocument, theme: Pick<BoxStyleTheme, 'presets' | 'lineShape'>): void {
+export function applyThemeToDoc(d: TEMDocument, theme: Pick<BoxStyleTheme, 'presets' | 'lineShape' | 'legendRealityOnly'>): void {
   d.settings.boxTypePresets = JSON.parse(JSON.stringify(theme.presets));
+  if (d.settings.legend) d.settings.legend.realityOnly = theme.legendRealityOnly === true;
   if (!theme.lineShape) return;
   d.settings.lineDefaults = { ...(d.settings.lineDefaults ?? {}), shape: theme.lineShape };
   for (const sh of d.sheets) for (const l of sh.lines) l.shape = theme.lineShape;
@@ -96,6 +99,7 @@ export const BUILTIN_THEMES: BoxStyleTheme[] = [
     builtin: true,
     // 線の角度・向きに意味を持たせない表記なので、径路は原則カギ線（2026-11-12 ユーザー指示）
     lineShape: 'elbow',
+    legendRealityOnly: true,
     presets: {
       normal:      { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },
       other:       { backgroundColor: '#ffffff', borderColor: '#000000', color: '#000000', borderWidth: 1.5, borderStyle: 'solid' },

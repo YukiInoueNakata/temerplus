@@ -805,7 +805,10 @@ function BoxStyleSection() {
   const handleResetAll = () => {
     if (!confirm(t('theme.confirmResetAll'))) return;
     useTEMStore.setState((state) => ({
-      doc: produce(state.doc, (d) => { d.settings.boxTypePresets = {}; }),
+      doc: produce(state.doc, (d) => {
+        d.settings.boxTypePresets = {};
+        if (d.settings.legend) d.settings.legend.realityOnly = false; // 簡素化方式の凡例も外す
+      }),
       dirty: true,
     }));
   };
@@ -1944,6 +1947,10 @@ export function LegendSettingsSection() {
         <div className="setting-row">
           <label>{t('legend.includeBoxes')}</label>
           <input type="checkbox" checked={lg.includeBoxes} onChange={(e) => update({ includeBoxes: e.target.checked })} />
+        </div>
+        <div className="setting-row">
+          <label title={t('legend.realityOnly.title')}>{t('legend.realityOnly')}</label>
+          <input type="checkbox" checked={lg.realityOnly === true} onChange={(e) => update({ realityOnly: e.target.checked })} title={t('legend.realityOnly.title')} />
         </div>
         <div className="setting-row">
           <label>{t('legend.includeLines')}</label>

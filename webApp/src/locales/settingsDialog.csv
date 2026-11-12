@@ -283,6 +283,8 @@ period.empty,まだ時期ラベルがありません。,No period labels yet.,�
 legend.targets,表示対象,Items to show,設定 > 凡例 の見出し
 legend.autoGenerate,自動生成（使用記号を抽出）,Auto-generate (collect symbols in use),設定 > 凡例 の項目名
 legend.includeBoxes,Box 種別を含む,Include Box types,設定 > 凡例 の項目名
+legend.realityOnly,簡素化方式の凡例（実線・点線の 2 項目）,Simplified legend (solid and dotted only),設定 > 凡例 の項目名（簡素化方式のテーマを当てると入る）
+legend.realityOnly.title,"Box と径路をまとめて，「実現した行為・径路」（実線）と「実現しなかった行為・径路」（点線）の 2 項目にします。簡素化方式のテーマを当てると入ります。","Combines Boxes and trajectories into two items: realized (solid) and unrealized (dotted). Turned on when the simplified theme is applied.",設定 > 凡例 > 簡素化方式の凡例 の説明（マウスを重ねたとき）
 legend.includeLines,Line 種別を含む,Include line types,設定 > 凡例 の項目名
 legend.includeSDSG,SD/SG を含む,Include SD/SG,設定 > 凡例 の項目名
 legend.includeTimeArrow,非可逆的時間を含む,Include irreversible time,設定 > 凡例 の項目名

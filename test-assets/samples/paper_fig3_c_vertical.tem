@@ -2,7 +2,7 @@
   "version": "0.4",
   "sheets": [
     {
-      "id": "Sheet_mwdmlegc_f322o",
+      "id": "Sheet_mwdnkk6r_atumt",
       "name": "Sheet 1",
       "type": "individual",
       "order": 0,
@@ -10,7 +10,7 @@
         {
           "id": "Item1",
           "type": "normal",
-          "label": "経験1",
+          "label": "行為1",
           "x": -110,
           "y": -3,
           "width": 110,
@@ -20,7 +20,7 @@
         {
           "id": "OPP1",
           "type": "OPP",
-          "label": "経験2",
+          "label": "行為2",
           "x": -110,
           "y": 127,
           "width": 110,
@@ -30,7 +30,7 @@
         {
           "id": "BFP1",
           "type": "BFP",
-          "label": "経験3",
+          "label": "行為3",
           "x": -110,
           "y": 257,
           "width": 110,
@@ -40,7 +40,7 @@
         {
           "id": "Item2",
           "type": "normal",
-          "label": "経験4",
+          "label": "行為4",
           "x": 40,
           "y": 387,
           "width": 110,
@@ -50,7 +50,7 @@
         {
           "id": "EFP1",
           "type": "EFP",
-          "label": "経験5",
+          "label": "行為5",
           "x": 40,
           "y": 517,
           "width": 110,
@@ -60,7 +60,7 @@
         {
           "id": "Latent1",
           "type": "annotation",
-          "label": "経験4'",
+          "label": "行為4′",
           "x": -260,
           "y": 387,
           "width": 110,
@@ -70,7 +70,7 @@
         {
           "id": "P_EFP1",
           "type": "P-EFP",
-          "label": "経験5'",
+          "label": "行為5′",
           "x": -260,
           "y": 517,
           "width": 110,
@@ -218,7 +218,7 @@
       "periodLabels": []
     }
   ],
-  "activeSheetId": "Sheet_mwdmlegc_f322o",
+  "activeSheetId": "Sheet_mwdnkk6r_atumt",
   "participants": [],
   "settings": {
     "layout": "vertical",
@@ -281,8 +281,8 @@
     },
     "legend": {
       "autoGenerate": true,
-      "alwaysVisible": false,
-      "includeInExport": false,
+      "alwaysVisible": true,
+      "includeInExport": true,
       "position": {
         "x": -319,
         "y": 647
@@ -316,9 +316,10 @@
       "itemOverrides": {},
       "placement": "auto",
       "layoutModeHorizontal": "rows",
-      "rowsHorizontal": 2,
+      "rowsHorizontal": 1,
+      "realityOnly": true,
       "layoutModeVertical": "rows",
-      "rowsVertical": 4
+      "rowsVertical": 1
     },
     "periodLabels": {
       "alwaysVisible": true,
@@ -444,12 +445,15 @@
         "borderWidth": 1.5,
         "borderStyle": "dashed"
       }
+    },
+    "lineDefaults": {
+      "shape": "elbow"
     }
   },
   "metadata": {
     "title": "paper_fig3_notation",
-    "createdAt": "2026-11-12T14:10:55.212Z",
-    "modifiedAt": "2026-11-12T14:10:57.880Z"
+    "createdAt": "2026-11-12T14:38:15.604Z",
+    "modifiedAt": "2026-11-12T14:38:19.078Z"
   },
   "history": [],
   "transcripts": []

@@ -99,7 +99,25 @@ export function computeReportStatus(doc: TEMDocument, choices: ReportContentChoi
   const m = doc.metadata;
   const items: ReportStatusItem[] = [];
 
-  // Block 1 記号体系
+  // ブロック1 協力者情報（論文の報告フォーマットの順。2026-11-15）
+  const pi = m.participantsInfo;
+  const piParts = [!!pi && pi.count > 0, filled(pi?.description)];
+  items.push({
+    key: 'participants', label: i18n.t('reportStatus:item.participants'), tab: 'participants',
+    state: piParts.every(Boolean) ? 'done' : piParts.some(Boolean) ? 'partial' : 'missing',
+    detail: piParts.some(Boolean) && !piParts.every(Boolean) ? (piParts[0] ? i18n.t('reportStatus:detail.participants.descriptionEmpty') : i18n.t('reportStatus:detail.participants.countZero')) : undefined,
+  });
+
+  // ブロック2 インタビュー／データ収集の方法
+  const iv = m.interview;
+  const ivAny = filled(iv?.method) || filled(iv?.durationDescription) || (iv?.timesCount ?? 0) > 0;
+  items.push({
+    key: 'interview', label: i18n.t('reportStatus:item.interview'), tab: 'interview',
+    state: filled(iv?.method) ? 'done' : ivAny ? 'partial' : 'missing',
+    detail: !filled(iv?.method) && ivAny ? i18n.t('reportStatus:detail.interview.methodEmpty') : undefined,
+  });
+
+  // ブロック3 用いた記号の宣言
   const ns = m.notationSystem;
   items.push({
     key: 'notation', label: i18n.t('reportStatus:item.notation'), tab: 'notation',
@@ -114,25 +132,7 @@ export function computeReportStatus(doc: TEMDocument, choices: ReportContentChoi
     if (it) items.push({ ...it, tab: 'notation' });
   }
 
-  // Block 2 協力者
-  const pi = m.participantsInfo;
-  const piParts = [!!pi && pi.count > 0, filled(pi?.description)];
-  items.push({
-    key: 'participants', label: i18n.t('reportStatus:item.participants'), tab: 'participants',
-    state: piParts.every(Boolean) ? 'done' : piParts.some(Boolean) ? 'partial' : 'missing',
-    detail: piParts.some(Boolean) && !piParts.every(Boolean) ? (piParts[0] ? i18n.t('reportStatus:detail.participants.descriptionEmpty') : i18n.t('reportStatus:detail.participants.countZero')) : undefined,
-  });
-
-  // Block 3 インタビュー
-  const iv = m.interview;
-  const ivAny = filled(iv?.method) || filled(iv?.durationDescription) || (iv?.timesCount ?? 0) > 0;
-  items.push({
-    key: 'interview', label: i18n.t('reportStatus:item.interview'), tab: 'interview',
-    state: filled(iv?.method) ? 'done' : ivAny ? 'partial' : 'missing',
-    detail: !filled(iv?.method) && ivAny ? i18n.t('reportStatus:detail.interview.methodEmpty') : undefined,
-  });
-
-  // Block 4 表記方針（項目ごと）
+  // ブロック4 表記方針の明文化（項目ごと）
   for (const it of VISUAL_CONVENTION_ITEMS) {
     const ent = m.visualConventions?.[it.key];
     const meaning = ent ? resolveConventionMeaning(ent) : undefined;
@@ -144,7 +144,7 @@ export function computeReportStatus(doc: TEMDocument, choices: ReportContentChoi
     });
   }
 
-  // Block 5 要素の説明（説明か「説明不要」があれば済）
+  // ブロック5 要素一覧の説明（説明か「説明不要」があれば済）
   const described = (x: { description?: string; noDescriptionNeeded?: boolean }) => filled(x.description) || !!x.noDescriptionNeeded;
   const boxes = doc.sheets.flatMap((s) => s.boxes);
   const lines = doc.sheets.flatMap((s) => s.lines);

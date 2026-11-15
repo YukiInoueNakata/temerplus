@@ -37,7 +37,7 @@
 "file.csvExport","CSV エクスポート","CSV export","リボン > ファイル のボタン"
 "file.csvExport.title","現在シートの Box / Line / SDSG / 時期ラベルを ZIP で CSV エクスポート","Export the Boxes, Lines, SD/SG and period labels of the current sheet as CSV files in a ZIP","ボタンの説明（マウスを重ねたとき）"
 "file.paperReport","論文レポート","Paper report","リボン > ファイル のボタン"
-"file.paperReport.title","記号体系・協力者・図・結果（全要素リスト）・用語凡例を含む .docx を生成","Create a .docx with the notation, participants, figure, results (list of all elements) and glossary","ボタンの説明（マウスを重ねたとき）"
+"file.paperReport.title","協力者情報・データ収集の方法・用いた記号の宣言・表記方針・要素一覧（TEM 図を含む）・用語凡例を含む .docx を生成","Create a .docx with participants, data collection, symbols used, notation policy, list of elements (with the TEM diagram) and glossary","ボタンの説明（マウスを重ねたとき）"
 "file.group.env","環境","Preferences","リボン > ファイル のまとまりの名前"
 "file.settings","設定","Settings","リボン > ファイル のボタン"
 "file.settings.title","全般設定（レイアウト・フォント・凡例など）","General settings (layout, fonts, legend, etc.)","ボタンの説明（マウスを重ねたとき）"

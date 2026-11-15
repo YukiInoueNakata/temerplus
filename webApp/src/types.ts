@@ -451,23 +451,46 @@ export interface Sheet {
 // メタデータ（論文報告用）
 // ----------------------------------------------------------------------------
 
+// 論文用レポートの欄は、論文（質的研究と社会実装 第4号）の報告フォーマット ブロック1〜5 の表3〜表6 に合わせる（2026-11-15）。
+// 足した欄はどれも省略できる（前の .tem はそのまま読める）
+
+/** ブロック3 用いた記号の宣言（表5） */
 export interface NotationSystem {
+  /** 'Arakawa2012' は「TEMerPlus の既定の表記」を指す（保存したファイルとの互換のため名前は変えない） */
   base: 'Arakawa2012' | 'custom' | 'other';
   customDescription?: string;
+  /** 参照・準拠した文献（表記のもとにした文献） */
+  sources?: string;
+  /** その文献にそのまま従った（準拠）か、一部を取り入れた（参照）か */
+  sourceRelation?: 'conform' | 'refer';
+  /** 挙げた文献の記述と異なる運用をした点 */
+  differences?: string;
+  /** SD・SG の表現（矢印・図形のどちらで描いたか、配置の規則） */
+  sdsgExpression?: string;
+  /** 凡例の有無と所在 */
+  legendLocation?: 'inText' | 'inFigure' | 'appendix' | 'none';
 }
 
+/** ブロック1 協力者情報（表3） */
 export interface ParticipantsInfo {
   count: number;
   description: string;
+  /** HSI（歴史的構造化ご招待）の論理 */
   hsiDescription: string;
   pseudonyms?: string[];
+  /** 1・4・9 の法則との関係（人数がどの水準を狙ったものか） */
+  sampleSizeRationale?: string;
 }
 
+/** ブロック2 インタビュー／データ収集の方法（表4） */
 export interface InterviewInfo {
+  /** 形式（非構造化／半構造化／構造化） */
   method: string;
   durationDescription: string;
   timesCount: number;
   analysisCombination?: string;
+  /** データの抽象化プロセス（逐語録から一次コード・カテゴリー・Box へ） */
+  abstractionProcess?: string;
   notes?: string;
 }
 

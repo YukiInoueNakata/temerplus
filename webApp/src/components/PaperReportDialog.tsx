@@ -1,6 +1,6 @@
 // ============================================================================
 // PaperReportDialog - 論文用レポート出力ダイアログ
-// 記号体系 / 協力者情報 / インタビュー / 表記方針 / 備考 を編集し、
+// 協力者情報 / データ収集の方法 / 用いた記号の宣言 / 表記方針 / 備考 を編集し（論文の報告フォーマットのブロック1〜4 の順）、
 // docx として出力する。出力の前に確認画面を出す（論文 04_report_format.md 4 節）:
 // 入力状況（済／未／一部）、図にあるメモ・記号・コメントを載せるか（毎回未選択から）、未入力の扱い
 // ============================================================================
@@ -43,11 +43,12 @@ import type {
 type Tab = ReportTab;
 
 // 表示名は描画のときに t(labelKey) で引く
+// 順は論文の報告フォーマットのブロック1〜4 に合わせる（協力者 → データ収集 → 記号 → 表記方針。2026-11-15）
 const TABS: { key: Tab; labelKey: string }[] = [
   { key: 'general', labelKey: 'tab.general' },
-  { key: 'notation', labelKey: 'tab.notation' },
   { key: 'participants', labelKey: 'tab.participants' },
   { key: 'interview', labelKey: 'tab.interview' },
+  { key: 'notation', labelKey: 'tab.notation' },
   { key: 'visual', labelKey: 'tab.visual' },
   { key: 'export', labelKey: 'tab.export' },
 ];
@@ -402,6 +403,59 @@ function NotationSection({ updateMeta }: { updateMeta: UpdateMeta }) {
           placeholder={t('notation.description.placeholder')}
         />
       </div>
+      {/* 論文 表5: 参照・準拠した文献 / 文献と異なる点 / SD・SG の表現 / 凡例の有無と所在 */}
+      <div className="setting-row" style={{ alignItems: 'flex-start' }}>
+        <label>{t('notation.sources')}</label>
+        <textarea
+          value={ns?.sources ?? ''}
+          onChange={(e) => update({ sources: e.target.value })}
+          style={{ width: 320, height: 48, resize: 'vertical' }}
+          placeholder={t('notation.sources.placeholder')}
+        />
+      </div>
+      <div className="setting-row">
+        <label title={t('notation.sourceRelation.title')}>{t('notation.sourceRelation')}</label>
+        <select
+          value={ns?.sourceRelation ?? ''}
+          onChange={(e) => update({ sourceRelation: (e.target.value || undefined) as NotationSystem['sourceRelation'] })}
+          title={t('notation.sourceRelation.title')}
+        >
+          <option value="">{t('notation.sourceRelation.unset')}</option>
+          <option value="conform">{t('notation.sourceRelation.conform')}</option>
+          <option value="refer">{t('notation.sourceRelation.refer')}</option>
+        </select>
+      </div>
+      <div className="setting-row" style={{ alignItems: 'flex-start' }}>
+        <label>{t('notation.differences')}</label>
+        <textarea
+          value={ns?.differences ?? ''}
+          onChange={(e) => update({ differences: e.target.value })}
+          style={{ width: 320, height: 48, resize: 'vertical' }}
+          placeholder={t('notation.differences.placeholder')}
+        />
+      </div>
+      <div className="setting-row" style={{ alignItems: 'flex-start' }}>
+        <label>{t('notation.sdsg')}</label>
+        <textarea
+          value={ns?.sdsgExpression ?? ''}
+          onChange={(e) => update({ sdsgExpression: e.target.value })}
+          style={{ width: 320, height: 48, resize: 'vertical' }}
+          placeholder={t('notation.sdsg.placeholder')}
+        />
+      </div>
+      <div className="setting-row">
+        <label>{t('notation.legend')}</label>
+        <select
+          value={ns?.legendLocation ?? ''}
+          onChange={(e) => update({ legendLocation: (e.target.value || undefined) as NotationSystem['legendLocation'] })}
+        >
+          <option value="">{t('notation.sourceRelation.unset')}</option>
+          <option value="inText">{t('notation.legend.inText')}</option>
+          <option value="inFigure">{t('notation.legend.inFigure')}</option>
+          <option value="appendix">{t('notation.legend.appendix')}</option>
+          <option value="none">{t('notation.legend.none')}</option>
+        </select>
+      </div>
       {symbols.length > 0 && (
         <>
           <h4 style={{ marginTop: 16 }}>{t('notation.symbols.title')}</h4>
@@ -475,6 +529,15 @@ function ParticipantsSection({ updateMeta }: { updateMeta: UpdateMeta }) {
           placeholder={t('participants.pseudonyms.placeholder')}
         />
       </div>
+      <div className="setting-row" style={{ alignItems: 'flex-start' }}>
+        <label>{t('participants.sampleSize')}</label>
+        <textarea
+          value={pi?.sampleSizeRationale ?? ''}
+          onChange={(e) => update({ sampleSizeRationale: e.target.value })}
+          style={{ width: 320, height: 48, resize: 'vertical' }}
+          placeholder={t('participants.sampleSize.placeholder')}
+        />
+      </div>
     </section>
   );
 }
@@ -529,6 +592,15 @@ function InterviewSection({ updateMeta }: { updateMeta: UpdateMeta }) {
           onChange={(e) => update({ analysisCombination: e.target.value })}
           style={{ width: 320, height: 60, resize: 'vertical' }}
           placeholder={t('interview.analysis.placeholder')}
+        />
+      </div>
+      <div className="setting-row" style={{ alignItems: 'flex-start' }}>
+        <label>{t('interview.abstraction')}</label>
+        <textarea
+          value={iv?.abstractionProcess ?? ''}
+          onChange={(e) => update({ abstractionProcess: e.target.value })}
+          style={{ width: 320, height: 60, resize: 'vertical' }}
+          placeholder={t('interview.abstraction.placeholder')}
         />
       </div>
       <div className="setting-row" style={{ alignItems: 'flex-start' }}>

@@ -1,5 +1,11 @@
 [
   {
+    "date": "2026-11-15",
+    "items": [
+      {"kind":"改善","title":"論文用レポートを、TEM 研究の報告フォーマットの 5 つのブロックの順にする","detail":"論文用レポートの節とタブの順・見出しを、報告フォーマットのブロック1〜5（協力者情報 → インタビュー／データ収集の方法 → 用いた記号の宣言 → 表記方針の明文化 → 要素一覧）に合わせました。TEM 図は要素一覧の初めに入ります。足りなかった欄も足しました。記号の宣言には、参照・準拠した文献と、そのまま従った（準拠）か一部を取り入れた（参照）かの書き分け、文献と異なる点、SD・SG の表現、凡例の有無と所在を書けます。協力者には 1・4・9 の法則との関係、データ収集にはデータの抽象化プロセスを書けます。表記方針の「意味なし」は、選択肢の名前どおり「意味なし」と書き出します。前に作ったファイルの入力はそのまま読めます。","en":{"title":"Paper report follows the five blocks of the TEM reporting format","detail":"The sections, tabs and headings of the paper report now follow blocks 1–5 of the reporting format: participants → interview / data collection method → declaration of symbols used → statement of notation policy → list of elements. The TEM diagram is placed at the start of the list of elements. Missing fields were added: the sources of the notation and whether you conformed to them or drew on them, differences from the sources, how SD and SG are represented, and where the legend is (symbols); the relation to the 1-4-9 rule (participants); and the data abstraction process (data collection). \"Not meaningful\" in the notation policy is now written as such. Entries in existing files are read as before."}}
+    ]
+  },
+  {
     "date": "2026-11-13",
     "items": [
       {"kind":"改善","title":"組み立て済みのファイルを同梱し、Zenodo の写しだけで動かす手順を書く","detail":"GitHub が使えなくなっても TEMer Plus を動かせるように、組み立て済みのファイル一式（release/web）を各版に入れ、Zenodo に保存される zip に含めるようにしました。Node.js が無くても、静的なファイルとして配れば手元や別のサーバーで動きます。手順は docs/build-from-archive.ja.md（英語版あり）にまとめ、README から辿れます。ソースから組み立てる手順と、依存のパッケージが取れなくなったときの備えも書きました。","en":{"title":"Prebuilt files included; guide to running from the Zenodo archive","detail":"So that TEMer Plus can still run if GitHub becomes unavailable, every version now includes the prebuilt files (release/web), which are part of the zip archived on Zenodo. Served as static files, they run on your computer or another server without Node.js. The steps are in docs/build-from-archive.en.md (with a Japanese version), linked from the README, together with how to build from source and what to do if the dependencies can no longer be downloaded."}},

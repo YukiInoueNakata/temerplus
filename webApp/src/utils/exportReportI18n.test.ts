@@ -78,13 +78,13 @@ describe('論文用レポートの本文は図の言語', () => {
     const t = await reportText(englishDoc('en'), { sourceRefStyle: style });
     expect(t.filter((p) => JA.test(p))).toEqual([]);
     expect(t).toContain('TEM diagram report');
-    expect(t).toContain('1. Notation declaration');
-    expect(t.some((p) => p.startsWith('Results', 3) || p.endsWith('. Results'))).toBe(true);
+    expect(t.some((p) => /^[0-9]+[.] Declaration of symbols used$/.test(p))).toBe(true);
+    expect(t.some((p) => /^[0-9]+[.] List of elements$/.test(p))).toBe(true);
     // 画面（paperReportDialog の英語）の例と同じ書き方
     expect(t.some((p) => p.includes(style === 'apa' ? '(A, session 1, §4) "hello" [could not be traced]' : '[Source T §4] "hello"'))).toBe(true);
     expect(t.some((p) => p.includes('(not entered)'))).toBe(true);
     expect(t).toContain(`${conventionItemLabel('verticalPosition', 'en')}: loosely meaningful. (no description entered)`);
-    expect(t).toContain(`${conventionItemLabel('arrowAngle', 'en')}: not meaningful (appearance only)`);
+    expect(t).toContain(`${conventionItemLabel('arrowAngle', 'en')}: not meaningful`);
   });
 
   it('画面の言語が英語でも、図の言語が日本語なら本文は日本語のまま', async () => {
@@ -92,7 +92,7 @@ describe('論文用レポートの本文は図の言語', () => {
     await i18n.changeLanguage('en');
     const jaWithEnUi = await reportText(englishDoc('ja'), {});
     expect(jaWithEnUi).toEqual(ja);
-    expect(ja).toContain('1. 記号体系の宣言');
+    expect(ja.some((p) => /^[0-9]+[.] 用いた記号の宣言$/.test(p))).toBe(true);
   });
 
   it('記号の宣言の文（線種と意味）も図の言語', () => {

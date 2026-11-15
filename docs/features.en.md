@@ -85,7 +85,7 @@ Settings (File > Settings) control the look of the diagram in detail.
 - **Check what to include**: before exporting, confirm whether to include the legend, period labels, and so on.
 - **Readability on paper**: shows the smallest text size (pt) when the figure is fitted to the paper, and warns below 7 pt. The preview can be viewed in grayscale to check black-and-white printing.
 - **Presets**: save frequently used export settings under a name.
-- **Paper report (Word)**: create a Word file with a notation declaration, notation policy, the diagram, and a description of each element (File > Paper report). The text is written in the diagram language.
+- **Paper report (Word)**: create a Word file following the five blocks of the TEM reporting format (participants, interview / data collection method, declaration of symbols used, statement of notation policy, list of elements), including the diagram and a description of each element (File > Paper report). The text is written in the diagram language.
 - **CSV export**: export the elements of the diagram to CSV (File > CSV export).
 
 ## Files and saving

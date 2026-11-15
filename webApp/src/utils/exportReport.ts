@@ -462,6 +462,9 @@ function buildGlossary(t: Tr, sectionTitle: string): Paragraph[] {
 // 結果セクション全体（複数シート対応）
 // ----------------------------------------------------------------------------
 
+/** 空白だけでない文字があるか */
+const filledText = (v: string | undefined): boolean => !!v && v.trim().length > 0;
+
 function buildResultsSection(
   t: Tr,
   doc: TEMDocument,
@@ -538,7 +541,42 @@ export async function buildPaperReportParagraphs(
   const section = (title: string) => children.push(heading(`${++secNo}. ${title}`, HeadingLevel.HEADING_1));
   const missingPara = () => children.push(para(t('exportReport:notEntered'), { italic: true }));
 
-  // 1. 記号体系（Block 1）
+  // ブロック1 協力者情報（論文 表3）
+  const pi = doc.metadata.participantsInfo;
+  const piLines: string[] = [];
+  if (pi) {
+    if (pi.count > 0) piLines.push(t('exportReport:participants.count', { count: pi.count }));
+    if (pi.description) piLines.push(t('exportReport:participants.description', { text: pi.description }));
+    if (pi.hsiDescription) piLines.push(t('exportReport:participants.hsi', { text: pi.hsiDescription }));
+    if (pi.pseudonyms && pi.pseudonyms.length) piLines.push(t('exportReport:participants.pseudonyms', { names: pi.pseudonyms.join(', ') }));
+    if (pi.sampleSizeRationale) piLines.push(t('exportReport:participants.sampleSize', { text: pi.sampleSizeRationale }));
+  }
+  if (piLines.length > 0 || !omit) {
+    section(t('exportReport:section.participants'));
+    if (piLines.length > 0) piLines.forEach((line) => children.push(para(line)));
+    else missingPara();
+    children.push(para(''));
+  }
+
+  // ブロック2 インタビュー／データ収集の方法（論文 表4）
+  const iv = doc.metadata.interview;
+  const ivLines: string[] = [];
+  if (iv) {
+    if (iv.method) ivLines.push(t('exportReport:interview.method', { text: iv.method }));
+    if (iv.durationDescription) ivLines.push(t('exportReport:interview.duration', { text: iv.durationDescription }));
+    if (iv.timesCount > 0) ivLines.push(t('exportReport:interview.times', { count: iv.timesCount }));
+    if (iv.analysisCombination) ivLines.push(t('exportReport:interview.analysis', { text: iv.analysisCombination }));
+    if (iv.abstractionProcess) ivLines.push(t('exportReport:interview.abstraction', { text: iv.abstractionProcess }));
+    if (iv.notes) ivLines.push(t('exportReport:interview.notes', { text: iv.notes }));
+  }
+  if (ivLines.length > 0 || !omit) {
+    section(t('exportReport:section.interview'));
+    if (ivLines.length > 0) ivLines.forEach((line) => children.push(para(line)));
+    else missingPara();
+    children.push(para(''));
+  }
+
+  // ブロック3 用いた記号の宣言（論文 表5）
   const ns = doc.metadata.notationSystem;
   const symbols = content.symbols ? usedSymbols(doc) : [];
   const symbolMeanings = doc.metadata.symbolMeanings ?? {};
@@ -560,6 +598,13 @@ export async function buildPaperReportParagraphs(
             : t('exportReport:notation.other')
       ));
       if (ns.customDescription) children.push(para(ns.customDescription));
+      // 表記のもとにした文献は、準拠（そのまま従った）か参照（一部を取り入れた）かを書き分ける（論文 表5）
+      if (filledText(ns.sources)) {
+        children.push(para(t(ns.sourceRelation === 'conform' ? 'exportReport:notation.sources.conform' : ns.sourceRelation === 'refer' ? 'exportReport:notation.sources.refer' : 'exportReport:notation.sources', { text: ns.sources!.trim() })));
+      }
+      if (filledText(ns.differences)) children.push(para(t('exportReport:notation.differences', { text: ns.differences!.trim() })));
+      if (filledText(ns.sdsgExpression)) children.push(para(t('exportReport:notation.sdsg', { text: ns.sdsgExpression!.trim() })));
+      if (ns.legendLocation) children.push(para(t(`exportReport:notation.legend.${ns.legendLocation}`)));
     } else if (!omit) {
       missingPara();
     }
@@ -575,40 +620,7 @@ export async function buildPaperReportParagraphs(
     children.push(para(''));
   }
 
-  // 2. 協力者情報（Block 2）
-  const pi = doc.metadata.participantsInfo;
-  const piLines: string[] = [];
-  if (pi) {
-    if (pi.count > 0) piLines.push(t('exportReport:participants.count', { count: pi.count }));
-    if (pi.description) piLines.push(t('exportReport:participants.description', { text: pi.description }));
-    if (pi.hsiDescription) piLines.push(t('exportReport:participants.hsi', { text: pi.hsiDescription }));
-    if (pi.pseudonyms && pi.pseudonyms.length) piLines.push(t('exportReport:participants.pseudonyms', { names: pi.pseudonyms.join(', ') }));
-  }
-  if (piLines.length > 0 || !omit) {
-    section(t('exportReport:section.participants'));
-    if (piLines.length > 0) piLines.forEach((line) => children.push(para(line)));
-    else missingPara();
-    children.push(para(''));
-  }
-
-  // 3. インタビュー（Block 3）
-  const iv = doc.metadata.interview;
-  const ivLines: string[] = [];
-  if (iv) {
-    if (iv.method) ivLines.push(t('exportReport:interview.method', { text: iv.method }));
-    if (iv.durationDescription) ivLines.push(t('exportReport:interview.duration', { text: iv.durationDescription }));
-    if (iv.timesCount > 0) ivLines.push(t('exportReport:interview.times', { count: iv.timesCount }));
-    if (iv.analysisCombination) ivLines.push(t('exportReport:interview.analysis', { text: iv.analysisCombination }));
-    if (iv.notes) ivLines.push(t('exportReport:interview.notes', { text: iv.notes }));
-  }
-  if (ivLines.length > 0 || !omit) {
-    section(t('exportReport:section.interview'));
-    if (ivLines.length > 0) ivLines.forEach((line) => children.push(para(line)));
-    else missingPara();
-    children.push(para(''));
-  }
-
-  // 4. 表記方針（Block 4・論文の表の順・11 項目）
+  // ブロック4 表記方針の明文化（論文 表6 の 3 項目を含む 11 項目）
   const vc = doc.metadata.visualConventions;
   const convLines: string[] = [];
   for (const it of VISUAL_CONVENTION_ITEMS) {
@@ -640,9 +652,9 @@ export async function buildPaperReportParagraphs(
     children.push(para(''));
   }
 
-  // 5. 図（埋込）
+  // TEM 図（埋込）。要素一覧（ブロック5）の見出しの後に入れる
+  const diagramChildren: Paragraph[] = [];
   if (opts.includeDiagram && opts.diagramElementId) {
-    section(t('exportReport:section.diagram'));
     try {
       const el = document.getElementById(opts.diagramElementId);
       if (el) {
@@ -654,7 +666,7 @@ export async function buildPaperReportParagraphs(
         const rect = el.getBoundingClientRect();
         const maxW = 600;
         const scale = Math.min(1, maxW / Math.max(1, rect.width));
-        children.push(new Paragraph({
+        diagramChildren.push(new Paragraph({
           alignment: AlignmentType.CENTER,
           children: [
             new ImageRun({
@@ -671,15 +683,16 @@ export async function buildPaperReportParagraphs(
       }
     } catch (e) {
       console.warn('図の埋め込みに失敗:', e); // i18n-ok（開発者向けのログ）
-      children.push(para(t('exportReport:diagram.failed'), { italic: true }));
+      diagramChildren.push(para(t('exportReport:diagram.failed'), { italic: true }));
     }
-    children.push(para(''));
+    diagramChildren.push(para(''));
   }
 
-  // 6. 結果（漏れなく図要素を列挙）
+  // ブロック5 要素一覧（漏れなく図要素を列挙。図はその見出しの後）
   const includeRefs = opts.includeSourceRefs !== false;   // 既定 true
   const style = opts.sourceRefStyle ?? 'bracket';
-  children.push(...buildResultsSection(t, doc, includeRefs, style, content, `${++secNo}. ${t('exportReport:section.results')}`, omit));
+  const resultsChildren = buildResultsSection(t, doc, includeRefs, style, content, `${++secNo}. ${t('exportReport:section.results')}`, omit);
+  children.push(...resultsChildren.slice(0, 1), ...diagramChildren, ...resultsChildren.slice(1));
 
   // 7. 用語凡例
   children.push(...buildGlossary(t, `${++secNo}. ${t('exportReport:section.glossary')}`));

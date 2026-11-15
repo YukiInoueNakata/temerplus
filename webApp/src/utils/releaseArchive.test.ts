@@ -6,8 +6,11 @@ import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-const root = join(process.cwd(), '..', 'release', 'web');
-const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8')) as { version: string };
+// webApp で流しても PJ のトップから流しても同じ場所を見る（以前は webApp で流す前提で、トップから流すと見つからなかった。
+// 試験の環境では import.meta.url が file:// にならないので、今いるフォルダから決める）
+const webApp = existsSync(join(process.cwd(), 'webApp', 'package.json')) ? join(process.cwd(), 'webApp') : process.cwd();
+const root = join(webApp, '..', 'release', 'web');
+const pkg = JSON.parse(readFileSync(join(webApp, 'package.json'), 'utf8')) as { version: string };
 
 describe('組み立て済みのファイル（release/web）', () => {
   it('index.html があり、読み込みは相対のパス（どこに置いても動く）', () => {
